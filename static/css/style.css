@@ -1,0 +1,653 @@
+body{padding:0px; margin:0px; background-color:#b1b1b1; font-family:Tahoma, Geneva, sans-serif; font-weight:normal;}
+
+	 
+*{padding:0px; margin:0px; } 
+ul,ol{padding:0px; margin:0px;}	
+a{text-decoration:none;}
+p{padding:0px; margin:0px;}
+h1, h2, h3{padding:0px; margin:0px; } 
+img { border: 0; }
+
+td.va_top: { vertical-align:top; }
+td.full_width: { width:100%;border:0 }
+
+.ha_left { text-align:left; }
+.ha_right  { text-align:right; }
+
+.inputbox{ font-family:Verdana, Geneva, sans-serif; font-size:12px; font-weight:normal; color:#6d6d6d; border:1px solid #181c22; background:#FFF; width:252px; height:27px; line-height:27px; padding:5px 10px 5px 10px; }
+.inputbox2{ font-family:Verdana, Geneva, sans-serif; font-size:11px; font-weight:normal; color:#484848; border:1px solid #e9e9e9; background:#FFF; width:229px; height:24px; line-height:24px; }
+
+.textarea{ font-family:Verdana, Geneva, sans-serif; font-size:11px; font-weight:normal; color:#484848; border:1px solid #e9e9e9; background:#FFF; width:229px; height:52px; line-height:18px; }			
+
+.inputform ul {
+    list-style:none;
+    margin:0;
+}
+
+.inputform ul li.control-group
+{
+    margin-bottom:20px;
+}
+
+.inputform ul>li.pull-left {
+    float:left
+}
+
+.inputform ul>li>ul>li:last-child {
+    padding-left:12px;
+}
+
+ul.errorlist>li {
+    color:#F00;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+
+.cssbutton {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #0075bd), color-stop(1, #03f6fa) );
+	background:-moz-linear-gradient( center top, #0075bd 5%, #03f6fa 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#0075bd', endColorstr='#03f6fa');
+	background-color:#0075bd;
+	-webkit-border-top-left-radius:5px;
+	-moz-border-radius-topleft:5px;
+	border-top-left-radius:5px;
+	-webkit-border-top-right-radius:5px;
+	-moz-border-radius-topright:5px;
+	border-top-right-radius:5px;
+	-webkit-border-bottom-right-radius:5px;
+	-moz-border-radius-bottomright:5px;
+	border-bottom-right-radius:5px;
+	-webkit-border-bottom-left-radius:5px;
+	-moz-border-radius-bottomleft:5px;
+	border-bottom-left-radius:5px;
+	text-indent:0px;
+	border:1px solid #a3a3a3;
+	display:inline-block;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:13px;
+	font-weight:normal;
+	font-style:normal;
+	height:24px;
+	line-height:24px;
+	width:85px;
+	text-decoration:none;
+	text-align:center;
+    cursor:pointer;
+	text-shadow:0px 1px 0px #adadad;
+}
+.cssbutton:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #03f6fa), color-stop(1, #0075bd) );
+	background:-moz-linear-gradient( center top, #03f6fa 5%, #0075bd 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#03f6fa', endColorstr='#0075bd');
+	background-color:#03f6fa;
+}.cssbutton:active {
+	position:relative;
+	top:1px;
+}
+
+.cssbutton.grey {
+    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) );
+    background:-moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% );
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfdfdf', endColorstr='#ededed');
+    background-color:#dfdfdf;
+    color:#383838;
+}
+
+.cssbutton.grey:hover {
+    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
+    background:-moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf');
+    background-color:#ededed;
+    color:#383838;
+}
+
+.cssbutton.red {
+    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ff0000), color-stop(1, #a31010) );
+    background:-moz-linear-gradient( center top, #ff0000 5%, #a31010 100% );
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0000', endColorstr='#a31010');
+    background-color:#ff0000;
+    color:#ffffff;
+    text-shadow:1px 1px 0px #9e999e;
+}
+
+.cssbutton.red:hover {
+    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #a31010), color-stop(1, #ff0000) );
+    background:-moz-linear-gradient( center top, #a31010 5%, #ff0000 100% );
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#a31010', endColorstr='#ff0000');
+    background-color:#a31010;
+    color:#ffffff;
+}
+
+.cssbutton.large {
+   height:40px;
+   line-height:40px;
+}
+
+
+/*================== text style ==================*/	
+
+.prepand{padding-top:0px;}
+.prepand1{padding-top:5px;}
+.prepand2{padding-top:10px;}
+.prepand3{padding-top:15px;}
+.prepand4{padding-top:20px;}
+.prepand5{padding-top:25px;}
+
+.font{font-family:Verdana, Geneva, sans-serif; font-size:11px; font-weight:normal; color:#484848; }
+.font2{font-family:Verdana, Geneva, sans-serif; font-size:13px; font-weight:normal; color:#FFF; }
+.font2 span{ color:#a3ff37; }
+.font3{ font-family:Tahoma, Geneva, sans-serif; font-size:11px; font-weight:normal; color:#ff0000; }
+.font4{font-family:Verdana, Geneva, sans-serif; font-size:13px; font-weight:normal; color:#a5a5a5; line-height:17px; }
+	.font4 a{ color:#30dcda; }
+		.font4 a:hover{ color:#a5a5a5; }
+
+
+/*====================
+		page structure
+======================*/
+
+#wrap-block{
+			width:1000px;
+			margin:auto;
+			position:relative;
+			}
+			
+#wrap{
+	width:960px;
+	float:left;
+	border-top:2px solid #ec2128;
+	border-bottom:2px solid #ec2128;
+	background-color:#FFFFFF;
+	position:relative;
+	padding:0 20px;
+	padding-bottom:20px;
+    min-height:600px;
+	}
+			
+	
+/*====================
+		top block
+======================*/
+
+.header-block{
+				width:960px;
+				float:left;
+				position:relative;
+				z-index:1;
+				}
+				
+.logo{position:absolute; top:10px; left:33px; z-index:1;}
+.logo-small{float:left;}
+
+.header-login{
+				width:425px;
+				float:right;
+				position:relative;
+				background-color:#FFFFFF;
+				padding-top:10px;
+				
+				}
+
+.header-top{
+				float:right;
+				width:877px;
+				position:relative;
+				border-bottom:1px solid #cbc9c9;
+				padding-bottom:13px;
+				padding-top:5px;
+				
+				}
+
+				
+
+.login-input{font-family:Tahoma, Geneva, sans-serif; font-size:13px; font-weight:normal; color:#000000; border:1px solid #999999; background-color:#FFFFFF; margin:0px; padding:3px 5px; }	
+.login-text{font-family:Tahoma, Geneva, sans-serif; font-size:13px; font-weight:normal; color:#000000;}
+.login-text a{color:#000000;}
+.login-text2{font-family:Tahoma, Geneva, sans-serif; font-size:11px; font-weight:normal; color:#0087cd;}
+.login-text2 a{color:#0087cd;}
+			
+/*====================
+		top block
+======================*/
+.top-block{
+			width:960px;
+			float:left;
+			position:relative;
+			margin-left:-17px;
+			}
+			
+/*====================
+		content block
+======================*/			
+
+			
+.content-block{
+			width:960px;
+			float:left;
+			position:relative;
+			padding-top:25px;
+			}
+			
+			
+.content-home-left{
+			width:460px;
+			float:left;
+			position:relative;
+			}
+
+.content-home-left h2{font-family:Tahoma, Geneva, sans-serif; font-size:25px; font-weight:normal; color:#676767; line-height:30px;}
+.buddies-text{font-family:Tahoma, Geneva, sans-serif; font-size:17px; font-weight:normal; color:#676767; }
+
+.content-home-form{
+			width:460px;
+			float:right;
+			position:relative;
+			}
+.content-home-form h2{font-family:Tahoma, Geneva, sans-serif; font-size:38px; font-weight:normal; color:#676767; line-height:38px;}
+.content-home-form h2 span{font-family:Tahoma, Geneva, sans-serif; font-size:21px; font-weight:normal; color:#a8a8a8; }
+.home-form-input{font-family:Tahoma, Geneva, sans-serif; font-size:21px; font-weight:normal; color:#a8a8a8; border:1px solid #999999; background-color:#FFFFFF; margin:0px; padding:3px 5px 3px 9px; }
+.home-form-text{font-family:Tahoma, Geneva, sans-serif; font-size:11px; font-weight:normal; color:#7f7d7d; }
+
+.create-account{width:440px; height:30px}
+.create-account-small{width:206px; height:30px}
+
+
+/*====================
+		left block
+======================*/
+.left-block{
+			width:167px;
+			float:left;
+			position:relative;
+}
+.logo-sub{float:left;width:167px;}
+.left-block h2{font-family:Tahoma, Geneva, sans-serif; font-size:22px; font-weight:normal; color:#676767; line-height:22px; margin-top:25px;}
+
+.menu-block{
+			width:167px;
+			float:left;
+			position:relative;
+			padding-top:50px;
+			border-bottom:1px solid #ec2027;
+}
+
+.menu-block li{font-family:Tahoma, Geneva, sans-serif; font-size:13px; font-weight:normal; color:#060606; list-style:none; width:167px; float:left;}
+.menu-block li a{ color:#060606; width:149px; float:left; padding:7px 9px;}
+.menu-block li a:hover{ color:#FFFFFF; background-color:#ec2027;}
+.menu-block li a.fixed{ color:#FFFFFF; background-color:#ec2027;}
+
+
+.frogman-text{font-family:Tahoma, Geneva, sans-serif; font-size:13px; font-weight:normal; color:#060606; }
+
+.frogman-text.prepand{padding-right:17px;}
+
+.logbox{
+		background:url(images/scubamob-log-box.png) no-repeat;
+		width:187px;
+		height:109px;
+		position:absolute;
+		padding:35px 30px 30px 35px;
+		float:left;
+		display:none;
+		right:-20px;
+			  top:25px;
+			  z-index:2;
+}
+
+.logbox-text{font-family:Tahoma, Geneva, sans-serif; font-size:13px; font-weight:normal; color:#060606;}
+.logbox-text s{color:#060606;}
+
+
+.frogman-block{
+			width:167px;
+			float:left;
+			position:relative;
+			padding-top:20px;
+}
+
+
+/*====================
+		right block
+======================*/
+.right-block{
+			width:758px;
+			float:right;
+			position:relative;
+			padding-top:8px;
+}
+.right-field{
+			width:758px;
+			float:right;
+			position:relative;
+			
+}
+
+.photo{
+		width:225px;
+		float:left;
+		background:url(images/scubamob-trans-bg.png) repeat;
+		padding:10px 10px 10px 15px;
+		position:absolute;
+		top:245px;;
+		right:1px;
+		z-index:1;
+}
+
+.photo-text1{font-family:Tahoma, Geneva, sans-serif; font-size:13px; font-weight:normal; color:#7ae3ff;}
+.photo-text2{font-family:Tahoma, Geneva, sans-serif; font-size:13px; font-weight:normal; color:#FFFFFF;}
+
+.spot-block{
+			width:440px;
+			float:left;
+			position:relative;
+			padding-left:15px;
+			padding-top:25px;
+}
+
+.spot-block h2{font-family: 'vigaregular'; font-size:17px; font-weight:normal; color:#5c5c5c; line-height:17px;}
+
+.spot-left{
+			width:200px;
+			float:left;
+			position:relative;
+}
+.spot-right{
+			width:205px;
+			float:right;
+			position:relative;
+}
+
+.spot-field{
+			width:200px;
+			float:left;
+			position:relative;
+			padding-top:25px;
+}
+.spot-text-field{
+			width:200px;
+			float:left;
+			position:relative;
+			padding-top:5px;
+			padding-left:25px;
+}
+.spot-block h3{font-family: 'vigaregular'; font-size:17px; font-weight:normal; color:#000000; padding-left:25px; height:22px;}
+.spot-text{font-family: 'vigaregular'; font-size:13px; font-weight:normal; color:#000000;}
+
+.equip-block{
+			width:222px;
+			float:right;
+			position:relative;
+			background:#f0f0f0 url(images/scubamob-slice.png) repeat-x;
+			min-height:346px;
+			margin-top:2px;
+			padding-top:25px;
+			padding-left:23px;
+}
+.equip-block h2{font-family: 'vigaregular'; font-size:17px; font-weight:normal; color:#5c5c5c; line-height:17px;}
+
+.equip-text{font-family:Verdana, Geneva, sans-serif; font-size:11px; font-weight:normal; color:#484848;}
+.equip-text span{font-family:Verdana, Geneva, sans-serif; font-size:11px; font-weight:normal; color:#ff0000;}
+.equip-block .prepand{margin-top:83px;}
+
+
+/*====================
+		footer block
+======================*/			
+
+			
+.footer-block{
+			width:960px;
+			float:left;
+			position:relative;
+			padding-top:15px;
+			padding-bottom:25px;
+			}
+			
+.footer-block li{font-family:Tahoma, Geneva, sans-serif; font-size:13px; font-weight:normal; color:#868686; display:inline; list-style:none; }
+.footer-block li a{color:#FFF;}
+
+/*====================
+		sales block
+======================*/			
+.sales h1
+{
+    font-size:30px;
+    line-height:40px;
+    margin-bottom:30px;
+    font-family:Times New Roman;
+}
+
+
+/*====================
+	friends page
+======================*/
+.logo-small{float:left;position:absolute;}
+.friend-top{
+	float:right; 
+	width:877px; 
+	position:relative; 
+	border-bottom:1px solid #cbc9c9;
+	padding-bottom:22px;
+	padding-top:5px;
+	}
+	
+.frnd-list{
+			width:480px;
+			float:left;
+			position:relative;			
+			margin-top:60px;
+}
+	
+.frnd-list-top{
+			width:450px;
+			float:left;
+			position:relative;
+			background-color:#efefef;			
+			padding:10px 15px;
+}
+.frnd-list-top h2{font-family:Tahoma, Geneva, sans-serif; font-size:16px; font-weight:normal; color:#565555; }
+
+.frnd-list-middle{
+			width:450px;
+			float:left;
+			position:relative;
+			background-color:#f9f9f9;
+			padding:0px 15px;
+}
+
+.frnd-list-block{
+			width:450px;
+			float:left;
+			position:relative;
+			border-bottom:1px solid #cbc9c9;
+}
+
+.frnd-left{
+			width:224px;
+			float:left;
+			position:relative;			
+			border-right:1px solid #cbc9c9;
+			padding:20px 0;
+}
+.frnd-right{
+			width:210px;
+			float:left;
+			position:relative;
+			padding:20px 0;
+			padding-left:15px;
+}
+
+.frnd-text1{font-family:Tahoma, Geneva, sans-serif; font-size:14px; font-weight:normal; color:#565555; }
+.frnd-text2{font-family:Tahoma, Geneva, sans-serif; font-size:14px; font-weight:normal; color:#2775f6; }
+
+
+.frnd-find{
+			width:240px;
+			float:right;
+			position:relative;
+			margin-top:60px;
+			margin-right:10px;
+}
+.frnd-find h2{font-family: 'vigaregular'; font-size:20px; font-weight:normal; color:#676767; line-height:20px; margin-top:30px;}
+
+.frnd-pending{
+			width:210px;
+			float:left;
+			position:relative;
+			margin-top:15px;
+			background-color:#f9f9f9;
+			padding:15px;
+}
+.frnd-pending-block{
+			width:210px;
+			float:left;
+			position:relative;
+			padding:15px 0;
+			border-bottom:1px solid #cbc9c9;
+}
+
+.btm-border{border-bottom:none;}
+
+/*====================
+	gallery page
+======================*/
+.gallery{
+			width:770px;
+			float:left;
+			position:relative;
+			margin-top:10px;
+}
+
+.gallery_title
+{
+    text-align:center;
+}
+
+.gallery_title h1
+{
+    font-size:18px;
+    color:#333;
+    -webkit-font-smoothing: antialiased;
+    margin:32px 214px 7px 213px;
+}
+
+.gallery-block{
+			width:770px;
+			float:left;
+			position:relative;
+			margin-top:35px;
+}
+
+.gallery-box{
+	border-bottom:1px solid #dad1d1;
+}
+
+.gallery-img{
+			width:150px;
+			position:relative;
+			border:1px solid #dad1d1;
+			margin-top:5px;
+}
+
+.gallery-txt {
+    font-size:11px;
+    margin-left:25px;
+    padding:5px;
+}
+
+.gallery-album-header {
+    margin-bottom:20px;
+}
+
+.gallery-item {
+    margin-left:25px;
+    float:left
+}
+
+img.gallery-image-item{
+	border:1px solid #dad1d1;
+}
+.gall-text1{font-family:Tahoma, Geneva, sans-serif; font-size:12px; font-weight:normal; color:#808080; }
+
+.gall-text1 a.gall-lnk { color: #3b5998; font-weight:600; }
+
+/*====================
+		Div Shops
+======================*/
+.radious-findus{
+				width:500px;
+				float:left;
+				position:absolute;
+				left:4px;
+				top:3px;
+				z-index:2;
+				}
+				
+.divshop-address{
+				 width:191px;
+				 padding:12px 14px 16px 14px;
+				 float:left;
+				 position:absolute;
+				 left:70px;
+				 top:232px;
+				 z-index:1;
+				 background:url(images/scubamob-divshop-address.png) repeat;
+				 border:2px solid #373736;
+				 -webkit-border-radius:6px;
+				 -moz-border-radius:6px;
+				 border-radius:6px;
+				 behavior: url('PIE.htc');				 
+				 -moz-box-shadow: -2px 2px 2px 2px  #1f333f; /* Firefox 3.6 and earlier */
+				 -webkit-box-shadow: -2px 2px 2px 2px  #1f333f; /* Safari */
+				 box-shadow: -0px -0px 2px 2px  #1f333f;
+				}
+
+
+.divshop-address2{
+				 width:163px;
+				 padding:20px 6px 0px 14px;
+				 background:url(images/map-infopane.png) repeat;
+				 height:535px;
+				 float:left;
+				 position:absolute;
+				 right:0px;
+				 top:0px;
+				 z-index:1;				 
+				}
+					
+	
+.divshop-address-details{
+    width:163px;
+    float:left;
+    position:relative;	 
+}
+							
+.divshop-address-details h3{font-family: 'vigaregular'; font-size:17px; font-weight:normal; color:#FFF; background:url(images/scubamob-icon3.png) left no-repeat; padding-left:22px; height:16px; line-height:18px; margin-bottom:8px; }
+.divshop-address-details h4{font-family: 'vigaregular'; font-size:17px; font-weight:normal; color:#FFF; padding-bottom:6px;}
+	
+.divshop-address-details p{font-family:Tahoma, Geneva, sans-serif; font-size:13px; font-weight:normal; color:#FFF; padding-left:22px; }
+
+.adddiv-shop-left{
+				width:350px;
+				float:left;
+				position:relative;
+				}
+				
+.adddiv-shop-left p { font-family:Verdana, Geneva, sans-serif; font-size:11px; font-weight:normal; color:#676767; padding-left:22px; }
+.adddiv-shop-right{
+				width:352px;
+				float:right;
+				position:relative;
+				}
+			
+            
+            
+/* adding stuff for dashboard cards   */
+.dashboard-card .bulk {     float: left; width:30px;padding-left:1px   }
+.dashboard-card .profileImage {     float: left; width:100px;   }
+.dashboard-card .info {     float: left; width:430px;   }
+
+.clear                { content: "."; display:block;height:0;clear:both;visibility:hidden; }
+.left                 { float: left; }
+.ltgrey               { color: #d7d7d7; }

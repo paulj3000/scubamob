@@ -1,0 +1,10 @@
+<h1>Equipment Profile Page</h1>
+{% for post in posts %}
+<l1>Type of Equipment<l1><h2>{{ post.addone}}</h2>
+<l1>Brand of Equipment<l1><h2>{{ post.addtwo}}</h2>
+<l1>Date Purchased: <l1><h2>{{ post.addthree}}</h2>
+<l1>Suggested Value: <l1><h2>{{ post.addfour}}</h2>
+
+{% endfor %}
+
+<tr><th><label for="id_addone"><Practice Element:</label></th><td><input id="id_addone" type="text" name="addone" maxlength="200" /></td></tr>

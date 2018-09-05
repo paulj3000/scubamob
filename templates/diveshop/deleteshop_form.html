@@ -1,0 +1,15 @@
+<html>
+<head>
+    <title>Search</title>
+    </head>
+    <l1>Delete Dive Shop Page<l1>
+    <body>
+            <form method="post">{% csrf_token %}
+            {{ form }}#this creates the form that the modelform demands
+            <input type="submit" value="Submit">
+            </form>
+            <p>You searched for: <strong>{{ query }}</strong></p>
+
+    </body>
+</html>
+

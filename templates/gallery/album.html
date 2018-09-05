@@ -1,0 +1,120 @@
+{% extends 'layout.html' %}
+{% load media %}
+{% load mediaurls %}
+
+{% block includes %}
+{% include_media 'gallery_album.js' %}
+{% include_media 'gallery_album.css' %}
+{% endblock %}
+
+{% block content %}
+<div class="gallery-album-header">
+    <div class="gallery_title">
+        <div style="text-align:center">
+            <h1>{{ album.title }}</h1>
+
+            {% if album.description %}
+            <h3>{{ album.description }}</h3>
+            {% endif %}
+        </div>
+    </div>
+    <div class="ha_right">
+        <a href="#" class="runupload cssbutton grey">Add Photos</a>
+        <a href="{% url 'edit_album'  album_id=album.guid  %}" class="cssbutton grey">Edit</a>
+    </div>
+</div>
+
+<style type="text/css">
+#fileupload {
+    opacity:0
+}
+</style>
+
+<script type="text/javascript">
+
+
+    $('.runupload').click(function(){
+               $("#fileupload").trigger('click');
+               })
+
+
+var albumId = "{{ album.guid }}";   
+var galleryUrl = "{{ PRODUCTION_GALLERY_URL }}";
+
+function deleteAlbum()
+{
+    $.ajax({ 
+        url: "{% url 'delete_album' album_id=album.guid %}",
+        type: "DELETE", 
+        })
+        .done(function(data)  
+        {
+            location.href="{% url 'gallery_home' %}";
+        });
+}
+</script>
+
+<style type="text/css">
+    li { display:inline; }
+    .bar {  height: 18px;  background: green;   }
+</style>
+
+<input id="fileupload" type="file" name="image" data-url="{% url 'gallery_image_upload' %}" multiple><br/>
+
+<div id="album">
+    <ul id="albumimages">
+    </ul>
+</div>
+
+
+<script type="text/javascript">
+$('#fileupload').fileupload({
+        dataType: 'json',
+        complete: function(xhr) {
+            resp    = jQuery.parseJSON(xhr.responseText);
+            data    = resp.data.items[0];
+            data.thumbnail  = galleryUrl + data.thumbnail;
+
+            $('#albumimages').append(Mustache.render(html, data));
+            $('#progress').hide();
+        },
+
+        progressall: function (e, data) 
+        {
+            $('#progress').show();
+            var progress = parseInt(data.loaded / data.total * 100, 10);
+            $('#progress .bar').css(
+                             'width',
+                              progress + '%'
+            );
+            $('#percent').html(progress + '%');
+        },
+        formData: { albumId: albumId }, 
+  });
+
+
+$(document).ready(function()
+{
+$.get("{% url 'json_getalbumimages' album_id=album.guid %}", function(data)
+    {
+        html    = $('#image_template').html();
+        $.each(data.data.items, function(i, d)
+        {
+            $('#albumimages').append(Mustache.render(html, d));
+        });
+        $(".imggroup").colorbox({rel:'imggroup', transition:"none", width:"75%", height:"75%"});
+    });
+});
+</script>
+
+
+{% verbatim %}
+<div id="image_template" style="display:none">
+    <li>
+        <a class="imggroup" href="{{ image }}"><img class="gallery-image-item" src="{{ thumbnail }}" alt="img thumbnail" /></a>
+    </li>
+</div>
+{% endverbatim %}
+
+
+{% endblock %}

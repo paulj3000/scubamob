@@ -1,0 +1,15 @@
+/.*\.pyc$
+/.*\.orig$
+/.*\.swp$
+^\.DS_Store
+smenv/
+static/components
+static/CACHE
+static/django_extensions
+db.sqlite3
+*.pyc
+test_results.xml
+test_result.log
+testdata
+test.sqlite3
+static/admin

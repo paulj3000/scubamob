@@ -1,0 +1,179 @@
+/* GLOBAL */
+.jnewsbar {
+	position: fixed;
+	overflow: hidden;
+	width: 100%;
+	right: 0;
+	padding:5px 0px;
+	display: none;
+}
+.jnews-bottom{
+	border-top: 1px solid;
+}
+.jnews-top{
+	border-bottom: 1px solid;
+}
+.jnewsbar h2, .jnewsbar ul, .jnewsbar li{
+	padding: 0;
+	margin: 0;
+	list-style-type: none;
+}
+.jnewsbar > div.jnewsbar-title{
+	display: inline-block;
+	float: left;
+	overflow: hidden;
+	padding:0px 20px;
+	max-width: 30%;
+	text-transform: uppercase;
+}
+.jnewsbar ul{
+	overflow: hidden;
+	display: inline-block;
+	float: left;
+	padding:0px 25px;
+	max-width: 60%;	
+	word-break: break-all;
+}
+.jnewsbar a{
+	text-decoration: none;
+}
+.jnewsbar a:hover{
+	text-decoration: underline;
+}
+.jnewsbar li > a{
+	padding: 0 20px 0px 0px;
+	text-align: right;
+	text-transform: uppercase;
+}
+.jnewsbar li span{
+	font-size: 12px;
+	opacity: 0.6;
+}
+
+/*
+	Controls
+ */
+.jnewsbar-navigate{
+	float: left;
+	padding: 0px 20px;
+	font-size: 18px;
+	width: 35px;
+}
+.jnewsbar-navigate a:hover{
+	text-decoration: none;
+	font-size: 22px;
+}
+.jnews-toggle{
+	position: absolute;
+	float: right;
+	padding:0px 15px;
+	right: 0px;
+}
+.jnews-top .jnews-toggle{
+	bottom: 5px;
+}
+.jnews-bottom .jnews-toggle{
+	top: 5px;
+}
+.jnews-top .jnews-toggle .toggle{
+	display: block;
+}
+/*
+	Mobile
+ */
+
+@media (max-width: 480px){ 
+	 .jnewsbar > div > h2, .jnewsbar li span{
+	 	display: none;
+	 }
+	 .jnewsbar ul.jnewsbar-items{
+	 	width: 85%;
+	 	padding:0px 10px;
+	 }
+	 .jnewsbar ul.jnewsbar-items li a{
+	 	display: block;
+	 	width: 9999%;
+	 	overflow: hidden;
+	 	text-align: left;
+	 }
+	 .jnewsbar-navigate{
+	 	width: 12%;
+	 	padding: 0px;
+	 }
+}
+
+/*
+	Fade Effect Custom Css
+ */
+/*.jnewsbar.jnews-fade ul li{
+	position: absolute;
+	opacity: 0;
+}*/
+
+/*
+	Themes
+ */
+
+/* Dark */
+.jnews-dark{
+	background: #2d2d2d;
+	border-color: #000;
+}
+.jnews-dark,.jnews-dark h2, .jnews-dark a{
+	color: #dedede;
+}
+.jnews-dark a:hover{
+	color:#fff;
+}
+
+/* Light */
+.jnews-light{
+	background-color: #FFF;
+	border-color: #eeeeee;
+}
+.jnews-light, .jnews-light h2, .jnews-light a{
+	color: #444444;
+}
+.jnews-light a:hover{
+	color:#000;
+}
+.jnews-light.jnews-top{
+	background-image: -webkit-gradient(linear, center top, center bottom, from(#EEEEEE), to(#FFF));
+	background-image: -o-linear-gradient(top, #EEEEEE, #FFF);
+	background-image: linear-gradient(top, #EEEEEE, #FFF);
+
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.10);
+	-moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.10);
+	-webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.10);
+}
+
+.jnews-light.jnews-bottom{
+	background-image: -webkit-gradient(linear, center top, center bottom, from(#FFF), to(#EEEEEE));
+	background-image: -o-linear-gradient(top, #FFF, #EEEEEE);
+	background-image: linear-gradient(top, #FFF, #EEEEEE);
+
+	box-shadow: 10px 0 0 0 rgba(0.10, 0, 0, 0);
+	-moz-box-shadow: 10px 0 0 rgba(0.10, 0, 0, 0);
+	-webkit-box-shadow: 10px 0 0 rgba(0.10, 0, 0, 0);
+}
+
+/* Blue */
+.jnews-blue{
+	background-color: #435d9f;
+	border-color: #3d4e7e;
+}
+.jnews-blue, .jnews-blue h2, .jnews-blue a{
+	color: #e9effd;
+}
+.jnews-blue a:hover{
+	color:#FFFFFF;
+}
+
+/* Red */
+.jnews-red{
+	background-color: #ab1111;
+	border-color: #980404;
+}
+.jnews-red, .jnews-red h2, .jnews-red a{
+	color: #FFFFFF;
+}

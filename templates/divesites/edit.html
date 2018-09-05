@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+{% load media %}
+{% load mediaurls %}
+
+{% block content %}
+<script src="//maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=AIzaSyCZcaPxfE_UnCFqYFEuZU1lI7kIMSMLvfs" type="text/javascript"></script>
+{% include_media 'divesites_new.js' %}
+
+<style type="text/css">
+    #map_canvas { height: 448px;width: 352px }
+    body { overflow:visible;width:100% }
+    .togglebtn { cursor:pointer; }
+</style>
+
+<script type="text/javascript">
+$(document).ready(function()
+{
+    $(window).resize(function()
+    {
+        SM.DiveSites_New.initScreenSize();
+    });
+
+    SM.DiveSites_New.initUserLocation();
+    SM.DiveSites_New.displayMap();
+});
+
+</script>
+
+<div class="adddiv-shop-body">
+    <h3>Add Dive Site</h3>
+    <div class="adddiv-shop-left">
+        <p>Note:  Click map to set site latitude / longitude.</p>
+        <form id="site_id" method="post">
+            <table width="350" cellpadding="0" cellspacing="0" border="0">
+                {% for f in site_form %}
+                <tr>
+                    <td width="113" class="font prepand1" align="right">{{ f.label_tag }}</td>
+                    <td width="237" class="prepand1" align="right">{{ f.errors }} {{ f }}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td style="padding-top:45px" align="right">
+                        <a href="#" onclick="$('#site_id').submit()" class="cssbutton">Save</a>
+                    </td>
+                    <td>&nbsp;</td>
+                </tr>
+            </table>
+        {% csrf_token %}
+        </form>
+    </div>
+    <div class="adddiv-shop-right">
+        <div id="map_canvas"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+divesite_new	= function()
+{
+	$('.chosen-select').chosen();
+}
+
+// start the divesite plugins
+$(document).ready(divesite_new);
+
+</script>
+
+
+{% endblock %}

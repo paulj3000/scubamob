@@ -1,0 +1,126 @@
+{% extends 'layout.html' %}
+{% load media %}
+{% load mediaurls %}
+
+{% block includes %}
+{% include_media 'gallery_index.js' %}
+{% endblock %}
+
+{% block content %}
+
+<div class="ha_right">
+    <a href="#" class="cssbutton" id="creategallery">Add Gallery</a>
+</div>
+
+<div class="gallery">
+    <div class="gallery-block" style="margin-top:0px">
+    </div>
+</div>
+
+<style type="text/css">
+    li { display:inline; }
+    .bar {  height: 18px;  background: green;   }
+</style>
+
+<div id="gallery">
+    <ul id="gallery-block" style="margin-top:0px">
+    </ul>
+</div>
+
+<script type="text/javascript">
+var photoImage = "{% media_url 'images/photoalbum.jpg' %}";
+$(document).ready(function() {
+    html    = $('#album_template').html();
+    var galleryUrl = "{{ PRODUCTION_GALLERY_URL }}";
+
+    $.get("{% url 'json_getalbums' %}", function(data)
+    {
+        $.each(data.albums, function(i, d) 
+        {
+            if (d.cover)
+                d.cover = galleryUrl + d.cover;
+            else
+                d.cover = photoImage;
+
+            $('#gallery-block').append(Mustache.render(html, d));
+        });
+     });
+
+        $( "#creategallery" )
+        .click(function() {
+            $( "#dialog-form" ).dialog( "open" );
+         });
+
+    $( "#dialog-form" ).dialog({
+        autoOpen: false,
+        height: 300,
+        width: 350,
+        modal: true,
+        buttons: 
+        {
+            "Create an account": function() 
+            {
+                createAlbum(); 
+            },
+            Cancel: function() 
+            {
+                $( this ).dialog( "close" );
+            }
+        }
+    });
+});
+
+function createAlbum()
+{
+    serializedData  = $('#f_createalbum').serialize();
+
+    $.post('/gallery/json/createalbum', serializedData, function(data)
+    {
+        html    = $('#album_template').html();
+        data.cover  = photoImage; 
+        data.image_count  = '0 photos';
+        $('#gallery-block').append(Mustache.render(html, data));
+    });
+
+    $("#dialog-form").dialog( "close" );
+}
+
+</script>
+
+    {% verbatim %}
+    <div id="album_template" style="display:none">
+        <li class="gallery-item">
+            <div class="gallery-img">
+                <div class="gallery-box">
+                    <a href="{{ url }}"><img width="150px" src="{{ cover }}" /></a>
+                </div>
+                <div class="gallery-txt">
+                    <div class="gall-text1"><a class="gall-lnk" href="{{ url }}">{{ title }}</a><br/>{{ image_count }}<div>
+                </div>
+            </div>
+        </li>
+    </div>
+    {% endverbatim %}
+
+    <div style="display:none">
+        <div id="dialog-form" title="Create new user">
+        <p class="validateTips">All form fields are required.</p>
+
+        <form id="f_createalbum">
+            <table>
+                <tr>
+                    <td>Album</td>
+                    <td><input type="text" name="title" id="title" class="text ui-widget-content ui-corner-all" /></td>
+                </tr>
+                <tr>
+                    <td>Description</td>
+                    <td><textarea id="description" name="description"></textarea></td>
+                </tr>
+            </table>
+        </form>
+        </div>
+    </div>
+
+
+
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% load media %}
+
+{% block includes %}
+{% include_media 'account_profile.js' %}
+{% endblock %}
+
+
+{% block content %}
+{% include 'title.html' with title="My Friends" %}
+
+<div class="frogman-block">
+    <div><img src="{% media_url 'images/scubamob-frogman.jpg' %}" alt="" /></div>
+</div>
+
+<div>
+    <span>{{ user.get_full_name }}</span><br/>
+</div>
+
+{% if is_user %}
+this is me!!!!!!
+{% else %}
+    <div class="frnd ctr"></div>
+{% endif %}
+
+{% if friends %}
+here are my friends
+{{ friends }}
+{% endif %}
+
+<script type="text/template" id="friendrequested">
+You have sent a request<br/>
+<a class="link friend cancel" data-id="{{profile.account.first.guid }}">Cancel Friend Request</a>
+</script>
+
+<script type="text/template" id="requestfriendship">
+<a class="link friend add" data-id="{{profile.account.first.guid }}">Add Friend</a>
+<a class="link friend block" data-id="{{profile.account.first.guid }}">Block friend</a>
+</script>
+
+<script type="text/template" id="friendrequest">
+Respond to user friend request<br/>
+<a class="link friend accept" data-id="{{ profile.account.first.guid }}">Accept</a>
+<a class="link friend ignore" data-id="{{ profile.account.first.guid }}">Ignore</a>
+</script>
+
+<script type="text/template" id="isfriend">
+You are friends<br/>
+<a class="link friend unfriend" data-id="{{profile.account.first.guid }}">Unfriend</a><br/>
+</script>
+
+<script type="text/javascript">
+{% if friendship_request.id %}
+var requestId='{{friendship_request.id}}';
+{% else %}
+var requestId=null;
+{% endif %}
+{% if friendship.id %}
+var friendId    =   '{{friendship.id}}',
+{% else %}
+var friendId=null;
+{% endif %}
+
+SM.account.profile.init();SM.friends.index.init();</script>
+
+{% endblock %}

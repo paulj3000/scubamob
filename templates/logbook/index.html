@@ -1,0 +1,125 @@
+{% extends "layout.html" %}
+{% load media %}
+{% load mediaurls %}
+
+{% block content %}
+{% include_media 'logbook_index.js' %}
+
+{% if messages %}
+<ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+</ul>
+{% endif %}
+
+<div class="sales">
+    <h1 style="margin-bottom:10px">Log Books</h1>
+</div>
+
+<ul>
+    <li>
+        <div id="lb-folders" onclick="SM.logbook.headers.toggleFolders();">Folders</div>
+        <div class="headermenu" id="foldersHeaderMenu" style="display:none"></div>
+    </li>
+    <li>
+        <div id="lb-tags" onclick="alert('hello2');">Tags</div>
+    </li>
+</ul>
+
+<div class="ha_right" style="margin-bottom:10px">
+    <a class="cssbutton" href="{% url 'dive_add' %}" class="cant" style="width:100px">Log a New Dive</a>
+</div>
+
+<div id="lb-results">
+</div>
+   
+<script type="text/javascript">
+$(document).ready(function()
+{
+    SM.logbook.headers.refreshAssets();
+});
+</script>   
+    
+{% verbatim %}
+<script type="text/x-mustache-template" id="filtertempl">
+<a href="javascript:SM.logbook.folders.create()">Create new folder</a>
+</script>
+
+
+<script type="text/x-mustache-template" id="logtempl">
+{{#folders}}
+<div class="dashboard-card">
+    <div class="bulk">
+        <input type="checkbox" />
+    </div>
+    <div class="profileImage">
+        <div>Log</div>
+    </div>
+    <div class="info">
+        <div>
+            <a class="title" href="javascript:SM.logbook.openFolder('{{id}}')">{{name}}</a>
+        </div>
+        <div class="status">
+            <div class="left">0 Jobs</div>
+            <div class="left ltgrey">&nbsp; | &nbsp;</div>
+            <div class="left">
+                <ul>
+                    <li>Move to Folder</li>
+                    <li>Actions</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>
+{{/folders}}
+</script>
+
+
+
+<script type="text/x-mustache-template" id="foldertempl">
+<div id="dashboard-card-layer">
+{{#folders}}
+<div class="dashboard-card">
+    <div class="bulk">
+        <input type="checkbox" />
+    </div>
+    <div class="profileImage">
+        <div>Folder</div>
+    </div>
+    <div class="info">
+        <div>
+            <a class="title" href="javascript:SM.logbook.openFolder('{{id}}')">{{name}}</a>
+        </div>
+        <div class="status">
+            <div class="left">0 Jobs</div>
+            <div class="left ltgrey">&nbsp; | &nbsp;</div>
+            <div class="left">
+                <ul>
+                    <li>Move to Folder</li>
+                    <li>Actions</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>
+{{/folders}}
+</div>
+</script>
+
+<script type="text/x-mustache-template" id="filterdlgtempl">
+<div id="filterdlg">
+    Folder name:  <input type="text" name="foldername" id="foldername" />
+</div>
+</script>
+
+<script type="text/x-mustache-template" id="subfoldertempl">
+   <div class="folderinfo">
+      <a href="javascript:SM.logbook.headers.refreshAssets();">My Folders</a>&nbsp;&nbsp;/&nbsp;&nbsp;<span id="folder-title">{{name}}</span>
+   </div>
+</script>
+{% endverbatim %}
+
+{% endblock %}

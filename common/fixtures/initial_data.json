@@ -1,0 +1,18 @@
+[
+    {
+        "model": "common.Temperature",
+            "pk": 1,
+            "fields": 
+            {
+                "name": "Celsius"
+            }
+    },
+    {
+        "model": "common.Temperature",
+            "pk": 2,
+            "fields": 
+            {
+                "name": "Fareinheit"
+            }
+    }
+]

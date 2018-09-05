@@ -1,0 +1,36 @@
+from django.conf import settings
+print "WARNING:  Running in production mode"
+
+DEBUG = False
+ALLOWED_HOSTS   = ['.us-west-1.compute.amazonaws.com', '.scubamob.com', 'sm.pjsmidnightlabs.com']
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'pauldim1_scubamob',
+        'USER': 'pauldim1_smuser',                      # Not used with sqlite3.
+        'PASSWORD': '+AGanaw2EtR$',
+        'HOST': 'localhost',
+        'PORT': '3306',                      # Set to empty string for default. Not used with sqlite3.
+    }
+}
+
+MONGO   = {
+        'USE_REPLICASET': False,
+        'HOSTS': [],
+        'REPLICASET': {},
+        'HOST': 'c81.alcatraz.0.mongolayer.com',
+        'USERNAME': 'scuba',
+        'PASSWORD': 'NatUniv2014!',
+        'PORT': 10081,
+        'DATABASE': 'scubamob'
+}
+
+MEMCACHE = {
+    'server':      ['scubamob.r51jrg.cfg.usw1.cache.amazonaws.com:11211']
+}
+
+settings.MIDDLEWARE_CLASSES += ('htmlmin.middleware.HtmlMinifyMiddleware',)
+
+GALLERY_BUCKET      = 'scubamob.gallery.prod'
+PRODUCTION_MEDIA_URL = '//media-sm.pjsmidnightlabs.com/'

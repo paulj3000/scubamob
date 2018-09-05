@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="sales">
+    <h1>Log In</h1>
+</div>
+
+{% if form.errors %}
+<p>Your username and password didn't match. Please try again.</p>
+{% endif %}
+
+<div class="inputform">
+    <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
+        {% csrf_token %}
+        <ul>
+        {% for field in form %}
+            <li class="control-group">
+                {{ field.errors }}
+                {{ field.label_tag }} {{ field }}
+            </li>
+        {% endfor %}
+        </ul>
+        <div class="loginoption">
+            <span class="cssbutton large formsubmit">Log In</span>
+            <a href="{% url 'forgot_password1' %}" class="cant">Forgot your password?</a>
+        </div>
+
+        <input type="hidden" name="next" value="{{ next }}" />
+    </form>
+</div>
+
+<ul>
+{% for name in social_auth.backends.oauth2 %}
+   <li><a rel="nofollow" href="{% url "socialauth_begin" name %}">{{ name|title }}</a></li>
+{% endfor %}
+</ul>
+
+<script type="text/javascript">
+$('.formsubmit').click(function()
+{
+    $(this).closest('form').submit();
+});
+</script>
+
+{% endblock %}
