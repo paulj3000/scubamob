@@ -7,12 +7,12 @@
 #
 # Author: Pauljames "The Juggernaut" Dimitriu
 # -----------------------------------------------------------------------------
-from django.conf.urls import patterns, url, include
+from django.conf.urls import url, include
 from django.contrib.auth.views import password_reset
 
 from account.forms import LoginForm, PasswordForm, SettingsForm
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^json/setfavorite/?$', 'account.views.json.setfavorite', name='setfavorite'),
     url(r'^json/getfavorite/?$', 'account.views.json.getfavorites', name='getfavorites'),
 
@@ -31,4 +31,4 @@ urlpatterns = patterns('',
     url(r'^password/reset/$', password_reset, {'template_name': 'account/password_reset.html', 'email_template_name': 'account/password_reset_email.html'}, name='forgot_password1'),
     url(r'^password_reset_done/$', 'django.contrib.auth.views.password_reset_done', {'template_name': 'account/password_reset_done.html'}, name='password_reset_done'),
     url(r'^password_reset_done/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm', {'template_name' : 'account/password_reset_done.html',  'post_reset_redirect': '/account/logout/' }),
-)
+]

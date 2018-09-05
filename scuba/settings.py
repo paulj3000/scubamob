@@ -12,15 +12,19 @@ import os
 import django.conf.global_settings as DEFAULT_SETTINGS
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 TEMPLATE_ROOT = os.path.join(BASE_DIR, './templates')
 IMAGES_ROOT = os.path.join(BASE_DIR, './static/images')
 STATIC_ROOT = os.path.join(BASE_DIR, './static')
+LOG_DIRECTORY = '/tmp'
+
+TEMPLATE_DIR_LIST = [
+    os.path.join(BASE_DIR, './templates'),
+    #os.path.join(BASE_DIR, './skmcore/templates'),
+]
 
 ADMINS = (
-     #('Pauljames Dimitriu', 'paulj3000@gmail.com'),
      ('Pauljames Dimitriu', 'paulj1999@yahoo.com'),
 )
 
@@ -97,11 +101,6 @@ SECRET_KEY = '(ql8jk&amp;4f5y+m+4#5mgk^^^tf)2cb6*x6x&amp;wkw$v626tyaiijm'
 
 YUICOMPRESSOR_PATH = os.path.join(BASE_DIR, './scuba/tools/yuicompressor.jar')
 
-ROOT_MEDIA_FILTERS = {
-    'js': 'mediagenerator.filters.yuicompressor.YUICompressor',
-    'css': 'mediagenerator.filters.yuicompressor.YUICompressor',
-}
-
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
@@ -109,9 +108,23 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.Loader',
 )
 
-## add my context processor to this
-TEMPLATE_CONTEXT_PROCESSORS     = DEFAULT_SETTINGS.TEMPLATE_CONTEXT_PROCESSORS + \
-                                    ('utils.context_processors.sm',)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': TEMPLATE_DIR_LIST,
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.request',
+                'utils.context_processors.sm',
+            ],
+        },
+    },
+]
 
 LOGIN_URL = '/login/'
 

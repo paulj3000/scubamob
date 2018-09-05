@@ -4,7 +4,7 @@
 """ mongo - This module emulates simpleDB using MongoDB
 """
 
-from pymongo import ReplicaSetConnection, MongoClient
+#from pymongo import ReplicaSetConnection, MongoClient
 from django.conf import settings 
 
 def Mongo(connection_params=settings.MONGO):
