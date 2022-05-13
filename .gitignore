@@ -2,7 +2,7 @@
 /.*\.orig$
 /.*\.swp$
 ^\.DS_Store
-smenv/
+env/
 static/components
 static/CACHE
 static/django_extensions

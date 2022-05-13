@@ -15,9 +15,9 @@ DEBUG = True
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 TEMPLATE_ROOT = os.path.join(BASE_DIR, './templates')
-IMAGES_ROOT = os.path.join(BASE_DIR, './static/images')
 STATIC_ROOT = os.path.join(BASE_DIR, './static')
 LOG_DIRECTORY = '/tmp'
+
 
 TEMPLATE_DIR_LIST = [
     os.path.join(BASE_DIR, './templates'),
@@ -155,12 +155,6 @@ try:
     PRODUCTION_MEDIA_URL    += '%s/' % RELEASE_VERSION
 except ImportError:
     print('no release version available. Continuing with standard settings.')
-
-
-# add some setting for the
-GENERATED_MEDIA_DIR = os.path.join(BASE_DIR, '../_generated_media')
-GLOBAL_MEDIA_DIRS = (STATIC_ROOT,IMAGES_ROOT,GENERATED_MEDIA_DIR)
-
 
 ROOT_URLCONF = 'scuba.urls'
 
