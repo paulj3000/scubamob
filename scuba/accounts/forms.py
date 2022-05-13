@@ -6,7 +6,7 @@ from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.validators import validate_email
 
-from account.models import UserFriendRequest, UserFriend, User
+from scuba.accounts.models import UserFriendRequest, UserFriend, User
 
 
 class LoginForm(AuthenticationForm):

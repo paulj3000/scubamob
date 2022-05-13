@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.forms.models import model_to_dict
 
-from account.models import User
+from scuba.accounts.models import User
 from api.views.apiutils import trigger_response, process_request, UPDATER, REQUIRED
 from utils.decorators import mobile_auth
 from api.views.exceptions import *

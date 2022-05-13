@@ -13,8 +13,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseBadRequest, HttpResponse
 
 # define the user data for this account
-from account.forms import EmailInviteForm
-from account.models import UserFriendRequest, UserFriend
+from scuba.accounts.forms import EmailInviteForm
+from scuba.accounts.models import UserFriendRequest, UserFriend
 
 from utils.core.user import User
 

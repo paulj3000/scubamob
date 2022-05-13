@@ -4,10 +4,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 
 # define the user data for this account
-from account.mongo import Account as AccountMongo
 from divesites.mongo import DiveSite as DiveSiteMongo
 from home.forms import HomeLoginForm
-from account.forms import AccountForm
+from scuba.accounts.forms import AccountForm
+from scuba.accounts.mongo import Account as AccountMongo
 from utils.external.weather import Weather
 from utils.maxmind import MaxMind
 

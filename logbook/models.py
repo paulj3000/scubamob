@@ -11,7 +11,7 @@ from logbook.mongo import DiveLog
 from utils.core.models import Timestamped
 #from utils.db import models
 from scuba.settings import MONGO_DIVELOGS
-from account.models import User
+from scuba.accounts.models import User
 
 
 class LogbookManager(models.Manager):

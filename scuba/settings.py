@@ -163,7 +163,7 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django_extensions',
     'compressor',
-    'account',
+    'scuba.accounts',
     'gallery',
     'common',
     'divesites',
@@ -216,7 +216,7 @@ LOGGING = {
 }
 
 #AUTH_PROFILE_MODULE = "account.Account"
-AUTH_USER_MODEL = 'account.User'
+AUTH_USER_MODEL = 'accounts.User'
 
 WEATHER_UNDERGROUND = 'weather_underground'
 FACEBOOK = 'facebook'

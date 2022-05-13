@@ -7,10 +7,10 @@ from django.contrib.auth.views import LoginView
 
 import scuba.settings
 import home.views as home_views
-import account.views.profiles as account_profiles
+import scuba.accounts.views.profiles as account_profiles
 #import account.views.login as login_views
-import account.views.xlogin as login_views
-import account.views as account_views
+import scuba.accounts.views.xlogin as login_views
+import scuba.accounts.views as account_views
 
 
 from django.contrib import admin
@@ -23,7 +23,7 @@ urlpatterns = [
     path('home/', home_views.home, name='home'),
     path('register/', account_views.register, name='register'),
 
-    path('account/', include('account.urls')),
+    path('account/', include('scuba.accounts.urls')),
     path('friends/', include('friends.urls')),
     path('logbook/', include('logbook.urls')),
     path('divesites/', include('divesites.urls')),
@@ -33,9 +33,9 @@ urlpatterns = [
     path('env/', include('env.urls')),
 #    url(r'^diveshop/', include('diveshop.urls')),
 
-    path('password/', include('account.urls_password')),
+    path('password/', include('scuba.accounts.urls_password')),
 
-    #url(r'^profile/', include('account.urls_profile')),
+    #url(r'^profile/', include('scuba.accounts.urls_profile')),
 
     path('api/1.0/divesites/', include('api.urls_divesites')),
     path('api/1.0/divelogs/', include('api.urls_divelogs')),

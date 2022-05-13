@@ -15,7 +15,7 @@ from django.dispatch.dispatcher import receiver
 
 from utils import uuidmodel
 from utils.core.models import Timestamped
-from account.models import User
+from scuba.accounts.models import User
 
 
 IMAGE_TYPE_EXTENSIONS   = {

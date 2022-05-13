@@ -13,16 +13,17 @@ from django.views.decorators.http import require_http_methods
 from django.http import HttpResponseBadRequest, HttpResponse
 
 # define the user data for this account
-from account.forms import EmailInviteForm
-from account.models import UserFriendRequest, UserFriend
+from scuba.accounts.forms import EmailInviteForm
+from scuba.accounts.models import UserFriendRequest, UserFriend
 
 from utils.core.user import User
+
 
 @login_required
 def profile(us_request, username):
     user = us_request.user
 
-    #### let's get the user based on the uidb36 coming in
+    # let's get the user based on the uidb36 coming in
     profile      = None
     authorized  = False
     is_user     = False
@@ -33,14 +34,14 @@ def profile(us_request, username):
 
     context = { 'title': 'My Friends', 'is_user': is_user }
     try:
-        ### let's try and get the user
+        # let's try and get the user
         profile    = User.objects.get(username=username)
 
-        ### is the user looking at his profile?
+        # is the user looking at his profile?
         if profile == user:
             authorized = True
         else:
-            ### nope, is it a possible friend?
+            # nope, is it a possible friend?
             if len(UserFriend.objects.filter(user=user, friend=profile)) or \
                 len(UserFriendRequest.objects.filter(user=profile, friend=user)):
                     authorized = True

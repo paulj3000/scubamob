@@ -6,8 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 
 # define the user data for this account
-from account.forms import AccountForm
-from account.models import User
+from scuba.accounts.forms import AccountForm
+from scuba.accounts.models import User
 
 
 def register(us_request):

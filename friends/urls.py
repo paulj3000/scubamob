@@ -12,7 +12,7 @@ from django.urls import path, re_path
 
 import friends.views.ajax as friends_ajax
 import friends.views as friends_views
-import account.views.json as account_json
+import scuba.accounts.views.json as account_json
 
 
 urlpatterns = [

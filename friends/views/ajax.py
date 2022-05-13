@@ -12,10 +12,11 @@ from django.views.decorators.http import require_http_methods
 from django.http import HttpResponseBadRequest, HttpResponse
 
 # define the user data for this account
-from account.forms import EmailInviteForm
-from account.models import UserFriendRequest, UserFriend
+from scuba.accounts.forms import EmailInviteForm
+from scuba.accounts.models import UserFriendRequest, UserFriend
 
 from utils.core.user import User
+
 
 @login_required
 @require_http_methods(["POST"])

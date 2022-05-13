@@ -12,7 +12,7 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 
 # define the user data for this account
-from account.mongo import Account as AccountMongo
+from scuba.accounts.mongo import Account as AccountMongo
 #from home.forms import AccountForm, UserCreateForm
 from utils.external.weather import Weather
 

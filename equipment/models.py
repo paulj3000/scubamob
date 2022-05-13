@@ -1,5 +1,5 @@
 from django.db import models
-from account.models import User
+from scuba.accounts.models import User
 
 
 class Equipment(models.Model):

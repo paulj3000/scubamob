@@ -16,7 +16,7 @@ from django.utils.translation import gettext_lazy as _
 from django_extensions.db.fields import CreationDateTimeField, ModificationDateTimeField
 
 
-from account.models.manager import NotificationManager
+from scuba.accounts.models.manager import NotificationManager
 
 from utils.core.models import Timestamped
 #from utils.db import models
