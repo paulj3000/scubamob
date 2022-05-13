@@ -2,20 +2,18 @@ from datetime import datetime, timedelta
 from pprint import pprint
 from bson.objectid import ObjectId
 
-from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.http import QueryDict
 
 from logbook.mongo import DiveLog
 from api.views.apiutils import trigger_response, process_request
-from utils.jsonresponse import JSONResponse, api_response
 from utils.decorators import external_authentication
 
-@csrf_exempt
+
 @external_authentication
 def external(us_request, us_log_id=None):
     data = process_request(us_request)
-    
+
     us_input_data   = data['us_input_data']
     action          = data['action']
 
@@ -47,7 +45,7 @@ def get(us_request, us_input_data, us_log_id):
         del data['_id']
         if data.get('user_id'):
             del(data['user_id'])
-    
+
         ### add this
         items.append(data)
 
@@ -91,7 +89,7 @@ def create(us_request, us_input_data, us_divesite_id):
     log_create  = {'user_id': user.id }
     for field in us_input_data:
         log_create[field]   = us_input_data.get(field)
-    
+
     data = str(divelog.collection.insert(log_create))
 
     #response = api_response(data={'items':items, 'total': len(items), 'offset' : offset})

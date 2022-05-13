@@ -4,14 +4,12 @@
 #
 # Author: Pauljames Dimitriu
 # -----------------------------------------------------------------------------
-import re, time, base64, httplib
+import re, time, base64
 import json
-from urlparse import urlparse
 from pprint import pprint
 
 from django.conf import settings
 
-from utils.httprequest import HttpRequest
 
 class MaxMind():
     def __init__(self, *args, **kwargs):
@@ -40,10 +38,11 @@ class MaxMind():
         except:
             # JSON error, the return data was not JSON
             # for some reason, we cannot communicate w/ Quova.  Log the message, email OPS and return
-            logmsg      = "Error communicating w/ maxmind.  Response received:  %s\n" % ret['response']
-            logmsg     += "IP Address queried:  %s\n" % ip;
+            logmsg = ''
+            #logmsg = "Error communicating w/ maxmind.  Response received:  %s\n" % ret['response']
+            logmsg += "IP Address queried:  %s\n" % ip;
 
-            print logmsg
+            #print(logmsg)
 
             return None     # something bad happened communicating w/ quova
 
@@ -53,4 +52,4 @@ class MaxMind():
         username = 'Basic ' + base64.b64encode('%s:%s' % (settings.MAXMIND_USER, settings.MAXMIND_LICENSE)) + '==='
         url =  settings.MAXMIND_URL % ip
         http_obj    = HttpRequest()
-        return http_obj.invoke(url, {}, { 'headers': { 'Authorization': username }})
+        return http_obj.invoke(url, {}, {'headers': {'Authorization': username}})

@@ -7,8 +7,8 @@ from django.http import QueryDict
 
 from diveshops.mongo import DiveShop as DiveShop
 from api.views.apiutils import trigger_response, process_request
-from utils.jsonresponse import JSONResponse, api_response
 from utils.decorators import external_authentication
+
 
 @csrf_exempt
 #@external_authentication
@@ -45,7 +45,7 @@ def get(us_request, us_input_data, us_diveshop_id):
         del data['_id']
         if data.get('user_id'):
             del(data['user_id'])
-    
+
         ### add this
         items.append(data)
 

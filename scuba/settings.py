@@ -28,7 +28,7 @@ ADMINS = (
      ('Pauljames Dimitriu', 'paulj1999@yahoo.com'),
 )
 
-AUTHENTICATION_BACKENDS =   ('utils.middleware.authentication.DefaultBackend', 
+AUTHENTICATION_BACKENDS =   ('utils.middleware.authentication.DefaultBackend',
                              'utils.middleware.authentication.EmailLogin', )
 
 SERVER_EMAIL = 'no-reply@scubamob.com'
@@ -38,7 +38,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '%s/db/scubamob' % BASE_DIR ,  
+        'NAME': '%s/db/scubamob' % BASE_DIR ,
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -131,20 +131,18 @@ LOGIN_URL = '/login/'
 LOGIN_EXEMPT_URLS = (
          r'^about\.html$',
           r'^legal/', # allow any URL under /legal/*
-) 
+)
 
-MIDDLEWARE_CLASSES = (
-    'mediagenerator.middleware.MediaMiddleware',
-    'django.middleware.common.CommonMiddleware',
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'htmlmin.middleware.HtmlMinifyMiddleware',
-    'utils.middleware.crossdomainxhr.XsSharing',
-    # Uncomment the next line for simple clickjacking protection:
-    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
 
 DEV_MEDIA_URL = '/devmedia/'
 PRODUCTION_MEDIA_URL = '//d1fqxyumeztd89.cloudfront.net/media/'
@@ -156,10 +154,10 @@ try:
     from version import *
     PRODUCTION_MEDIA_URL    += '%s/' % RELEASE_VERSION
 except ImportError:
-    print 'no release version available. Continuing with standard settings.'
+    print('no release version available. Continuing with standard settings.')
 
 
-## add some setting for the 
+# add some setting for the
 GENERATED_MEDIA_DIR = os.path.join(BASE_DIR, '../_generated_media')
 GLOBAL_MEDIA_DIRS = (STATIC_ROOT,IMAGES_ROOT,GENERATED_MEDIA_DIR)
 
@@ -182,7 +180,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
-    'mediagenerator',
     'account',
     'gallery',
     'common',
@@ -239,7 +236,7 @@ LOGGING = {
 try:
     from mediasettings import *
 except ImportError:
-    print 'mediasettings.py was not found. Continuing with standard settings.'
+    print('mediasettings.py was not found. Continuing with standard settings.')
 
 WEATHER_UNDERGROUND         = 'weather_underground'
 FACEBOOK                    = 'facebook'
@@ -273,7 +270,7 @@ MEMCACHE = {
     'server':      ['127.0.0.1:11211']
 }
 
-## set up the external API stuff
+# set up the external API stuff
 WEATHER_API_KEY = 'd41784195576cec0' + '-'
 WEATHER_API_URL = 'http://api.wunderground.com/api/%s/conditions/q/%s/%s.json'
 #WEATHER_API_LAT_LNG_URL = 'http://api.wunderground.com/api/%s/conditions/q/%s/%s,%s.json'
@@ -289,36 +286,36 @@ NOSQL_DB         = 'scubamob'
 AWS_ACCESS_KEY_ID = 'AKIAJDVN6XIBZ5I7TVSA'
 AWS_SECRET_ACCESS_KEY = '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'
 
-## Here is the bucket file pattern.  It goes in the following manner:
-## account guid / album id / file name
+# Here is the bucket file pattern.  It goes in the following manner:
+# account guid / album id / file name
 GALLERY_BUCKET      = 'scubamob.gallery.dev'
 
 EMAIL_BACKEND = 'django_ses.SESBackend'
 DEFAULT_FROM_EMAIL  = 'no-reply@scubamob.com'
 GOOGLE_API_KEY  = 'AIzaSyD8CDOojSGLURvXDISrXKHZss1BkOA-Lss'
 
-## this is a constant to be used to compute geodistance stuff
+# this is a constant to be used to compute geodistance stuff
 EARTH_RADIUS    = 3159
 
-## the following settings are for the mobile apps
+# the following settings are for the mobile apps
 MOBILE_HEADER_APP   = 'scubaapp'
 MOBILE_HEADER_DEVICES   = {'smandroid': 'am', 'smios': 'io'}
 
 try:
     from localsettings import *
-except ImportError, ex:
-    print 'localsettings.py was not loaded. Continuing with standard settings.\n%s'%ex
+except ImportError as ex:
+    print('localsettings.py was not loaded. Continuing with standard settings.\n%s' % ex)
 
 MEDIA_DEV_MODE = MEDIA_DEV_MODE if 'MEDIA_DEV_MODE' in locals() else DEBUG
 
-### maxmind settings
+# maxmind settings
 #MAXMIND_URL     = 'https://geoip.maxmind.com/geoip/v2.0/city_isp_org/%s'
 MAXMIND_URL     = 'https://geoip.maxmind.com/geoip/v2.0/city/%s'
 MAXMIND_LICENSE = 'hVeqTCTxxU5H'
 MAXMIND_USER    = '75205'
 DEBUG_IP        = '68.101.214.253'
 
-##### define the mongo collections
+# define the mongo collections
 MONGO_DIVELOGS		= 'divelogs'
 
 

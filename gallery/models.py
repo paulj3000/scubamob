@@ -3,17 +3,16 @@ import re
 import uuid
 import datetime
 from PIL import Image
-import cStringIO
-from StringIO import StringIO
+from io import StringIO
 
 from django.db import models
 from django.db.models import fields, Q
 from django.contrib.auth.models import User
-from django.conf import settings 
+from django.conf import settings
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
 
-from boto.s3.connection import S3Connection
+#from boto3.s3.connection import S3Connection
 
 from utils import uuidmodel
 from utils.core.models import Timestamped
@@ -26,7 +25,7 @@ IMAGE_TYPE_EXTENSIONS   = {
 }
 
 class Album(Timestamped, models.Model):
-    user = models.ForeignKey(User, related_name='albums' )
+    user = models.ForeignKey(User, related_name='albums', on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=255)
     guid = models.CharField(max_length=125, db_index=True)
@@ -34,7 +33,7 @@ class Album(Timestamped, models.Model):
     def add_image(self, uploaded_image):
         ### seek to the beginning of the script
         #uploaded_image.seek(0)
-        filename    = "%s.%s" % (str(uuid.uuid1()).replace('-', ''), 
+        filename    = "%s.%s" % (str(uuid.uuid1()).replace('-', ''),
                     IMAGE_TYPE_EXTENSIONS[uploaded_image.content_type])
 
         account     = self.user.get_account()
@@ -46,14 +45,14 @@ class Album(Timestamped, models.Model):
 
         k = b.new_key(gallery_file)
         k.set_contents_from_string(uploaded_image.read(), header)
-   
+
         return gallery_file
 
     def add_image_thumbnail(self, uploaded_image):
         ###### this is really bad!  Refactor
         uploaded_image.seek(0)
 
-        filename    = "%s.%s" % (str(uuid.uuid1()).replace('-', ''), 
+        filename    = "%s.%s" % (str(uuid.uuid1()).replace('-', ''),
                     IMAGE_TYPE_EXTENSIONS[uploaded_image.content_type])
 
         account     = self.user.get_account()
@@ -100,7 +99,7 @@ class Album(Timestamped, models.Model):
             self.guid    = str(uuid.uuid1()).replace('-', '')
 
         super(Album, self).save(*args, **kwargs)
-   
+
     def delete(self):
         pprint(self.album_image.all())
         #super(Album, self).delete(*args, **kwargs)
@@ -112,7 +111,7 @@ class Album(Timestamped, models.Model):
         return { 'title': self.title, 'description': self.description, 'id': self.id, 'guid': self.guid }
 
 class AlbumImage(Timestamped, models.Model):
-    album = models.ForeignKey(Album, related_name='album_image')
+    album = models.ForeignKey(Album, related_name='album_image', on_delete=models.CASCADE)
     image = models.CharField(max_length=255)
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=255)
@@ -124,7 +123,7 @@ class AlbumImage(Timestamped, models.Model):
     def generate_image_name(guid, album_id, filename):
         ### generate a new filename
         return  '%s/%s/%s' % (guid, album_id, filename)
-    
+
     @staticmethod
     def generate_image_thumbnail_name(guid, album_id, filename):
         ### generate a new filename
@@ -138,10 +137,10 @@ class AlbumImage(Timestamped, models.Model):
             self.guid    = str(uuid.uuid1()).replace('-', '')
 
         super(AlbumImage, self).save(*args, **kwargs)
-    
+
     def get_image(self):
         return settings.PRODUCTION_GALLERY_URL + self.image
-    
+
     def get_thumbnail(self):
         return settings.PRODUCTION_GALLERY_URL + self.thumbnail
 
@@ -157,14 +156,14 @@ def _mymodel_delete(sender, instance, **kwargs):
     conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
     b = conn.get_bucket(settings.GALLERY_BUCKET)
 
-    ### delete the images   Eventually move this to SQS as we want to do this 
+    ### delete the images   Eventually move this to SQS as we want to do this
     ### offline
     to_delete   = []
     for i in images:
         ## append these images to the queue
         to_delete.append(i.image)
         to_delete.append(i.thumbnail)
-   
+
     ### and finally delete them all
     result  = b.delete_keys(to_delete)
     result.deleted

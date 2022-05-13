@@ -1,15 +1,18 @@
 # -----------------------------------------------------------------------------
 # logbook/urls.py
 #
-# This is the url resolver for the actual logbook. 
+# This is the url resolver for the actual logbook.
 #
 # (C) Copyright 2013, Scubalog.  All rights reserved.
 #
 # Author: Pauljames "The Juggernaut" Dimitriu
 # -----------------------------------------------------------------------------
-from django.conf.urls import patterns, url
+from django.urls import path, re_path
 
-urlpatterns = patterns('',
-    url(r'^$', 'api.views.mobile_account.external'),
-    url(r'^/([\w]{5,36})$', 'api.views.mobile_account.external'),
-)
+import api.views.mobile_account as api_mobile_account
+
+
+urlpatterns = [
+    path('', api_mobile_account.external),
+    re_path(r'^/([\w]{5,36})$', api_mobile_account.external),
+]

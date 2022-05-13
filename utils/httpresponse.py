@@ -1,8 +1,8 @@
 import uuid, re, sys
 
-from django.utils import simplejson
 from django.http import HttpResponse
 from django.conf import settings
+
 
 class HttpResponseNotAuthorized(HttpResponse):
     def __init__(self):

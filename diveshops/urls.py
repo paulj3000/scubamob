@@ -1,18 +1,23 @@
 # -----------------------------------------------------------------------------
 # logbook/urls.py
 #
-# This is the url resolver for the actual logbook. 
+# This is the url resolver for the actual logbook.
 #
 # (C) Copyright 2013, Scubalog.  All rights reserved.
 #
 # Author: Pauljames "The Juggernaut" Dimitriu
 # -----------------------------------------------------------------------------
-from django.conf.urls import patterns, url
+from django.urls import path, re_path
 
-urlpatterns = patterns('',
-    url(r'^$', 'diveshops.views.index',name="diveshops_home"),
-    url(r'^create_site/?$', 'diveshops.views.shopadmin.packages',name="diveshops_packages"),
-    url(r'^new/?$', 'diveshops.views.shopadmin.editshop',name="diveshops_new"),
-    
-    url(r'^json/getlocaldiveshops/?$', 'diveshops.views.getlocaldiveshops'),
-)
+import diveshops.views as diveshops_views
+#import diveshops.views.shopviews as diveshops_shopadmin
+import diveshops.views as diveshops_shopadmin
+
+
+urlpatterns = [
+    path('', diveshops_views.index, name="diveshops_home"),
+    #path('create_site/', diveshops_shopadmin.packages, name="diveshops_packages"),
+    #path('new/', diveshops_shopadmin.editshop, name="diveshops_new"),
+
+    path('json/getlocaldiveshops/', diveshops_views.getlocaldiveshops),
+]

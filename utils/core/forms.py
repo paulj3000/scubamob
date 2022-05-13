@@ -9,17 +9,17 @@ from utils.nosql.mongo import Mongo
 from scuba.settings import NOSQL_HOST, NOSQL_PORT, NOSQL_DB
 
 class NoSQLForm(forms.Form):
-    ## construct a new UUID field based on a UUID
+    # construct a new UUID field based on a UUID
     def __init__(self, *args, **kwargs):
         self.db = Mongo()
         self.collection = self.db[self.Meta.model]
         self.Object  = self.Meta.mongo()
 
-        try: 
+        try:
             self.user_id = kwargs.pop('user_id') if kwargs.keys().count('user_id') else None
         except:
             raise ValueError("Missing something...")
-                    
+
         super(NoSQLForm, self).__init__(*args, **kwargs)
 
     def save(self, data = None):
@@ -27,11 +27,11 @@ class NoSQLForm(forms.Form):
             data   = self.cleaned_data
 
         if hasattr(self.Meta, 'id') and self.Meta.id:
-            ## let's perform our update
+            # let's perform our update
             self.collection.update({ '_id': self.Meta.id }, { "$set": data })
         else:
-            print "starting the save process here 1234"
+            print("starting the save process here 1234")
             guid    =   str(uuid.uuid1()).replace('-','')
-            ## nope, let's add our new document
+            # nope, let's add our new document
             data.update({ '_id': { 'user': self.user_id, 'guid': guid }, 'user_id': self.user_id })
             self.collection.insert(data)

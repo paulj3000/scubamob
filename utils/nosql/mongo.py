@@ -5,7 +5,7 @@
 """
 
 #from pymongo import ReplicaSetConnection, MongoClient
-from django.conf import settings 
+from django.conf import settings
 
 def Mongo(connection_params=settings.MONGO):
     try:
@@ -18,6 +18,6 @@ def Mongo(connection_params=settings.MONGO):
             conn.authenticate(connection_params['USERNAME'], connection_params['PASSWORD'])
         return conn
 
-    except Exception, ConnectionError:
+    except (Exception, ConnectionError):
     #Log().exception(ConnectionError)
         raise ConnectionError

@@ -4,35 +4,30 @@ from pprint import pprint
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
-from django.core.context_processors import csrf
-from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import csrf_exempt
 #from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest, HttpResponse
 
 # define the user data for this account
-from utils.jsonresponse import JSONResponse, api_response
 from account.forms import EmailInviteForm
 from account.models import UserFriendRequest, UserFriend
 
 from utils.core.user import User
 
 @login_required
-@csrf_exempt
 @require_http_methods(["POST"])
 def invited(us_request):
-  
-    user    = us_request.user 
+
+    user    = us_request.user
     email_invites   = []
     response    = { 'invalid': [], 'sent': [], 'resent': [], 'friends': [] }
 
     if us_request.is_ajax():
         email_data  = json.loads(us_request.body)
-    
+
         friend    = None
         from django.core.validators import validate_email
 
@@ -42,16 +37,16 @@ def invited(us_request):
                 ## make sure the email address is correct
                 validate_email(email)
             except:
-                print "bad email:  %s " % email
+                print("bad email:  {email}")
                 response['invalid'].append(email)
                 continue
-      
+
             ### let's see if the user is being a jackass and is inviting himself
             if user.email == email:
-                print "user is inviting himself" 
+                print("user is inviting himself")
                 response['invalid'].append(email)
                 continue
-       
+
             friend  = None
             try:
                 friend  = User.objects.get(email=email)
@@ -59,10 +54,10 @@ def invited(us_request):
                 pass
 
             ### ok, so far a valid email address.  now, let's check for a valid user
-            ### first, is this this a valid usre with 
+            ### first, is this this a valid usre with
 
             if Friendship.objects.filter(
-                Q(friend1__email=email) | 
+                Q(friend1__email=email) |
                 Q(friend2__email=email)):
                 ### the user is already a friend.  forget it
                 response['friends'].append(email)
@@ -88,17 +83,17 @@ def invite(us_request):
     else:
         email_invite_form   = EmailInviteForm()
 
-    context.update(csrf(us_request), email_invite_form=email_invite_form)
+    context.update(us_request, email_invite_form=email_invite_form)
     return render(us_request, "account/friends/invite.html", context)
 
-@csrf_exempt
+
 @login_required
 @require_http_methods(["POST", "DELETE"])
-def accept(us_request):  
+def accept(us_request):
     fid = us_request.POST.get('fid')
     delete = us_request.POST.get('delete', False)
     user    = us_request.user
-    
+
     retval = { 'data': { }}
     httpclass   = HttpResponse
 
@@ -117,31 +112,30 @@ def accept(us_request):
     ### all is good, let's return this instance
     return JSONResponse(api_response(**retval), httpclass=httpclass)
 
+
 @login_required
-@csrf_exempt
 @require_http_methods(["PUT"])
 def accept_invite(us_request):
     response    = {}
-    
-    user    = us_request.user 
+
+    user    = us_request.user
     return JSONResponse( response )
 
+
 @login_required
-@csrf_exempt
 @require_http_methods(["DELETE"])
 def delete_friendship(us_request):
     response    = {}
-    
-    user    = us_request.user 
+
+    user    = us_request.user
     return JSONResponse( response )
 
 
 @login_required
-@csrf_exempt
 @require_http_methods(["PUT"])
 def add_friend(us_request):
     response    = {}
-    user    = us_request.user 
+    user    = us_request.user
 
     if us_request.is_ajax():
         request_data  = json.loads(us_request.body)
@@ -164,22 +158,21 @@ def add_friend(us_request):
 
     return JSONResponse( response )
 
+
 @login_required
-@csrf_exempt
 @require_http_methods(["DELETE"])
 def delete_friendship(us_request):
     response    = {}
-    
-    user    = us_request.user 
+
+    user    = us_request.user
     return JSONResponse( response )
 
 
 @login_required
-@csrf_exempt
 @require_http_methods(["PUT"])
 def add_friend(us_request):
     response    = {}
-    user    = us_request.user 
+    user    = us_request.user
 
     if us_request.is_ajax():
         request_data  = json.loads(us_request.body)
@@ -202,12 +195,12 @@ def add_friend(us_request):
 
     return JSONResponse( response )
 
+
 @login_required
-@csrf_exempt
 @require_http_methods(["DELETE"])
 def cancel_request(us_request):
     response    = {}
-    user    = us_request.user 
+    user    = us_request.user
 
     if us_request.is_ajax():
         request_data  = json.loads(us_request.body)
@@ -221,12 +214,12 @@ def cancel_request(us_request):
 
     return JSONResponse( response )
 
+
 @login_required
-@csrf_exempt
 @require_http_methods(["PUT"])
 def block_friend(us_request):
     response    = {}
-    user    = us_request.user 
+    user    = us_request.user
 
     if us_request.is_ajax():
         request_data  = json.loads(us_request.body)
@@ -237,12 +230,12 @@ def block_friend(us_request):
 
     return JSONResponse( response )
 
+
 @login_required
-@csrf_exempt
 @require_http_methods(["PUT"])
 def accept_request(us_request):
     response    = {}
-    user    = us_request.user 
+    user    = us_request.user
 
     if us_request.is_ajax():
         request_data  = json.loads(us_request.body)
@@ -263,8 +256,8 @@ def accept_request(us_request):
                 request_obj = UserFriendRequest.objects.get(user=user, friend=friend)
                 if mode == 'add':
                     Friendship.objects.create(friend1=user, friend2=friend).save()
-                
-                #### delete the request object    
+
+                #### delete the request object
                 request_obj.delete()
 
             except IntegrityError:

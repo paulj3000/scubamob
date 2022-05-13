@@ -5,40 +5,38 @@ from django.http import HttpResponseNotFound, HttpResponseBadRequest, HttpRespon
 from django.conf import settings
 from django.http import HttpResponseNotFound, QueryDict
 
-from utils.jsonresponse import JSONResponse, api_response
 from api.views.exceptions import *
 
-UPDATER         = 'UPDATER'
-REQUIRED        = 'REQUIRED'
-CONFIF          = 'CONFIG'
+UPDATER = 'UPDATER'
+REQUIRED = 'REQUIRED'
+CONFIF = 'CONFIG'
 
 def trigger_response(function, us_request, us_input_data, us_id):
-    try: 
+    try:
         response = function(us_request, us_input_data, us_id)
-    except InvalidIdException, ex:
+    except InvalidIdException as ex:
         return JSONResponse(ex.json, httpclass=HttpResponseNotFound)
-    except CannotCompleteAction, ex:
+    except CannotCompleteAction as ex:
         return JSONResponse(ex.json, httpclass=HttpResponseBadRequest)
-    except InvalidFieldException, ex:
+    except InvalidFieldException as ex:
         return JSONResponse(ex.json, httpclass=HttpResponseBadRequest)
-    except InvalidValueException, ex:
+    except InvalidValueException as ex:
         return JSONResponse(ex.json, httpclass=HttpResponseBadRequest)
-    except RequiredFieldMissingException, ex:
+    except RequiredFieldMissingException as ex:
         return JSONResponse(ex.json, httpclass=HttpResponseBadRequest)
-    except CatastrophicException, ex:
+    except CatastrophicException as ex:
         return JSONResponse(ex.json, httpclass=HttpResponseServerError)
     except:
-        raise
         return JSONResponse({}, httpclass=HttpResponseServerError)
 
     return response or JSONResponse()
 
 def process_request(us_request):
-    ## ..and make sure we have a valid request method.  Since we're doing
-    ## standard CRUD methodology, we need to make sure we have at least the
-    ## 'GET' verb
-    request_method  = us_request.META.get('REQUEST_METHOD', 'GET')
-    us_input_data   = {}        # declare a variable
+    # ..and make sure we have a valid request method.  Since we're doing
+    # standard CRUD methodology, we need to make sure we have at least the
+    # 'GET' verb
+    request_method = us_request.META.get('REQUEST_METHOD', 'GET')
+    us_input_data = {}        # declare a variable
 
     if request_method == 'POST' or request_method == 'PUT':
         # verify the header
@@ -47,14 +45,14 @@ def process_request(us_request):
             us_request.body:
 
             try:
-                us_input_data   = QueryDict('', mutable=True)
+                us_input_data = QueryDict('', mutable=True)
                 us_input_data.update(simplejson.loads(us_request.body))
             except:
-                us_input_data   = QueryDict('', mutable=True)
+                us_input_data = QueryDict('', mutable=True)
 
         elif us_request.body:
-            ### kind of a crappy way to do this, but parse out the raw data and
-            ### turn it into a dict
+            # kind of a crappy way to do this, but parse out the raw data and
+            # turn it into a dict
             us_input_data = QueryDict(us_request.body, mutable=True)
     else:
         us_input_data = QueryDict(us_request.META.get('QUERY_STRING'), mutable=True)
@@ -71,7 +69,7 @@ class HttpResponseNotAuthorized(HttpResponse):
     def __init__(self):
         super(HttpResponseNotAuthorized, self).__init__()
         self.status_code = 401
-    
+
 def invalid(us_request, invalid):
     return JSONResponse({ "errors": { "message": "Resource %s not available" % invalid, "code": "MON_0000"  }}, httpclass=HttpResponseNotFound)
 
@@ -85,7 +83,7 @@ class APIResponse():
         total = data.get('total', '0')
         data['offset'] = offset
 
-        if count + offset >= total: 
+        if count + offset >= total:
             data['more'] = False
         else:
             data['more'] = True
@@ -101,7 +99,7 @@ class APIResponse():
 
         if 'offset' in items:
             del(items['offset'])
-    
+
     def validate_pagination(self, data):
         items = data['data']
 
@@ -176,4 +174,4 @@ class APIErrorCodes():
 
 
     def system_error(self):
-        return { self.code:  'MON_9999', self.message: 'An internal error has occured'     } 
+        return { self.code:  'MON_9999', self.message: 'An internal error has occured'     }

@@ -6,7 +6,6 @@ from django.core.validators import validate_email
 from django.forms import ValidationError
 from django.http import HttpResponseNotFound, QueryDict
 from django.views.decorators.csrf import csrf_exempt
-from django.utils import simplejson
 from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
@@ -15,12 +14,12 @@ from account.models import Account
 from api.views.apiutils import trigger_response, process_request, UPDATER, REQUIRED
 from utils.decorators import mobile_auth
 from api.views.exceptions import *
-from utils.jsonresponse import api_response, JSONResponse
+
 
 CONFIG  = 'CONFIG'
 FIELD   = 'ACCOUNT'
 
-## creating our API Error Code object
+# creating our API Error Code object
 API_Error_Codes = APIErrorCodes()
 
 def account_firstname(user, value):
@@ -70,7 +69,7 @@ ACCOUNT_FIELDS =  {
                       'password':        { UPDATER : account_password }
                   }
 
-REQUIRED_FIELDS = [ i for i in ACCOUNT_FIELDS.keys() ] 
+REQUIRED_FIELDS = [ i for i in ACCOUNT_FIELDS.keys() ]
 VALID_PARAMS  = REQUIRED_FIELDS + [ i for i in ACCOUNT_FIELDS.keys() if ACCOUNT_FIELDS[i].get(CONFIG) ]
 
 pprint(REQUIRED_FIELDS)
@@ -90,7 +89,7 @@ def external(us_request, us_username=None):
     return trigger_response(function, us_request, us_input_data, us_username)
 
 def update(us_request, us_input_data, us_username):
-    print "us_username:  %s " % us_username
+    print(f"us_username:  {us_username}")
     # make sure we have a valid monitor id
     if not us_username:
         errors = API_Error_Codes.id_not_supplied(FIELD)
@@ -128,7 +127,7 @@ def update(us_request, us_input_data, us_username):
 
 def create(us_request, us_input_data, us_username):
     input_fields = set(us_input_data.keys())
-    
+
     #account = get_from_model(us_username)
 
     if not len(input_fields):
@@ -137,7 +136,7 @@ def create(us_request, us_input_data, us_username):
         raise RequiredFieldMissingException(**errors)
 
     if set(REQUIRED_FIELDS).difference(set(input_fields)):
-        missing_fields = list(set(REQUIRED_FIELDS).difference(input_fields)) 
+        missing_fields = list(set(REQUIRED_FIELDS).difference(input_fields))
 
         # get our eror message
         errors  = API_Error_Codes.missing_fields(missing_fields)
@@ -172,9 +171,9 @@ def get_from_model(us_username):
     if not us_username:
         errors = API_Error_Codes.id_not_supplied(FIELD)
         raise InvalidIdException(**errors)
-    
+
     account = User.objects.filter(username=us_username)
-    
+
     try:
         return account[0]
     except:

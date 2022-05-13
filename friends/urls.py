@@ -7,18 +7,21 @@
 #
 # Author: Pauljames "The Juggernaut" Dimitriu
 # -----------------------------------------------------------------------------
-from django.conf.urls import patterns, url, include
-from django.contrib.auth.views import password_reset
+from django.conf.urls import include
+from django.urls import path, re_path
 
-from account.forms import LoginForm, PasswordForm, SettingsForm
+import friends.views.ajax as friends_ajax
+import friends.views as friends_views
+import account.views.json as account_json
 
-urlpatterns = patterns('',
-    url(r'^$',          'friends.views.index', name='friends_index'),
+
+urlpatterns = [
+    path('', friends_views.index, name='friends_index'),
 #    url(r'^ajax/', include('account.urls_ajax')),
-    
-    url(r'^json/setfavorite/?$', 'account.views.json.setfavorite', name='setfavorite'),
-    url(r'^json/getfavorite/?$', 'account.views.json.getfavorites', name='getfavorites'),
 
-    url(r'^request/accept/?$', 'friends.views.ajax.accept', name='friend_accept'),
-    url(r'^invite/?$', 'friends.views.ajax.invite', name='friends_invite'),
-)
+    path('json/setfavorite/', account_json.setfavorite, name='setfavorite'),
+    path('json/getfavorite/', account_json.getfavorites, name='getfavorites'),
+
+    path('request/accept/', friends_ajax.accept, name='friend_accept'),
+    path('invite/', friends_ajax.invite, name='friends_invite'),
+]

@@ -2,26 +2,22 @@ import uuid
 
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from django.core.context_processors import csrf
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from pprint import pprint
-from django.core.urlresolvers import reverse
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-from django.conf import settings 
+from django.conf import settings
 
-from boto.s3.connection import S3Connection
+#from boto.s3.connection import S3Connection
 from PIL import Image
-import cStringIO
 
-from logbook.forms import DiveForm 
+from logbook.forms import DiveForm
 from utils.core.user import User
-from utils.jsonresponse import JSONResponse, api_response
 from gallery.models import Album, AlbumImage
+
 
 IMAGE_TYPE_EXTENSIONS   = {
         'image/gif': 'gif',
@@ -30,7 +26,7 @@ IMAGE_TYPE_EXTENSIONS   = {
         'image/tiff': 'tiff'
 }
 
-@csrf_exempt
+
 @login_required
 @require_http_methods(["POST"])
 def upload(us_request):

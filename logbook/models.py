@@ -6,7 +6,6 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
-from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import CreationDateTimeField, ModificationDateTimeField
 
 from logbook.mongo import DiveLog
@@ -14,30 +13,32 @@ from utils.core.models import Timestamped
 #from utils.db import models
 from scuba.settings import MONGO_DIVELOGS
 
+
 class LogbookManager(models.Manager):
 
     #class Meta:
     #	collection	= MONGO_DIVELOGS
 
     def get_logs(self, user):
-		pass
+        pass
+
 
 class Logbook(models.Model):
-    user = models.ForeignKey(User, related_name='logbooks')
+    user = models.ForeignKey(User, related_name='logbooks', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=144)
 
     class Meta:
         db_table = 'logbook'
         unique_together = (('user', 'name'), )
-    
+
 	#### get our new manager
     objects = LogbookManager()
 
 
 
 class LogbookFolder(models.Model):
-    user = models.ForeignKey(User, related_name='logbook_folders')
+    user = models.ForeignKey(User, related_name='logbook_folders', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
 
     def init_guid(self):
@@ -51,8 +52,9 @@ class LogbookFolder(models.Model):
         db_table = 'logbook_folder'
         unique_together = (('user', 'name'), )
 
+
 class LogbookTag(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     guid = models.CharField(max_length=40)
     name = models.CharField(max_length=255)
 
@@ -60,7 +62,7 @@ class LogbookTag(models.Model):
         return str(uuid.uuid1()).replace('-','')
 
     def save(self, *args, **kwargs):
-      
+
         ## make sure we have a valid guid
         self.guid   = self.init_guid() if not self.guid else self.guid
 

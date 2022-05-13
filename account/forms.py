@@ -37,7 +37,7 @@ class AccountForm(UserCreationForm):
 
         ## return the clenaed password
         return password2
-    
+
     def clean_email(self):
         email   = self.cleaned_data.get('email')
 
@@ -46,7 +46,7 @@ class AccountForm(UserCreationForm):
             raise forms.ValidationError(
                 '%s is already registered' % email
             )
-        
+
         ## return the clenaed password
         return email
 
@@ -86,7 +86,7 @@ class PasswordForm(ModelForm):
     class Meta:
         model = User
         fields = ('password1', 'password2')
-    
+
     def clean_password2(self):
         password1   = self.cleaned_data.get('password1')
         password2   = self.cleaned_data.get('password2')
@@ -96,7 +96,7 @@ class PasswordForm(ModelForm):
 
         ## return the clenaed password
         return password2
-    
+
     def save(self, commit=True):
         user = super(PasswordForm, self).save(commit=False)
         user.set_password(self.cleaned_data['password1'])
@@ -119,7 +119,7 @@ class EmailInviteForm(forms.Form):
 
     def save(self, commit=True):
         ### before we even think about saving, let's make sure:
-        ### if the email is registered, this user is not a friend of 
+        ### if the email is registered, this user is not a friend of
         ### the current logged in user
         friend    = None
         email   = self.cleaned_data['email']
@@ -132,9 +132,9 @@ class EmailInviteForm(forms.Form):
                 ## make sure the email address is correct
                 validate_email(email)
             except:
-                print "bad email:  %s " % email
+                print(f"bad email:  {email}")
                 continue
-       
+
             friend  = None
             try:
                 friend  = User.objects.get(email=email)
@@ -142,7 +142,7 @@ class EmailInviteForm(forms.Form):
                 pass
 
             ### ok, so far a valid email address.  now, let's check for a valid user
-            ### first, is this this a valid usre with 
+            ### first, is this this a valid usre with
             if UserFriend.objects.filter(user__email=email, friend=self.user):
                 ### the user is already a friend.  forget it
                 continue

@@ -7,7 +7,7 @@ import string
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django_extensions.db.fields import CreationDateTimeField, ModificationDateTimeField
 
 
@@ -17,7 +17,7 @@ from utils.core.models import Timestamped
 #from utils.db import models
 
 class Account(models.Model):
-    user = models.ForeignKey(User, related_name='account' )
+    user = models.ForeignKey(User, related_name='account', on_delete=models.CASCADE)
     guid = models.CharField(max_length=40)
     can_add_divesites = models.BooleanField(default=False)
     reputation = models.IntegerField(max_length=6, default=0)
@@ -38,14 +38,14 @@ class Account(models.Model):
     class Meta:
         db_table = 'account'
 
-    def get_active_friend_requests(self): 
+    def get_active_friend_requests(self):
         ## let's get our user object
-        user    = self.user                
-      
+        user    = self.user
+
         ## check for requests which have the user's email, but do not have a friend (user) id
         ## associated to it.  We will update the friend id with the current user
-        UserFriendRequest.objects.filter(friend__id=0, email=user.email).update(friend=user)   
-       
+        UserFriendRequest.objects.filter(friend__id=0, email=user.email).update(friend=user)
+
         ### now, let's actually run the query and return
         user.friend_requested.filter(active=1).sort('first_name')
 
@@ -58,7 +58,7 @@ class Account(models.Model):
 
         ### ok, we have a new account id.  return it
         return retval
-    
+
     def save(self, *args, **kwargs):
         if not self.apikey and not self.secret:
             self.apikey = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(24))
@@ -68,8 +68,8 @@ class Account(models.Model):
 
 
 class Friendship(models.Model):
-    friend1 = models.ForeignKey(User, related_name='friend_friend1')
-    friend2 = models.ForeignKey(User, related_name='friend_friend2')
+    friend1 = models.ForeignKey(User, related_name='friend_friend1', on_delete=models.CASCADE)
+    friend2 = models.ForeignKey(User, related_name='friend_friend2', on_delete=models.CASCADE)
     blocked = models.BooleanField(default=False)
     created = CreationDateTimeField(_('created'))
     modified = ModificationDateTimeField(_('modified'))
@@ -79,8 +79,8 @@ class Friendship(models.Model):
         unique_together = (('friend1', 'friend2'), )
 
 class UserFriend(models.Model):
-    user = models.ForeignKey(User, related_name='friend_user' )
-    friend = models.ForeignKey(User, related_name='friend_friend')
+    user = models.ForeignKey(User, related_name='friend_user', on_delete=models.CASCADE)
+    friend = models.ForeignKey(User, related_name='friend_friend', on_delete=models.CASCADE)
     hide = models.BooleanField(default=False)
     created = CreationDateTimeField(_('created'))
     modified = ModificationDateTimeField(_('modified'))
@@ -90,8 +90,8 @@ class UserFriend(models.Model):
         unique_together = (('user', 'friend'), )
 
 class UserFriendBlocked(models.Model):
-    user = models.ForeignKey(User, null=True, related_name='blocked_user')
-    friend = models.ForeignKey(User, related_name='blocked_friend')
+    user = models.ForeignKey(User, null=True, related_name='blocked_user', on_delete=models.CASCADE)
+    friend = models.ForeignKey(User, related_name='blocked_friend', on_delete=models.CASCADE)
     created = CreationDateTimeField(_('created'))
     modified = ModificationDateTimeField(_('modified'))
 
@@ -107,10 +107,10 @@ class UserFriendRequestManager(models.Manager):
         UserFriendRequest.objects.filter(friend=user, active=True).update(active=False)
 
 class UserFriendRequest(models.Model):
-    user = models.ForeignKey(User, null=True, related_name='friend_requests')
+    user = models.ForeignKey(User, null=True, related_name='friend_requests', on_delete=models.CASCADE)
     email = models.CharField(max_length=100, null=True)
     active  = models.BooleanField(default=True)
-    friend = models.ForeignKey(User, related_name='friend_requested')
+    friend = models.ForeignKey(User, related_name='friend_requested', on_delete=models.CASCADE)
     created = CreationDateTimeField(_('created'))
     modified = ModificationDateTimeField(_('modified'))
 
@@ -122,7 +122,7 @@ class UserFriendRequest(models.Model):
         unique_together = (('user', 'friend'), ('user','email'), )
 
 class UserDiveSiteBuddyFinder(models.Model):
-    user = models.ForeignKey(User, related_name='buddyfinder')
+    user = models.ForeignKey(User, related_name='buddyfinder', on_delete=models.CASCADE)
     divesite_id = models.CharField(max_length=100, null=True)
     created = CreationDateTimeField(_('created'))
     modified = ModificationDateTimeField(_('modified'))
@@ -136,7 +136,7 @@ class Notification(models.Model):
     NOTIFICATION_TYPE = (
         (1, 'FRIEND_REQUEST'),
     )
-    user = models.ForeignKey(User, related_name='notifications' )
+    user = models.ForeignKey(User, related_name='notifications', on_delete=models.CASCADE)
     notification_type    = models.PositiveSmallIntegerField(max_length=3, choices=NOTIFICATION_TYPE)
     notification_id    = models.PositiveIntegerField(max_length=10)
     active = models.BooleanField(default=True)
@@ -151,7 +151,7 @@ class Notification(models.Model):
 ### define a signal, make sure we have an account set up for the user
 def create_account(sender, **kw):
     user = kw["instance"]
-    
+
     ### make sure we have an acccount
     if kw["created"]:
         account = Account(user=user)

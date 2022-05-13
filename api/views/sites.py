@@ -1,16 +1,14 @@
 from datetime import datetime, timedelta
 from pprint import pprint
 
-from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.http import QueryDict
 
 from divesites.mongo import DiveSite
 from api.views.apiutils import trigger_response, process_request
-from utils.jsonresponse import JSONResponse, api_response
 from utils.decorators import external_authentication
 
-@csrf_exempt
+
 @external_authentication
 def external(us_request, us_divesite_id=None):
     data = process_request(us_request)

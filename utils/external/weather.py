@@ -3,12 +3,12 @@ from decimal import Decimal
 from pprint import pprint
 import calendar
 import logging
+import requests
 
 import json
 from django.conf import settings
 
 from utils.memcache_client import MemcacheClient
-from utils.httprequest import HttpRequest
 
 class Weather:
     def __init__(self):
@@ -32,7 +32,7 @@ class Weather:
                 raise ValueError("Invalid Response")
         except:
             raise ValueError("Error")
-    
+
     def get_data_latlng(self, lat, lon):
 
         try:
@@ -42,7 +42,7 @@ class Weather:
             return simplejson.loads(res)
         except:
             pass
-        
+
         url         = self.settings['url_latlng'] % (self.settings['apikey'], lat, lon)
         res         = self.do_comm(url)
 
@@ -50,14 +50,14 @@ class Weather:
         try:
             memcache.set(memcache_key, simplejson.dumps(res), 3600)
         except:
-            print "memcache not available"
+            print("memcache not available")
             pass
-        
+
         ## let's return
         return res
 
     def do_comm(self, url):
-        
+
         ## make the call to weather underground
         data = self.http_interface.invoke(url)
 

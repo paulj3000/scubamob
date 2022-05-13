@@ -1,17 +1,21 @@
 # -----------------------------------------------------------------------------
 # logbook/urls.py
 #
-# This is the url resolver for the actual logbook. 
+# This is the url resolver for the actual logbook.
 #
 # (C) Copyright 2013, Scubalog.  All rights reserved.
 #
 # Author: Pauljames "The Juggernaut" Dimitriu
 # -----------------------------------------------------------------------------
-from django.conf.urls import patterns, url
+from django.urls import path, re_path
 
-urlpatterns = patterns('',
-    url(r'^$', 'divesites.views.index',name="divesites_home"),
-    url(r'^edit/([0-9A-Fa-f]{20,36})?$', 'divesites.views.newsite',name="divesites_new"),
-    url(r'^json/locations/?$', 'divesites.views.json.getdivesites'),
-    url(r'^json/getdivesiteinfo/([0-9A-Fa-f]{20,36})/?$', 'divesites.views.json.getdivesiteinfo'),
-)
+import divesites.views as divesites_views
+import divesites.views.json as divesites_json
+
+
+urlpatterns = [
+    path('', divesites_views.index, name="divesites_home"),
+    re_path(r'^edit/([0-9A-Fa-f]{20,36})?$', divesites_views.newsite, name="divesites_new"),
+    path('json/locations/', divesites_json.getdivesites),
+    re_path(r'^json/getdivesiteinfo/([0-9A-Fa-f]{20,36})/?$', divesites_json.getdivesiteinfo),
+]

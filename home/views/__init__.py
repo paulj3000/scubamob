@@ -15,18 +15,17 @@ from utils.external.weather import Weather
 from utils.maxmind import MaxMind
 
 def index(us_request):
-    if us_request.user.is_authenticated():
+    if us_request.user.is_authenticated:
         return redirect('/home/')
-  
+
     context     = {}
-    context.update(csrf(us_request))
-    
-    ### get maxmind data 
+
+    # get maxmind data
     maxmind     = MaxMind()
     ip      = maxmind.get_client_ip(us_request)
     context['geoip']    = maxmind.get_maxmind_data(ip)
 
-    ## render the appropriate template
+    # render the appropriate template
     return render(us_request, 'home/index.html', context)
 
 @login_required
@@ -38,11 +37,11 @@ def home(us_request):
 
 
     template    = 'home/home.html'
- 
-    divesite_mongo  = DiveSiteMongo() 
+
+    divesite_mongo  = DiveSiteMongo()
     weather = Weather()
- 
-    ## let's get the favorites for this particular user
+
+    # let's get the favorites for this particular user
     mongo_obj   = AccountMongo(user_id=user.id)
     user_favorites  = mongo_obj.get_favorites()
     context     = { 'divesites': [] }
@@ -56,9 +55,9 @@ def home(us_request):
         divesite_data['weather']    = weather_data
 
         context['divesites'].append(divesite_data)
-    
+
     account = AccountMongo(user_id=user_id)
 
-    ## render the appropriate template
+    # render the appropriate template
     return render(us_request, template, context)
 
