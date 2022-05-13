@@ -4,10 +4,9 @@ import uuid
 from django import forms
 from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.models import User
 from django.core.validators import validate_email
 
-from account.models import UserFriendRequest, UserFriend
+from account.models import UserFriendRequest, UserFriend, User
 
 
 class LoginForm(AuthenticationForm):

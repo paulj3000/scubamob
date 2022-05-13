@@ -252,5 +252,5 @@ def create_account(sender, **kw):
             account = Account(user=user)
             account.save()
 
-post_save.connect(create_account, sender=User, dispatch_uid="users-accountcreation-signal")
+#post_save.connect(create_account, sender=User, dispatch_uid="users-accountcreation-signal")
 
