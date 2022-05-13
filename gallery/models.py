@@ -7,7 +7,6 @@ from io import StringIO
 
 from django.db import models
 from django.db.models import fields, Q
-from django.contrib.auth.models import User
 from django.conf import settings
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
@@ -16,6 +15,8 @@ from django.dispatch.dispatcher import receiver
 
 from utils import uuidmodel
 from utils.core.models import Timestamped
+from account.models import User
+
 
 IMAGE_TYPE_EXTENSIONS   = {
         'image/gif': 'gif',

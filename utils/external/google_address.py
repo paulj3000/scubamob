@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
-from pprint import pprint
 import calendar
 import logging
 import urllib
@@ -21,19 +20,18 @@ class GoogleAddress:
     def get_data_city_state(self, address, city, state):
         city    = city.replace(' ', '_').lower()
         settings    = self.settings
-    
+
         citystatezip    = "%s %s %s" % (address.lower(), city.lower(), state.lower())
 
         url         = self.settings['url'] % urllib.quote(citystatezip)
 
-        ## make the call to weather underground
+        # make the call to weather underground
         return self.do_comm(url)
         '''
         data = self.http_interface.invoke(url)
 
-        ## ... and of course, let's return the data
+        # ... and of course, let's return the data
         try:
-            pprint(data)
             if str(data['code']) == '200':
                 return simplejson.loads(data['response'])
             else:
@@ -41,13 +39,13 @@ class GoogleAddress:
         except:
             raise ValueError("Error")
         '''
-    
+
     def do_comm(self, url):
-        
-        ## make the call to weather underground
+
+        # make the call to weather underground
         data = self.http_interface.invoke(url)
 
-        ## ... and of course, let's return the data
+        # ... and of course, let's return the data
         try:
             if str(data['code']) == '200':
                 map_data =  simplejson.loads(data['response'])

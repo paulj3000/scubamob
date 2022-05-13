@@ -5,6 +5,8 @@ Django==4.0.4
 Pillow==9.1.0
 django-ses==3.0.1
 django-extensions==3.1.5
+django-compressor==4.0
+django-yarn==0.0.2
 pymongo==4.1.1
 mysqlclient==2.1.0; sys_platform == 'linux'
 djangorestframework==3.13.1

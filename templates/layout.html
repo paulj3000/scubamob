@@ -1,4 +1,4 @@
-{% load media %}
+{% load static %}
 {% include "includes/origin.html" %} 
 
 {% block includes %}
@@ -8,7 +8,7 @@
 <body>
 <script type="text/javascript">
 var image_url = "/"; 
-var divemarker  = "{% media_url 'images/icons/divemarker.png' %}";
+var divemarker  = "{% static 'images/icons/divemarker.png' %}";
 $(document).ready(function()
 {
     doPoll();
@@ -21,12 +21,12 @@ $(document).ready(function()
     <div id="wrap">
         <div class="header-block">
             <div class="logo-small">
-                <img src="{% media_url 'images/logo_small_80.png' %}" width="80" alt="logo small" />
+                <img src="{% static 'images/logo_small_80.png' %}" width="80" alt="logo small" />
             </div>
             <div class="header-top">
                 {% if logged_in %}
                 <div style="padding-top:10px;padding-bottom:10px;">
-                    <div class="frogman-text prepand" style="text-align:right">{{ fullname }}&nbsp;&nbsp;<a href="#" onclick="$('.friend-cross').slideToggle()"><a href="#" onclick="$('.friend-cross').slideToggle()"><img onclick="$('.logbox').slideToggle()" src="{% media_url 'images/scubamob-icon.jpg' %}" alt="" style="position:relative; top:6px; background-image: url(#); layer-background-image: url(#); border: 1px none #000000;" /></a>
+                    <div class="frogman-text prepand" style="text-align:right">{{ fullname }}&nbsp;&nbsp;<a href="#" onclick="$('.friend-cross').slideToggle()"><a href="#" onclick="$('.friend-cross').slideToggle()"><img onclick="$('.logbox').slideToggle()" src="{% static 'images/scubamob-icon.jpg' %}" alt="" style="position:relative; top:6px; background-image: url(#); layer-background-image: url(#); border: 1px none #000000;" /></a>
 
                      </div>
                 {% else %}
@@ -34,8 +34,8 @@ $(document).ready(function()
                     <table style="width:100%;border:0px" cellpadding="0" cellspacing="0">
                       <tr>
                           <td width="155" align="right">
-                              <a href="{% url 'account_login' %}"><img src="{% media_url 'images/scubamob-login-button.png' %}" /></a>&nbsp;
-                              <a href="{% url 'account_register' %}"><img src="{% media_url 'images/scubamob-signup-top.png' %}" /></a>
+                              <a href="{% url 'login' %}"><img src="{% static 'images/scubamob-login-button.png' %}" /></a>&nbsp;
+                              <a href="{% url 'register' %}"><img src="{% static 'images/scubamob-signup-top.png' %}" /></a>
                           </td>
                       </tr>
                     </table>

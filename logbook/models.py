@@ -4,7 +4,6 @@ import random
 import uuid
 
 from django.db import models
-from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django_extensions.db.fields import CreationDateTimeField, ModificationDateTimeField
 
@@ -12,6 +11,7 @@ from logbook.mongo import DiveLog
 from utils.core.models import Timestamped
 #from utils.db import models
 from scuba.settings import MONGO_DIVELOGS
+from account.models import User
 
 
 class LogbookManager(models.Manager):

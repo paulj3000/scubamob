@@ -5,15 +5,18 @@ from django import forms
 from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
+from django.core.validators import validate_email
 
 from account.models import UserFriendRequest, UserFriend
 
+
 class LoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
-        super(LoginForm, self).__init__(*args, **kwargs)
-        self.fields['username'].widget.attrs['class']   = 'home-form-input create-account';
-        self.fields['username'].label  = 'Username or Email';
-        self.fields['password'].widget.attrs['class']   = 'home-form-input create-account';
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs['class'] = 'home-form-input create-account';
+        self.fields['username'].label = 'Username or Email';
+        self.fields['password'].widget.attrs['class'] = 'home-form-input create-account';
+
 
 class AccountForm(UserCreationForm):
     username = forms.CharField(label="", widget=forms.TextInput(attrs={'class':'home-form-input create-account', 'placeholder':'Username'}), required=True)
@@ -29,29 +32,29 @@ class AccountForm(UserCreationForm):
 
 
     def clean_password2(self):
-        password1   = self.cleaned_data.get('password1')
-        password2   = self.cleaned_data.get('password2')
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
 
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError("Passwords do not match")
 
-        ## return the clenaed password
+        # return the cleaned password
         return password2
 
     def clean_email(self):
-        email   = self.cleaned_data.get('email')
+        email = self.cleaned_data.get('email')
 
-        ## check to see if this email address has already been used
+        # check to see if this email address has already been used
         if User.objects.filter(email=email):
             raise forms.ValidationError(
                 '%s is already registered' % email
             )
 
-        ## return the clenaed password
+        # return the clenaed password
         return email
 
     def save(self, commit=True):
-        user = super(AccountForm, self).save(commit=False)
+        user = super().save(commit=False)
         user.set_password(self.cleaned_data['password1'])
 
         if commit:
@@ -69,10 +72,10 @@ class SettingsForm(ModelForm):
         fields = ("first_name", "last_name", 'email')
 
     def save(self, commit=True):
-        user = super(NameForm, self).save(commit=False)
+        user = super().save(commit=False)
         user.first_name = self.cleaned_data['first_name']
-        user.last_name  = self.cleaned_data['last_name']
-        user.email  = self.cleaned_data['email']
+        user.last_name = self.cleaned_data['last_name']
+        user.email = self.cleaned_data['email']
 
         if commit:
             user.save()
@@ -88,17 +91,17 @@ class PasswordForm(ModelForm):
         fields = ('password1', 'password2')
 
     def clean_password2(self):
-        password1   = self.cleaned_data.get('password1')
-        password2   = self.cleaned_data.get('password2')
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
 
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError("Passwords do not match")
 
-        ## return the clenaed password
+        # return the clenaed password
         return password2
 
     def save(self, commit=True):
-        user = super(PasswordForm, self).save(commit=False)
+        user = super().save(commit=False)
         user.set_password(self.cleaned_data['password1'])
 
         if commit:
@@ -118,40 +121,39 @@ class EmailInviteForm(forms.Form):
             fields = ['email']
 
     def save(self, commit=True):
-        ### before we even think about saving, let's make sure:
-        ### if the email is registered, this user is not a friend of
-        ### the current logged in user
-        friend    = None
-        email   = self.cleaned_data['email']
-        from django.core.validators import validate_email
+        # before we even think about saving, let's make sure:
+        # if the email is registered, this user is not a friend of
+        # the current logged in user
+        friend = None
+        email = self.cleaned_data['email']
 
         #UserFriendRequest.objects.get(friend=friend, user=self.user)
         for email in self.cleaned_data['email'].split(','):
-            ## let's get the email and check if it's already in the system
+            # let's get the email and check if it's already in the system
             try:
-                ## make sure the email address is correct
+                # make sure the email address is correct
                 validate_email(email)
             except:
                 print(f"bad email:  {email}")
                 continue
 
-            friend  = None
+            friend = None
             try:
-                friend  = User.objects.get(email=email)
+                friend = User.objects.get(email=email)
             except:
                 pass
 
-            ### ok, so far a valid email address.  now, let's check for a valid user
-            ### first, is this this a valid usre with
+            # ok, so far a valid email address.  now, let's check for a valid user
+            # first, is this this a valid usre with
             if UserFriend.objects.filter(user__email=email, friend=self.user):
-                ### the user is already a friend.  forget it
+                # the user is already a friend.  forget it
                 continue
 
             if UserFriendRequest.objects.filter(user=self.user, email=email):
-                ### the user has already been requested
+                # the user has already been requested
                 continue
 
-            ## if we got down here, we can add the new user
-            friend_id   = friend.id if friend else 0
+            # if we got down here, we can add the new user
+            friend_id = friend.id if friend else 0
             self.email_invites.append(email)
             UserFriendRequest.objects.create(friend=self.user, email=email, user=friend)

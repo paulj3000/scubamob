@@ -1,12 +1,16 @@
 from django.conf.urls import include
 from django.urls import path, re_path
 from django.views.generic import TemplateView
-import scuba.settings
 
-# Uncomment the next two lines to enable the admin:
+from django.contrib.auth.views import LoginView
+
+
+import scuba.settings
 import home.views as home_views
 import account.views.profiles as account_profiles
 #import account.views.login as login_views
+import account.views.login as login_views
+import account.views as account_views
 
 
 from django.contrib import admin
@@ -17,7 +21,7 @@ urlpatterns = [
     # url(r'^scubamob/', include('scubamob.foo.urls')),
     path('', home_views.index, name='index'),
     path('home/', home_views.home, name='home'),
-    #url(r'^register/$', 'home.views.register', name='register'),
+    path('register/', account_views.register, name='register'),
 
     path('account/', include('account.urls')),
     path('friends/', include('friends.urls')),
@@ -55,11 +59,10 @@ urlpatterns = [
 
     re_path(r'^(?P<username>[0-9A-Za-z]+)/$',  account_profiles.profile, name='profile'),
 
-    #path('login/', login_views.LoginView.as_view(
-    #    template_name='accounts/login.html'),
-    #    name='login'),
+    #path('xx/login/', login_views.LoginView.as_view(
+    path('xx/login/', LoginView.as_view(
+        template_name='account/login.html'),
+        name='login'),
 
     #path('logout/', SignoutView.as_view(next_page='/'), name='signout'),
 ]
-
-#urlpatterns += staticfiles_urlpatterns()

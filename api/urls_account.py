@@ -14,5 +14,5 @@ import api.views.mobile_account as api_mobile_account
 
 urlpatterns = [
     path('', api_mobile_account.external),
-    re_path(r'^/([\w]{5,36})$', api_mobile_account.external),
+    re_path(r'^([\w]{5,36})$', api_mobile_account.external),
 ]

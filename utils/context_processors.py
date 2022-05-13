@@ -9,7 +9,7 @@ def sm(request):
     context = {
             'logged_in': user.is_authenticated,
             'GOOGLE_API_KEY': settings.GOOGLE_API_KEY,
-            'IMAGE_URL': settings.DEV_MEDIA_URL if settings.DEBUG else settings.PRODUCTION_MEDIA_URL,
+            #'IMAGE_URL': settings.DEV_MEDIA_URL if settings.DEBUG else settings.PRODUCTION_MEDIA_URL,
             'PRODUCTION_GALLERY_URL': settings.PRODUCTION_GALLERY_URL
             }
 

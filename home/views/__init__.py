@@ -1,6 +1,3 @@
-# Create your views here.
-from pprint import pprint
-
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
@@ -13,6 +10,7 @@ from home.forms import HomeLoginForm
 from account.forms import AccountForm
 from utils.external.weather import Weather
 from utils.maxmind import MaxMind
+
 
 def index(us_request):
     if us_request.user.is_authenticated:
@@ -27,6 +25,7 @@ def index(us_request):
 
     # render the appropriate template
     return render(us_request, 'home/index.html', context)
+
 
 @login_required
 def home(us_request):

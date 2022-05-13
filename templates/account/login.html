@@ -10,7 +10,7 @@
 {% endif %}
 
 <div class="inputform">
-    <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
+    <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
         <ul>
         {% for field in form %}
@@ -22,7 +22,7 @@
         </ul>
         <div class="loginoption">
             <span class="cssbutton large formsubmit">Log In</span>
-            <a href="{% url 'forgot_password1' %}" class="cant">Forgot your password?</a>
+            <a href="{% url 'forgot_password' %}" class="cant">Forgot your password?</a>
         </div>
 
         <input type="hidden" name="next" value="{{ next }}" />
@@ -35,7 +35,7 @@
 {% endfor %}
 </ul>
 
-<script type="text/javascript">
+<script>
 $('.formsubmit').click(function()
 {
     $(this).closest('form').submit();

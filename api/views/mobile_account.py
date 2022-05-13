@@ -8,16 +8,15 @@ from django.http import HttpResponseNotFound, QueryDict
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.forms.models import model_to_dict
-from django.contrib.auth.models import User
 
-from account.models import Account
+from account.models import User
 from api.views.apiutils import trigger_response, process_request, UPDATER, REQUIRED
 from utils.decorators import mobile_auth
 from api.views.exceptions import *
 
 
-CONFIG  = 'CONFIG'
-FIELD   = 'ACCOUNT'
+CONFIG = 'CONFIG'
+FIELD = 'ACCOUNT'
 
 # creating our API Error Code object
 API_Error_Codes = APIErrorCodes()
@@ -61,18 +60,17 @@ def account_password(user, value):
     user.set_password(value)
     return user
 
-ACCOUNT_FIELDS =  {
-                      'username':      { UPDATER : account_username },
-                      'first_name':      { UPDATER : account_firstname },
-                      'last_name':       { UPDATER : account_lastname },
-                      'email':           { UPDATER : account_email },
-                      'password':        { UPDATER : account_password }
+ACCOUNT_FIELDS = {
+                      'username': { UPDATER : account_username },
+                      'first_name': { UPDATER : account_firstname },
+                      'last_name': { UPDATER : account_lastname },
+                      'email': { UPDATER : account_email },
+                      'password': { UPDATER : account_password }
                   }
 
-REQUIRED_FIELDS = [ i for i in ACCOUNT_FIELDS.keys() ]
-VALID_PARAMS  = REQUIRED_FIELDS + [ i for i in ACCOUNT_FIELDS.keys() if ACCOUNT_FIELDS[i].get(CONFIG) ]
+REQUIRED_FIELDS = [i for i in ACCOUNT_FIELDS.keys()]
+VALID_PARAMS = REQUIRED_FIELDS + [i for i in ACCOUNT_FIELDS.keys() if ACCOUNT_FIELDS[i].get(CONFIG)]
 
-pprint(REQUIRED_FIELDS)
 
 @csrf_exempt
 @mobile_auth
@@ -89,7 +87,7 @@ def external(us_request, us_username=None):
     return trigger_response(function, us_request, us_input_data, us_username)
 
 def update(us_request, us_input_data, us_username):
-    print(f"us_username:  {us_username}")
+    print(f"us_username: {us_username}")
     # make sure we have a valid monitor id
     if not us_username:
         errors = API_Error_Codes.id_not_supplied(FIELD)
@@ -98,7 +96,7 @@ def update(us_request, us_input_data, us_username):
     user = User.objects.filter(username=us_username)
 
     try:
-        user    = user[0]
+        user = user[0]
     except:
         errors = API_Error_Codes.id_not_supplied(FIELD)
         raise InvalidIdException(**errors)
@@ -107,7 +105,7 @@ def update(us_request, us_input_data, us_username):
 
     if not len(input_fields):
         # get our eror message.  The user did not supply any data in the post
-        errors  = API_Error_Codes.no_data_supplied_put()
+        errors = API_Error_Codes.no_data_supplied_put()
         raise RequiredFieldMissingException(**errors)
 
     if set(input_fields).difference(VALID_PARAMS):
@@ -132,18 +130,18 @@ def create(us_request, us_input_data, us_username):
 
     if not len(input_fields):
         # get our eror message.  The user did not supply any data in the post
-        errors  = API_Error_Codes.no_data_supplied_post()
+        errors = API_Error_Codes.no_data_supplied_post()
         raise RequiredFieldMissingException(**errors)
 
     if set(REQUIRED_FIELDS).difference(set(input_fields)):
         missing_fields = list(set(REQUIRED_FIELDS).difference(input_fields))
 
         # get our eror message
-        errors  = API_Error_Codes.missing_fields(missing_fields)
+        errors = API_Error_Codes.missing_fields(missing_fields)
         raise RequiredFieldMissingException(**errors)
 
     if set(input_fields).difference(VALID_PARAMS):
-        errors  = API_Error_Codes.invalid_fields(list(set(input_fields).difference(VALID_PARAMS)))
+        errors = API_Error_Codes.invalid_fields(list(set(input_fields).difference(VALID_PARAMS)))
         raise InvalidFieldException(**errors)
 
     user = User()
@@ -152,15 +150,15 @@ def create(us_request, us_input_data, us_username):
             user = ACCOUNT_FIELDS[key][UPDATER](user, us_input_data.get(key))
 
     user.save()
-    Account.objects.create(user=user)
+    User.objects.create(user=user)
 
     response = api_response(data={'items': { 'created' : '2013-09-01', 'id': user.id }})
     return JSONResponse(response)
 
 def get(us_request, us_input_data, us_username):
-    account     = get_from_model(us_username)
+    account = get_from_model(us_username)
     try:
-        account_json  = model_to_dict(account, fields=['username', 'email', 'last_name', 'first_name'])
+        account_json = model_to_dict(account, fields=['username', 'email', 'last_name', 'first_name'])
         return JSONResponse(api_response(data={'items':[account_json] }))
     except:
         errors = API_Error_Codes.not_found(FIELD, us_username)

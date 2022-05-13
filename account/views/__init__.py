@@ -10,7 +10,7 @@ from django.conf import settings
 
 # define the user data for this account
 from account.forms import AccountForm
-from account.models import Account
+from account.models import User
 
 
 def register(us_request):
@@ -27,7 +27,7 @@ def register(us_request):
             login(us_request, new_user)
 
             # create the new account
-            Account.objects.create(user=new_user)
+            User.objects.create(user=new_user)
 
             # and redirect them home
             return redirect('home')
@@ -37,8 +37,7 @@ def register(us_request):
         account_form    = AccountForm()
 
     # now let's render everything
-    c = { 'account_form': account_form }
-    c.update(csrf(us_request))
+    c = {'account_form': account_form}
 
     return render(us_request, "account/register.html", c)
 
