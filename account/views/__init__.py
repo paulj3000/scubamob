@@ -1,4 +1,3 @@
-# Create your views here.
 from pprint import pprint
 
 from django.http import HttpResponse
@@ -18,7 +17,6 @@ def register(us_request):
         if account_form.is_valid():
             a = account_form.save()
 
-
             user = authenticate(
                 us_request,
                 username=us_request.POST['email'],
@@ -26,9 +24,6 @@ def register(us_request):
 
             # log the user in
             login(us_request, user)
-
-            # create the new account
-            User.objects.create(user=user)
 
             # and redirect them home
             return redirect('home')
@@ -42,6 +37,7 @@ def register(us_request):
 
     return render(us_request, "account/register.html", c)
 
+
 @login_required
 def home(us_request):
     template = 'home/home.html'
@@ -50,6 +46,7 @@ def home(us_request):
 
     # render the appropriate template
     return render(us_request, template, context)
+
 
 @login_required
 def poll(us_request):
@@ -67,4 +64,3 @@ def poll(us_request):
 
     # render the appropriate template
     return JSONResponse(api_response(**retval))
-

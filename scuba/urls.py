@@ -9,7 +9,7 @@ import scuba.settings
 import home.views as home_views
 import account.views.profiles as account_profiles
 #import account.views.login as login_views
-import account.views.login as login_views
+import account.views.xlogin as login_views
 import account.views as account_views
 
 
