@@ -10,3 +10,5 @@ django-yarn==0.0.2
 pymongo==4.1.1
 mysqlclient==2.1.0; sys_platform == 'linux'
 djangorestframework==3.13.1
+django-crispy-forms==1.14.0
+crispy-bootstrap5==0.6

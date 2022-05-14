@@ -1,9 +1,11 @@
 from pprint import pprint
+from datetime import datetime
 import uuid
 
 from django import forms
 from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import validate_email
 
 from scuba.accounts.models import UserFriendRequest, UserFriend, User
@@ -156,3 +158,37 @@ class EmailInviteForm(forms.Form):
             friend_id = friend.id if friend else 0
             self.email_invites.append(email)
             UserFriendRequest.objects.create(friend=self.user, email=email, user=friend)
+
+
+def validate_password(password):
+    """ validate_password
+
+    A generic class to validate the password for a user. The
+    password needs to fulfil the password requirements stuff.
+
+    returns a boolean: True if password fulfils the params else
+        return false
+    """
+    if password and len(password) < 4 or len(password) > 20:
+        return False
+
+    # the passord is good. We will return True
+    return True
+
+
+class SignupForm(ModelForm):
+    """ SignupForm
+
+    Sign up a new user
+    """
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email', 'password',)
+
+    def clean_full_name(self):
+        full_name = self.cleaned_data.get('full_name')
+
+        if full_name.endswith('whofe'):
+            raise forms.ValidationError('Cannot register account')
+
+        return full_name

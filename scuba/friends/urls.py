@@ -10,8 +10,8 @@
 from django.conf.urls import include
 from django.urls import path, re_path
 
-import friends.views.ajax as friends_ajax
-import friends.views as friends_views
+import scuba.friends.views.ajax as friends_ajax
+import scuba.friends.views as friends_views
 import scuba.accounts.views.json as account_json
 
 

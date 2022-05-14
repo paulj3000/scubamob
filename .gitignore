@@ -13,3 +13,4 @@ test_result.log
 testdata
 test.sqlite3
 static/admin
+node_modules/*

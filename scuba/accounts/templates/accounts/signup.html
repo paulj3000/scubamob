@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+{% load crispy_forms_tags static %}
+
+{% block content %}
+<div class="sales">
+    <h1>Sign up for ScubaMob</h1>
+</div>
+<div class="inputform">
+
+    <form method="post" action="{% url 'signup' %}">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <div class="loginoption">
+            <button class="btn btn-primary" type="submit">Login</button>
+        </div>
+
+        <input type="hidden" name="next" value="{{ next }}" />
+    </form>
+</div>
+
+{% endblock %}

@@ -8,8 +8,8 @@ from django.contrib.auth.views import LoginView
 import scuba.settings
 import home.views as home_views
 import scuba.accounts.views.profiles as account_profiles
-#import account.views.login as login_views
-import scuba.accounts.views.xlogin as login_views
+import scuba.accounts.views.login as login_views
+import scuba.accounts.views.signup as signup_views
 import scuba.accounts.views as account_views
 
 
@@ -20,11 +20,12 @@ urlpatterns = [
     # Examples:
     # url(r'^scubamob/', include('scubamob.foo.urls')),
     path('', home_views.index, name='index'),
+
     path('home/', home_views.home, name='home'),
-    path('register/', account_views.register, name='register'),
+    path('signup/', signup_views.SignupView.as_view(), name='signup'),
 
     path('account/', include('scuba.accounts.urls')),
-    path('friends/', include('friends.urls')),
+    path('friends/', include('scuba.friends.urls')),
     path('logbook/', include('logbook.urls')),
     path('divesites/', include('divesites.urls')),
     path('diveshops/', include('diveshops.urls')),
@@ -32,6 +33,8 @@ urlpatterns = [
     path('equipment/', include('equipment.urls')),
     path('env/', include('env.urls')),
 #    url(r'^diveshop/', include('diveshop.urls')),
+
+
 
     path('password/', include('scuba.accounts.urls_password')),
 
@@ -44,6 +47,7 @@ urlpatterns = [
     path('api/1.0/mobile/account', include('api.urls_account')),
     path('api/1.0/mobile', include('api.urls_mobile')),
 
+
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
@@ -54,15 +58,12 @@ urlpatterns = [
 
     # start some user account helper modules
 
-    # enable the admin section
-    path('admin/', admin.site.urls),
-
-    re_path(r'^(?P<username>[0-9A-Za-z]+)/$',  account_profiles.profile, name='profile'),
-
-    #path('xx/login/', login_views.LoginView.as_view(
-    path('xx/login/', LoginView.as_view(
+    path('login/', LoginView.as_view(
         template_name='account/login.html'),
         name='login'),
 
-    #path('logout/', SignoutView.as_view(next_page='/'), name='signout'),
+    # enable the admin section
+    path('admin/', admin.site.urls),
+
+    re_path(r'^p/(?P<username>[0-9A-Za-z]+)/$',  account_profiles.profile, name='profile'),
 ]
