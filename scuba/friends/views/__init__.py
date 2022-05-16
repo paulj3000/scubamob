@@ -30,7 +30,6 @@ def index(us_request, mode=None):
     friend_list = us_request.user.friend_user.order_by('friend__first_name')
     friend_request_list = us_request.user.friend_requests.order_by('friend__first_name')
 
-    context.update(csrf(us_request))
     context.update(friend_list=friend_list, friend_request_list=friend_request_list)
     return render(us_request, "friends/index.html", context)
 

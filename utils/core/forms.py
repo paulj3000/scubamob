@@ -15,11 +15,7 @@ class NoSQLForm(forms.Form):
         self.collection = self.db[self.Meta.model]
         self.Object  = self.Meta.mongo()
 
-        try:
-            self.user_id = kwargs.pop('user_id') if kwargs.keys().count('user_id') else None
-        except:
-            raise ValueError("Missing something...")
-
+        self.user_id = kwargs.pop('user_id') if 'user_id' in kwargs.keys() else None
         super(NoSQLForm, self).__init__(*args, **kwargs)
 
     def save(self, data = None):

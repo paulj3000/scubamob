@@ -1,10 +1,9 @@
 {% extends "layout.html" %}
-{% load media %}
-{% load mediaurls %}
+{% load static %}
 
 {% block content %}
 <script src="//maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=AIzaSyCZcaPxfE_UnCFqYFEuZU1lI7kIMSMLvfs" type="text/javascript"></script>
-{% include_media 'divesites_index.js' %}
+<script src="{% static 'js/divesites_index.js' %}"></script>
 
 <style type="text/css">
     #map_canvas { height: 554px;width: 758px }
@@ -13,7 +12,7 @@
 </style>
 
     <script type="text/javascript"> 
-var sitemarker="{% media_url 'images/icons/divemarker.png' %}";
+var sitemarker="{% static 'images/icons/divemarker.png' %}";
 $(document).ready(function()
 {
     $(window).resize(function()     

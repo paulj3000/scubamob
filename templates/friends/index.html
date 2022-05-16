@@ -1,8 +1,8 @@
 {% extends "layout.html" %}
-{% load media %}
+{% load static %}
 
 {% block includes %}
-{% include_media 'account_friends.js' %}
+<script src="{% static 'account_friends.js' %}"></script>
 {% endblock %}
 
 
@@ -10,13 +10,13 @@
 
     <div class="frnd-list">
         <div class="frnd-list-top">
-            <h2>Your Friends ({{ friend_list|length }})</h2>
+            <h2>Your Friends ({{friend_list|length}})</h2>
         </div>
         <div class="frnd-list-middle">
         <div class="frnd-list-block">
             {% for f in friend_list %}
             <div class="{% cycle "frnd-left" "frnd-right" %}" >
-                {{ f.friend.get_full_name }}
+                {{f.friend.get_full_name}}
             </div>
 
         {% if forloop.counter|divisibleby:2 %}
@@ -32,14 +32,14 @@
     <div class="frnd-find">
         <div class="prepand">
             <a href="{% url 'friends_invite' %}">
-                <img src="{% media_url 'images/scubamob-frnd-button.png' %}" alt="find friends" />
+                <img src="{% static 'images/scubamob-frnd-button.png' %}" alt="find friends" />
             </a>
         </div>
         <h2>Pending Friends</h2>
         <div class="frnd-pending">
             {% for f in friend_request_list %}
                 <!--    start friend block  -->
-                <div class="frnd-pending-block {% if forloop.last %}btm-border{% endif %}" id="friend_{{ f.user.id }}" 
+                <div class="frnd-pending-block {% if forloop.last %}btm-border{% endif %}" id="friend_{{f.user.id}}" 
                     {% if forloop.first %}style="padding-top:0px"{% endif %}>
                     <table class="td_full_width">
                         <tbody>
@@ -48,9 +48,9 @@
                                     <img src="" />
                                 </td>
                                 <td style="width:145px">
-                                    <div class="frnd-text2"><a href="{% url 'account.views.user.profile' f.user.username %} ">{{ f.user.get_full_name }}</a></div>
-                                    <span class="accept" id="{{ f.user.id }}"><img src="{% media_url 'images/scubamob-accept-button.png' %}" alt="accept"  /></span>&nbsp;
-                                    <span class="ignore" id="{{ f.user.id }}"><img src="{% media_url 'images/scubamob-ignore.png' %}" alt="accept" /></span>
+                                    <div class="frnd-text2"><a href="{% url 'account.views.user.profile' f.user.username %} ">{{f.user.get_full_name}}</a></div>
+                                    <span class="accept" id="{{f.user.id}}"><img src="{% static 'images/scubamob-accept-button.png' %}" alt="accept" /></span>&nbsp;
+                                    <span class="ignore" id="{{f.user.id}}"><img src="{% static 'images/scubamob-ignore.png' %}" alt="accept" /></span>
 
                                 </td>
                             </tr>
@@ -80,7 +80,7 @@ $(document).ready(function(){ init_friends_index(); })
 {% if messages %}
 <ul class="messages">
     {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        <li{% if message.tags %} class="{{message.tags}}"{% endif %}>{{message}}</li>
             {% endfor %}
 </ul>
 {% endif %}

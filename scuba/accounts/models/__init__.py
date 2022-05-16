@@ -20,7 +20,7 @@ from utils.core.models import Timestamped
 
 
 class Account(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     is_blocked = models.BooleanField(default=False)
     aws_id = models.CharField(max_length=10, blank=True)
