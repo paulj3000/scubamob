@@ -74,7 +74,7 @@ $(document).ready(function()
             {% endif %}
             <div class="menu-block">
                 <ul>
-                    <li><a href="{% url 'profile' username=username %}">{{ fullname }}</a></li>
+                    <li><a href="{% url 'profile' username=user.username %}">{{ fullname }}</a></li>
                     <li><a href="{% url 'home' %}">Home</a></li>
                     <li><a href="{% url 'logbook_home' %}">Logs</a></li>
                     <li><a href="{% url 'gallery_home' %}">Gallery</a></li>
