@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 
-
-""" mongo - This module emulates simpleDB using MongoDB
-"""
-
-#from pymongo import ReplicaSetConnection, MongoClient
+from pymongo import MongoClient
 from django.conf import settings
+
 
 def Mongo(connection_params=settings.MONGO):
     try:
         if connection_params['USE_REPLICASET']:
-            mongo_conn = ReplicaSetConnection(connection_params['HOSTS'], replicaSet=connection_params['REPLICASET'])
+            mongo_conn = MongoClient(connection_params['HOSTS'],
+                connection_params['PORT'],
+                replicaSet=connection_params['REPLICASET'])
         else:
             mongo_conn = MongoClient(host=connection_params['HOST'], port=connection_params['PORT'])
         conn = mongo_conn[connection_params['DATABASE']]
@@ -19,5 +18,6 @@ def Mongo(connection_params=settings.MONGO):
         return conn
 
     except (Exception, ConnectionError):
+        raise
     #Log().exception(ConnectionError)
         raise ConnectionError

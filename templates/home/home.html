@@ -1,6 +1,5 @@
 {% extends 'layout.html' %}
-
-{% load media %}
+{% load static %}
 
 {% block content %}
         <div class="photo">
@@ -16,12 +15,12 @@
                 </tr>
             </table>
         </div>
-        <img src="{% media_url 'images/scubamob-img2.jpg' %}" alt="" />
+        <img src="{% static 'images/scubamob-img2.jpg' %}" alt="" />
         <div class="spot-block">
             <div class="spot-left">
                 <h2>My Favorites Dive Spots</h2>
                 {% if divesites %}
-                
+
                 {% for d in divesites %}
                 <div class="spot-field">
                     <h3>{{ d.title }}</h3>
@@ -41,7 +40,7 @@
                     </div>
                 </div>
                 {% endfor %}
-                
+
                 {% else %}
                 <div class="spot-field">
                     <h3>You do not have any favorite dive sites yet</h3>
@@ -52,7 +51,9 @@
         <div class="equip-block">
             <h2>Equipment Maintenance</h2>
             <div class="equip-text">Required in (<span>3 Days</span>)</div>
-            <div align="center" class="prepand"><img src="{% media_url 'images/scubamob-img3.png' %}" alt="equipment" /></div>
+            <div align="center" class="prepand">
+                <img src="{% static 'images/scubamob-img3.png' %}" alt="equipment" />
+            </div>
         </div>
 
 {% endblock %}

@@ -1,9 +1,10 @@
 from django.conf.urls import include
 from django.urls import path, re_path
 
-from scuba.accounts.forms import SettingsForm
+from scuba.accounts.forms import SettingsForm, PasswordForm
 import scuba.accounts.views.json as json_views
 import scuba.accounts.views as account_views
+import scuba.accounts.views.settings as settings_views
 
 
 urlpatterns = [
@@ -14,9 +15,14 @@ urlpatterns = [
 
     path('poll/', account_views.poll, name='account_poll'),
 
-    #path('settings/', include(patterns('scuba.account.views.settings',
-    #    path('', 'settings', { 'formname': SettingsForm, 'mode': 'settings' }, name='account_settings' ),
-    #    path('password/', 'settings', { 'formname': PasswordForm, 'mode': 'password' }, name='account_settings_password' ),
-    #))),
+    path('settings/', include(
+        [
+            path('', settings_views.settings,
+                {'formname': SettingsForm, 'mode': 'settings'},
+                name='account_settings'),
+            path('password/', settings_views.settings,
+                {'formname': PasswordForm, 'mode': 'password'},
+                name='account_settings_password'),
+        ])),
     path('register/', account_views.register, name='account_register'),
 ]

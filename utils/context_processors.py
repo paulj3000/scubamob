@@ -14,6 +14,6 @@ def sm(request):
             }
 
     if user.is_authenticated:
-        context.update({ 'fullname': user.get_full_name(), 'email': user.email, 'username': user.username })
+        context.update({'fullname': user.get_full_name(), 'email': user.email})
 
     return context

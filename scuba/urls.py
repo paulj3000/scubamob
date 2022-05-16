@@ -2,7 +2,7 @@ from django.conf.urls import include
 from django.urls import path, re_path
 from django.views.generic import TemplateView
 
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, LogoutView
 
 
 import scuba.settings
@@ -61,6 +61,8 @@ urlpatterns = [
     path('login/', LoginView.as_view(
         template_name='account/login.html'),
         name='login'),
+
+    path('logout/', LogoutView.as_view(next_page='/'), name="logout"),
 
     # enable the admin section
     path('admin/', admin.site.urls),
