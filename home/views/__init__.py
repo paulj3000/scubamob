@@ -32,9 +32,6 @@ def home(us_request):
     user = us_request.user
     user_id = user.id
 
-    #return redirect('account_settings')
-
-
     template = 'home/home.html'
 
     divesite_mongo = DiveSiteMongo()
@@ -47,8 +44,9 @@ def home(us_request):
 
     for fav in user_favorites:
         fav_data = divesite_mongo.get_divesite_info(fav)
-        weather_data = weather.get_data_latlng(fav_data['latlng']['latitude'],\
-                            fav_data['latlng']['longitude'])
+        weather_data = weather.get_data_latlng(
+            fav_data['latlng']['latitude'],
+            fav_data['latlng']['longitude'])
 
         divesite_data = divesite_mongo.get_divesite_info(fav)
         divesite_data['weather'] = weather_data
@@ -59,4 +57,3 @@ def home(us_request):
 
     # render the appropriate template
     return render(us_request, template, context)
-

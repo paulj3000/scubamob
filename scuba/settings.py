@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'test_pep8',
     'compressor',
     'crispy_forms',
     'crispy_bootstrap5',
@@ -283,3 +284,5 @@ DEBUG_IP = '68.101.214.253'
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+TEST_PEP8_DIRS = [BASE_DIR]

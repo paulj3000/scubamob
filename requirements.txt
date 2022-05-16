@@ -12,3 +12,5 @@ mysqlclient==2.1.0; sys_platform == 'linux'
 djangorestframework==3.13.1
 django-crispy-forms==1.14.0
 crispy-bootstrap5==0.6
+pycodestyle==2.8.0
+django-test-pep8==0.1
