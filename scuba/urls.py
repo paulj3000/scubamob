@@ -51,7 +51,7 @@ urlpatterns = [
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
-    ## let's go ahead and add some static pages (about and all of those things....)
+    # let's go ahead and add some static pages (about and all of those things....)
     path('terms/', TemplateView.as_view(template_name="static/terms.html")),
     path('aboutus/', TemplateView.as_view(template_name="static/about.html")),
     path('privacy/', TemplateView.as_view(template_name="static/privacy.html"), name='privacy_policy'),

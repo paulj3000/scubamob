@@ -17,6 +17,7 @@ import django.conf.global_settings as DEFAULT_SETTINGS
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_DIR = f"{BASE_DIR}/scuba"
 STATIC_ROOT = os.path.join(BASE_DIR, './static')
 LOG_DIRECTORY = '/tmp'
 
@@ -285,4 +286,4 @@ DEBUG_IP = '68.101.214.253'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-TEST_PEP8_DIRS = [BASE_DIR]
+TEST_PEP8_DIRS = [PROJECT_DIR]
