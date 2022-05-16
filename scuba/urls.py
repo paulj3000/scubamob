@@ -31,7 +31,7 @@ urlpatterns = [
     path('diveshops/', include('diveshops.urls')),
     path('gallery/', include('gallery.urls')),
     path('equipment/', include('equipment.urls')),
-    path('env/', include('env.urls')),
+    path('env/', include('scuba.environ.urls')),
 #    url(r'^diveshop/', include('diveshop.urls')),
 
 

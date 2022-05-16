@@ -55,7 +55,6 @@ INSTALLED_APPS = [
     'compressor',
     'crispy_forms',
     'crispy_bootstrap5',
-    'scuba.accounts',
     'gallery',
     'common',
     'divesites',
@@ -66,6 +65,8 @@ INSTALLED_APPS = [
     'diveshops',
     'utils',
     'api',
+    'scuba.accounts',
+    'scuba.environ',
     'scuba.friends',
     # 'django.contrib.admindocs',
 ]
@@ -195,12 +196,12 @@ SERVER_EMAIL = 'no-reply@scubamob.com'
 
 
 MONGO = {
-        'USE_REPLICASET': False,
-        'HOSTS': [],
-        'REPLICASET': {},
-        'HOST': 'localhost',
-        'PORT': 27017,
-        'DATABASE': 'scubamob'
+    'USE_REPLICASET': False,
+    'HOSTS': [],
+    'REPLICASET': {},
+    'HOST': 'localhost',
+    'PORT': 27017,
+    'DATABASE': 'scubamob'
 }
 
 NOSQL = 'mongo'
