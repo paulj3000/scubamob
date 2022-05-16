@@ -8,8 +8,6 @@ from io import StringIO
 from django.db import models
 from django.db.models import fields, Q
 from django.conf import settings
-from django.db.models.signals import pre_delete
-from django.dispatch.dispatcher import receiver
 
 #from boto3.s3.connection import S3Connection
 
@@ -18,12 +16,42 @@ from utils.core.models import Timestamped
 from scuba.accounts.models import User
 
 
-IMAGE_TYPE_EXTENSIONS   = {
+IMAGE_TYPE_EXTENSIONS = {
         'image/gif': 'gif',
         'image/jpeg': 'jpg',
         'image/png': 'png',
         'image/tiff': 'tiff'
 }
+
+
+class Media(models.Model):
+    user = models.ForeignKey(User, related_name='media', on_delete=models.CASCADE)
+    image = models.CharField(max_length=255)
+    title = models.CharField(max_length=100)
+    description = models.CharField(max_length=255)
+    thumbnail = models.CharField(max_length=255)
+    guid = models.CharField(max_length=125, db_index=True)
+
+    # define a couple of static functions which will define an image name
+    @staticmethod
+    def generate_image_name(guid, album_id, filename):
+        # generate a new filename
+        return  '%s/%s/%s' % (guid, album_id, filename)
+
+    @staticmethod
+    def generate_image_thumbnail_name(guid, album_id, filename):
+        # generate a new filename
+        return  '%s/%s/p206x206/%s' % (guid, album_id, filename)
+
+    def get_image(self):
+        return settings.PRODUCTION_GALLERY_URL + self.image
+
+    def get_thumbnail(self):
+        return settings.PRODUCTION_GALLERY_URL + self.thumbnail
+
+    class Meta:
+        db_table = 'media'
+
 
 class Album(Timestamped, models.Model):
     user = models.ForeignKey(User, related_name='albums', on_delete=models.CASCADE)
@@ -32,13 +60,13 @@ class Album(Timestamped, models.Model):
     guid = models.CharField(max_length=125, db_index=True)
 
     def add_image(self, uploaded_image):
-        ### seek to the beginning of the script
+        # seek to the beginning of the script
         #uploaded_image.seek(0)
-        filename    = "%s.%s" % (str(uuid.uuid1()).replace('-', ''),
+        filename = "%s.%s" % (str(uuid.uuid1()).replace('-', ''),
                     IMAGE_TYPE_EXTENSIONS[uploaded_image.content_type])
 
-        account     = self.user.get_account()
-        gallery_file            = AlbumImage.generate_image_name(account.guid, self.guid, filename)
+        account = self.user.get_account()
+        gallery_file = AlbumImage.generate_image_name(account.guid, self.guid, filename)
         header = {'Content-Type' : uploaded_image.content_type}
 
         conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
@@ -50,20 +78,20 @@ class Album(Timestamped, models.Model):
         return gallery_file
 
     def add_image_thumbnail(self, uploaded_image):
-        ###### this is really bad!  Refactor
+        # this is really bad!  Refactor
         uploaded_image.seek(0)
 
-        filename    = "%s.%s" % (str(uuid.uuid1()).replace('-', ''),
+        filename = "%s.%s" % (str(uuid.uuid1()).replace('-', ''),
                     IMAGE_TYPE_EXTENSIONS[uploaded_image.content_type])
 
-        account     = self.user.get_account()
-        gallery_file_thumbnail  = AlbumImage.generate_image_thumbnail_name(account.guid, self.guid, filename)
+        account = self.user.get_account()
+        gallery_file_thumbnail = AlbumImage.generate_image_thumbnail_name(account.guid, self.guid, filename)
         header = {'Content-Type' : uploaded_image.content_type}
 
         conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
         b = conn.get_bucket(settings.GALLERY_BUCKET)
 
-        WHITE   = (255, 255, 255)
+        WHITE = (255, 255, 255)
 
         size = 150, 150
         im = Image.open(cStringIO.StringIO(uploaded_image.read()))
@@ -81,9 +109,9 @@ class Album(Timestamped, models.Model):
         b = conn.get_bucket(settings.GALLERY_BUCKET)
         k = b.new_key(gallery_file_thumbnail)
 
-        ### convert the image
-        img_type   = IMAGE_TYPE_EXTENSIONS[uploaded_image.content_type]
-        img_type    = 'jpeg' if img_type.lower() == 'jpg' else img_type
+        # convert the image
+        img_type = IMAGE_TYPE_EXTENSIONS[uploaded_image.content_type]
+        img_type = 'jpeg' if img_type.lower() == 'jpg' else img_type
 
         temp_handle = StringIO()
         bg.save(temp_handle, img_type)
@@ -94,10 +122,10 @@ class Album(Timestamped, models.Model):
         return gallery_file_thumbnail
 
     def save(self, *args, **kwargs):
-        ## save the album
+        # save the album
 
         if not self.guid:
-            self.guid    = str(uuid.uuid1()).replace('-', '')
+            self.guid = str(uuid.uuid1()).replace('-', '')
 
         super(Album, self).save(*args, **kwargs)
 
@@ -111,6 +139,7 @@ class Album(Timestamped, models.Model):
     def to_json(self):
         return { 'title': self.title, 'description': self.description, 'id': self.id, 'guid': self.guid }
 
+
 class AlbumImage(Timestamped, models.Model):
     album = models.ForeignKey(Album, related_name='album_image', on_delete=models.CASCADE)
     image = models.CharField(max_length=255)
@@ -119,23 +148,23 @@ class AlbumImage(Timestamped, models.Model):
     thumbnail = models.CharField(max_length=255)
     guid = models.CharField(max_length=125, db_index=True)
 
-    ### define a couple of static functions which will define an image name
+    # define a couple of static functions which will define an image name
     @staticmethod
     def generate_image_name(guid, album_id, filename):
-        ### generate a new filename
+        # generate a new filename
         return  '%s/%s/%s' % (guid, album_id, filename)
 
     @staticmethod
     def generate_image_thumbnail_name(guid, album_id, filename):
-        ### generate a new filename
+        # generate a new filename
         return  '%s/%s/p206x206/%s' % (guid, album_id, filename)
 
 
     def save(self, *args, **kwargs):
-        ## save the album
+        # save the album
 
         if not self.guid:
-            self.guid    = str(uuid.uuid1()).replace('-', '')
+            self.guid = str(uuid.uuid1()).replace('-', '')
 
         super(AlbumImage, self).save(*args, **kwargs)
 
@@ -148,23 +177,12 @@ class AlbumImage(Timestamped, models.Model):
     class Meta:
         db_table = 'gallery_album_image'
 
-## add a signal to delete the the images from S3 before we delete the album
-@receiver(pre_delete, sender=Album)
-def _mymodel_delete(sender, instance, **kwargs):
-    images  = instance.album_image.all()
 
-    ### MOVE THIS TO IT'S OWN LIBRARY
-    conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
-    b = conn.get_bucket(settings.GALLERY_BUCKET)
+class AlbumMedia(models.Model):
+    album = models.ForeignKey(Album, on_delete=models.CASCADE)
+    media = models.ForeignKey(Album, related_name='media', on_delete=models.CASCADE)
+    pos = models.PositiveSmallIntegerField()
 
-    ### delete the images   Eventually move this to SQS as we want to do this
-    ### offline
-    to_delete   = []
-    for i in images:
-        ## append these images to the queue
-        to_delete.append(i.image)
-        to_delete.append(i.thumbnail)
-
-    ### and finally delete them all
-    result  = b.delete_keys(to_delete)
-    result.deleted
+    class Meta:
+        verbose_name_plural = 'album media'
+        db_table = 'album_media'
