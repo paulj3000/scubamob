@@ -7,8 +7,9 @@ from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import validate_email
+from django.contrib.auth.models import User
 
-from scuba.accounts.models import UserFriendRequest, UserFriend, User
+from scuba.accounts.models import UserFriendRequest, UserFriend, Account
 
 
 class LoginForm(AuthenticationForm):
@@ -31,7 +32,6 @@ class AccountForm(UserCreationForm):
         model = User
         fields = ('username', "first_name", "last_name", "email")
 
-
     def clean_password2(self):
         password1 = self.cleaned_data.get('password1')
         password2 = self.cleaned_data.get('password2')
@@ -51,7 +51,7 @@ class AccountForm(UserCreationForm):
                 '%s is already registered' % email
             )
 
-        # return the clenaed password
+        # return the cleaned password
         return email
 
     def save(self, commit=True):
@@ -60,6 +60,7 @@ class AccountForm(UserCreationForm):
 
         if commit:
             user.save()
+            Account.objects.create(user=user)
 
         return user
 

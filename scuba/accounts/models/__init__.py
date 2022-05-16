@@ -4,7 +4,6 @@ import random
 import uuid
 import string
 
-
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin
 )
@@ -13,51 +12,18 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.utils.translation import gettext_lazy as _
-from django_extensions.db.fields import CreationDateTimeField, ModificationDateTimeField
 
 
 from scuba.accounts.models.manager import NotificationManager
 
 from utils.core.models import Timestamped
-#from utils.db import models
 
 
-class UserManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
-        """
-        Creates and saves a User with the given email and password.
-        """
-        if not email:
-            raise ValueError('The given email must be set')
+class Account(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-        now = timezone.now()
-        email = self.normalize_email(email)
-        user = self.model(email=email, last_login=now, date_joined=now, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-
-        # return the new user
-        return user
-
-    def create_superuser(self, email, password, **extra_fields):
-        user = self.create_user(email, password=password)
-        user.is_admin = True
-        user.is_superuser = True
-        user.save(using=self._db)
-        return user
-
-
-class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(max_length=255, unique=True, db_index=True)
-    first_name = models.CharField(max_length=100, blank=True)
-    last_name = models.CharField(max_length=100, blank=True)
-
-    is_active = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
     aws_id = models.CharField(max_length=10, blank=True)
-    date_joined = models.DateTimeField(auto_now_add=True)
-
     guid = models.CharField(max_length=40)
     can_add_divesites = models.BooleanField(default=False)
     reputation = models.PositiveSmallIntegerField(default=0)
@@ -75,13 +41,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         return self.mongo_obj
 
-
-    objects = UserManager()
-
-    USERNAME_FIELD = 'email'
-
     class Meta:
-        db_table = 'user'
+        db_table = 'account'
 
     def get_full_name(self):
         full_name = '%s %s' % (self.first_name, self.last_name)
@@ -159,19 +120,20 @@ class Friendship(models.Model):
     friend1 = models.ForeignKey(User, related_name='friend_friend1', on_delete=models.CASCADE)
     friend2 = models.ForeignKey(User, related_name='friend_friend2', on_delete=models.CASCADE)
     blocked = models.BooleanField(default=False)
-    created = CreationDateTimeField(_('created'))
-    modified = ModificationDateTimeField(_('modified'))
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'friendship'
         unique_together = (('friend1', 'friend2'), )
 
+
 class UserFriend(models.Model):
     user = models.ForeignKey(User, related_name='friend_user', on_delete=models.CASCADE)
     friend = models.ForeignKey(User, related_name='friend_friend', on_delete=models.CASCADE)
     hide = models.BooleanField(default=False)
-    created = CreationDateTimeField(_('created'))
-    modified = ModificationDateTimeField(_('modified'))
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'user_friend'
@@ -180,8 +142,8 @@ class UserFriend(models.Model):
 class UserFriendBlocked(models.Model):
     user = models.ForeignKey(User, null=True, related_name='blocked_user', on_delete=models.CASCADE)
     friend = models.ForeignKey(User, related_name='blocked_friend', on_delete=models.CASCADE)
-    created = CreationDateTimeField(_('created'))
-    modified = ModificationDateTimeField(_('modified'))
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'user_friend_blocked'
@@ -199,8 +161,8 @@ class UserFriendRequest(models.Model):
     email = models.CharField(max_length=100, null=True)
     active = models.BooleanField(default=True)
     friend = models.ForeignKey(User, related_name='friend_requested', on_delete=models.CASCADE)
-    created = CreationDateTimeField(_('created'))
-    modified = ModificationDateTimeField(_('modified'))
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     # instantiate the new manager
     objects = UserFriendRequestManager()
@@ -212,8 +174,9 @@ class UserFriendRequest(models.Model):
 class UserDiveSiteBuddyFinder(models.Model):
     user = models.ForeignKey(User, related_name='buddyfinder', on_delete=models.CASCADE)
     divesite_id = models.CharField(max_length=100, null=True)
-    created = CreationDateTimeField(_('created'))
-    modified = ModificationDateTimeField(_('modified'))
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
 
     class Meta:
         db_table = 'user_divesite_buddy_finder'
