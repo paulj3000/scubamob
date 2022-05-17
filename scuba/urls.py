@@ -34,8 +34,6 @@ urlpatterns = [
     path('env/', include('scuba.environ.urls')),
 #    url(r'^diveshop/', include('diveshop.urls')),
 
-
-
     path('password/', include('scuba.accounts.urls_password')),
 
     #url(r'^profile/', include('scuba.accounts.urls_profile')),
@@ -46,6 +44,7 @@ urlpatterns = [
 
     path('api/1.0/mobile/account', include('api.urls_account')),
     path('api/1.0/mobile', include('api.urls_mobile')),
+    path('api/accounts', include('scuba.accounts.urls_accounts_api')),
 
 
     # Uncomment the admin/doc line below to enable admin documentation:

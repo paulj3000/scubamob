@@ -1,9 +1,12 @@
 {% extends "layout.html" %}
-{% load static %}
-
-<script src="{% static 'account_profile.js' %}"></script>
+{% load static compress %}
 
 {% block content %}
+{% compress js file profile %}
+<script src="{% static 'js/account/sm.profile.js' %}"></script>
+<script src="{% static 'js/sm.friends.js' %}"></script>
+{% endcompress %}
+
 {% include 'title.html' with title="My Friends" %}
 
 <div class="frogman-block">

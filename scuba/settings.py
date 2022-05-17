@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     'compressor',
     'crispy_forms',
     'crispy_bootstrap5',
+    'rest_framework',
+    'rest_framework.authtoken',
     'gallery',
     'common',
     'divesites',
