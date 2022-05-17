@@ -1,4 +1,4 @@
-{% load static %}
+{% load static compress %}
 {% include "includes/origin.html" %}
 
 {% block includes %}
@@ -6,7 +6,12 @@
 
 {% block bodytag %}
 <body>
-<script type="text/javascript">
+
+    {% compress js file core %}
+    <script src="{% static 'js/sm.core.js' %}"></script>
+    <script src="{% static 'js/sm.poll.js' %}"></script>
+    {% endcompress %}
+<script>
 var image_url = "/";
 var divemarker  = "{% static 'images/icons/divemarker.png' %}";
 $(document).ready(function()

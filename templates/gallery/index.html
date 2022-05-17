@@ -1,9 +1,8 @@
 {% extends 'layout.html' %}
-{% load media %}
-{% load mediaurls %}
+{% load static %}
 
 {% block includes %}
-{% include_media 'gallery_index.js' %}
+<script src="{% static 'gallery_index.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -28,14 +27,14 @@
 </div>
 
 <script type="text/javascript">
-var photoImage = "{% media_url 'images/photoalbum.jpg' %}";
+var photoImage = "{% static 'images/photoalbum.jpg' %}";
 $(document).ready(function() {
     html    = $('#album_template').html();
     var galleryUrl = "{{ PRODUCTION_GALLERY_URL }}";
 
     $.get("{% url 'json_getalbums' %}", function(data)
     {
-        $.each(data.albums, function(i, d) 
+        $.each(data.albums, function(i, d)
         {
             if (d.cover)
                 d.cover = galleryUrl + d.cover;
@@ -48,6 +47,7 @@ $(document).ready(function() {
 
         $( "#creategallery" )
         .click(function() {
+                alert("FOO ... ");
             $( "#dialog-form" ).dialog( "open" );
          });
 
@@ -56,13 +56,13 @@ $(document).ready(function() {
         height: 300,
         width: 350,
         modal: true,
-        buttons: 
+        buttons:
         {
-            "Create an account": function() 
+            "Create an account": function()
             {
-                createAlbum(); 
+                createAlbum();
             },
-            Cancel: function() 
+            Cancel: function()
             {
                 $( this ).dialog( "close" );
             }
@@ -74,10 +74,10 @@ function createAlbum()
 {
     serializedData  = $('#f_createalbum').serialize();
 
-    $.post('/gallery/json/createalbum', serializedData, function(data)
+    $.post('/gallery/json/createalbum/', serializedData, function(data)
     {
         html    = $('#album_template').html();
-        data.cover  = photoImage; 
+        data.cover  = photoImage;
         data.image_count  = '0 photos';
         $('#gallery-block').append(Mustache.render(html, data));
     });

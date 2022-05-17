@@ -41,7 +41,7 @@ class SignupView(FormView):
 
         user = authenticate(
             self.request,
-            username=request.POST['email'],
+            username=request.POST['username'],
             password=request.POST['password1'])
 
         print(" THE USER ... ")
@@ -56,7 +56,6 @@ class SignupView(FormView):
         context.update({
             'hidelogin': True,
             'facebook_id': FACEBOOK_APP,
-            'hide_steps': self.hide_steps,
         })
         return context
 

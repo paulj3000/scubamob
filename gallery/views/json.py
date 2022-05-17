@@ -1,5 +1,5 @@
 from pprint import pprint
-
+from django.http import JsonResponse
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.db.models import Count
@@ -31,7 +31,7 @@ def showalbum(us_request, id):
         json = album.to_json()
         retval.append(json)
 
-    return JSONResponse({'albums': retval })
+    return JsonResponse({'albums': retval})
 
 
 @login_required
@@ -49,7 +49,7 @@ def json_createalbum(us_request):
         json = album.to_json()
         json['url'] = reverse('show_album', kwargs={'album_id': album.guid})
 
-        return JSONResponse( json )
+        return JsonResponse(json)
     except:
         pass
 
@@ -73,7 +73,7 @@ def json_getalbums(us_request):
         json['image_count'] = "%i %s" % (img_count, 'photo' if img_count == 1 else 'photos')
         retval.append(json)
 
-    return JSONResponse({'albums': retval })
+    return JsonResponse({'albums': retval})
 
 
 @login_required
@@ -88,7 +88,7 @@ def json_deletealbum(us_request, album_id):
     except:
         pass
 
-    return JSONResponse( retval )
+    return JsonResponse(retval)
 
 @login_required
 @require_http_methods(['GET'])
@@ -108,5 +108,5 @@ def json_getalbumimages(us_request, album_id):
         raise
         pass
 
-    return JSONResponse(api_response(data={'items':retval, 'total': len(retval) }))
+    return JsonResponse(api_response(data={'items':retval, 'total': len(retval) }))
 

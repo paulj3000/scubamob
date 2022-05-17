@@ -20,7 +20,7 @@
 
     <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.css' %}" media="all" />
 
-
+    <script src="{% static 'mustache/mustache.js' %}"></script>
   <script src="{% static 'js/main.js' %}"></script>
 
   <script>
@@ -34,6 +34,9 @@
   </script>
 
 </head>
+
+{% block includes %}
+{% endblock %}
 
 {% block mainblock %}
 {% endblock %}

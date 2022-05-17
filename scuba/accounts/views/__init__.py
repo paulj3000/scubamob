@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
+from django.http import JsonResponse
 
 # define the user data for this account
 from scuba.accounts.forms import AccountForm
@@ -63,4 +64,4 @@ def poll(us_request):
     retval['data']['items'] = [{'alerts': alerts, 'pollrate': 5000 }]
 
     # render the appropriate template
-    return JSONResponse(api_response(**retval))
+    return JsonResponse(api_response(**retval))
