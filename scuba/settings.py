@@ -216,6 +216,7 @@ FACEBOOK = 'facebook'
 GOOGLE_MAPS = 'google_maps'
 GOOGLE_ADDRESS = 'google_address'
 
+FACEBOOK_APP = ''
 FACEBOOK_APP_ID = ''
 FACEBOOK_API_SECRET = ''
 

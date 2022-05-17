@@ -5,7 +5,7 @@ import uuid
 import string
 
 from django.contrib.auth.models import (
-    AbstractBaseUser, BaseUserManager, PermissionsMixin
+    AbstractBaseUser, BaseUserManager, PermissionsMixin, AbstractUser
 )
 
 from django.db import models
