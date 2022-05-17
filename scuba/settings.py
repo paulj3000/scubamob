@@ -100,10 +100,11 @@ TEMPLATES = [
     },
 ]
 
-AUTHENTICATION_BACKENDS = DEFAULT_SETTINGS.AUTHENTICATION_BACKENDS + \
-    [
-        'rest_framework.authentication.TokenAuthentication',
-    ]
+#AUTHENTICATION_BACKENDS = DEFAULT_SETTINGS.AUTHENTICATION_BACKENDS + \
+AUTHENTICATION_BACKENDS = [
+    'rest_framework.authentication.TokenAuthentication',
+    'utils.middleware.authentication.DefaultBackend',
+]
 
 WSGI_APPLICATION = 'scuba.wsgi.application'
 

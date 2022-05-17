@@ -1,16 +1,13 @@
 {% extends "layout.html" %}
-{% load media %}
+{% load static %}
 
-{% block includes %}
-{% include_media 'account_profile.js' %}
-{% endblock %}
-
+<script src="{% static 'account_profile.js' %}"></script>
 
 {% block content %}
 {% include 'title.html' with title="My Friends" %}
 
 <div class="frogman-block">
-    <div><img src="{% media_url 'images/scubamob-frogman.jpg' %}" alt="" /></div>
+    <div><img src="{% static 'images/scubamob-frogman.jpg' %}" alt="" /></div>
 </div>
 
 <div>

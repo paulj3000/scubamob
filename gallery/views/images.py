@@ -15,7 +15,6 @@ from django.conf import settings
 from PIL import Image
 
 from logbook.forms import DiveForm
-from utils.core.user import User
 from gallery.models import Album, AlbumImage
 
 

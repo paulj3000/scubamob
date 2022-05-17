@@ -1,5 +1,6 @@
 from django.conf import settings
 
+
 def sm(request):
     """
     populate the header and footer fields of the template

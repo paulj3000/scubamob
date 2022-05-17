@@ -16,8 +16,6 @@ from django.http import HttpResponseBadRequest, HttpResponse
 from scuba.accounts.forms import EmailInviteForm
 from scuba.accounts.models import UserFriendRequest, UserFriend
 
-from utils.core.user import User
-
 
 @login_required
 def index(us_request, mode=None):
