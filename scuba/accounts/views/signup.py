@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.views.generic import View
 
 from scuba.accounts.forms import AccountForm
 from scuba.settings import FACEBOOK_APP
