@@ -1,50 +1,43 @@
-{% load static %}
+{% load static compress %}
 
 <!doctype html>
-<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
-<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
-<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-  <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><![endif]-->
-  <title>{% block title %}ScubaMob{% endblock %}</title>
-  <meta name="description" content="">
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+        <title>{% block title %}ScubaMob{% endblock %}</title>
+        <meta name="description" content="">
 
-  <meta name="viewport" content="width=device-width">
+        <meta name="viewport" content="width=device-width">
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous"/>
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous"/>
 
+        {% compress css file style %}
+        <link rel="stylesheet" href="{% static 'css/style.css' %}" media="all" />
+        {% endcompress %} 
 
-    <link rel="stylesheet" href="{% static 'css/style.css' %}" media="all" />
+        {% compress css file vendor %}
+        <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.css' %}" media="all" />
+        {% endcompress %}
 
-    <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.css' %}" media="all" />
+        {% compress js file vendor %}
+        <script src="{% static 'mustache/mustache.js' %}"></script>
+        {% endcompress %}
 
-    <script src="{% static 'mustache/mustache.js' %}"></script>
-    <script src="{% static 'js/sm.core.js' %}"></script>
-    <script src="{% static 'js/sm.poll.js' %}"></script>
-    <script src="{% static 'js/core.js' %}"></script>
-    <script src="{% static 'js/jquery.form.js' %}"></script>
-    <script src="{% static 'js/chosen.jquery.js' %}"></script>
+        {% compress js file scripts %}
+        <script src="{% static 'js/sm.core.js' %}"></script>
+        <script src="{% static 'js/sm.poll.js' %}"></script>
+        <script src="{% static 'js/core.js' %}"></script>
+        <script src="{% static 'js/jquery.form.js' %}"></script>
+        <script src="{% static 'js/chosen.jquery.js' %}"></script>
+        {% endcompress %}
 
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        {% block includes %}
+        {% endblock %}
+    </head>
 
-      ga('create', 'UA-44034626-1', 'scubamob.com');
-      ga('send', 'pageview');
-  </script>
-
-</head>
-
-{% block includes %}
-{% endblock %}
-
-{% block mainblock %}
-{% endblock %}
+    {% block mainblock %}
+    {% endblock %}
