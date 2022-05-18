@@ -10,6 +10,7 @@
     {% compress js file core %}
     <script src="{% static 'js/sm.core.js' %}"></script>
     <script src="{% static 'js/sm.poll.js' %}"></script>
+    <script src="{% static 'js/sm.common.js' %}"></script>
     {% endcompress %}
 <script>
 var image_url = "/";
@@ -78,6 +79,7 @@ $(document).ready(function()
             <h2>{{ page_title }}</h2>
             {% endif %}
             <div class="menu-block">
+                {% block sidemenu %}
                 <ul>
                     <li><a href="{% url 'profile' username=user.username %}">{{ fullname }}</a></li>
                     <li><a href="{% url 'home' %}">Home</a></li>
@@ -88,6 +90,7 @@ $(document).ready(function()
                     <li><a href="{% url 'diveshops_home' %}">Dive Shops</a></li>
                     <li><a href="#">Environmental Causes</a></li>
                 </ul>
+                {% endblock %}
             </div>
             {% endif %}
         </div>

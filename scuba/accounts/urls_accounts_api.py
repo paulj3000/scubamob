@@ -5,5 +5,5 @@ import scuba.accounts.api as account_api
 
 
 urlpatterns = [
-    path('/poll', account_api.poll, name='account_poll'),
+    path('poll', account_api.poll, name='account_poll'),
 ]

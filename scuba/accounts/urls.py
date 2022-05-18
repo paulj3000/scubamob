@@ -16,14 +16,5 @@ urlpatterns = [
 
     path('poll/', account_api.poll, name='account_poll'),
 
-    path('settings/', include(
-        [
-            path('', settings_views.settings,
-                {'formname': SettingsForm, 'mode': 'settings'},
-                name='account_settings'),
-            path('password/', settings_views.settings,
-                {'formname': PasswordForm, 'mode': 'password'},
-                name='account_settings_password'),
-        ])),
     path('register/', account_views.register, name='account_register'),
 ]

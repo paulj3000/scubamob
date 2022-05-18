@@ -4,8 +4,7 @@ from bson import json_util
 import json
 
 # Create your views here.
-from django.core.serializers.json import DjangoJSONEncoder
-from django.http import HttpResponse, HttpResponseNotFound, Http404
+from django.http import HttpResponse, JsonResponse, Http404
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login
 from django.views.decorators.http import require_http_methods
@@ -30,7 +29,7 @@ def getdivesites(us_request):
         retval.append(site)
 
     # convert the response to JSON
-    return JSONResponse({'sites': retval })
+    return JsonResponse({'sites': retval})
 
 @login_required
 @require_http_methods(["GET"])
@@ -90,4 +89,4 @@ def getdivesiteinfo(us_request, siteid):
         pass
 
     # convert the response to JSON
-    return JSONResponse(api_response(data={ 'items' : [retval] }))
+    return JsonResponse(api_response(data={'items': [retval]}))

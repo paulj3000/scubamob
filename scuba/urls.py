@@ -25,6 +25,7 @@ urlpatterns = [
     path('signup/', signup_views.SignupView.as_view(), name='signup'),
 
     path('account/', include('scuba.accounts.urls')),
+    path('settings/', include('scuba.accounts.urls_settings')),
     path('friends/', include('scuba.friends.urls')),
     path('logbook/', include('logbook.urls')),
     path('divesites/', include('divesites.urls')),
@@ -44,7 +45,7 @@ urlpatterns = [
 
     path('api/1.0/mobile/account', include('api.urls_account')),
     path('api/1.0/mobile', include('api.urls_mobile')),
-    path('api/accounts', include('scuba.accounts.urls_accounts_api')),
+    path('api/accounts/', include('scuba.accounts.urls_accounts_api')),
 
 
     # Uncomment the admin/doc line below to enable admin documentation:
