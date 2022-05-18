@@ -1,242 +1,264 @@
 {% load static compress %}
-{% include "includes/origin.html" %}
 
-{% block includes %}
-{% endblock %}
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+        <title>{% block title %}ScubaMob{% endblock %}</title>
+        <meta name="description" content="">
 
-{% block bodytag %}
-<body>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    {% compress js file core %}
-    <script src="{% static 'js/sm.core.js' %}"></script>
-    <script src="{% static 'js/sm.poll.js' %}"></script>
-    <script src="{% static 'js/sm.common.js' %}"></script>
-    {% endcompress %}
-<script>
-var image_url = "/";
-var divemarker  = "{% static 'images/icons/divemarker.png' %}";
-$(document).ready(function()
-{
-    doPoll();
-});
-</script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous"/>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <!-- Container wrapper -->
-      <div class="container">
-        <!-- Toggle button -->
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-mdb-toggle="collapse"
-          data-mdb-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <i class="fas fa-bars"></i>
-        </button>
+        {% compress css file style %}
+        <link rel="stylesheet" href="{% static 'css/style.css' %}" media="all" />
+        {% endcompress %} 
 
-        <!-- Collapsible wrapper -->
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <!-- Navbar brand -->
-          <a class="navbar-brand mt-2 mt-lg-0" href="{% url 'index' %}">
-            <img
-              src="{% static 'images/logo_small_80.png' %}"
-              alt="Scubamob Logo"
-              loading="lazy"
-            />
-          </a>
-          <!-- Left links -->
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link" href="#">Dashboard</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Team</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Projects</a>
-            </li>
-          </ul>
-          <!-- Left links -->
-        </div>
-        <!-- Collapsible wrapper -->
+        {% compress css file vendor %}
+        <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.css' %}" media="all" />
+        {% endcompress %}
 
-        <!-- Right elements -->
-        {% block rightmenu %}
-        <div class="d-flex align-items-center">
-          {% block loggedin %}
-          <!-- Icon -->
-          <a class="text-reset me-3" href="#">
-            <i class="fas fa-shopping-cart"></i>
-          </a>
+        {% compress js file vendor %}
+        <script src="{% static 'mustache/mustache.js' %}"></script>
+        <link rel="stylesheet" href="{% static 'bootstrap/dist/js/bootstrap.bundle.js' %}" media="all" />
+        {% endcompress %}
 
-          <!-- Notifications -->
-          <div class="dropdown">
-            <a
-              class="text-reset me-3 dropdown-toggle hidden-arrow"
-              href="#"
-              id="navbarDropdownMenuLink"
-              role="button"
-              data-mdb-toggle="dropdown"
-              aria-expanded="false"
-            >
-              <i class="fas fa-bell"></i>
-              <span class="badge rounded-pill badge-notification bg-danger">1</span>
-            </a>
-            <ul
-              class="dropdown-menu dropdown-menu-end"
-              aria-labelledby="navbarDropdownMenuLink"
-            >
-              <li>
-                <a class="dropdown-item" href="#">Some news</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="#">Another news</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="#">Something else here</a>
-              </li>
-            </ul>
-          </div>
-          <!-- Avatar -->
-          <div class="dropdown">
-            <a
-              class="dropdown-toggle d-flex align-items-center hidden-arrow"
-              href="#"
-              id="navbarDropdownMenuAvatar"
-              role="button"
-              data-mdb-toggle="dropdown"
-              aria-expanded="false"
-            >
-              <img
-                src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"
-                class="rounded-circle"
-                height="25"
-                alt="Black and White Portrait of a Man"
-                loading="lazy"
-              />
-            </a>
-            <ul
-              class="dropdown-menu dropdown-menu-end"
-              aria-labelledby="navbarDropdownMenuAvatar"
-            >
-              <li>
-                <a class="dropdown-item" href="#">My profile</a>
-              </li>
-              <li>
-                  <a class="dropdown-item" href="{% url 'account_settings' %}">Settings</a>
-              </li>
-              <li>
-                  <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
-              </li>
-            </ul>
-          </div>
-          {% endblock %}
-        </div>
+        {% compress js file scripts %}
+        <script src="{% static 'js/sm.core.js' %}"></script>
+        <script src="{% static 'js/sm.poll.js' %}"></script>
+        <script src="{% static 'js/core.js' %}"></script>
+        {% endcompress %}
+
+        {% block includes %}
         {% endblock %}
-        <!-- Right elements -->
-      </div>
-      <!-- Container wrapper -->
-    </nav>
-    <!-- Navbar -->
+    </head>
 
+    <body>
+        {% compress js file core %}
+        <script src="{% static 'js/sm.core.js' %}"></script>
+        <script src="{% static 'js/sm.poll.js' %}"></script>
+        <script src="{% static 'js/sm.common.js' %}"></script>
+        {% endcompress %}
+        <script>
+        var image_url = "/";
+        var divemarker  = "{% static 'images/icons/divemarker.png' %}";
+        $(document).ready(function()
+        {
+            doPoll();
+        });
+        </script>
 
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <!-- Container wrapper -->
+          <div class="container">
+            <!-- Toggle button -->
+            <button
+              class="navbar-toggler"
+              type="button"
+              data-mdb-toggle="collapse"
+              data-mdb-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
+              <i class="fas fa-bars"></i>
+            </button>
 
-
-
-
-
-<div id="fb-root"></div>
-{% endblock %}
-<div id="wrap-block">
-    <div id="wrap">
-        <div class="header-block">
-            <div class="logo-small">
-                <img src="{% static 'images/logo_small_80.png' %}" width="80" alt="logo small" />
+            <!-- Collapsible wrapper -->
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <!-- Navbar brand -->
+              <a class="navbar-brand mt-2 mt-lg-0" href="{% url 'index' %}">
+                <img
+                  src="{% static 'images/logo_small_80.png' %}"
+                  alt="Scubamob Logo"
+                  loading="lazy"
+                />
+              </a>
+              <!-- Left links -->
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Team</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Projects</a>
+                </li>
+              </ul>
+              <!-- Left links -->
             </div>
-            <div class="header-top">
-                {% if logged_in %}
-                <div style="padding-top:10px;padding-bottom:10px;">
-                    <div class="frogman-text prepand" style="text-align:right">{{ fullname }}&nbsp;&nbsp;<a href="#" onclick="$('.friend-cross').slideToggle()"><a href="#" onclick="$('.friend-cross').slideToggle()"><img onclick="$('.logbox').slideToggle()" src="{% static 'images/scubamob-icon.jpg' %}" alt="" style="position:relative; top:6px; background-image: url(#); layer-background-image: url(#); border: 1px none #000000;" /></a>
+            <!-- Collapsible wrapper -->
 
-                     </div>
-                {% else %}
-                <div class="header-login">
-                    <table style="width:100%;border:0px" cellpadding="0" cellspacing="0">
-                      <tr>
-                          <td width="155" align="right">
-                              <a href="{% url 'login' %}"><img src="{% static 'images/scubamob-login-button.png' %}" /></a>&nbsp;
-                              <a href="{% url 'signup' %}"><img src="{% static 'images/scubamob-signup-top.png' %}" /></a>
-                          </td>
-                      </tr>
-                    </table>
-                </div>
-                {% endif %}
-            </div>
+            <!-- Right elements -->
+            {% block rightmenu %}
+            <div class="d-flex align-items-center">
+              {% block loggedin %}
+              <!-- Icon -->
+              <a class="text-reset me-3" href="#">
+                <i class="fas fa-shopping-cart"></i>
+              </a>
 
-            {% if logged_in %}
-                <span id="alerts">{{ alerts }}</span>
-                <div class="logbox">
-                    <table style="width:100%;border:0px">
-                        <tr>
-                            <td class="logbox-text ha_left"><a href="{% url 'friends_index' %}">Friends</a></td>
-                        </tr>
-                        <tr>
-                            <td class="logbox-text ha_left" style="padding-top:5px;"><a href="{% url 'account_settings' %}">Account Settings</a></td>
-                        </tr>
-                        <tr>
-                            <td class="logbox-text ha_left" style="padding-top:5px; border-bottom:1px solid #bebebe; padding-bottom:15px;"><a href="{% url 'logout' %}">Log Out</a></td>
-                        </tr>
-                        <tr>
-                            <td class="logbox-text ha_left" style="padding-top:10px"><a href="#">Help</a></td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-
-
-        <div class="left-block">
-            {% if logged_in %}
-
-            {% if page_title %}
-            <h2>{{ page_title }}</h2>
-            {% endif %}
-            <div class="menu-block">
-                {% block sidemenu %}
-                <ul>
-                    <li><a href="{% url 'profile' username=user.username %}">{{ fullname }}</a></li>
-                    <li><a href="{% url 'home' %}">Home</a></li>
-                    <li><a href="{% url 'logbook_home' %}">Logs</a></li>
-                    <li><a href="{% url 'gallery_home' %}">Gallery</a></li>
-                    <li><a href="{% url 'divesites_home' %}">Dive Sites</a></li>
-                    <li><a href="{% url 'equipment_home' %}">Equipment Maintenance</a></li>
-                    <li><a href="{% url 'diveshops_home' %}">Dive Shops</a></li>
-                    <li><a href="#">Environmental Causes</a></li>
+              <!-- Notifications -->
+              <div class="dropdown">
+                <a
+                  class="text-reset me-3 dropdown-toggle hidden-arrow"
+                  href="#"
+                  id="navbarDropdownMenuLink"
+                  role="button"
+                  data-mdb-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <i class="fas fa-bell"></i>
+                  <span class="badge rounded-pill badge-notification bg-danger">1</span>
+                </a>
+                <ul
+                  class="dropdown-menu dropdown-menu-end"
+                  aria-labelledby="navbarDropdownMenuLink"
+                >
+                  <li>
+                    <a class="dropdown-item" href="#">Some news</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#">Another news</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#">Something else here</a>
+                  </li>
                 </ul>
-                {% endblock %}
+              </div>
+              <!-- Avatar -->
+              <div class="dropdown">
+                <a
+                  class="dropdown-toggle d-flex align-items-center hidden-arrow"
+                  href="#"
+                  id="navbarDropdownMenuAvatar"
+                  role="button"
+                  data-mdb-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <img
+                    src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"
+                    class="rounded-circle"
+                    height="25"
+                    alt="Black and White Portrait of a Man"
+                    loading="lazy"
+                  />
+                </a>
+                <ul
+                  class="dropdown-menu dropdown-menu-end"
+                  aria-labelledby="navbarDropdownMenuAvatar"
+                >
+                  <li>
+                    <a class="dropdown-item" href="#">My profile</a>
+                  </li>
+                  <li>
+                      <a class="dropdown-item" href="{% url 'account_settings' %}">Settings</a>
+                  </li>
+                  <li>
+                      <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                  </li>
+                </ul>
+              </div>
+              {% endblock %}
             </div>
-            {% endif %}
+            {% endblock %}
+            <!-- Right elements -->
+          </div>
+          <!-- Container wrapper -->
+        </nav>
+        <!-- Navbar -->
+
+        <div id="fb-root"></div>
+        <div id="wrap-block">
+            <div id="wrap">
+                <div class="header-block">
+                    <div class="logo-small">
+                        <img src="{% static 'images/logo_small_80.png' %}" width="80" alt="logo small" />
+                    </div>
+                    <div class="header-top">
+                        {% if logged_in %}
+                        <div style="padding-top:10px;padding-bottom:10px;">
+                            <div class="frogman-text prepand" style="text-align:right">{{ fullname }}&nbsp;&nbsp;<a href="#" onclick="$('.friend-cross').slideToggle()"><a href="#" onclick="$('.friend-cross').slideToggle()"><img onclick="$('.logbox').slideToggle()" src="{% static 'images/scubamob-icon.jpg' %}" alt="" style="position:relative; top:6px; background-image: url(#); layer-background-image: url(#); border: 1px none #000000;" /></a>
+
+                             </div>
+                        {% else %}
+                        <div class="header-login">
+                            <table style="width:100%;border:0px" cellpadding="0" cellspacing="0">
+                              <tr>
+                                  <td width="155" align="right">
+                                      <a href="{% url 'login' %}"><img src="{% static 'images/scubamob-login-button.png' %}" /></a>&nbsp;
+                                      <a href="{% url 'signup' %}"><img src="{% static 'images/scubamob-signup-top.png' %}" /></a>
+                                  </td>
+                              </tr>
+                            </table>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {% if logged_in %}
+                        <span id="alerts">{{ alerts }}</span>
+                        <div class="logbox">
+                            <table style="width:100%;border:0px">
+                                <tr>
+                                    <td class="logbox-text ha_left"><a href="{% url 'friends_index' %}">Friends</a></td>
+                                </tr>
+                                <tr>
+                                    <td class="logbox-text ha_left" style="padding-top:5px;"><a href="{% url 'account_settings' %}">Account Settings</a></td>
+                                </tr>
+                                <tr>
+                                    <td class="logbox-text ha_left" style="padding-top:5px; border-bottom:1px solid #bebebe; padding-bottom:15px;"><a href="{% url 'logout' %}">Log Out</a></td>
+                                </tr>
+                                <tr>
+                                    <td class="logbox-text ha_left" style="padding-top:10px"><a href="#">Help</a></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+
+                <div class="left-block">
+                    {% if logged_in %}
+
+                    {% if page_title %}
+                    <h2>{{ page_title }}</h2>
+                    {% endif %}
+                    <div class="menu-block">
+                        {% block sidemenu %}
+                        <ul>
+                            <li><a href="{% url 'profile' username=user.username %}">{{ fullname }}</a></li>
+                            <li><a href="{% url 'home' %}">Home</a></li>
+                            <li><a href="{% url 'logbook_home' %}">Logs</a></li>
+                            <li><a href="{% url 'gallery_home' %}">Gallery</a></li>
+                            <li><a href="{% url 'divesites_home' %}">Dive Sites</a></li>
+                            <li><a href="{% url 'equipment_home' %}">Equipment Maintenance</a></li>
+                            <li><a href="{% url 'diveshops_home' %}">Dive Shops</a></li>
+                            <li><a href="#">Environmental Causes</a></li>
+                        </ul>
+                        {% endblock %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="right-block">
+                {% block content %}
+                {% endblock %}
+                </div>
+
+
+            </div>
+            <div class="barter-block" style="text-align:right">
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li>&nbsp;|&nbsp;</li>
+                    <li><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
+                </ul>
+            </div>
         </div>
-
-        <div class="right-block">
-        {% block content %}
-        {% endblock %}
-        </div>
-
-
-    </div>
-    <div class="barter-block" style="text-align:right">
-        <ul>
-            <li><a href="#">Contact Us</a></li>
-            <li>&nbsp;|&nbsp;</li>
-            <li><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
-        </ul>
-    </div>
-</div>
-</body>
+    </body>
 </html>

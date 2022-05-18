@@ -283,7 +283,7 @@ ul.errorlist>li {
 .frogman-text.prepand{padding-right:17px;}
 
 .logbox{
-		background:url(images/scubamob-log-box.png) no-repeat;
+		background:url(../images/scubamob-log-box.png) no-repeat;
 		width:187px;
 		height:109px;
 		position:absolute;
@@ -326,7 +326,7 @@ ul.errorlist>li {
 .photo{
 		width:225px;
 		float:left;
-		background:url(images/scubamob-trans-bg.png) repeat;
+		background:url(../images/scubamob-trans-bg.png) repeat;
 		padding:10px 10px 10px 15px;
 		position:absolute;
 		top:245px;;
@@ -378,7 +378,7 @@ ul.errorlist>li {
 			width:222px;
 			float:right;
 			position:relative;
-			background:#f0f0f0 url(images/scubamob-slice.png) repeat-x;
+			background:#f0f0f0 url(../images/scubamob-slice.png) repeat-x;
 			min-height:346px;
 			margin-top:2px;
 			padding-top:25px;
