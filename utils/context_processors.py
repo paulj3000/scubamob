@@ -5,7 +5,7 @@ def sm(request):
     """
     populate the header and footer fields of the template
     """
-    user    = request.user
+    user = request.user
 
     context = {
             'logged_in': user.is_authenticated,
