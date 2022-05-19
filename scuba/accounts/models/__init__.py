@@ -15,6 +15,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 from scuba.accounts.models.manager import NotificationManager
+from scuba.libs.models.uuidmodel import UUIDModel
 
 from utils.core.models import Timestamped
 
@@ -181,6 +182,36 @@ class UserDiveSiteBuddyFinder(models.Model):
     class Meta:
         db_table = 'user_divesite_buddy_finder'
         unique_together = (('user', 'divesite_id'), )
+
+
+class UserProfileImage(UUIDModel):
+    """ UserProfileImage
+
+    Keep a representation of the user's profile image
+    """
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    image = models.CharField(max_length=128)
+
+    class Meta:
+        """ define database tables, etc """
+        db_table = 'user_profile_image'
+
+    def __str__(self):
+        """ return a string representation of the model """
+        return self.user.get_full_name()
+
+    @property
+    def image_cleaned(self):
+        return self.image.replace('programs/', '')
+
+    def get_profile_image(self):
+        """ get_profile_image
+
+        sanitize the profile image. This will return the full url path
+        of the profile image, sans the 'profiles/' prefix
+        """
+        return f"{AWS_CLOUDFRONT}{self.image_cleaned}"
+
 
 # this is for notifications
 class Notification(models.Model):
