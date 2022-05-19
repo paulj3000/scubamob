@@ -62,7 +62,6 @@ INSTALLED_APPS = [
     'divesites',
     'equipment',
     'entities',
-    'home',
     'logbook',
     'diveshops',
     'utils',
@@ -70,6 +69,7 @@ INSTALLED_APPS = [
     'scuba.accounts',
     'scuba.environ',
     'scuba.friends',
+    'scuba.home',
     # 'django.contrib.admindocs',
 ]
 
