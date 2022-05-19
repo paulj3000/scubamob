@@ -295,3 +295,5 @@ TEST_PEP8_DIRS = [PROJECT_DIR]
 
 # start AWS stuff
 AWS_PROFILE_BLANK_URL = '/images/profiles/profile-blank.png'
+AWS_S3_BUCKET = os.environ.get("AWS_S3_BUCKET", "scubamob-dev")
+AWS_CLOUDFRONT = os.environ.get('AWS_CLOUDFRONT', 'https://d2cu90eg58hyxf.cloudfront.net')
