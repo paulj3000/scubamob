@@ -24,7 +24,7 @@ class HomeJumbotronForm(ModelForm):
     is_active flag is NOT set if there is no program file, cover, or "coming soon"
     is set
     """
-    video = forms.FileField(validators=[
+    filename = forms.FileField(validators=[
         FileExtensionValidator(allowed_extensions=['mp3'])])
 
     class Meta:
@@ -35,7 +35,7 @@ class HomeJumbotronForm(ModelForm):
         m = super().save(commit=False)
 
         cover = self.cleaned_data['cover']
-        video_file = self.cleaned_data['video']
+        video_file = self.cleaned_data['filename']
 
         m.save()
         id = str(m.id)
