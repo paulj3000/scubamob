@@ -223,10 +223,9 @@ header .navbar-toggler:focus {
 
         <div id="fb-root"></div>
         <div class="container">
-            <div id="wrap">
-                <div class="left-block">
-                    {% if logged_in %}
-
+            <div class="row">
+                {% if user.is_authenticated %}
+                <div class="col-3">
                     {% if page_title %}
                     <h2>{{ page_title }}</h2>
                     {% endif %}
@@ -244,23 +243,38 @@ header .navbar-toggler:focus {
                         </ul>
                         {% endblock %}
                     </div>
-                    {% endif %}
                 </div>
+                {% endif %}
 
-                <div class="right-block">
-                {% block content %}
-                {% endblock %}
+                <div class="col">
+                    {% block content %}
+                    {% endblock %}
                 </div>
-
-
-            </div>
-            <div class="barter-block" style="text-align:right">
-                <ul>
-                    <li><a href="#">Contact Us</a></li>
-                    <li>&nbsp;|&nbsp;</li>
-                    <li><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
-                </ul>
             </div>
         </div>
+
+        <footer>
+            <div class="container-fluid">
+                <div class="copy-rght container">
+                    <div class="row footer">
+                        <div class="col-sm-6">
+                            <a href="{{social_media.FACEBOOK}}" target="_blank" class="btn btn-primary btn-lg btn-floating" title="facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="{{social_media.TWITTER}}" target="_blank" class="btn btn-primary btn-lg btn-floating" title="twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="{{social_media.INSTAGRAM}}" target="_blank" class="btn btn-primary btn-lg btn-floating" title="instagram"><i class="fab fa-instagram"></i></a>
+                        </div>
+                        <div class="col-sm-6">
+                            <ul class="footerlinks">
+                                <li><a href="/about" title="about us">About Us</a></li>
+                                <li><a href="/faq" title="frequently asked questions">FAQ</a></li>
+                                <li><a href="/privacy" title="privacy policy">Privacy Policy</a></li>
+                                <li><a href="/terms" title="terms and conditions">Terms of Use</a></li>
+                                <li><a href="/contactus" title="contact us">Contact Us</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid text-center" style="background-color:#1a2027;color: #d6d4d3;font-size: 13px;padding-top: 5px;padding-bottom: 5px;">xxx</div>
+        </footer>
     </body>
 </html>

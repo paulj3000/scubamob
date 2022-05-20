@@ -297,3 +297,16 @@ TEST_PEP8_DIRS = [PROJECT_DIR]
 AWS_PROFILE_BLANK_URL = '/images/profiles/profile-blank.png'
 AWS_S3_BUCKET = os.environ.get("AWS_S3_BUCKET", "scubamob-dev")
 AWS_CLOUDFRONT = os.environ.get('AWS_CLOUDFRONT', 'https://d2cu90eg58hyxf.cloudfront.net')
+
+
+FILE_UPLOAD_HANDLERS = ['django.core.files.uploadhandler.TemporaryFileUploadHandler',]
+
+SOCKET_SERVER = 'location:3001'
+SOCKET_SERVER_ACTIVE = False
+
+# Social Media
+SOCIAL_MEDIA = {
+    'FACEBOOK': 'https://www.facebook.com/scubamob/',
+    'INSTAGRAM': 'https://www.instagram.com/scubamob/',
+    'TWITTER': 'https://www.instagram.com/scubamob/'
+}
