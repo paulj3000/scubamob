@@ -1,4 +1,4 @@
-{% extends 'layout_index.html' %}
+{% extends 'layout.html' %}
 {% load static %}
 
 {% block jumbotron %}
@@ -11,10 +11,8 @@
 </div>
 {% endblock %}
 
-
-
 {% block includes %}
-{% static 'js/home_index.js' %}
+<script src="{% static 'js/home_index.js' %}"></script>
 {% endblock %}
 
 {% block title %}ScubaMob - A Social Dive Spot{% endblock %}
@@ -44,10 +42,6 @@ function showMap(position) {
 //navigator.geolocation.getCurrentPosition(showMap);
 </script>
 
-
-<style type="text/css">
-    ul.marquee li {float:left; clear:none; list-style:none; }
-</style>
 
 <div class="top-block"><img src="{% static 'images/scubamob-img.png' %}" alt="" /></div>
 
