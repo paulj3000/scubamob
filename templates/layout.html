@@ -13,7 +13,7 @@
 
         {% compress css file style %}
         <link rel="stylesheet" href="{ static 'css/style.css' %}" media="all" />
-        {% endcompress %} 
+        {% endcompress %}
 
         {% compress css file vendor %}
         <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.css' %}" media="all" />
@@ -32,9 +32,8 @@
 
         {% block includes %}
         {% endblock %}
-        
-        <title>{% block title %}ScubaMob{% endblock %}</title>
 
+        <title>{% block title %}ScubaMob{% endblock %}</title>
 
         <style>
 /* GLOBAL STYLES */
@@ -93,11 +92,10 @@ header .navbar-toggler:focus {
   box-shadow: none;
 }
 
-
 @media screen and (max-width: 991px) {
   /* header .navbar-brand {
     width: 90px;
-    
+
   } */
   header .navbar-collapse {
     margin-left: 0;
@@ -174,6 +172,7 @@ header .navbar-toggler:focus {
 
                     {% block rightmenu %}
                     <ul class="navbar-nav flex-row ms-lg-auto mb-2 mb-lg-0">
+                        {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-bell-fill"></i>
@@ -196,6 +195,21 @@ header .navbar-toggler:focus {
                                 <li><a class="dropdown-item" href="{% url 'logout' %}">Log Out</a></li>
                             </ul>
                         </li>
+
+                        {% else %}
+
+                        {# start the login button section #}
+                        {% if not hidelogin %}
+                        <li class="nav-link">
+                          <a href="{% url 'login' %}" class="nav-link signup login" title="log in to your account">Login</a>
+                        </li>
+                        <li class="nav-link">
+                            <a href="{% url 'signup' %}" class="nav-link signup" title="sign up for a free account">Sign Up Now</a>
+                        </li>
+                        {% endif %}
+                        {# end the login button section #}
+
+                        {% endif %}
                     </ul>
                     {% endblock %}
                 {% endblock %}
@@ -204,6 +218,8 @@ header .navbar-toggler:focus {
           </nav>
         </header>
         <!-- Navbar -->
+
+        {% block jumbotron %}{% endblock %}
 
         <div id="fb-root"></div>
         <div class="container">
