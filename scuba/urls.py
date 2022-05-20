@@ -2,8 +2,7 @@ from django.conf.urls import include
 from django.urls import path, re_path
 from django.views.generic import TemplateView
 
-from django.contrib.auth.views import LoginView, LogoutView
-
+from django.contrib.auth.views import LogoutView
 
 import scuba.settings
 import scuba.home.views as home_views
@@ -58,7 +57,7 @@ urlpatterns = [
 
     # start some user account helper modules
 
-    path('login/', LoginView.as_view(
+    path('login/', login_views.LoginView.as_view(
         template_name='account/login.html'),
         name='login'),
 
