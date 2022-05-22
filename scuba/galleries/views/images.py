@@ -1,6 +1,6 @@
 import uuid
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login
@@ -15,10 +15,10 @@ from django.conf import settings
 from PIL import Image
 
 from logbook.forms import DiveForm
-from scuba.gallery.models import Album, AlbumImage
+from scuba.galleries.models import Album, AlbumImage
 
 
-IMAGE_TYPE_EXTENSIONS   = {
+IMAGE_TYPE_EXTENSIONS = {
         'image/gif': 'gif',
         'image/jpeg': 'jpg',
         'image/png': 'png',
@@ -33,24 +33,24 @@ def upload(us_request):
 
     account = us_request.user.get_account()
 
-    retval  = {'data': { 'items': [] }}
+    retval = {'data': { 'items': [] }}
 
     try:
-        ## convert the response to JSON
-        album_id        = params['albumId']
-        uploaded_image  = us_request.FILES['image']
+        # convert the response to JSON
+        album_id = params['albumId']
+        uploaded_image = us_request.FILES['image']
 
-        ##  let's get the album
-        album   = us_request.user.get_album_by_guid(album_id)
-        gallery_file                = album.add_image(uploaded_image)
-        gallery_file_thumbnail      = album.add_image_thumbnail(uploaded_image)
+        # let's get the album
+        album = us_request.user.get_album_by_guid(album_id)
+        galleries_file = album.add_image(uploaded_image)
+        galleries_file_thumbnail = album.add_image_thumbnail(uploaded_image)
 
-        retval['data']['items'] = [{ 'thumbnail': gallery_file_thumbnail, 'full': gallery_file }]
-        AlbumImage.objects.create(album=album, image=gallery_file, thumbnail=gallery_file_thumbnail)
+        retval['data']['items'] = [{'thumbnail': galleries_file_thumbnail, 'full': galleries_file}]
+        AlbumImage.objects.create(album=album, image=galleries_file, thumbnail=galleries_file_thumbnail)
     except:
         raise
 
-    return JSONResponse(api_response(**retval))
+    return JsonResponse(api_response(**retval))
 
 @login_required
 @require_http_methods(["GET"])
@@ -59,6 +59,6 @@ def getimage(us_request):
 
     account = us_request.user.get_account()
 
-    retval  = {'data': { 'items': [] }}
+    retval = {'data': { 'items': [] }}
 
-    return JSONResponse(api_response(**retval))
+    return JsonResponse(api_response(**retval))

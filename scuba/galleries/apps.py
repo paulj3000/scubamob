@@ -1,9 +1,9 @@
 from django.apps import AppConfig
 
 
-class GalleryConfig(AppConfig):
+class GalleriesConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'scuba.gallery'
+    name = 'scuba.galleries'
 
     def ready(self):
-        import scuba.gallery.signals
+        import scuba.galleries.signals

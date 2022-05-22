@@ -68,7 +68,7 @@ INSTALLED_APPS = [
     'scuba.accounts',
     'scuba.environ',
     'scuba.friends',
-    'scuba.gallery',
+    'scuba.galleries',
     'scuba.home',
     # 'django.contrib.admindocs',
 ]

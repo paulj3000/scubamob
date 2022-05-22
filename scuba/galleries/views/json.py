@@ -10,14 +10,14 @@ from django.contrib import messages
 from django.urls import reverse
 
 from logbook.forms import DiveForm
-from scuba.gallery.models import Album, AlbumImage
+from scuba.galleries.models import Album, AlbumImage
 
 
 @login_required
 def index(us_request):
     # render the appropriate template
     context = {}
-    return render(us_request, 'gallery/index.html', context)
+    return render(us_request, 'galleries/index.html', context)
 
 
 @login_required

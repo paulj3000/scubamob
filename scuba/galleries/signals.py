@@ -1,7 +1,7 @@
 from django.dispatch.dispatcher import receiver
 from django.db.models.signals import pre_delete
 
-from scuba.gallery.models import Media
+from scuba.galleries.models import Media
 
 
 # add a signal to delete the the images from S3 before we delete the album
