@@ -6,7 +6,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 
 
 import scuba.settings
-import home.views as home_views
+import scuba.home.views as home_views
 import scuba.accounts.views.profiles as account_profiles
 import scuba.accounts.views.login as login_views
 import scuba.accounts.views.signup as signup_views

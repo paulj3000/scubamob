@@ -6,6 +6,7 @@ import requests
 from scuba.sitesettings.models import SystemApi
 from scuba.settings import AWS_S3_BUCKET
 from scuba.libs.stringutils import StringUtils
+from scuba.libs.exceptions import InvalidHttpStatusCode
 
 
 class FileUtils:
@@ -34,6 +35,10 @@ class FileUtils:
 
         files = {'upload_file': content}
         resp = requests.post(url, files=files, data=data)
+
+        if resp.status_code < 200 or resp.status_code > 299:
+            raise InvalidHttpStatusCode(resp.status_code, resp.text)
+
         return resp
 
     @staticmethod

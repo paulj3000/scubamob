@@ -10,16 +10,16 @@ The admin page for the home app
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from scuba.home.forms.admin import HomeJumbotronForm
-from scuba.home.models import HomeJumbotron
+from scuba.home.forms.admin import JumbotronForm
+from scuba.home.models import Jumbotron
 
 
-class HomeJumbotronAdmin(admin.ModelAdmin):
+class JumbotronAdmin(admin.ModelAdmin):
     """ HomeDemoAdmin
 
     Override some of the display elements for the admin display
     """
-    form = HomeJumbotronForm
+    form = JumbotronForm
 
 
-admin.site.register(HomeJumbotron, HomeJumbotronAdmin)
+admin.site.register(Jumbotron, JumbotronAdmin)

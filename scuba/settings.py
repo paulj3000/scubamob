@@ -258,11 +258,6 @@ NOSQL_PASSWORD = 'notset'
 NOSQL_PORT = 27017
 NOSQL_DB = 'scubamob'
 
-#AWS_ACCESS_KEY_ID = 'AKIAJAKVVBLJNXEABZVQ'
-#AWS_SECRET_ACCESS_KEY = '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'
-AWS_ACCESS_KEY_ID = 'AKIAJDVN6XIBZ5I7TVSA'
-AWS_SECRET_ACCESS_KEY = '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'
-
 # Here is the bucket file pattern.  It goes in the following manner:
 # account guid / album id / file name
 GALLERY_BUCKET = 'scubamob.gallery.dev'
@@ -293,3 +288,9 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 TEST_PEP8_DIRS = [PROJECT_DIR]
+
+AWS_S3_BUCKET = 'scubamob-dev'
+
+VIDEO_TYPES = ['mp4']
+IMAGE_TYPES = ['png', 'jpg', 'gif',]
+VALID_CONTENT_TYPES = ['image/png',]
