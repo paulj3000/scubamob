@@ -19,7 +19,10 @@ urlpatterns = [
     path('createalbum/',
         galleries_api.json_createalbum),
     path('getalbums/',
-        galleries_api.json_getalbums,
+        galleries_api.ListAlbumsApi.as_view(),
+        name="json_getalbums"),
+    path('albums',
+        galleries_api.ListAlbumsApi.as_view(),
         name="json_getalbums"),
 
     re_path(r'getalbumimages/(?P<album_id>[0-9A-Fa-f-]{32,36})$',

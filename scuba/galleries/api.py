@@ -9,15 +9,36 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse
 
-from logbook.forms import DiveForm
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+
 from scuba.galleries.models import Album, AlbumImage
+from scuba.galleries.serializers import AlbumSerializer
 
 
-@login_required
-def index(us_request):
-    # render the appropriate template
-    context = {}
-    return render(us_request, 'galleries/index.html', context)
+class ListAlbumsApi(generics.ListAPIView):
+    """ HomeView
+
+    display the home page
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = AlbumSerializer
+    def get_queryset(self):
+        """ get_queryset
+
+        get all of categories associated to the section
+        """
+        return self.request.user.albums.all().order_by('title')
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        retval = {
+            'albums': self.serializer_class(queryset, many=True).data
+        }
+
+        return Response(retval)
 
 
 @login_required
@@ -56,7 +77,7 @@ def json_createalbum(us_request):
 
 @login_required
 @require_http_methods(["GET"])
-def json_getalbums(us_request):
+def getalbums(us_request):
     pprint(us_request.user.albums.filter())
 
     retval = []
