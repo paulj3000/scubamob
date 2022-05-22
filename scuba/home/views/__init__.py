@@ -5,7 +5,6 @@ from django.contrib.auth import authenticate, login
 
 # define the user data for this account
 from divesites.mongo import DiveSite as DiveSiteMongo
-from home.forms import HomeLoginForm
 from scuba.accounts.forms import AccountForm
 from scuba.accounts.mongo import Account as AccountMongo
 from utils.external.weather import Weather
