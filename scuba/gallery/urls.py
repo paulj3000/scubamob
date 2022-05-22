@@ -9,9 +9,9 @@
 # -----------------------------------------------------------------------------
 from django.urls import path, re_path
 
-import gallery.views as gallery_views
-import gallery.views.images as gallery_images
-import gallery.views.json as gallery_json
+import scuba.gallery.views as gallery_views
+import scuba.gallery.views.images as gallery_images
+import scuba.gallery.views.json as gallery_json
 
 
 urlpatterns = [

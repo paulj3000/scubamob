@@ -15,7 +15,7 @@ from django.conf import settings
 from PIL import Image
 
 from logbook.forms import DiveForm
-from gallery.models import Album, AlbumImage
+from scuba.gallery.models import Album, AlbumImage
 
 
 IMAGE_TYPE_EXTENSIONS   = {

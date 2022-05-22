@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
@@ -9,9 +9,8 @@ from django.contrib import messages
 from pprint import pprint
 from django.core.urlresolvers import reverse
 
-from logbook.forms import DiveForm 
-from utils.jsonresponse import JSONResponse
-from gallery.models import Album
+from logbook.forms import DiveForm
+from scuba.gallery.models import Album
 
 
 @login_required
@@ -31,7 +30,7 @@ def showalbum(us_request, id):
         json['url'] =   reverse('show_album', kwargs={'id': json['id']})
         retval.append(json)
 
-    return JSONResponse({'albums': retval })
+    return JsonResponse({'albums': retval })
 
 @csrf_exempt
 @login_required
@@ -46,8 +45,8 @@ def json_createalbum(us_request):
         Album.objects.create(account=us_request.user, title=params['title'], description=params.get('description'))
 
 
-        return JSONResponse({'sites': retval })
-        
+        return JsonResponse({'sites': retval })
+
     except:
         raise
         pass

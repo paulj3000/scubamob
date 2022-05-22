@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.http import Http404
 from django.contrib import messages
 
-from gallery.models import Album
+from scuba.gallery.models import Album
 
 
 @login_required

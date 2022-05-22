@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'rest_framework',
     'rest_framework.authtoken',
-    'gallery',
     'common',
     'divesites',
     'equipment',
@@ -69,6 +68,7 @@ INSTALLED_APPS = [
     'scuba.accounts',
     'scuba.environ',
     'scuba.friends',
+    'scuba.gallery',
     'scuba.home',
     # 'django.contrib.admindocs',
 ]
@@ -310,3 +310,5 @@ SOCIAL_MEDIA = {
     'INSTAGRAM': 'https://www.instagram.com/scubamob/',
     'TWITTER': 'https://www.instagram.com/scubamob/'
 }
+
+SITE_NAME = 'Scuba Mob'

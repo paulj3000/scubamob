@@ -5,7 +5,7 @@ from django.views.generic.edit import FormView
 
 class LoginView(BaseLoginView):
     #form_class = AuthenticationForm
-    template_name = 'accounts/login.htmxxl'
+    template_name = 'accounts/login.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

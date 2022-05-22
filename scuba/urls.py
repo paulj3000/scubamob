@@ -29,7 +29,7 @@ urlpatterns = [
     path('logbook/', include('logbook.urls')),
     path('divesites/', include('divesites.urls')),
     path('diveshops/', include('diveshops.urls')),
-    path('gallery/', include('gallery.urls')),
+    path('gallery/', include('scuba.gallery.urls')),
     path('equipment/', include('equipment.urls')),
     path('env/', include('scuba.environ.urls')),
 #    url(r'^diveshop/', include('diveshop.urls')),
@@ -58,7 +58,7 @@ urlpatterns = [
     # start some user account helper modules
 
     path('login/', login_views.LoginView.as_view(
-        template_name='account/login.html'),
+        template_name='accounts/login.html'),
         name='login'),
 
     path('logout/', LogoutView.as_view(next_page='/'), name="logout"),

@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.urls import reverse
 
 from logbook.forms import DiveForm
-from gallery.models import Album, AlbumImage
+from scuba.gallery.models import Album, AlbumImage
 
 
 @login_required
