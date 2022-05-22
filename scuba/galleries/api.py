@@ -15,7 +15,7 @@ from rest_framework.response import Response
 
 
 from scuba.galleries.models import Album, AlbumImage
-from scuba.galleries.serializers import AlbumSerializer
+from scuba.galleries.serializers import AlbumSerializer, MediaSerializer
 
 
 class ListAlbumsApi(generics.ListAPIView):
@@ -131,3 +131,26 @@ def json_getalbumimages(us_request, album_id):
 
     return JsonResponse(api_response(data={'items':retval, 'total': len(retval) }))
 
+
+class MediaUploadApi(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = MediaSerializer
+    def get_queryset(self):
+        """ get_queryset
+
+        get all of categories associated to the section
+        """
+        return Media.objects.all()
+
+    def post(self, request):
+        data = [{'file': value} for _, value in request.data.items()]
+
+        serializer = self.serializer_class(data=data, many=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        retval = {
+            'media': serializer.data
+        }
+
+        return Response(retval)

@@ -3,9 +3,9 @@ import json
 import base64
 import requests
 
-from cf.sitesettings.models import SystemApi
-from cf.settings import AWS_S3_BUCKET
-from cf.libs.stringutils import StringUtils
+from scuba.sitesettings.models import SystemApi
+from scuba.settings import AWS_S3_BUCKET
+from scuba.libs.stringutils import StringUtils
 
 
 class FileUtils:

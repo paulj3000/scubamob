@@ -11,9 +11,11 @@ from django.conf import settings
 
 #from boto3.s3.connection import S3Connection
 
+from scuba.accounts.models import User
+from scuba.libs.fileutils import FileUtils
+
 from utils import uuidmodel
 from utils.core.models import Timestamped
-from scuba.accounts.models import User
 
 
 IMAGE_TYPE_EXTENSIONS = {
@@ -51,6 +53,34 @@ class Media(models.Model):
 
     class Meta:
         db_table = 'media'
+
+    @staticmethod
+    def upload_new_media(name, content_type, data):
+        name = StringUtils.generate_url_from_string(name)
+        print(name)
+
+        count = Media.objects.filter(title=name).count()
+        extra = 1
+        while count:
+            tmp_name, ext = os.path.splitext(name)
+            tmp_name = f"{tmp_name}-{extra}{ext}"
+            extra += 1
+            count = Media.objects.filter(title=tmp_name).count()
+
+            if not count:
+                name = tmp_name
+
+        # TODO: validate the extension
+        #ext = guess_extension(content_type)
+        #if not ext:
+        #    raise InvalidContentTypeException(content_type)
+        aws_filename = f"content/{SITE_ID}/{name}"
+
+        # upload the file to s3
+        FileUtils.upload_file_to_s3(aws_filename, content_type, data)
+
+        # and now, create the file
+        return Media.objects.create(filename=name, content_type=content_type, aws_filename=aws_filename)
 
 
 class Album(Timestamped, models.Model):

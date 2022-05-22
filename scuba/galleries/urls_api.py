@@ -22,6 +22,10 @@ urlpatterns = [
         galleries_api.ListAlbumsApi.as_view(),
         name="api_listalbums"),
 
+    path('media/',
+        galleries_api.MediaUploadApi.as_view(),
+        name="api_mediaupload"),
+
     re_path(r'getalbumimages/(?P<album_id>[0-9A-Fa-f-]{32,36})$',
         galleries_api.json_getalbumimages,
         name="json_getalbumimages"),
