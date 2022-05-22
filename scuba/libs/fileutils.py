@@ -1,0 +1,47 @@
+import os
+import json
+import base64
+import requests
+
+from cf.sitesettings.models import SystemApi
+from cf.settings import AWS_S3_BUCKET
+from cf.libs.stringutils import StringUtils
+
+
+class FileUtils:
+    @staticmethod
+    def write_to_file(filename, content):
+        f = open(filename, "wb")
+        f.write(content.encode())
+        f.close()
+
+    @staticmethod
+    def upload_file_to_s3(filename, content_type, content):
+        url = SystemApi.get_s3_upload()
+
+        data = {
+            'headers':
+                json.dumps([{
+                    "key": "ContentType",
+                    "value": content_type,
+                }, {
+                    "key": "ContentType",
+                    "value": content_type,
+                }]),
+            'bucket': AWS_S3_BUCKET,
+            'key': filename
+        }
+
+        files = {'upload_file': content}
+        resp = requests.post(url, files=files, data=data)
+        return resp
+
+    @staticmethod
+    def create_temp_dir(dir_base):
+        tmp_dir = StringUtils.generate_random_string(6)
+        layout_temp_dir = os.path.join(dir_base, tmp_dir)
+
+        # create the directory
+        os.mkdir(layout_temp_dir)
+
+        return layout_temp_dir

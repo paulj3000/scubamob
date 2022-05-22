@@ -2,13 +2,14 @@
 {% load static %}
 
 {% block includes %}
-<script src="{% static 'gallery_index.js' %}"></script>
+<script src="{% static 'js/gallery/sm_index.js' %}"></script>
 {% endblock %}
 
 {% block content %}
-
-<div class="ha_right">
-    <a href="#" class="cssbutton" id="creategallery">Add Gallery</a>
+<div class="row">
+    <div class="col">
+        <a href="#" class="float-end" id="creategallery">Add Gallery</a>
+    </div>
 </div>
 
 <div class="gallery">
@@ -17,7 +18,6 @@
 </div>
 
 <style type="text/css">
-    li { display:inline; }
     .bar {  height: 18px;  background: green;   }
 </style>
 
@@ -55,14 +55,11 @@ $(document).ready(function() {
         height: 300,
         width: 350,
         modal: true,
-        buttons:
-        {
-            "Create an account": function()
-            {
+        buttons: {
+            "Create an account": function() {
                 createAlbum();
             },
-            Cancel: function()
-            {
+            Cancel: function() {
                 $( this ).dialog( "close" );
             }
         }
@@ -83,7 +80,6 @@ function createAlbum()
 
     $("#dialog-form").dialog( "close" );
 }
-
 </script>
 
     {% verbatim %}
@@ -119,7 +115,4 @@ function createAlbum()
         </form>
         </div>
     </div>
-
-
-
 {% endblock %}

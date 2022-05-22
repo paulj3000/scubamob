@@ -229,7 +229,7 @@ header .navbar-toggler:focus {
                     {% if page_title %}
                     <h2>{{ page_title }}</h2>
                     {% endif %}
-                    <div class="menu-block">
+                    <div class="menu-block" style="margin-top: 50px;">
                         {% block sidemenu %}
                         <ul>
                             <li><a href="{% url 'profile' username=user.username %}">{{ fullname }}</a></li>
