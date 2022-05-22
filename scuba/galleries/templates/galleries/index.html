@@ -17,7 +17,7 @@
     </div>
 </div>
 
-<style type="text/css">
+<style>
     .bar {  height: 18px;  background: green;   }
 </style>
 
@@ -32,7 +32,7 @@ $(document).ready(function() {
     html    = $('#album_template').html();
     var galleryUrl = "{{ PRODUCTION_GALLERY_URL }}";
 
-    $.get("{% url 'json_getalbums' %}", function(data)
+    $.get("{% url 'api_listalbums' %}", function(data)
     {
         $.each(data.albums, function(i, d)
         {
