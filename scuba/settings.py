@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     'scuba.accounts',
     'scuba.environ',
     'scuba.friends',
+    'scuba.sitesettings',
     # 'django.contrib.admindocs',
 ]
 
