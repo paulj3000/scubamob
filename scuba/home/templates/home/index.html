@@ -1,39 +1,12 @@
 {% extends 'layout.html' %}
 {% load static %}
 
-{% block jumbotron %}
-<div class="p-5 mb-4 bg-light rounded-3">
-    <div class="container-fluid py-5">
-        <h1 class="display-5 fw-bold">Custom jumbotron</h1>
-        <p class="col-md-8 fs-4">Using a series of utilities, you can create this jumbotron, just like the one in previous versions of Bootstrap. Check out the examples below for how you can remix and restyle it to your liking.</p>
-        <button class="btn btn-primary btn-lg" type="button">Example button</button>
-    </div>
-</div>
-{% endblock %}
-
-{% block includes %}
-<script src="{% static 'js/home_index.js' %}"></script>
-{% endblock %}
-
 {% block title %}ScubaMob - A Social Dive Spot{% endblock %}
 
-{% block login %}
-<form method="post" action="{% url 'django.contrib.auth.views.login' %}">
-    {% csrf_token %}
-    {{ form }}
-    <button name="submit" type="submit" value="login" >Login</button>
-    <div class="loginoption">
-        <a href="{% url 'forgot_password1' %}" class="cant">Forgot your password?</a>
-        <input type="checkbox" name="remember" /> Remember me on this computer
-    </div>
-
-    <input type="hidden" name="next" value="{{ next }}" />
-</form>
-{% endblock %}
-
 {% block content %}
+<script src="{% static 'js/home_index.js' %}"></script>
 
-<script type="text/javascript">
+<script>
 function showMap(position) {
     console.log(position);
 }

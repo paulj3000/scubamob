@@ -1,6 +1,5 @@
 import os
 import json
-import base64
 import requests
 
 from scuba.sitesettings.models import SystemApi

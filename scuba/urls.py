@@ -18,7 +18,7 @@ admin.autodiscover()
 urlpatterns = [
     # Examples:
     # url(r'^scubamob/', include('scubamob.foo.urls')),
-    path('', home_views.index, name='index'),
+    path('', home_views.IndexView.as_view(), name='index'),
 
     path('home/', home_views.home, name='home'),
     path('signup/', signup_views.SignupView.as_view(), name='signup'),
