@@ -71,7 +71,7 @@ INSTALLED_APPS = [
     'scuba.friends',
     'scuba.home',
     'scuba.sitesettings',
-    # 'django.contrib.admindocs',
+    'django.contrib.admindocs',
 ]
 
 MIDDLEWARE = [
@@ -289,7 +289,8 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 TEST_PEP8_DIRS = [PROJECT_DIR]
 
-AWS_S3_BUCKET = 'scubamob-dev'
+AWS_S3_BUCKET = os.environ.get('AWS_S3', 'scubamob-dev')
+AWS_CLOUDFRONT = os.environ.get('AWS_CLOUDFRONT', 'https://d2pw8lka09f5g5.cloudfront.net')
 
 VIDEO_TYPES = ['mp4']
 IMAGE_TYPES = ['png', 'jpg', 'gif',]

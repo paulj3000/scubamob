@@ -9,7 +9,7 @@ Add some signal stuff for account creation stuff
 """
 import logging
 from django.dispatch import receiver
-from django.db.models.signals import pre_delete
+from django.db.models.signals import pre_delete, pre_save
 
 from scuba.home.models import Jumbotron
 from scuba.libs.fileutils import FileUtils
@@ -22,10 +22,18 @@ def delete_obj_from_s3(sender, instance, **kwargs):
     Some modifications necessary for the campaign once it's uploaded
     """
     logger = logging.getLogger('main')
-
-    print("FOO")
-    print("FOO")
-    print("FOO")
-    print("FOO")
-    print("FOO")
     FileUtils.delete_file_from_s3(instance.filename)
+
+
+@receiver(pre_save, sender=Jumbotron)
+def validate_is_active(sender, instance, **kwargs):
+    """ post_save
+
+    Some modifications necessary for the campaign once it's uploaded
+    """
+    logger = logging.getLogger('main')
+
+    # verify there is an active jumbotron. If there is not, set this one
+    # to active
+    if not Jumbotron.objects.filter(is_active=True).count():
+        instance.is_active = True

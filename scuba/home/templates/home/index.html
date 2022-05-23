@@ -1,29 +1,12 @@
 {% extends 'layout_index.html' %}
 {% load static %}
 
-{% block includes %}
-{% static 'js/home_index.js' %}
-{% endblock %}
-
 {% block title %}ScubaMob - A Social Dive Spot{% endblock %}
 
-{% block login %}
-<form method="post" action="{% url 'django.contrib.auth.views.login' %}">
-    {% csrf_token %}
-    {{ form }}
-    <button name="submit" type="submit" value="login" >Login</button>
-    <div class="loginoption">
-        <a href="{% url 'forgot_password1' %}" class="cant">Forgot your password?</a>
-        <input type="checkbox" name="remember" /> Remember me on this computer
-    </div>
-
-    <input type="hidden" name="next" value="{{ next }}" />
-</form>
-{% endblock %}
-
 {% block content %}
+<script src="{% static 'js/home_index.js' %}"></script>
 
-<script type="text/javascript">
+<script>
 function showMap(position) {
     console.log(position);
 }
@@ -37,7 +20,13 @@ function showMap(position) {
     ul.marquee li {float:left; clear:none; list-style:none; }
 </style>
 
-<div class="top-block"><img src="{% static 'images/scubamob-img.png' %}" alt="" /></div>
+{% if jumbotron %}
+<div class="top-block">
+    {% if jumbotron.is_image %}
+        <img src="{% static 'images/scubamob-img.png' %}" alt="" />
+    {% endif %}
+</div>
+{% endif %}
 
     <div class="content-block">
     	<div class="content-home-left">

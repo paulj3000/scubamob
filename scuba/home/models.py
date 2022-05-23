@@ -1,13 +1,16 @@
 import os
+from urllib.parse import urljoin
 
 from django.db import models
 from django.templatetags.static import static
 from mimetypes import guess_extension
 
 from scuba.libs.models.uuidmodel import UUIDModel
-from scuba.settings import VIDEO_TYPES, IMAGE_TYPES, VALID_CONTENT_TYPES
 from scuba.libs.exceptions import InvalidContentTypeException
 from scuba.libs.fileutils import FileUtils
+from scuba.settings import (
+    VIDEO_TYPES, IMAGE_TYPES, VALID_CONTENT_TYPES, AWS_CLOUDFRONT
+)
 
 
 class Jumbotron(UUIDModel):
@@ -36,23 +39,27 @@ class Jumbotron(UUIDModel):
         return self.name
 
     @property
+    def url(self):
+        """ url
+
+        return the filename with cloudfront attached to it
+        """
+        return urljoin(AWS_CLOUDFRONT, self.filename)
+
+    @property
     def is_video(self):
         return True \
-            if self.jumbotron_type == HomeJumbotron.JUMBOTRON_TYPE_VIDEO \
+            if self.jumbotron_type == Jumbotron.JUMBOTRON_TYPE_VIDEO \
             else False
 
     @property
     def is_image(self):
         return True \
-            if self.jumbotron_type == HomeJumbotron.JUMBOTRON_TYPE_IMAGE \
+            if self.jumbotron_type == Jumbotron.JUMBOTRON_TYPE_IMAGE \
             else False
 
-    @property
-    def url(self):
-        return static(self.filename)
-
     @staticmethod
-    def get_active_jumbotron(self):
+    def get_active_jumbotron():
         """ get_active_video
 
         Get the active video.
@@ -60,8 +67,8 @@ class Jumbotron(UUIDModel):
         * If not, return None
         """
         try:
-            return HomeJumbotron.objects.get(is_active=True).url
-        except HomeVideo.DoesNotExist:
+            return Jumbotron.objects.get(is_active=True)
+        except Jumbotron.DoesNotExist:
             return None
 
     @staticmethod
@@ -76,7 +83,7 @@ class Jumbotron(UUIDModel):
         filename = None
         while True:
             tmp_name, ext = os.path.splitext(name)
-            tmp_name = f"jumbotrons/{tmp_name}-{extra}{ext}"
+            tmp_name = f"jtrons/{tmp_name}-{extra}{ext}"
             extra += 1
 
             if not Jumbotron.objects.filter(filename=tmp_name).count():
