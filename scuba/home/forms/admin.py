@@ -64,7 +64,7 @@ class JumbotronForm(ModelForm):
         m.jumbotron_type = getattr(self, 'jtype')
         m.filename = getattr(self, 'filename')
 
-        if commot:
+        if commit:
             m.save()
 
         return m
