@@ -42,6 +42,26 @@ class FileUtils:
         return resp
 
     @staticmethod
+    def delete_file_from_s3(filename):
+        url = SystemApi.get_s3_delete()
+
+        data = {
+            'bucket': AWS_S3_BUCKET,
+            'key': filename,
+        }
+
+        from pprint import pprint
+        pprint(data)
+        print(url)
+        resp = requests.post(url, json=data)
+
+        if resp.status_code < 200 or resp.status_code > 299:
+            raise InvalidHttpStatusCode(resp.status_code, resp.text)
+
+        return resp
+
+
+    @staticmethod
     def create_temp_dir(dir_base):
         tmp_dir = StringUtils.generate_random_string(6)
         layout_temp_dir = os.path.join(dir_base, tmp_dir)

@@ -28,6 +28,9 @@ class SystemApi(UUIDModel):
     def get_s3_upload():
         return SystemApi.get_url_by_key('AWS_S3_UPLOAD')
 
+    def get_s3_delete():
+        return SystemApi.get_url_by_key('AWS_S3_DELETE')
+
     @staticmethod
     def get_billing_authorize_cc_url():
         return SystemApi.get_url_by_key('BILLING_AUTHORIZE_CC')
