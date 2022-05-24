@@ -21,13 +21,6 @@ function showMap(position) {
     <img src="{{jumbotron.url}}" alt="{{jumbotron.title}}" />
     {% endif %}
 
-
-{% if jumbotron %}
-<div class="top-block">
-    {% if jumbotron.is_image %}
-    <img src="{{jumbotron.url}}" alt="{{jumbotron.title}}" />
-    {% endif %}
-
     {% if jumbotron.is_video %}
     <video autoplay style="width:100%" muted loop>
         <source src="{{jumbotron.url}}" type="video/mp4">
