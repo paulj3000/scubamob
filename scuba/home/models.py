@@ -1,10 +1,16 @@
+import os
+
 from django.db import models
 from django.templatetags.static import static
+from mimetypes import guess_extension
 
 from scuba.libs.models.uuidmodel import UUIDModel
+from scuba.settings import VIDEO_TYPES, IMAGE_TYPES, VALID_CONTENT_TYPES
+from scuba.libs.exceptions import InvalidContentTypeException
+from scuba.libs.fileutils import FileUtils
 
 
-class HomeJumbotron(UUIDModel):
+class Jumbotron(UUIDModel):
     """ UserProfileImage
 
     Keep a representation of the user's profile image
@@ -57,3 +63,30 @@ class HomeJumbotron(UUIDModel):
             return HomeJumbotron.objects.get(is_active=True).url
         except HomeVideo.DoesNotExist:
             return None
+
+    @staticmethod
+    def upload_jumbotron(name, content_type, data):
+        # TODO: validate the extension
+        ext = guess_extension(content_type)
+        print('ext')
+        if content_type not in VALID_CONTENT_TYPES:
+            raise InvalidContentTypeException(content_type)
+
+        extra = 1
+        filename = None
+        while True:
+            tmp_name, ext = os.path.splitext(name)
+            tmp_name = f"jumbotrons/{tmp_name}-{extra}{ext}"
+            extra += 1
+
+            if not Jumbotron.objects.filter(filename=tmp_name).count():
+                filename = tmp_name
+                break
+
+        jtron_type = Jumbotron.JUMBOTRON_TYPE_VIDEO if ext in VIDEO_TYPES \
+                else Jumbotron.JUMBOTRON_TYPE_IMAGE
+
+        # upload the file to s3
+        FileUtils.upload_file_to_s3(filename, content_type, data)
+
+        return filename, jtron_type

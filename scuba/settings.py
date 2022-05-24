@@ -258,11 +258,6 @@ NOSQL_PASSWORD = 'notset'
 NOSQL_PORT = 27017
 NOSQL_DB = 'scubamob'
 
-#AWS_ACCESS_KEY_ID = 'AKIAJAKVVBLJNXEABZVQ'
-#AWS_SECRET_ACCESS_KEY = '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'
-AWS_ACCESS_KEY_ID = 'AKIAJDVN6XIBZ5I7TVSA'
-AWS_SECRET_ACCESS_KEY = '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'
-
 # Here is the bucket file pattern.  It goes in the following manner:
 # account guid / album id / file name
 GALLERY_BUCKET = 'scubamob.gallery.dev'
@@ -313,3 +308,6 @@ SOCIAL_MEDIA = {
 }
 
 SITE_NAME = 'Scuba Mob'
+VIDEO_TYPES = ['mp4']
+IMAGE_TYPES = ['png', 'jpg', 'gif',]
+VALID_CONTENT_TYPES = ['image/png',]
