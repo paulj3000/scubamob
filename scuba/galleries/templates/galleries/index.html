@@ -6,6 +6,15 @@
 {% endblock %}
 
 {% block content %}
+<style>
+.gallery-block {
+    height: 300px;
+    border: solid 3px #ccc;
+    margin: 10px;
+}
+</style>
+
+
 <div class="row">
     <div class="col">
         <a href="#" class="float-end" id="creategallery">Add Gallery</a>
@@ -13,8 +22,8 @@
 </div>
 
 <div class="gallery">
-    <div class="gallery-block" style="margin-top:0px;height:300px">
-        <ul id="gallery-block" style="margin-top:0px">
+    <div class="gallery-block" style="margin-top:0px;height:300px" draggable="true">
+        <ul id="media" style="margin-top:0px">
         </ul>
     </div>
 </div>
@@ -109,3 +118,7 @@ function createAlbum()
         </div>
     </div>
 {% endblock %}
+
+<!--
+    https://www.javascripttutorial.net/web-apis/javascript-drag-and-drop/
+-->
