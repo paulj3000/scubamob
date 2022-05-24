@@ -242,8 +242,11 @@ EXTERNAL_INTERFACES = {
     }
 }
 
-MEMCACHE = {
-    'server': ['127.0.0.1:11211']
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'LOCATION': os.environ.get('MEMCACHE_SERVER', '127.0.0.1:11211')
+    }
 }
 
 # set up the external API stuff

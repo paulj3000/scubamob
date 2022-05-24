@@ -43,7 +43,6 @@ urlpatterns = [
     path('api/1.0/diveshops/', include('api.urls_diveshops')),
 
     path('api/1.0/mobile/account', include('api.urls_account')),
-    path('api/1.0/mobile', include('api.urls_mobile')),
     path('api/accounts/', include('scuba.accounts.urls_accounts_api')),
     path('api/galleries/', include('scuba.galleries.urls_api')),
 
