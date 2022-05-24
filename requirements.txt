@@ -14,3 +14,4 @@ django-crispy-forms==1.14.0
 crispy-bootstrap5==0.6
 pycodestyle==2.8.0
 git+https://github.com/paulj3000/django-test-pep8
+pymemcache==3.5.2
