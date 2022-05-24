@@ -58,10 +58,7 @@ urlpatterns = [
 
     # start some user account helper modules
 
-    path('login/', login_views.LoginView.as_view(
-        template_name='accounts/login.html'),
-        name='login'),
-
+    path('login/', login_views.LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(next_page='/'), name="logout"),
 
     # enable the admin section
