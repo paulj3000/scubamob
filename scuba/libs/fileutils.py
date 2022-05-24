@@ -29,10 +29,12 @@ class FileUtils:
                     "value": content_type,
                 }]),
             'bucket': AWS_S3_BUCKET,
-            'key': filename
+            'key': filename,
         }
 
-        files = {'upload_file': content}
+        headers = {'Content-Type': 'multipart/form-data'}
+
+        files = {'file': content}
         resp = requests.post(url, files=files, data=data)
 
         if resp.status_code < 200 or resp.status_code > 299:
@@ -49,9 +51,6 @@ class FileUtils:
             'key': filename,
         }
 
-        from pprint import pprint
-        pprint(data)
-        print(url)
         resp = requests.post(url, json=data)
 
         if resp.status_code < 200 or resp.status_code > 299:

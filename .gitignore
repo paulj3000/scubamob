@@ -3,6 +3,7 @@
 /.*\.swp$
 ^\.DS_Store
 senv/
+env/
 static/components
 static/CACHE
 static/django_extensions
@@ -14,3 +15,4 @@ testdata
 test.sqlite3
 static/admin
 node_modules/*
+migrations/
