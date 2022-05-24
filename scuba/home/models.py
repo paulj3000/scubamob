@@ -2,6 +2,7 @@ import os
 import time
 from urllib.parse import urljoin
 
+from django.core.exceptions import MultipleObjectsReturned
 from django.db import models
 from django.templatetags.static import static
 from mimetypes import guess_extension
@@ -59,6 +60,11 @@ class Jumbotron(UUIDModel):
             if self.jumbotron_type == Jumbotron.JUMBOTRON_TYPE_IMAGE \
             else False
 
+    def set_active(self):
+        Jumbotron.objects.all().update(is_active=False)
+        self.is_active = True
+        self.save()
+
     @staticmethod
     def get_active_jumbotron():
         """ get_active_video
@@ -71,6 +77,12 @@ class Jumbotron(UUIDModel):
             return Jumbotron.objects.get(is_active=True)
         except Jumbotron.DoesNotExist:
             return None
+        except MultipleObjectsReturned:
+            # we have more than one is_active. Fix
+            jumbo = Jumbotron.objects.all().first()
+            jumbo.set_active()
+            return jumbo
+
 
     @staticmethod
     def upload_jumbotron(name, content_type, data):
