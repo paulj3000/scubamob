@@ -18,6 +18,7 @@ from scuba.home.models import Jumbotron
 from scuba.libs.fileutils import FileUtils
 from scuba.libs.exceptions import InvalidHttpStatusCode
 #from skm.libs.aws.s3 import S3
+from scuba.settings import IMAGE_TYPES, VIDEO_TYPES
 
 
 class JumbotronForm(ModelForm):
@@ -31,18 +32,23 @@ class JumbotronForm(ModelForm):
     IMAGE_FORMATS = ['png', 'jpg', 'gif',]
 
     upload = forms.FileField(validators=[
-        FileExtensionValidator(allowed_extensions=['mp4', 'png', 'jpg', 'gif',])])
+        FileExtensionValidator(allowed_extensions=IMAGE_TYPES + VIDEO_TYPES)])
 
     class Meta:
         model = Jumbotron
         fields = '__all__'
         exclude = ('filename', 'jumbotron_type',)
 
-    def clean(self, commit=True):
+    def save(self, commit=True):
         m = super().save(commit=False)
 
-        upload = self.cleaned_data['upload']
-        name = self.cleaned_data['name']
+        cleaned_data = self.cleaned_data
+
+        upload = cleaned_data['upload']
+        name = cleaned_data['name']
+
+        from pprint import pprint
+        pprint(cleaned_data)
 
         #ext = guess_extension(video_file.content_type, video_file.read())
         try:
@@ -58,8 +64,8 @@ class JumbotronForm(ModelForm):
                 params={'value': '42'},
             )
 
-    def save(self, commit=True):
-        m = super().save(commit=False)
+
+
 
         m.jumbotron_type = getattr(self, 'jtype')
         m.filename = getattr(self, 'filename')

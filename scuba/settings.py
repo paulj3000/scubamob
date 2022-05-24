@@ -292,5 +292,5 @@ AWS_S3_BUCKET = os.environ.get('AWS_S3', 'scubamob-dev')
 AWS_CLOUDFRONT = os.environ.get('AWS_CLOUDFRONT', 'https://d2pw8lka09f5g5.cloudfront.net')
 
 VIDEO_TYPES = ['mp4']
-IMAGE_TYPES = ['png', 'jpg', 'gif',]
-VALID_CONTENT_TYPES = ['image/png',]
+IMAGE_TYPES = ['png', 'jpg', 'gif', 'jpeg',]
+VALID_CONTENT_TYPES = ['image/png', 'image/jpg', 'image/jpeg',]
