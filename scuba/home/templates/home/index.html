@@ -15,8 +15,13 @@ function showMap(position) {
 //navigator.geolocation.getCurrentPosition(showMap);
 </script>
 
-
-<div class="top-block"><img src="{% static 'images/scubamob-img.png' %}" alt="" /></div>
+{% if jumbotron %}
+<div class="top-block">
+    {% if jumbotron.is_image %}
+       <img src="{{jumbotron.url}}" alt="" />
+    {% endif %}
+</div>
+{% endif %}
 
     <div class="content-block">
     	<div class="content-home-left">
