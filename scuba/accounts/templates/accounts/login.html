@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% load crispy_forms_tags static %}
 
 {% block content %}
 <div class="sales">
@@ -12,16 +13,9 @@
 <div class="inputform">
     <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
-        <ul>
-        {% for field in form %}
-            <li class="control-group">
-                {{ field.errors }}
-                {{ field.label_tag }} {{ field }}
-            </li>
-        {% endfor %}
-        </ul>
+        {{form|crispy}}
         <div class="loginoption">
-            <span class="cssbutton large formsubmit">Log In</span>
+            <button type="submit" class="btn btn-primary">Login</button>
             <a href="{% url 'forgot_password' %}" class="cant">Forgot your password?</a>
         </div>
 
