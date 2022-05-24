@@ -28,47 +28,43 @@ class JumbotronForm(ModelForm):
     is_active flag is NOT set if there is no program file, cover, or "coming soon"
     is set
     """
-    VIDEO_FORMATS = ['mp4']
-    IMAGE_FORMATS = ['png', 'jpg', 'gif',]
-
     upload = forms.FileField(validators=[
         FileExtensionValidator(allowed_extensions=IMAGE_TYPES + VIDEO_TYPES)])
 
     class Meta:
         model = Jumbotron
-        fields = '__all__'
         exclude = ('filename', 'jumbotron_type',)
+        fields = ('name', 'is_active',)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['upload'].widget = forms.HiddenInput()
+            self.fields['upload'].required = False
 
     def save(self, commit=True):
         m = super().save(commit=False)
 
         cleaned_data = self.cleaned_data
 
-        upload = cleaned_data['upload']
-        name = cleaned_data['name']
+        if cleaned_data.get('upload'):
+            upload = cleaned_data['upload']
+            name = cleaned_data['name']
+            try:
+                upload, jtype = Jumbotron.upload_jumbotron(
+                    upload.name, upload.content_type, upload.read()
+                )
 
-        from pprint import pprint
-        pprint(cleaned_data)
+                setattr(self, 'filename', upload)
+                setattr(self, 'jtype', jtype)
+            except InvalidHttpStatusCode:
+                raise forms.ValidationError(
+                    _('Cannot upload media'),
+                    params={'value': '42'},
+                )
 
-        #ext = guess_extension(video_file.content_type, video_file.read())
-        try:
-            upload, jtype = Jumbotron.upload_jumbotron(
-                upload.name, upload.content_type, upload.read()
-            )
-
-            setattr(self, 'filename', upload)
-            setattr(self, 'jtype', jtype)
-        except InvalidHttpStatusCode:
-            raise forms.ValidationError(
-                _('Cannot upload media'),
-                params={'value': '42'},
-            )
-
-
-
-
-        m.jumbotron_type = getattr(self, 'jtype')
-        m.filename = getattr(self, 'filename')
+            m.jumbotron_type = getattr(self, 'jtype')
+            m.filename = getattr(self, 'filename')
 
         if commit:
             m.save()

@@ -25,6 +25,12 @@ function showMap(position) {
     {% if jumbotron.is_image %}
     <img src="{{jumbotron.url}}" alt="{{jumbotron.title}}" />
     {% endif %}
+
+    {% if jumbotron.is_video %}
+    <video autoplay style="width:100%" muted>
+        <source src="{{jumbotron.url}}" type="video/mp4">
+    </video>
+    {% endif %}
 </div>
 {% endif %}
 
@@ -54,3 +60,7 @@ function showMap(position) {
 
     </div>
 {% endblock %}
+
+<!--
+    https://www.istockphoto.com/video/flock-of-small-beautiful-red-fishes-at-reef-gm1184461988-333364992
+-->
