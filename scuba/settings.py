@@ -309,4 +309,4 @@ SOCIAL_MEDIA = {
 SITE_NAME = 'Scuba Mob'
 VIDEO_TYPES = ['mp4']
 IMAGE_TYPES = ['png', 'jpg', 'gif', 'jpeg',]
-VALID_CONTENT_TYPES = ['image/png', 'image/jpg', 'image/jpeg',]
+VALID_CONTENT_TYPES = ['image/png', 'image/jpg', 'image/jpeg', 'video/mp4',]

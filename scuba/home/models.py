@@ -1,4 +1,5 @@
 import os
+import time
 from urllib.parse import urljoin
 
 from django.db import models
@@ -74,24 +75,24 @@ class Jumbotron(UUIDModel):
     @staticmethod
     def upload_jumbotron(name, content_type, data):
         # TODO: validate the extension
-        ext = guess_extension(content_type)
-        print('ext')
+        ext = guess_extension(content_type).lower().replace('.', '')
         if content_type not in VALID_CONTENT_TYPES:
             raise InvalidContentTypeException(content_type)
 
         extra = 1
-        filename = None
-        while True:
-            tmp_name, ext = os.path.splitext(name)
-            tmp_name = f"jtrons/{tmp_name}-{extra}{ext}"
-            extra += 1
+        #_, ext = os.path.splitext(name)
 
-            if not Jumbotron.objects.filter(filename=tmp_name).count():
-                filename = tmp_name
-                break
+        prefix = None
+        jtron_type = None
 
-        jtron_type = Jumbotron.JUMBOTRON_TYPE_VIDEO if ext in VIDEO_TYPES \
-                else Jumbotron.JUMBOTRON_TYPE_IMAGE
+        if ext.lower() in VIDEO_TYPES:
+            jtron_type = Jumbotron.JUMBOTRON_TYPE_VIDEO
+            prefix = 'vid'
+        else:
+            jtron_type = Jumbotron.JUMBOTRON_TYPE_IMAGE
+            prefix = 'img'
+
+        filename = f"jtrons/{prefix}_{int(time.time())}.{ext}"
 
         # upload the file to s3
         FileUtils.upload_file_to_s3(filename, content_type, data)

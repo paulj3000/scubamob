@@ -1,0 +1,20 @@
+{% extends "admin/change_form.html" %}
+{% load static compress %}
+
+{% block after_related_objects %}
+
+{% if original.id %}
+{{original.is_video}}
+
+    {% if original.is_image %}
+    <img src="{{original.url}}" alt="{{original.title}}" />
+    {% endif %}
+
+    {% if original.is_video %}
+    <video width="320" height="240" controls muted autoplay>
+        <source src="{{original.url}}" type="video/mp4">
+    </video>
+    {% endif %}
+
+{% endif %}
+{% endblock %}
