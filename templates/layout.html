@@ -12,7 +12,7 @@
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous"/>
 
         {% compress css file style %}
-        <link rel="stylesheet" href="{ static 'css/style.css' %}" media="all" />
+        <link rel="stylesheet" href="{% static 'css/style.css' %}" media="all" />
         {% endcompress %}
 
         {% compress css file vendor %}
@@ -169,6 +169,7 @@ header .navbar-toggler:focus {
                     <a class="nav-link" href="#">Environmental Causes</a>
                   </li>
                 </ul>
+                {% endblock %}
 
                     {% block rightmenu %}
                     <ul class="navbar-nav flex-row ms-lg-auto mb-2 mb-lg-0">
@@ -201,10 +202,10 @@ header .navbar-toggler:focus {
                         {# start the login button section #}
                         {% if not hidelogin %}
                         <li class="nav-link">
-                          <a href="{% url 'login' %}" class="nav-link signup login" title="log in to your account">Login</a>
+                          <a href="{% url 'login' %}" class="btn btn-info" title="log in to your account">Login</a>
                         </li>
                         <li class="nav-link">
-                            <a href="{% url 'signup' %}" class="nav-link signup" title="sign up for a free account">Sign Up Now</a>
+                            <a href="{% url 'signup' %}" class="btn btn-light" title="sign up for a free account">Sign Up Now</a>
                         </li>
                         {% endif %}
                         {# end the login button section #}
@@ -212,7 +213,6 @@ header .navbar-toggler:focus {
                         {% endif %}
                     </ul>
                     {% endblock %}
-                {% endblock %}
               </div>
             </div>
           </nav>
