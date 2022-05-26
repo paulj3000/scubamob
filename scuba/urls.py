@@ -60,6 +60,8 @@ urlpatterns = [
     path('login/', login_views.LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(next_page='/'), name="logout"),
 
+    path('robots.txt', include('scuba.robots.urls')),
+
     # enable the admin section
     path('admin/', admin.site.urls),
 

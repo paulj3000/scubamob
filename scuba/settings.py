@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'django_extensions',
     'test_pep8',
     'compressor',
@@ -70,6 +71,7 @@ INSTALLED_APPS = [
     'scuba.friends',
     'scuba.galleries',
     'scuba.home',
+    'scuba.robots',
     'scuba.sitesettings',
     'django.contrib.admindocs',
 ]
@@ -309,7 +311,9 @@ SOCIAL_MEDIA = {
     'TWITTER': 'https://www.instagram.com/scubamob/'
 }
 
+SITE_ID = 1
 SITE_NAME = 'Scuba Mob'
+
 VIDEO_TYPES = ['mp4']
 IMAGE_TYPES = ['png', 'jpg', 'gif', 'jpeg',]
 VALID_CONTENT_TYPES = ['image/png', 'image/jpg', 'image/jpeg', 'video/mp4',]
