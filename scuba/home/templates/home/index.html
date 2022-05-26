@@ -3,18 +3,7 @@
 
 {% block title %}ScubaMob - A Social Dive Spot{% endblock %}
 
-{% block content %}
-<script src="{% static 'js/home_index.js' %}"></script>
-
-<script>
-function showMap(position) {
-    console.log(position);
-}
-
-//var watchId = navigator.geolocation.watchPosition(showMap);
-//navigator.geolocation.getCurrentPosition(showMap);
-</script>
-
+{% block jumbotron %}
 {% if jumbotron %}
 <div class="top-block">
     {% if jumbotron.is_image %}
@@ -28,6 +17,21 @@ function showMap(position) {
     {% endif %}
 </div>
 {% endif %}
+{% endblock %}
+
+
+{% block content %}
+<script src="{% static 'js/home_index.js' %}"></script>
+
+<script>
+function showMap(position) {
+    console.log(position);
+}
+
+//var watchId = navigator.geolocation.watchPosition(showMap);
+//navigator.geolocation.getCurrentPosition(showMap);
+</script>
+
 
     <div class="content-block">
     	<div class="content-home-left">
