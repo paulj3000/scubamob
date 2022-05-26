@@ -1,24 +1,8 @@
 {% extends 'layout.html' %}
 {% load static %}
 
+{% block headermenu %}{% endblock %}
 {% block title %}ScubaMob - A Social Dive Spot{% endblock %}
-
-{% block jumbotron %}
-{% if jumbotron %}
-<div class="top-block">
-    {% if jumbotron.is_image %}
-    <img src="{{jumbotron.url}}" alt="{{jumbotron.title}}" />
-    {% endif %}
-
-    {% if jumbotron.is_video %}
-    <video autoplay style="width:100%" muted loop>
-        <source src="{{jumbotron.url}}" type="video/mp4">
-    </video>
-    {% endif %}
-</div>
-{% endif %}
-{% endblock %}
-
 
 {% block content %}
 <script src="{% static 'js/home_index.js' %}"></script>
@@ -32,6 +16,19 @@ function showMap(position) {
 //navigator.geolocation.getCurrentPosition(showMap);
 </script>
 
+{% if jumbotron %}
+<div class="top-block">
+    {% if jumbotron.is_image %}
+    <img src="{{jumbotron.url}}" alt="{{jumbotron.title}}" />
+    {% endif %}
+
+    {% if jumbotron.is_video %}
+    <video autoplay style="width:100%" muted loop>
+        <source src="{{jumbotron.url}}" type="video/mp4">
+    </video>
+    {% endif %}
+</div>
+{% endif %}
 
     <div class="content-block">
     	<div class="content-home-left">
