@@ -1,9 +1,8 @@
 {% extends "layout.html" %}
-{% load media %}
-{% load mediaurls %}
+{% load static compress %}
 
 {% block content %}
-{% include_media 'diveshops_index.js' %}
+<script src="{% static 'js/sm.diveshops.js' %}"></script>
 
 {% if messages %}
 <ul class="messages">
@@ -14,18 +13,20 @@
 {% endif %}
 
 
-<script type="text/javascript"> 
-    
+<script>
+
+const GOOGLE_KEY = 'AIzaSyDqOQUMvf6Tdsq_K7KdhHt6LqmsdChv2QI';
+
 $(document).ready(function()
 {
-    $(window).resize(function()     
+    $(window).resize(function()
     {
         SM.DiveShops.initScreenSize();
     });
 
     SM.DiveShops.initUserLocation();
     SM.DiveShops.displayMap();
-    
+
     $('.chosen-select').chosen();
 
     $('.radius').click(function(){
@@ -45,7 +46,7 @@ $(document).ready(function()
 </div>
 
     <div class="ha_right" style="margin-bottom:10px">
-        <a href="{% url 'diveshops_new' %}" class="cssbutton" style="width:130px">Create a Dive Shop</a>
+        <a href="{ url 'business_index' %}" class="btn btn-info">Create a Dive Shop</a>
     </div>
 
 
@@ -58,7 +59,7 @@ $(document).ready(function()
                         <td width="276"><input name="" type="text" class="inputbox" value="Enter Street, City, State Or Zip Code"></td>
                         -->
                         <td width="75">
-                       
+
                             <select name="radius" id="radius" class="chosen-select">
                                 <option value="">Radius</option>
                                 <option value="5">5 Miles</option>
@@ -73,8 +74,8 @@ $(document).ready(function()
             </table>
         </div>
         <div style="float:left">
-            <div id="map_canvas" style="width:758px;height:554px"></div>   
+            <div id="map_canvas" style="width:758px;height:554px"></div>
         </div>
     </div>
-    
+
 {% endblock %}
