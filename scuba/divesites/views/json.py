@@ -15,7 +15,7 @@ from scuba.accounts.mongo import Account as AccountMongo
 #from home.forms import AccountForm, UserCreateForm
 from utils.external.weather import Weather
 
-from divesites.mongo import DiveSite
+from scuba.divesites.mongo import DiveSite
 
 
 def getdivesites(us_request):

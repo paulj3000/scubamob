@@ -27,7 +27,7 @@ urlpatterns = [
     path('settings/', include('scuba.accounts.urls_settings')),
     path('friends/', include('scuba.friends.urls')),
     path('logbook/', include('logbook.urls')),
-    path('divesites/', include('divesites.urls')),
+    path('divesites/', include('scuba.divesites.urls')),
     path('diveshops/', include('diveshops.urls')),
     path('gallery/', include('scuba.galleries.urls')),
     path('equipment/', include('equipment.urls')),
@@ -38,13 +38,13 @@ urlpatterns = [
 
     #url(r'^profile/', include('scuba.accounts.urls_profile')),
 
-    path('api/1.0/divesites/', include('api.urls_divesites')),
     path('api/1.0/divelogs/', include('api.urls_divelogs')),
     path('api/1.0/diveshops/', include('api.urls_diveshops')),
 
     path('api/1.0/mobile/account', include('api.urls_account')),
     path('api/accounts/', include('scuba.accounts.urls_accounts_api')),
     path('api/galleries/', include('scuba.galleries.urls_api')),
+    path('api/divesites/', include('scuba.divesites.urls_api')),
 
 
     # Uncomment the admin/doc line below to enable admin documentation:

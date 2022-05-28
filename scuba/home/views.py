@@ -5,7 +5,8 @@ from django.contrib.auth import authenticate, login
 from django.views.generic import TemplateView
 
 # define the user data for this account
-from divesites.mongo import DiveSite as DiveSiteMongo
+from scuba.divesites.models import Divesite
+#from divesites.mongo import DiveSite as DiveSiteMongo
 from scuba.accounts.forms import AccountForm
 from scuba.accounts.mongo import Account as AccountMongo
 from scuba.home.models import Jumbotron

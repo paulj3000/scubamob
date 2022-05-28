@@ -14,7 +14,7 @@ from pprint import pprint
 from django import forms
 
 from utils.core.forms import NoSQLForm
-from divesites.mongo import DiveSite
+from scuba.divesites.mongo import DiveSite
 from bson.objectid import ObjectId
 
 CLASSIFICATION_CHOICES = (('shark', 'Shark'),('reef', 'Reef'), ('wall', 'Wall'),
