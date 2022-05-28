@@ -7,7 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 # define the user data for this account
-from divesites.forms import SiteForm
+from scuba.divesites.forms import SiteForm
+
 
 @login_required
 def index(us_request):
@@ -16,6 +17,7 @@ def index(us_request):
 
     # render the appropriate template
     return render(us_request, 'divesites/index.html', context)
+
 
 @login_required
 def newsite(us_request, siteid=None):
