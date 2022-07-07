@@ -5,3 +5,5 @@ http://www.pythonware.com/products/pil/
 
 ### links
 https://pypi.python.org/pypi/django-social-auth
+
+https://www.geeksforgeeks.org/convert-pdf-to-image-using-python/

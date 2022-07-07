@@ -20,4 +20,5 @@ class Settings:
             return getattr(settings, *self.defaults[attribute])
         return None
 
+
 sys.modules[__name__] = Settings()

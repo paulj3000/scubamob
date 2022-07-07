@@ -9,7 +9,7 @@ class Account:
 
     def __init__(self, **kwargs):
         self._mongo = Mongo()
-        self.user_id = kwargs.get('user_id')
+        self.user_id = str(kwargs.get('user_id'))
         self.collection = self._mongo[self.Meta.collection]
 
         # let's make sure mongo has this account's record in its collection

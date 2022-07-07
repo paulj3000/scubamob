@@ -58,17 +58,15 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'rest_framework',
     'rest_framework.authtoken',
-    'common',
     'equipment',
     'logbook',
     'diveshops',
     'utils',
-    'api',
     'scuba.accounts',
+    'scuba.divegroups',
     'scuba.divesites',
     'scuba.entities',
     'scuba.environ',
-    'scuba.friends',
     'scuba.galleries',
     'scuba.home',
     'scuba.robots',
@@ -108,11 +106,12 @@ TEMPLATES = [
 #AUTHENTICATION_BACKENDS = DEFAULT_SETTINGS.AUTHENTICATION_BACKENDS + \
 AUTHENTICATION_BACKENDS = [
     'rest_framework.authentication.TokenAuthentication',
-    'utils.middleware.authentication.DefaultBackend',
+    'scuba.libs.middleware.authentication.DefaultBackend',
 ]
 
 WSGI_APPLICATION = 'scuba.wsgi.application'
 
+AUTH_USER_MODEL = 'accounts.User'
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -181,7 +180,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 STATICFILES_FINDERS = DEFAULT_SETTINGS.STATICFILES_FINDERS + [
     'compressor.finders.CompressorFinder',
@@ -189,16 +188,9 @@ STATICFILES_FINDERS = DEFAULT_SETTINGS.STATICFILES_FINDERS + [
 
 YARN_ROOT_PATH = BASE_DIR
 
-
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 SERVER_EMAIL = 'no-reply@scubamob.com'
-
 
 MONGO = {
     'USE_REPLICASET': False,
@@ -212,7 +204,6 @@ MONGO = {
 NOSQL = 'mongo'
 
 
-PRODUCTION_MEDIA_URL = '//d1fqxyumeztd89.cloudfront.net/media/'
 PRODUCTION_GALLERY_URL = '//s3-us-west-1.amazonaws.com/scubamob.gallery.dev/'
 
 
@@ -294,10 +285,11 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 TEST_PEP8_DIRS = [PROJECT_DIR]
 
 # start AWS stuff
-AWS_PROFILE_BLANK_URL = '/images/profiles/profile-blank.png'
+PROFILE_BLANK_URL = 'images/profiles/profile-blank.png'
 AWS_S3_BUCKET = os.environ.get("AWS_S3_BUCKET", "scubamob-dev")
-AWS_CLOUDFRONT = os.environ.get('AWS_CLOUDFRONT', 'https://d2pw8lka09f5g5.cloudfront.net')
+AWS_CLOUDFRONT = os.environ.get('AWS_CLOUDFRONT', 'https://d2pw8lka09f5g5.cloudfront.net/')
 
+#STATIC_URL = AWS_CLOUDFRONT
 
 FILE_UPLOAD_HANDLERS = ['django.core.files.uploadhandler.TemporaryFileUploadHandler',]
 
@@ -317,3 +309,13 @@ SITE_NAME = 'Scuba Mob'
 VIDEO_TYPES = ['mp4']
 IMAGE_TYPES = ['png', 'jpg', 'gif', 'jpeg',]
 VALID_CONTENT_TYPES = ['image/png', 'image/jpg', 'image/jpeg', 'video/mp4',]
+
+
+COMPRESS_FILTERS = {
+    'css': ['compressor.filters.css_default.CssAbsoluteFilter',
+            'compressor.filters.yuglify.YUglifyCSSFilter'],
+    'js': ['compressor.filters.jsmin.JSMinFilter',
+           'compressor.filters.yuglify.YUglifyJSFilter'],
+}
+
+COMPRESS_YUGLIFY_BINARY = f"{BASE_DIR}/node_modules/yuglify/bin/yuglify"

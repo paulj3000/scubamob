@@ -16,8 +16,10 @@ urlpatterns = [
     re_path(r'deletealbum/(?P<album_id>[0-9A-Fa-f-]{32,36})$',
         galleries_api.json_deletealbum,
         name='delete_album'),
+
     path('createalbum/',
         galleries_api.json_createalbum),
+
     path('albums',
         galleries_api.ListAlbumsApi.as_view(),
         name="api_listalbums"),

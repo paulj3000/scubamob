@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if [[ -z $(docker ps | grep "mongo" | awk '{ print $1 }')  ]]; then
 docker run -it -d -p 27017:27017 mongo
 fi

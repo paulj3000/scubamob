@@ -6,6 +6,7 @@ from scuba.sitesettings.models import SystemApi
 from scuba.settings import AWS_S3_BUCKET
 from scuba.libs.stringutils import StringUtils
 from scuba.libs.exceptions import InvalidHttpStatusCode
+from scuba.libs.aws.s3 import S3
 
 
 class FileUtils:
@@ -16,31 +17,30 @@ class FileUtils:
         f.close()
 
     @staticmethod
-    def upload_file_to_s3(filename, content_type, content):
+    def upload_file_to_s3(filename, content_type, content, **kwargs):
         url = SystemApi.get_s3_upload()
 
-        data = {
-            'headers':
-                json.dumps([{
-                    "key": "ContentType",
-                    "value": content_type,
-                }, {
-                    "key": "ContentType",
-                    "value": content_type,
-                }]),
-            'bucket': AWS_S3_BUCKET,
-            'key': filename,
+        headers = {
+            'ContentType': content_type,
         }
 
-        headers = {'Content-Type': 'multipart/form-data'}
+        headers.update(kwargs.get('headers', {}))
 
-        files = {'file': content}
-        resp = requests.post(url, files=files, data=data)
+        # generate the data to send over to S3
+        S3.upload_file_content(AWS_S3_BUCKET, filename, content, **headers)
 
-        if resp.status_code < 200 or resp.status_code > 299:
-            raise InvalidHttpStatusCode(resp.status_code, resp.text)
+    @staticmethod
+    def generate_post(content_type):
+        url = SystemApi.get_s3_upload()
 
-        return resp
+        headers = {
+            'ContentType': content_type,
+        }
+
+        headers.update(kwargs.get('headers', {}))
+
+        # generate the data to send over to S3
+        S3.upload_file_content(AWS_S3_BUCKET, filename, content, **headers)
 
     @staticmethod
     def delete_file_from_s3(filename):
@@ -57,7 +57,6 @@ class FileUtils:
             raise InvalidHttpStatusCode(resp.status_code, resp.text)
 
         return resp
-
 
     @staticmethod
     def create_temp_dir(dir_base):

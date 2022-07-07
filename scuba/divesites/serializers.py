@@ -20,4 +20,3 @@ class DivesiteSerializer(serializers.ModelSerializer):
         retval = []
         file = validated_data['file']
         return Media.upload_new_media(fileinfo.name, fileinfo.content_type, fileinfo.read())
-

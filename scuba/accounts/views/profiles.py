@@ -1,7 +1,6 @@
 # Create your views here.
 from pprint import pprint
 
-from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -14,7 +13,8 @@ from django.http import HttpResponseBadRequest, HttpResponse
 
 # define the user data for this account
 from scuba.accounts.forms import EmailInviteForm
-from scuba.accounts.models import UserFriendRequest, UserFriend
+from scuba.accounts.models import UserFriendRequest, UserFriend, User
+from scuba.sitesettings.models import SystemApi, SystemSetting
 
 
 @login_required
@@ -46,12 +46,13 @@ def profile(us_request, username):
         'title': 'My Friends',
         'is_user': is_user,
         'user': profile,
+        'chat_server_active': SystemSetting.get_chat_server_active(),
         'friends': user.get_all_friends()
     }
 
     UserFriendRequest.objects.update_friend_request_active(user)
-    friend_list = us_request.user.friend_user.order_by('friend__first_name')
+    #friend_list = us_request.user.friend_user.order_by('friend__first_name')
     friend_request_list = us_request.user.friend_requested.order_by('friend__first_name')
 
-    context.update(friend_list=friend_list, friend_request_list=friend_request_list)
-    return render(us_request, "account/user/profile.html", context)
+    context.update(friend_request_list=friend_request_list)
+    return render(us_request, "accounts/profile.html", context)

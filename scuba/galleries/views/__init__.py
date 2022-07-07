@@ -27,8 +27,9 @@ def showalbum(us_request, album_id):
     if not album or album.user != us_request.user:
         raise Http404
 
-    context = { 'album': album }
+    context = {'album': album}
     return render(us_request, 'galleries/album.html', context)
+
 
 @login_required
 def editalbum(us_request, album_id):

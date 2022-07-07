@@ -13,7 +13,6 @@ from django.db.models import Q
 from django.db import IntegrityError
 import json
 
-from utils.httpresponse import JSONResponse
 #from utils.dateutils import timezone_to_utc, timezone_from_utc
 from account.models import Friendship, UserFriendRequest, UserFriendBlocked
 
@@ -21,14 +20,14 @@ from account.models import Friendship, UserFriendRequest, UserFriendBlocked
 @csrf_exempt
 @require_http_methods(["POST"])
 def invited(us_request):
-  
-    user    = us_request.user 
+
+    user    = us_request.user
     email_invites   = []
     response    = { 'invalid': [], 'sent': [], 'resent': [], 'friends': [] }
 
     if us_request.is_ajax():
         email_data  = json.loads(us_request.body)
-    
+
         friend    = None
         from django.core.validators import validate_email
 
@@ -41,13 +40,13 @@ def invited(us_request):
                 print "bad email:  %s " % email
                 response['invalid'].append(email)
                 continue
-      
+
             ### let's see if the user is being a jackass and is inviting himself
             if user.email == email:
-                print "user is inviting himself" 
+                print "user is inviting himself"
                 response['invalid'].append(email)
                 continue
-       
+
             friend  = None
             try:
                 friend  = User.objects.get(email=email)
@@ -55,10 +54,10 @@ def invited(us_request):
                 pass
 
             ### ok, so far a valid email address.  now, let's check for a valid user
-            ### first, is this this a valid usre with 
+            ### first, is this this a valid usre with
 
             if Friendship.objects.filter(
-                Q(friend1__email=email) | 
+                Q(friend1__email=email) |
                 Q(friend2__email=email)):
                 ### the user is already a friend.  forget it
                 response['friends'].append(email)
@@ -81,8 +80,8 @@ def invited(us_request):
 @require_http_methods(["PUT"])
 def accept_invite(us_request):
     response    = {}
-    
-    user    = us_request.user 
+
+    user    = us_request.user
     return JSONResponse( response )
 
 @login_required
@@ -90,8 +89,8 @@ def accept_invite(us_request):
 @require_http_methods(["DELETE"])
 def delete_friendship(us_request):
     response    = {}
-    
-    user    = us_request.user 
+
+    user    = us_request.user
     return JSONResponse( response )
 
 
@@ -100,7 +99,7 @@ def delete_friendship(us_request):
 @require_http_methods(["PUT"])
 def add_friend(us_request):
     response    = {}
-    user    = us_request.user 
+    user    = us_request.user
 
     if us_request.is_ajax():
         request_data  = json.loads(us_request.body)
@@ -128,7 +127,7 @@ def add_friend(us_request):
 @require_http_methods(["DELETE"])
 def cancel_request(us_request):
     response    = {}
-    user    = us_request.user 
+    user    = us_request.user
 
     if us_request.is_ajax():
         request_data  = json.loads(us_request.body)
@@ -147,7 +146,7 @@ def cancel_request(us_request):
 @require_http_methods(["PUT"])
 def block_friend(us_request):
     response    = {}
-    user    = us_request.user 
+    user    = us_request.user
 
     if us_request.is_ajax():
         request_data  = json.loads(us_request.body)
@@ -163,7 +162,7 @@ def block_friend(us_request):
 @require_http_methods(["PUT"])
 def accept_request(us_request):
     response    = {}
-    user    = us_request.user 
+    user    = us_request.user
 
     if us_request.is_ajax():
         request_data  = json.loads(us_request.body)
@@ -184,8 +183,8 @@ def accept_request(us_request):
                 request_obj = UserFriendRequest.objects.get(user=user, friend=friend)
                 if mode == 'add':
                     Friendship.objects.create(friend1=user, friend2=friend).save()
-                
-                #### delete the request object    
+
+                #### delete the request object
                 request_obj.delete()
 
             except IntegrityError:

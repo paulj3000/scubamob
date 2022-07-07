@@ -9,7 +9,9 @@ The admin page for the home app
 """
 from __future__ import unicode_literals
 
+from django.contrib import messages
 from django.contrib import admin
+
 from scuba.home.forms.admin import JumbotronForm
 from scuba.home.models import Jumbotron
 
@@ -34,6 +36,24 @@ class JumbotronAdmin(admin.ModelAdmin):
         if obj:
             self.exclude.append('upload')
         return super().get_form(request, obj, **kwargs)
+
+
+    def activate_jumbotron(self, request, queryset):
+        Jumbotron.objects.all().update(is_active=False)
+
+        jumbo = queryset.first()
+        jumbo.set_active()
+
+
+        # set a success message
+        messages.add_message(request,
+                messages.INFO, f"Jumbotron {jumbo.name} has been activated")
+
+    activate_jumbotron.short_description = "Activate jumbotron"
+
+    actions = [
+        activate_jumbotron,
+    ]
 
 
 admin.site.register(Jumbotron, JumbotronAdmin)

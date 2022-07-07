@@ -10,6 +10,7 @@ import scuba.accounts.views.profiles as account_profiles
 import scuba.accounts.views.login as login_views
 import scuba.accounts.views.signup as signup_views
 import scuba.accounts.views as account_views
+from scuba.sitesettings.apis import GetSystemSettingsApi
 
 
 from django.contrib import admin
@@ -25,7 +26,8 @@ urlpatterns = [
 
     path('account/', include('scuba.accounts.urls')),
     path('settings/', include('scuba.accounts.urls_settings')),
-    path('friends/', include('scuba.friends.urls')),
+    #path('friends/', include('scuba.friends.urls')),
+    path('groups/', include('scuba.divegroups.urls')),
     path('logbook/', include('logbook.urls')),
     path('divesites/', include('scuba.divesites.urls')),
     path('diveshops/', include('diveshops.urls')),
@@ -38,22 +40,38 @@ urlpatterns = [
 
     #url(r'^profile/', include('scuba.accounts.urls_profile')),
 
-    path('api/1.0/divelogs/', include('api.urls_divelogs')),
-    path('api/1.0/diveshops/', include('api.urls_diveshops')),
+    #path('api/1.0/divelogs/', include('api.urls_divelogs')),
+    #path('api/1.0/diveshops/', include('api.urls_diveshops')),
 
-    path('api/1.0/mobile/account', include('api.urls_account')),
+    #path('api/1.0/mobile/account', include('api.urls_account')),
     path('api/accounts/', include('scuba.accounts.urls_accounts_api')),
+    path('api/chats/', include('scuba.accounts.urls_chats_api')),
+    path('api/messenger/', include('scuba.accounts.urls_messenger_api')),
     path('api/galleries/', include('scuba.galleries.urls_api')),
     path('api/divesites/', include('scuba.divesites.urls_api')),
+    path('api/sitesettings', GetSystemSettingsApi.as_view()),
+    path('api/sitesettings/all', GetSystemSettingsApi.as_view()),
 
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
+    # start the messenger portion of the show
+    path('messenger',
+        TemplateView.as_view(template_name="messenger.html"),
+        name='messenger',
+    ),
+
     # let's go ahead and add some static pages (about and all of those things....)
     path('terms/', TemplateView.as_view(template_name="static/terms.html")),
     path('aboutus/', TemplateView.as_view(template_name="static/about.html")),
     path('privacy/', TemplateView.as_view(template_name="static/privacy.html"), name='privacy_policy'),
+
+    # start the legal stuff
+    #path('privacy', content_views.ContentView.as_view(), name='privacy'),
+    #path('terms', content_views.ContentView.as_view(), name='terms'),
+    #path('cookies', content_views.ContentView.as_view(), name='cookies'),
+    #path('about', content_views.ContentView.as_view(), name='about'),
 
     # start some user account helper modules
 
@@ -65,5 +83,5 @@ urlpatterns = [
     # enable the admin section
     path('admin/', admin.site.urls),
 
-    re_path(r'^p/(?P<username>[0-9A-Za-z]+)/$',  account_profiles.profile, name='profile'),
+    re_path(r'^p/(?P<username>[\w_]+)/$',  account_profiles.profile, name='profile'),
 ]

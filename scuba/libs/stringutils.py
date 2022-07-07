@@ -64,6 +64,12 @@ class StringUtils:
         return ''.join(random.choice(password_characters) for i in range(length))
 
     @staticmethod
+    def generate_time_based_random_string(string_length):
+        time_str = StringUtils.generate_time_string()
+        str_part = StringUtils.generate_random_number(10)
+        return f"{str_part}_{time_str}"
+
+    @staticmethod
     def generate_url_from_string(to_convert):
         """ generate_url_from_string
 

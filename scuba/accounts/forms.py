@@ -112,6 +112,7 @@ class PasswordForm(ModelForm):
 
         return user
 
+
 class EmailInviteForm(forms.Form):
     email = forms.CharField(label="", widget=forms.TextInput(), required=True)
     email_invites = []

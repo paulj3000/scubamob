@@ -10,14 +10,13 @@ Add some signal stuff for account creation stuff
 import logging
 from django.dispatch import receiver
 from django.db.models.signals import pre_save, pre_delete
-from django.db.models import Q
 
-from scuba.accounts.models import Account
+from scuba.accounts.models import User
 from scuba.libs.stringutils import StringUtils
 
 
-@receiver(pre_save, sender=Account)
-def pre_save_upgrade_promo(sender, instance, **kwargs):
+@receiver(pre_save, sender=User)
+def pre_save_new_user(sender, instance, **kwargs):
     """ pre_save_upgrade_promo
 
     Some modifications necessary for the campaign once it's uploaded
@@ -27,4 +26,4 @@ def pre_save_upgrade_promo(sender, instance, **kwargs):
 
     if not instance.aws_id:
         # generate a short id for this
-        instance.aws_id = StringUtils.generate_short_id(Account, key_length, 'act', key='aws_id')
+        instance.aws_id = StringUtils.generate_short_id(User, key_length, 'act', key='aws_id')

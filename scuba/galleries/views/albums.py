@@ -1,7 +1,5 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
-from django.core.context_processors import csrf
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -15,51 +13,46 @@ from scuba.galleries.models import Album
 
 @login_required
 def index(us_request):
-    ## render the appropriate template
-    context     = {}
+    # render the appropriate template
+    context = {}
     return render(us_request, 'galleries/index.html', context)
+
 
 @login_required
 @require_http_methods(["GET"])
 def showalbum(us_request, id):
     pprint(us_request.user.albums.filter())
 
-    retval  = []
+    retval = []
     for album in us_request.user.albums.filter():
-        json    = album.to_json()
-        json['url'] =   reverse('show_album', kwargs={'id': json['id']})
+        json = album.to_json()
+        json['url'] = reverse('show_album', kwargs={'id': json['id']})
         retval.append(json)
 
-    return JsonResponse({'albums': retval })
+    return JsonResponse({'albums': retval})
 
-@csrf_exempt
+
 @login_required
 @require_http_methods(["POST"])
 def json_createalbum(us_request):
     params = us_request.REQUEST
 
-    retval  = []
+    retval = []
+    # convert the response to JSON
+    Album.objects.create(account=us_request.user, title=params['title'], description=params.get('description'))
 
-    try:
-        ## convert the response to JSON
-        Album.objects.create(account=us_request.user, title=params['title'], description=params.get('description'))
+    return JsonResponse({'sites': retval})
 
-
-        return JsonResponse({'sites': retval })
-
-    except:
-        raise
-        pass
 
 @login_required
 @require_http_methods(["GET"])
 def json_getalbums(us_request, image_id):
     pprint(us_request.user.albums.filter())
 
-    retval  = []
+    retval = []
     for album in us_request.user.albums.filter():
-        json    = album.to_json()
-        json['url'] =   reverse('show_album', kwargs={'id': json['id']})
+        json = album.to_json()
+        json['url'] = reverse('show_album', kwargs={'id': json['id']})
         retval.append(json)
 
     return render(us_request, 'galleries/image.html', context)

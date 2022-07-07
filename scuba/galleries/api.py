@@ -36,7 +36,7 @@ class ListAlbumsApi(generics.ListAPIView):
         queryset = self.get_queryset()
         retval = {
             'albums': self.serializer_class(queryset, many=True).data
-        }
+       }
 
         return Response(retval)
 
@@ -103,13 +103,11 @@ def json_deletealbum(us_request, album_id):
     params = us_request.REQUEST
 
     retval = []
-    try:
-        # convert the response to JSON
-        album = Album.objects.filter(guid=album_id, user=us_request.user).delete()
-    except:
-        pass
+    # convert the response to JSON
+    album = Album.objects.filter(guid=album_id, user=us_request.user).delete()
 
     return JsonResponse(retval)
+
 
 @login_required
 @require_http_methods(['GET'])
@@ -118,23 +116,20 @@ def json_getalbumimages(us_request, album_id):
 
     #PRODUCTION_GALLERY_URL
     retval = []
-    try:
-        # convert the response to JSON
-        print(f"album id:  {album_id}")
-        images = AlbumImage.objects.filter(album__guid=album_id, album__user=us_request.user)
+    # convert the response to JSON
+    print(f"album id:  {album_id}")
+    images = AlbumImage.objects.filter(album__guid=album_id, album__user=us_request.user)
 
-        for i in images:
-            retval.append({ 'thumbnail': i.get_thumbnail(), 'image': i.get_image() })
-    except:
-        raise
-        pass
+    for i in images:
+        retval.append({'thumbnail': i.get_thumbnail(), 'image': i.get_image()})
 
-    return JsonResponse(api_response(data={'items':retval, 'total': len(retval) }))
+    return JsonResponse(api_response(data={'items': retval, 'total': len(retval)}))
 
 
 class MediaUploadApi(generics.GenericAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = MediaSerializer
+
     def get_queryset(self):
         """ get_queryset
 

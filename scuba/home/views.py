@@ -45,23 +45,6 @@ class IndexView(TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
 
-
-
-def index(us_request):
-    if us_request.user.is_authenticated:
-        return redirect('/home/')
-
-    context = {}
-
-    # get maxmind data
-    maxmind = MaxMind()
-    ip = maxmind.get_client_ip(us_request)
-    context['geoip'] = maxmind.get_maxmind_data(ip)
-
-    # render the appropriate template
-    return render(us_request, 'home/index.html', context)
-
-
 @login_required
 def home(us_request):
     user = us_request.user
@@ -73,7 +56,12 @@ def home(us_request):
     weather = Weather()
 
     # let's get the favorites for this particular user
-    mongo_obj = AccountMongo(user_id=user.id)
+    print(user.pk_as_str)
+    print(user.pk_as_str)
+    print(user.pk_as_str)
+    print(user.pk_as_str)
+    print(user.pk_as_str)
+    mongo_obj = AccountMongo(user_id=user.pk_as_str)
     user_favorites = mongo_obj.get_favorites()
     context = {'divesites': []}
 

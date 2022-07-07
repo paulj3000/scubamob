@@ -6,7 +6,6 @@ from PIL import Image
 from io import StringIO
 
 from django.db import models
-from django.db.models import fields, Q
 from django.conf import settings
 
 #from boto3.s3.connection import S3Connection
@@ -14,7 +13,6 @@ from django.conf import settings
 from scuba.accounts.models import User
 from scuba.libs.fileutils import FileUtils
 
-from utils import uuidmodel
 from utils.core.models import Timestamped
 
 
@@ -38,12 +36,12 @@ class Media(models.Model):
     @staticmethod
     def generate_image_name(guid, album_id, filename):
         # generate a new filename
-        return  '%s/%s/%s' % (guid, album_id, filename)
+        return '%s/%s/%s' % (guid, album_id, filename)
 
     @staticmethod
     def generate_image_thumbnail_name(guid, album_id, filename):
         # generate a new filename
-        return  '%s/%s/p206x206/%s' % (guid, album_id, filename)
+        return '%s/%s/p206x206/%s' % (guid, album_id, filename)
 
     def get_image(self):
         return settings.PRODUCTION_GALLERY_URL + self.image
@@ -97,7 +95,7 @@ class Album(Timestamped, models.Model):
 
         account = self.user.get_account()
         gallery_file = AlbumImage.generate_image_name(account.guid, self.guid, filename)
-        header = {'Content-Type' : uploaded_image.content_type}
+        header = {'Content-Type': uploaded_image.content_type}
 
         conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
         b = conn.get_bucket(settings.GALLERY_BUCKET)
@@ -116,7 +114,7 @@ class Album(Timestamped, models.Model):
 
         account = self.user.get_account()
         gallery_file_thumbnail = AlbumImage.generate_image_thumbnail_name(account.guid, self.guid, filename)
-        header = {'Content-Type' : uploaded_image.content_type}
+        header = {'Content-Type': uploaded_image.content_type}
 
         conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
         b = conn.get_bucket(settings.GALLERY_BUCKET)
@@ -161,13 +159,13 @@ class Album(Timestamped, models.Model):
 
     def delete(self):
         pprint(self.album_image.all())
-        #super(Album, self).delete(*args, **kwargs)
+        # super(Album, self).delete(*args, **kwargs)
 
     class Meta:
         db_table = 'gallery_album'
 
     def to_json(self):
-        return { 'title': self.title, 'description': self.description, 'id': self.id, 'guid': self.guid }
+        return {'title': self.title, 'description': self.description, 'id': self.id, 'guid': self.guid}
 
 
 class AlbumImage(Timestamped, models.Model):
@@ -182,13 +180,12 @@ class AlbumImage(Timestamped, models.Model):
     @staticmethod
     def generate_image_name(guid, album_id, filename):
         # generate a new filename
-        return  '%s/%s/%s' % (guid, album_id, filename)
+        return '%s/%s/%s' % (guid, album_id, filename)
 
     @staticmethod
     def generate_image_thumbnail_name(guid, album_id, filename):
         # generate a new filename
-        return  '%s/%s/p206x206/%s' % (guid, album_id, filename)
-
+        return '%s/%s/p206x206/%s' % (guid, album_id, filename)
 
     def save(self, *args, **kwargs):
         # save the album
