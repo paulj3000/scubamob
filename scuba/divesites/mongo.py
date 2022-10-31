@@ -1,6 +1,4 @@
-from pprint import pprint
-
-from utils.nosql.mongo import Mongo
+from scuba.libs.nosql.mongo import Mongo
 from bson.objectid import ObjectId
 
 class DiveSite:

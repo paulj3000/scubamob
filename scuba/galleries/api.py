@@ -1,4 +1,3 @@
-from pprint import pprint
 from django.http import JsonResponse
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -14,8 +13,16 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 
-from scuba.galleries.models import Album, AlbumImage
-from scuba.galleries.serializers import AlbumSerializer, MediaSerializer
+from scuba.galleries.models import Album, AlbumImage, DailyImage
+from scuba.galleries.serializers import AlbumSerializer, MediaSerializer, DailyImageSerializer
+
+
+class GetDailyPicApi(generics.GenericAPIView):
+    serializer_class = MediaSerializer
+
+    def get(self, request):
+        img = DailyImage.objects.filter().first()
+        return Response({'image': DailyImageSerializer(img).data})
 
 
 class ListAlbumsApi(generics.ListAPIView):
@@ -44,8 +51,6 @@ class ListAlbumsApi(generics.ListAPIView):
 @login_required
 @require_http_methods(["GET"])
 def showalbum(us_request, id):
-    pprint(us_request.user.albums.all())
-
     retval = []
 
     for album in us_request.user.albums.all():
@@ -78,8 +83,6 @@ def json_createalbum(us_request):
 @login_required
 @require_http_methods(["GET"])
 def getalbums(us_request):
-    pprint(us_request.user.albums.filter())
-
     retval = []
     for album in us_request.user.albums.filter():
         json = album.to_json()

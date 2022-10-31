@@ -9,11 +9,16 @@ django-extensions==3.1.5
 django-compressor==4.0
 django-yarn==0.0.2
 pymongo==4.1.1
-mysqlclient==2.1.0; sys_platform == 'linux'
+#mysqlclient==2.1.0; sys_platform == 'linux'
 djangorestframework==3.13.1
 django-crispy-forms==1.14.0
 crispy-bootstrap5==0.6
 pycodestyle==2.8.0
-git+https://github.com/paulj3000/django-test-pep8
+#git+https://github.com/paulj3000/django-test-pep8
 pymemcache==3.5.2
 pdf2image==1.16.0
+python-geoip==1.2
+python-geoip-geolite2==2015.303
+python-geoip-python3==1.3
+django-cors-headers==3.13.0
+gunicorn==20.1.0

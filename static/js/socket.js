@@ -80,7 +80,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 updateAlertCount('alertcount', art.alertCount);
                 updateAlertCount('messagecount', art.messageCount);
             });
-            
+
+            socket.on('buddy request', function(art) {
+                alert(" BUDDY REQUEST SENT ");
+                console.log(art);
+            });
+
             socket.on('message alert', function(art) {
                 updateAlertCount('messagecount', art.count);
                 let divAlert = document.getElementById('messagealert');

@@ -11,9 +11,8 @@ from django.views.decorators.http import require_http_methods
 #from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest, HttpResponse
 
-# define the user data for this account
 from scuba.accounts.forms import EmailInviteForm
-from scuba.accounts.models import UserFriendRequest, UserFriend
+from scuba.accounts.models import UserBuddyRequest, UserBuddy
 
 
 @login_required
@@ -61,7 +60,7 @@ def invited(us_request):
                 response['friends'].append(email)
                 continue
 
-            if UserFriendRequest.objects.filter(friend=user, email=email):
+            if UserBuddyRequest.objects.filter(friend=user, email=email):
                 # the user has already been requested
                 response['resent'].append(email)
 
@@ -95,11 +94,11 @@ def accept(us_request):
     httpclass = HttpResponse
 
     try:
-        UserFriendRequest.objects.filter(friend=user, user__id=fid).delete()
+        UserBuddyRequest.objects.filter(friend=user, user__id=fid).delete()
 
         if not delete:
             friend = User.objects.get(id=fid)
-            UserFriend.objects.create(user=user, friend=friend)
+            UserBuddy.objects.create(user=user, friend=friend)
 
         retval['data']['items'] = [{'response': 'ok'}]
     except:
@@ -148,7 +147,7 @@ def add_friend(us_request):
         try:
             # this may seem backwards, but it is correct.  We want the the user object
             # (at the end) to collect all of his friendships
-            UserFriendRequest.objects.create(user=friend, friend=user)
+            UserBuddyRequest.objects.create(user=friend, friend=user)
         except IntegrityError:
             response['error'] = True
 
@@ -184,7 +183,7 @@ def add_friend(us_request):
         try:
             # this may seem backwards, but it is correct.  We want the the user object
             # (at the end) to collect all of his friendships
-            UserFriendRequest.objects.create(user=friend, friend=user)
+            UserBuddyRequest.objects.create(user=friend, friend=user)
         except IntegrityError:
             response['error'] = True
 
@@ -203,7 +202,7 @@ def cancel_request(us_request):
         friend = None
 
         try:
-            UserFriendRequest.objects.get(friend=user, user__account__guid=fid).delete()
+            UserBuddyRequest.objects.get(friend=user, user__account__guid=fid).delete()
         except:
             raise
 
@@ -248,7 +247,7 @@ def accept_request(us_request):
             UserFriendBlocked.objects.filter(user=user, friend=friend).delete()
         else:
             try:
-                request_obj = UserFriendRequest.objects.get(user=user, friend=friend)
+                request_obj = UserBuddyRequest.objects.get(user=user, friend=friend)
                 if mode == 'add':
                     Friendship.objects.create(friend1=user, friend2=friend).save()
 

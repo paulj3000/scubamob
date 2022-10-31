@@ -4,7 +4,6 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from pprint import pprint
 from django.core.urlresolvers import reverse
 
 from logbook.forms import DiveForm
@@ -21,8 +20,6 @@ def index(us_request):
 @login_required
 @require_http_methods(["GET"])
 def showalbum(us_request, id):
-    pprint(us_request.user.albums.filter())
-
     retval = []
     for album in us_request.user.albums.filter():
         json = album.to_json()
@@ -40,15 +37,6 @@ def json_createalbum(us_request):
     retval = []
     # convert the response to JSON
     Album.objects.create(account=us_request.user, title=params['title'], description=params.get('description'))
-
-    return JsonResponse({'sites': retval})
-
-
-@login_required
-@require_http_methods(["GET"])
-def json_getalbums(us_request, image_id):
-    pprint(us_request.user.albums.filter())
-
     retval = []
     for album in us_request.user.albums.filter():
         json = album.to_json()

@@ -12,4 +12,4 @@ class UUIDModel(models.Model):
 
     @property
     def pk_as_str(self):
-        return str(self.id)
+        return str(self.id).replace('-', '')

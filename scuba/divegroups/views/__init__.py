@@ -14,7 +14,7 @@ from django.http import HttpResponseBadRequest, HttpResponse
 
 # define the user data for this account
 from scuba.accounts.forms import EmailInviteForm
-from scuba.accounts.models import UserFriendRequest, UserFriend
+from scuba.accounts.models import UserBuddyRequest
 
 
 @login_required
@@ -24,7 +24,7 @@ def index(us_request, mode=None):
 
     print(user.get_account())
 
-    UserFriendRequest.objects.update_friend_request_active(user)
+    UserBuddyRequest.objects.update_friend_request_active(user)
     friend_list = us_request.user.friend_user.order_by('friend__first_name')
     friend_request_list = us_request.user.friend_requests.order_by('friend__first_name')
 
@@ -78,6 +78,6 @@ def invited(us_request):
                 response['friends'].append(email)
                 continue
 
-            if UserFriendRequest.objects.filter(friend=user, email=email):
+            if UserBuddyRequest.objects.filter(friend=user, email=email):
                 ### the user has already been requested
                 response['resent'].append(email)

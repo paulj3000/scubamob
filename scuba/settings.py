@@ -52,29 +52,30 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django_extensions',
-    'test_pep8',
+    'corsheaders',
+    #'test_pep8',
     'compressor',
     'crispy_forms',
     'crispy_bootstrap5',
     'rest_framework',
     'rest_framework.authtoken',
-    'equipment',
-    'logbook',
-    'diveshops',
-    'utils',
     'scuba.accounts',
     'scuba.divegroups',
+    'scuba.diveshops',
     'scuba.divesites',
     'scuba.entities',
     'scuba.environ',
+    'scuba.equipment',
     'scuba.galleries',
     'scuba.home',
+    'scuba.logbook',
     'scuba.robots',
     'scuba.sitesettings',
     'django.contrib.admindocs',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -97,7 +98,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'utils.context_processors.sm',
             ],
         },
     },
@@ -261,9 +261,6 @@ EMAIL_BACKEND = 'django_ses.SESBackend'
 DEFAULT_FROM_EMAIL = 'no-reply@scubamob.com'
 GOOGLE_API_KEY = 'AIzaSyD8CDOojSGLURvXDISrXKHZss1BkOA-Lss'
 
-# this is a constant to be used to compute geodistance stuff
-EARTH_RADIUS = 3159
-
 # the following settings are for the mobile apps
 MOBILE_HEADER_APP = 'scubaapp'
 MOBILE_HEADER_DEVICES = {'smandroid': 'am', 'smios': 'io'}
@@ -319,3 +316,13 @@ COMPRESS_FILTERS = {
 }
 
 COMPRESS_YUGLIFY_BINARY = f"{BASE_DIR}/node_modules/yuglify/bin/yuglify"
+
+CORS_ORIGIN_ALLOW_ALL=True
+CORS_ALLOW_ALL_ORIGINS = True
+
+try:
+    import sys
+    sys.path.append('/scuba')
+    from system.settings import *
+except ImportError as exp:
+    print('localsettings.py was not loaded. Continuing with standard settings.\n%s' % exp)

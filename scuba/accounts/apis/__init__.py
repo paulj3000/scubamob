@@ -65,7 +65,8 @@ class AlertsApi(generics.GenericAPIView):
         }
 
         try:
-            alerts = requests.get('http://localhost:3001/alerts', params=params);
+            url = SystemApi.get_alerting_alerts()
+            alerts = requests.get(url, params=params);
             return Response(alerts.json())
         except requests.exceptions.ConnectionError:
             return Response({'error': 'cannot reach chat server' }, 500)

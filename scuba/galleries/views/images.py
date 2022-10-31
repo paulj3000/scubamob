@@ -6,12 +6,11 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from pprint import pprint
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.conf import settings
 
-from logbook.forms import DiveForm
+from scuba.logbook.forms import DiveForm
 from scuba.galleries.models import Album, AlbumImage
 
 

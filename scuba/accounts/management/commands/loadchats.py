@@ -1,6 +1,5 @@
 import random
 import requests
-from pprint import pprint
 
 from django.core.management.base import BaseCommand
 
@@ -21,7 +20,6 @@ class Command(BaseCommand):
 
         for user in options.get('users'):
             try:
-                pprint(User.objects.get(username=user).pk_as_str)
                 users.append(User.objects.get(username=user).pk_as_str)
             except User.DoesNotExist:
                 print(f"{user} is not a valid username")
@@ -64,6 +62,4 @@ class Command(BaseCommand):
                 'userId': users[uid],
             }
 
-            pprint(params)
             requests.post(f"{SystemApi.get_chat_server()}api/messages/add", json=params);
-

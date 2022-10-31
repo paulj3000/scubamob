@@ -1,0 +1,44 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls admin_modify static %}
+{% block object-tools %}
+    {% if change %}{% if not is_popup %}
+        <ul class="object-tools">
+            {# You can also give a name to that pattern and refer to it below using 'url' #}
+            <li><a href="{% url 'admin:send_welcome_email' userid=object_id %}" class="historylink">Send Welcome Email</a></li>
+            <li><a href="{% url 'admin:reset_user_password' userid=object_id %}" class="historylink">Reset password</a></li>
+        </ul>
+    {% endif %}{% endif %}
+{% endblock %}
+
+{% block after_related_objects %}
+{% if original.id %}
+<div class="js-inline-admin-formset inline-group">
+  <div class="tabular inline-related last-related">
+<fieldset class="module ">
+    <h2>User Logins</h2>
+   
+    <table>
+        <thead>
+            <tr>
+                <th class="column-start_datex">Login Date</th>
+                <th class="column-end_datex">IP Address</th>
+                <th class="column-is_active">Device</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for login in original.get_logins %}
+            <tr class="form-row" id="xuser_billing_cycle-empty">
+                <td class="xfield-start_date">{{login.login_date}}</td>
+                <td class="xfield-start_date">{{login.ip_address}}</td>
+                <td class="xfield-start_date">{{login.device}}</td>
+            </tr>
+            {% endfor %}
+        </tbody> 
+   </table>
+</fieldset>
+  </div>
+  </div>
+{% endif %}
+{% endblock %}
+
