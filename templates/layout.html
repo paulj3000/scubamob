@@ -22,13 +22,11 @@
 
         {% compress js file vendor %}
         <script src="{% static 'js-cookie/dist/js.cookie.js' %}"></script>
-        <script src="{% static 'mustache/mustache.js' %}"></script>
         <script src="{% static 'bootstrap/dist/js/bootstrap.bundle.js' %}"></script>
         {% endcompress %}
 
         {% compress js file scripts %}
         <script src="{% static 'js/comms.js' %}"></script>
-        <script src="{% static 'js/core.js' %}"></script>
 
         {% if user.is_authenticated %}
         <script src="{% static 'socket.io/client-dist/socket.io.js' %}"></script>
@@ -53,7 +51,7 @@
 
 /* HEADER STYLE */
 header .navbar {
-  padding: 30px 0;
+  padding: 10px 0;
   border-top: 2px solid #e11d25;
 }
 
@@ -68,17 +66,6 @@ header .navbar-nav .nav-item:hover .nav-link {
   color: #e11d25
 }
 
-header .navbar-brand {
-  position: absolute;
-  top: -20px;
-  left: 12px;
-  width: 100px;
-  display: block;
-}
-
-header .navbar-collapse {
-  margin-left: 120px;
-}
 
 .dropdown-toggle::after {
   display: none !important;
@@ -105,9 +92,6 @@ header .navbar-toggler:focus {
     width: 90px;
 
   } */
-  header .navbar-collapse {
-    margin-left: 0;
-  }
 
   header .navbar-collapse .navbar-nav:first-child {
     margin-top: 100px;
@@ -129,7 +113,7 @@ i {
     vertical-align:middle;
     position: relative;
 }
-.badge:after{
+.xbadge:after{
     content:attr(data-count);
     position: absolute;
     background: rgba(0,0,255,1);
@@ -251,10 +235,6 @@ i {
     padding: 0 0 0 1px;
     width: 21px;
 }
-
-
-
-
 
 .popup-box .popup-messages {
     background: #3f9684 none repeat scroll 0 0;
@@ -446,7 +426,14 @@ i {
     position: relative;
 }
 
-
+.alert-fixed {
+    position:fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    z-index:9999;
+    border-radius:0px
+}
 
         </style>
 
@@ -455,7 +442,6 @@ i {
 
     <body>
         {% compress js file core %}
-        <script src="{% static 'js/sm.core.js' %}"></script>
         <script src="{% static 'js/sm.common.js' %}"></script>
         {% endcompress %}
         <script>
@@ -469,7 +455,7 @@ i {
             <div class="container position-relative justify-content-end">
               <!-- LOGO -->
                 <a class="navbar-brand" href="{% url 'index' %}">
-                  <img class="w-100" src="{% static 'images/logo_small_80.png' %}" alt="Logo">
+                  <img class="w-75" src="{% static 'images/logo_small_80.png' %}" alt="Logo">
                 </a>
                 <!-- LOGO -->
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -480,13 +466,13 @@ i {
                 {% block headermenu %}
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                   <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="#">Logs</a>
+                    <a class="nav-link" href="{% url 'logbook_home' %}">Logs</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="#">Gallary</a>
+                    <a class="nav-link" href="{% url 'galleries_home' %}">Galleries</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="#">Dive Sites</a>
@@ -566,11 +552,66 @@ i {
         {% block jumbotron %}{% endblock %}
 
         <div id="fb-root"></div>
-        <div class="container">
+        <div class="container mt-3">
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }} %}{% else %}alert-success{% endif %} alert-dismissible fade show alert-fixed" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block maincontent  %}
             <div class="row">
                 {% if user.is_authenticated %}
                 {% block leftmenu %}
-                <div class="col-3">
+                <div class="col-2">
+
+                    <div class="card mb-4">
+                        <div class="card-body text-center">
+                            <a href="{% url 'profile' username=user.username %}">
+                                <img src="{{user.profile_image}}" alt="profile image for {{user.get_full_name}}"
+                                class="rounded-circle img-fluid" style="width: 150px;" />
+                            </a>
+                            <h6 class="my-3">
+                                <a href="{% url 'profile' username=user.username %}">{{user.get_full_name}}</a>
+                            </h6>
+                            <p class="text-muted mb-1">Full Stack Developer</p>
+                            <p class="text-muted mb-4">Bay Area, San Francisco, CA</p>
+                            <div class="d-flex justify-content-center mb-2">
+                                <button type="button" class="btn btn-primary">Follow</button>
+                                <button type="button" class="btn btn-outline-primary ms-1">Message</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-4 mb-lg-0">
+                        <div class="card-body p-0">
+                            <ul class="list-group list-group-flush rounded-3">
+                                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                    <i class="fas fa-globe fa-lg text-warning"></i>
+                                    <p class="mb-0">https://mdbootstrap.com</p>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                    <i class="fab fa-github fa-lg" style="color: #333333;"></i>
+                                    <p class="mb-0">mdbootstrap</p>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                    <i class="fab fa-twitter fa-lg" style="color: #55acee;"></i>
+                                    <p class="mb-0">@{{user.username}}</p>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                    <i class="fab fa-instagram fa-lg" style="color: #ac2bac;"></i>
+                                    <p class="mb-0">mdbootstrap</p>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                    <i class="fab fa-facebook-f fa-lg" style="color: #3b5998;"></i>
+                                    <p class="mb-0">mdbootstrap</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
                     {% if page_title %}
                     <h2>{{ page_title }}</h2>
                     {% endif %}
@@ -597,6 +638,7 @@ i {
                     {% endblock %}
                 </div>
             </div>
+            {% endblock %}
         </div>
 
         {% if user.is_authenticated %}
@@ -726,6 +768,28 @@ i {
             </div>
             <div class="container-fluid text-center" style="background-color:#1a2027;color: #d6d4d3;font-size: 13px;padding-top: 5px;padding-bottom: 5px;">xxx</div>
         </footer>
+
+        {% block reactjs %}
+
+        {% compress css file react %}
+        <link rel="stylesheet" href="{% static 'bootstrap-icons/font/bootstrap-icons.css' %}" />
+        {% endcompress %}
+
+        {% compress js file react %}
+
+        {% if is_production %}
+        <script src="{% static 'react/umd/react.production.min.js' %}" crossorigin></script>
+        <script src="{% static 'react-dom/umd/react-dom.production.min.js' %}"></script>
+        {% else %}
+        <script src="{% static 'react/umd/react.development.js' %}" crossorigin></script>
+        <script src="{% static 'react-dom/umd/react-dom.development.js' %}"></script>
+        {% endif %}
+
+        {% endcompress %}
+
+        {% endblock %}
+        {% block reactscript %}
+        {% endblock %}
     </body>
 </html>
 

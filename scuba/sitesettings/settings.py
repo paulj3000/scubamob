@@ -1,7 +1,11 @@
 SYSTEM_APIS = (
-    ('ALERTING_NOTIFY_STAFF', 'Alerting Notify Staff'),
+    ('ALERTING_ALERTS',         'Alerting Alerts'),
+    ('ALERTING_BUDDY_REQUEST',  'Alerting Buddy Request'),
+    ('ALERTING_NOTIFY_STAFF',   'Alerting Notify Staff'),
 
+    ('ALERTING_SERVER',     'Alerting Server'),
     ('CHAT_SERVER',         'Chat Server'),
+    ('DIVE_SERVER',         'Dive Server'),
     ('API_SERVER',          'API Server'),
     ('AWS_S3_BUCKET',       'AWS S3 Bucket'),
     ('AWS_S3_FILE_DELETE',  'AWS S3 File Delete'),
@@ -12,9 +16,16 @@ SYSTEM_APIS = (
     ('AWS_SQS_QUEUE',       'AWS SQS Queue'),
     ('AWS_CLOUDFRONT_URL',  'AWS Cloudfront Url'),
 
-    ('BILLING_PROCESSORS', 'Billing Processors'),
+    ('BILLING_PROCESSORS',  'Billing Processors'),
     ('BILLING_AUTHORIZE_CC', 'Billing Authorize CC'),
+
 )
+
+DIVELOG_APIS = (
+    ('GET_DIVELOGS', 'Get Dive Logs'),
+    ('ADD_DIVELOG', 'Add Dive Logs'),
+)
+
 
 SYSTEM_SETTINGS = [
     ('CHAT_SERVER_ACTIVE',  'Chat Server Active'),

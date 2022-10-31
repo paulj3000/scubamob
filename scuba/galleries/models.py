@@ -1,4 +1,3 @@
-from pprint import pprint
 import re
 import uuid
 import datetime
@@ -12,8 +11,8 @@ from django.conf import settings
 
 from scuba.accounts.models import User
 from scuba.libs.fileutils import FileUtils
-
-from utils.core.models import Timestamped
+from scuba.libs.models.awsmodel import AWSModel
+from scuba.libs.models.uuidmodel import UUIDModel
 
 
 IMAGE_TYPE_EXTENSIONS = {
@@ -24,7 +23,7 @@ IMAGE_TYPE_EXTENSIONS = {
 }
 
 
-class Media(models.Model):
+class Media(UUIDModel):
     user = models.ForeignKey(User, related_name='media', on_delete=models.CASCADE)
     image = models.CharField(max_length=255)
     title = models.CharField(max_length=100)
@@ -81,11 +80,13 @@ class Media(models.Model):
         return Media.objects.create(filename=name, content_type=content_type, aws_filename=aws_filename)
 
 
-class Album(Timestamped, models.Model):
+class Album(UUIDModel):
     user = models.ForeignKey(User, related_name='albums', on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=255)
     guid = models.CharField(max_length=125, db_index=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     def add_image(self, uploaded_image):
         # seek to the beginning of the script
@@ -155,11 +156,7 @@ class Album(Timestamped, models.Model):
         if not self.guid:
             self.guid = str(uuid.uuid1()).replace('-', '')
 
-        super(Album, self).save(*args, **kwargs)
-
-    def delete(self):
-        pprint(self.album_image.all())
-        # super(Album, self).delete(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'gallery_album'
@@ -168,13 +165,15 @@ class Album(Timestamped, models.Model):
         return {'title': self.title, 'description': self.description, 'id': self.id, 'guid': self.guid}
 
 
-class AlbumImage(Timestamped, models.Model):
+class AlbumImage(UUIDModel):
     album = models.ForeignKey(Album, related_name='album_image', on_delete=models.CASCADE)
     image = models.CharField(max_length=255)
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=255)
     thumbnail = models.CharField(max_length=255)
     guid = models.CharField(max_length=125, db_index=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     # define a couple of static functions which will define an image name
     @staticmethod
@@ -205,7 +204,7 @@ class AlbumImage(Timestamped, models.Model):
         db_table = 'gallery_album_image'
 
 
-class AlbumMedia(models.Model):
+class AlbumMedia(UUIDModel):
     album = models.ForeignKey(Album, on_delete=models.CASCADE)
     media = models.ForeignKey(Album, related_name='media', on_delete=models.CASCADE)
     pos = models.PositiveSmallIntegerField()
@@ -213,3 +212,11 @@ class AlbumMedia(models.Model):
     class Meta:
         verbose_name_plural = 'album media'
         db_table = 'album_media'
+
+
+class DailyImage(AWSModel):
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name_plural = 'daily images'
+        db_table = 'daily_image'

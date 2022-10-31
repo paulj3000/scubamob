@@ -10,6 +10,9 @@ import scuba.accounts.views.profiles as account_profiles
 import scuba.accounts.views.login as login_views
 import scuba.accounts.views.signup as signup_views
 import scuba.accounts.views as account_views
+import scuba.accounts.apis.account as account_api
+import scuba.accounts.apis.profile as profile_api
+
 from scuba.sitesettings.apis import GetSystemSettingsApi
 
 
@@ -21,20 +24,19 @@ urlpatterns = [
     # url(r'^scubamob/', include('scubamob.foo.urls')),
     path('', home_views.IndexView.as_view(), name='index'),
 
-    path('home/', home_views.home, name='home'),
+    path('home/', home_views.HomeView.as_view(), name='home'),
     path('signup/', signup_views.SignupView.as_view(), name='signup'),
 
     path('account/', include('scuba.accounts.urls')),
     path('settings/', include('scuba.accounts.urls_settings')),
     #path('friends/', include('scuba.friends.urls')),
     path('groups/', include('scuba.divegroups.urls')),
-    path('logbook/', include('logbook.urls')),
+    path('logbook/', include('scuba.logbook.urls')),
     path('divesites/', include('scuba.divesites.urls')),
-    path('diveshops/', include('diveshops.urls')),
+    path('diveshops/', include('scuba.diveshops.urls')),
     path('gallery/', include('scuba.galleries.urls')),
-    path('equipment/', include('equipment.urls')),
+    path('equipment/', include('scuba.equipment.urls')),
     path('env/', include('scuba.environ.urls')),
-#    url(r'^diveshop/', include('diveshop.urls')),
 
     path('password/', include('scuba.accounts.urls_password')),
 
@@ -45,13 +47,20 @@ urlpatterns = [
 
     #path('api/1.0/mobile/account', include('api.urls_account')),
     path('api/accounts/', include('scuba.accounts.urls_accounts_api')),
+    path('api/profile/', profile_api.GetMeProfileApi.as_view()),
+    re_path('api/profile/(?P<id>[a-fA-F0-9]+)/', include('scuba.accounts.urls_profile_api')),
+    path('api/buddies/', include('scuba.accounts.urls_buddies_api')),
+    path('api/ui/', include('scuba.accounts.urls_ui_api')),
     path('api/chats/', include('scuba.accounts.urls_chats_api')),
     path('api/messenger/', include('scuba.accounts.urls_messenger_api')),
+    path('api/home/', include('scuba.home.urls_home_api')),
     path('api/galleries/', include('scuba.galleries.urls_api')),
     path('api/divesites/', include('scuba.divesites.urls_api')),
+    path('api/settings/', include('scuba.accounts.urls_settings_api')),
     path('api/sitesettings', GetSystemSettingsApi.as_view()),
     path('api/sitesettings/all', GetSystemSettingsApi.as_view()),
-
+    path('api/register/', account_api.RegisterUserApi.as_view()),
+    path('api/login/', account_api.LoginUserApi.as_view()),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -83,5 +92,9 @@ urlpatterns = [
     # enable the admin section
     path('admin/', admin.site.urls),
 
-    re_path(r'^p/(?P<username>[\w_]+)/$',  account_profiles.profile, name='profile'),
+    #re_path(r'^p/(?P<username>[\w_]+)/buddies$',
+    #    account_profiles.BuddiesView.as_view(),
+    #    name='buddies'),
+    #re_path(r'^p/(?P<username>[\w_]+)/$',  account_profiles.profile, name='profile'),
+    re_path(r'^p/(?P<username>[\w_]+)/',  include('scuba.accounts.urls_profile')),
 ]

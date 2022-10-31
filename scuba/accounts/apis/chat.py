@@ -1,4 +1,3 @@
-from pprint import pprint
 import requests
 
 from django.core.exceptions import ValidationError
@@ -10,7 +9,7 @@ from rest_framework import status
 from rest_framework import generics
 
 from scuba.accounts.models import User
-from scuba.accounts.serializers import UserListSerializer, UploadFileSerializer
+from scuba.accounts.serializers.chat import UserListSerializer, UploadFileSerializer
 from scuba.sitesettings.models import SystemApi
 
 

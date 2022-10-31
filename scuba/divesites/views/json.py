@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 # define the user data for this account
 from scuba.accounts.mongo import Account as AccountMongo
 #from home.forms import AccountForm, UserCreateForm
-from utils.external.weather import Weather
+from scuba.libs.external.weather import Weather
 
 from scuba.divesites.mongo import DiveSite
 

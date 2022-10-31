@@ -12,8 +12,7 @@ from scuba.accounts.mongo import Account as AccountMongo
 from scuba.home.models import Jumbotron
 
 
-from utils.external.weather import Weather
-from utils.maxmind import MaxMind
+from scuba.libs.external.weather import Weather
 
 
 class IndexView(TemplateView):
@@ -29,10 +28,7 @@ class IndexView(TemplateView):
         add more parameters to the context data
         """
         context = super().get_context_data(**kwargs)
-        maxmind = MaxMind()
-        ip = maxmind.get_client_ip(self.request)
         context.update({
-            'geoip':maxmind.get_maxmind_data(ip),
             'jumbotron': Jumbotron.get_active_jumbotron(),
         })
 
@@ -43,6 +39,14 @@ class IndexView(TemplateView):
             return redirect('home')
 
         return super().dispatch(request, *args, **kwargs)
+
+
+class HomeView(TemplateView):
+    """ IndexView
+
+    display the home page
+    """
+    template_name = 'home/home.html'
 
 
 @login_required
@@ -56,11 +60,6 @@ def home(us_request):
     weather = Weather()
 
     # let's get the favorites for this particular user
-    print(user.pk_as_str)
-    print(user.pk_as_str)
-    print(user.pk_as_str)
-    print(user.pk_as_str)
-    print(user.pk_as_str)
     mongo_obj = AccountMongo(user_id=user.pk_as_str)
     user_favorites = mongo_obj.get_favorites()
     context = {'divesites': []}

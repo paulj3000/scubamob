@@ -39,9 +39,17 @@ class MediaSerializer(serializers.Serializer):
 
     @staticmethod
     def get_url(data):
-        return f"{AWS_CLOUDFRONT}/{data.filename}"
+        return f"{AWS_CLOUDFRONT}{data.filename}"
 
     def create(self, validated_data):
         retval = []
         file = validated_data['file']
         return Media.upload_new_media(fileinfo.name, fileinfo.content_type, fileinfo.read())
+
+
+class DailyImageSerializer(MediaSerializer):
+    user = serializers.SerializerMethodField(read_only=True)
+
+    @staticmethod
+    def get_user(data):
+        return data.user.get_full_name()

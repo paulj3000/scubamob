@@ -3,7 +3,7 @@ from django.db.utils import IntegrityError
 
 from scuba.accounts.models import User
 
-from scuba.accounts.models import UserFriendRequest, UserFriend
+from scuba.accounts.models import UserBuddyRequest, UserBuddy
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -29,8 +29,8 @@ class Command(BaseCommand):
 
                 if me_user:
                     if not i % 10:
-                        UserFriendRequest.objects.create(user=new_user, friend=me_user)
+                        UserBuddyRequest.objects.create(user=new_user, buddy=me_user)
                     else:
-                        UserFriend.objects.create(friend=new_user, user=me_user)
+                        UserBuddy.objects.create(buddy=new_user, user=me_user)
             except IntegrityError:
                 print(f"User {username} with email {email} already exists")

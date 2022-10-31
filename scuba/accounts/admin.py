@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 from datetime import datetime
 from django.contrib import admin
 from django.contrib.sessions.models import Session
+from django.urls import re_path
 
-from scuba.accounts.models import User
+from scuba.accounts.models import User, UserBlocked, UserBuddyRequest, UserBuddy
+import scuba.accounts.models as account_models
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -12,6 +13,23 @@ class UserAdmin(admin.ModelAdmin):
 
     Override the user admin, add extra functionality
     """
+    def get_urls(self):
+        """ get_urls
+
+        adding some extra urls to the user model
+        """
+        urls = super().get_urls()
+
+        my_urls = [
+            re_path(r'^(?P<userid>([\w-]+))/emails/welcome/$',
+                self.send_welcome_email_to_user, name='send_welcome_email'),
+
+            re_path(r'^(?P<userid>([\w-]+))/reset-password/$',
+                self.reset_password, name='reset_user_password'),
+        ]
+
+        return my_urls + urls
+
     def profile_image(self, obj):
         return mark_safe(
             '<img src="%s" alt="%s" style="width:40px;height:auto" />' % \
@@ -20,7 +38,6 @@ class UserAdmin(admin.ModelAdmin):
 
     profile_image.short_description = ''
     profile_image.allow_tags = True
-
 
     def reset_password(self, request, userid):
         user = get_object_or_404(self.model, pk=userid)
@@ -66,6 +83,29 @@ class UserAdmin(admin.ModelAdmin):
         # set a success message
         messages.add_message(request, messages.INFO, 'Passwords successfully reset')
 
+    def send_welcome_email_to_user(modeladmin, request, userid):
+        user = User.objects.get(id=userid)
+        user.send_welcome_email()
+
+        messages.add_message(
+            request,
+            messages.INFO,
+            'Welcome email successfully reset'
+        )
+
+        return redirect(f'/admin/accounts/user/{userid}/change/')
+
+    def send_welcome_email(modeladmin, request, queryset, email_template):
+        for object in queryset:
+            # send emails whether or not the is_public flag is set
+            object.send_welcome_email(email_template)
+
+        messages.add_message(
+            request,
+            messages.INFO,
+            'Welcome email successfully reset'
+        )
+
     delete_all_unexpired_sessions_for_user.short_description = 'Invalidate User Sessions'
     block_user.short_description = "Block User"
     send_password_reset.short_description = "Send Password Reset"
@@ -83,12 +123,54 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ('username', 'first_name', 'last_name', 'email', 'is_active', 'date_joined',
                     'last_login_date')
 
+    readonly_fields = ['get_token', 'last_login_date',]
+
     fieldsets = (
-        (None, {'fields': ('email', 'full_name', 'is_admin', 'last_login_date', 'ignore_tracking', 'is_protected', 'is_active', 'is_blocked', 'is_staff_member',)}),
+        (None,
+            {'fields':
+                ('first_name', 'last_name', 'email', 'last_login_date', 'get_token')
+            }
+        ),
         ('Permissions', {'fields': ('groups', )}),
     )
 
-    search_fields = ['full_name', 'email', 'username',]
+    @admin.display(description='API token')
+    def get_token(self, obj):
+        return obj.get_api_token()
+
+    def get_fieldsets(self, request, obj=None):
+        """ get_fieldsets
+
+        make sure only superusers are allowed to access permissions
+        """
+        retval = self.fieldsets
+        if not request.user.is_superuser:
+            old_fields = self.fieldsets[0][1]['fields']
+            new_fields = [field for field in old_fields if field != 'is_admin']
+
+            if obj and obj.is_admin:
+                new_fields = [field for field in old_fields if field != 'is_staff_member']
+            retval = [(None, {'fields': new_fields})]
+
+        # return the normal stuff
+        return retval
+
+    search_fields = ['email', 'username',]
+
+    change_form_template = 'accounts/admin/change_user_form.html'
+
+
+class UserBlockedAdmin(admin.ModelAdmin):
+    list_display = ('user', 'buddy', 'blocked_by',)
+
+
+class UserBuddyRequestAdmin(admin.ModelAdmin):
+    list_display = ('user', 'buddy', 'is_active', 'is_deleted',)
 
 
 admin.site.register(User, UserAdmin)
+admin.site.register(UserBuddyRequest, UserBuddyRequestAdmin)
+admin.site.register(UserBlocked, UserBlockedAdmin)
+admin.site.register(UserBuddy)
+admin.site.register(account_models.UserEmail)
+admin.site.register(account_models.UserSetting)

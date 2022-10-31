@@ -5,20 +5,25 @@ import uuid
 import string
 
 from django.contrib.auth.models import (
-    AbstractUser, UserManager
+    AbstractUser
 )
 
 from django.db import models
 from django.db.models import Q
-from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.utils.translation import gettext_lazy as _
 from django.templatetags.static import static
+from django.core.exceptions import ValidationError
 
 from rest_framework.authtoken.models import Token
 
+from scuba.accounts.settings import SETTINGS_KEYS, SETTINGS_VALUES
+from scuba.accounts.exceptions import InvalidUserIdException
 from scuba.libs.models.uuidmodel import UUIDModel
-from scuba.settings import PROFILE_BLANK_URL
+from scuba.libs.alerting import Alerting
+from scuba.settings import PROFILE_BLANK_URL, AWS_CLOUDFRONT
+from scuba.accounts.exceptions import InvalidEmailIdException, PrimaryEmailIdException, EmailInUseException
+from scuba.accounts.settings import SETTINGS
 
 
 class User(AbstractUser, UUIDModel):
@@ -33,8 +38,8 @@ class User(AbstractUser, UUIDModel):
         ordering = ['-date_joined']
 
     @property
-    def get_id_str(self):
-        return str(self.id).replace('-', '')
+    def profile_image(self):
+        return self.get_profile_image()
 
     def __str__(self):
         return self.get_full_name()
@@ -62,7 +67,7 @@ class User(AbstractUser, UUIDModel):
         # check for requests which have the user's email,
         # but do not have a friend (user) id associated to it.
         # We will update the friend id with the current user
-        UserFriendRequest.objects.filter(
+        UserBuddyRequest.objects.filter(
             friend__id=0, email=user.email
         ).update(friend=user)
 
@@ -70,40 +75,79 @@ class User(AbstractUser, UUIDModel):
         user.friend_requested.filter(active=1).sort('first_name')
 
     def get_friend(self, friend):
-        # get all of the current friends
+        # get all of the current buddies
         return User.objects.filter(
                 Q(friend_friend1__friend1=friend) |
                 Q(friend_friend2__friend2=friend)).first()
 
-    def get_friend_count(self):
-        # get all of the current friends
-        return self.friends.all().count()
+    def get_buddies_count(self):
+        # get all of the current buddies
+        return self.buddies.all().count()
 
-    def get_all_friends(self):
-        # return all of the friends that is not us!
-        Friendship.objects.filter(Q(friend2=self) | Q(friend1=self)).values('friend1', 'friend2')
+    def get_all_buddies(self):
+        # return all of the buddies that is not us!
+        return self.buddies.all()
 
-    def block_friend(self, friend):
-        # get all of the current friends
-        UserFriendBlocked.objects.create(user=self, friend=friend)
+    def confirm_buddy_request(self, buddy):
+        self.buddies.create(buddy=buddy)
+        buddy.buddies.create(buddy=self)
+
+    def get_buddy_status(self, userid):
+        # return all of the buddies that is not us!
+        try:
+            user = User.objects.get(id=userid)
+
+            data = self.buddy_requests.filter(buddy=user, is_active=True).first()
+            if data:
+                return {'state': 1, 'type': 'Requested', 'id': data.pk_as_str}
+
+            data = self.buddies.filter(buddy=user).first()
+            if data:
+                return {'state': 2, 'type': 'Buddies', 'id': data.pk_as_str}
+
+            data = self.buddy_requested.filter(buddy=self, is_active=True, is_deleted=False).first()
+            if data:
+                return {'state': 3, 'type': 'Was Requested', 'id': data.pk_as_str}
+
+            return {'state': 0, 'type': 'Open'}
+        except (ValidationError, User.DoesNotExist):
+            raise InvalidUserIdException
+
+    def add_buddy_request(self, buddy):
+        obj, created = self.buddy_requests.update_or_create(
+            buddy=buddy,
+            defaults={'is_active': True},
+        )
+
+        if created:
+            Alerting.send_buddy_request(self.pk_as_str, buddy.pk_as_str)
+
+    def is_add_buddy_requested(self, buddy):
+        return self.buddy_requests.filter(buddy=buddy, is_active=True).count()
+
+    def cancel_buddy_request(self, buddy):
+        return self.buddy_requests.filter(buddy=buddy, is_active=True).update(is_active=False)
+
+    def block_buddy(self, buddy):
+        # get all of the current buddies
+        UserBlocked.objects.create(user=self, buddy=buddy, blocked_by=self)
 
         # now, let's delete all friend requests...
-        UserFriendRequest.objects.filter(Q(user=friend, friend=self) |
-                                         Q(user=self, friend=friend)).delete()
+        UserBuddyRequest.objects.filter(Q(user=buddy, buddy=self) |
+                                         Q(user=self, buddy=buddy)).delete()
 
-    def get_blocked_friends(self):
-        # get all of the current friends
+    def get_blocked_buddies(self):
+        # get all of the current buddies
         return self.blocked_user.order_by('friend__first_name')
 
-    def is_blocked(self, friend):
+    def is_blocked(self, buddy):
         # check if the user is blocking for the friend.
-        return UserFriendBlocked.objects.filter(Q(user=friend, friend=self) |
-                                                Q(user=self, friend=friend)).count()
+        return UserBlocked.objects.filter(Q(user=buddy, buddy=self) |
+                                          Q(user=self, buddy=buddy)).count()
 
     # -----------------------------------------------------------------------------
     # start profile image stuff
     # -----------------------------------------------------------------------------
-
     def get_profile_image(self):
         ''' return a profile image. make sure they have a user profile object
         first. Later, if no profile image exists, return a default avatar '''
@@ -112,7 +156,7 @@ class User(AbstractUser, UUIDModel):
             return self.userprofileimage.get_profile_image()
 
         # No profile image. just return a default
-        return static(PROFILE_BLANK_URL)
+        return static('images/profiles/profile-blank.png')
 
     def upload_profile_image_as_string(self, uploaded_image_string):
         ''' upload a profile image to S3 when the uploaded image is sent
@@ -146,6 +190,93 @@ class User(AbstractUser, UUIDModel):
 
         # return the new profile image
         return profile_image
+
+    def get_setting(self, setting):
+
+        setting_key = SETTINGS_KEYS[setting]
+        item = self.settings.filter(setting=setting_key).first()
+
+        if not item:
+            # generate a default
+            items_list = SETTINGS_VALUES[setting_key]
+            default = None
+            for option in items_list:
+                default = option.get('default')
+                if default:
+                    break
+
+            return self.settings.create(
+                    setting=SETTINGS_KEYS[settings_key],
+                    value=default)
+
+        return item
+
+    def add_email(self, email, is_primary=False):
+        if self.emails.filter(email=email).first():
+            raise EmailInUseException
+
+        return self.emails.create(email=email, is_primary=is_primary)
+
+    def verify_email(self, id):
+        try:
+            user_email = self.emails.get(id=id)
+            user_email.set_is_verified()
+        except UserEmail.DoesNotExist:
+            raise InvalidEmailIdException
+
+    def remove_email(self, id):
+        try:
+            user_email = self.emails.get(id=id)
+            if user_email.is_primary:
+                # cannot delete the primary email
+                raise PrimaryEmailIdException
+            user_email.delete()
+        except (ValidationError, UserEmail.DoesNotExist):
+            raise InvalidEmailIdException
+
+    def get_emails(self):
+        return self.emails.all().order_by('-is_primary')
+
+    def set_primary_email(self, id):
+        try:
+            user_email = self.emails.get(id=id)
+
+            self.email = user_email.email
+            self.save()
+
+            user_email.set_is_primary()
+        except (ValidationError, UserEmail.DoesNotExist):
+            raise InvalidEmailIdException
+
+    # -----------------------------------------------------------------------------
+    # Start stuff related to sending emails
+    # -----------------------------------------------------------------------------
+    def send_welcome_email(self, email_template):
+        """ send_welcome_email
+
+        Send a welcome email to the user. Attach a tracker to it to see when
+        he has opened it
+        """
+        data = self.generate_welcome_email(email_template, generate_tracker())
+
+        if EMAIL_BACKEND:
+            # now store the email
+            send_mail(self, email_template.subject, data[0], data[1])
+
+    def generate_welcome_email(self, email_template, tracker=""):
+        '''
+        This will generate the welcome email and return the
+        rendered value
+        '''
+        # now let's send something....
+        content = email_template.content.replace('##USERNAME##', self.full_name.title())
+        soup = BeautifulSoup(content, 'lxml')
+        email_txt = soup.get_text()
+
+        html = generate_email(self, 'emails/welcome.html',
+            {'content': content, 'short_code': email_template.short_code}, tracker)
+
+        return (html, email_txt)
 
 
 class Account(models.Model):
@@ -233,61 +364,77 @@ class Account(models.Model):
         super().save(*args, **kwargs)
 
 
-class Friendship(models.Model):
-    friend1 = models.ForeignKey(User, related_name='friend_friend1', on_delete=models.CASCADE)
-    friend2 = models.ForeignKey(User, related_name='friend_friend2', on_delete=models.CASCADE)
-    blocked = models.BooleanField(default=False)
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = 'friendship'
-        unique_together = (('friend1', 'friend2'), )
-
-
-class UserFriend(models.Model):
-    user = models.ForeignKey(User, related_name='friends', on_delete=models.CASCADE)
-    friend = models.ForeignKey(User, on_delete=models.CASCADE)
+class UserBuddy(UUIDModel):
+    user = models.ForeignKey(User, related_name='buddies', on_delete=models.CASCADE)
+    buddy = models.ForeignKey(User, on_delete=models.CASCADE)
     hide = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'user_friend'
-        unique_together = (('user', 'friend'), )
+        verbose_name_plural = 'user buddies'
+        db_table = 'user_buddy'
+        unique_together = (('user', 'buddy'), )
 
 
-class UserFriendBlocked(models.Model):
-    user = models.ForeignKey(User, null=True, related_name='blocked_user', on_delete=models.CASCADE)
-    friend = models.ForeignKey(User, related_name='blocked_friend', on_delete=models.CASCADE)
+class UserBlocked(models.Model):
+    user = models.ForeignKey(User, null=True, related_name='blocked', on_delete=models.CASCADE)
+    buddy = models.ForeignKey(User, related_name='blocked_friend', on_delete=models.CASCADE)
+    blocked_by = models.ForeignKey(User, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'user_friend_blocked'
-        unique_together = (('user', 'friend'), )
+        verbose_name_plural = 'blocked users'
+        db_table = 'user_blocked'
+        unique_together = (('user', 'buddy'), )
 
 
-class UserFriendRequestManager(models.Manager):
-    #@transaction.commit_on_success
+class UserSetting(UUIDModel):
+    user = models.ForeignKey(User, null=True, related_name='settings', on_delete=models.CASCADE)
+    setting = models.PositiveSmallIntegerField(choices=SETTINGS)
+    value = models.PositiveSmallIntegerField()
+
+    class Meta:
+        verbose_name_plural = 'user settings'
+        db_table = 'user_setting'
+
+
+class UserBuddyRequest(UUIDModel):
+    user = models.ForeignKey(User, null=True, related_name='buddy_requests', on_delete=models.CASCADE)
+    buddy = models.ForeignKey(User, related_name='buddy_requested', on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'user_buddy_request'
+        unique_together = (('user', 'buddy'),)
+
     def update_friend_request_active(self, user):
         # now, create the new blacklist version
-        UserFriendRequest.objects.filter(friend=user, active=True).update(active=False)
+        UserBuddyRequest.objects.filter(friend=user, active=True).update(active=False)
 
-class UserFriendRequest(models.Model):
-    user = models.ForeignKey(User, null=True, related_name='friend_requests', on_delete=models.CASCADE)
-    email = models.CharField(max_length=100, null=True)
-    active = models.BooleanField(default=True)
-    friend = models.ForeignKey(User, related_name='friend_requested', on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
 
-    # instantiate the new manager
-    objects = UserFriendRequestManager()
+class UserEmail(UUIDModel):
+    user = models.ForeignKey(User, related_name='emails', on_delete=models.CASCADE)
+    email = models.EmailField(User, unique=True)
+    is_primary = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
 
     class Meta:
-        db_table = 'user_friend_request'
-        unique_together = (('user', 'friend'), ('user','email'), )
+        verbose_name_plural = 'user email addresses'
+        db_table = 'user_email'
+
+    def set_is_primary(self):
+        self.user.emails.update(is_primary=False)
+        self.is_primary = True
+        self.save()
+
+    def set_is_verified(self, id):
+        user_email = self.emails.get(id=id)
+        user_email.is_verified = True
+        user_email.save()
+
 
 class UserDiveSiteBuddyFinder(models.Model):
     user = models.ForeignKey(User, related_name='buddyfinder', on_delete=models.CASCADE)

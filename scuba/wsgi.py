@@ -16,11 +16,7 @@ framework.
 import os
 import site
 
-site.addsitedir('/skm/apps/senv/lib64/python3.7/site-packages')
-site.addsitedir('/skm/apps/senv/lib64/python3.7/dist-packages')
-site.addsitedir('/skm/apps/senv/lib/python3.7/site-packages')
-site.addsitedir('/skm/apps/senv/lib/python3.7/dist-packages')
-site.addsitedir('/skm/apps/scubamob/current')
+site.addsitedir('/scuba/app/scubamob')
 
 from django.core.wsgi import get_wsgi_application
 

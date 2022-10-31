@@ -1,13 +1,21 @@
 {% extends "layout.html" %}
 {% load static compress %}
 
-{% block content %}
-{% compress js file profile %}
-<script src="{% static 'js/account/sm.profile.js' %}"></script>
-<script src="{% static 'js/sm.friends.js' %}"></script>
-<script src="{% static 'js/chat.js' %}"></script>
-{% endcompress %}
+{% block leftmenu %}{% endblock %}
 
+{% block includes %}
+<link rel="manifest" href="{% static 'manifest.json' %}" />
+{% endblock %}
+
+{% block reactscript %}
+
+{% compress js file profile %}
+<script type="module" src="{% static 'react/dist/profile.js' %}"></script>
+{% endcompress %}
+{% endblock %}
+
+{% block content %}
+<script src="{% static 'js/chat.js' %}"></script>
 <style>
 
 .og_preview {
@@ -50,43 +58,67 @@ input[type=number]:focus,
 [contenteditable].form-control:focus {
   box-shadow: inset 0 -1px 0 #ddd;
 }
-
 </style>
+
 <section>
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col">
         <div class="card">
           <div class="rounded-top text-white d-flex flex-row" style="background-color: #000; height:200px;">
             <div class="ms-4 mt-5 d-flex flex-column" style="width: 150px;">
-              <img src="{% static 'images/scubamob-frogman.jpg' %}"
-                alt="Generic placeholder image" class="img-fluid img-thumbnail mt-4 mb-2"
+              <img src="{{user.profile_image}}"
+                alt="Generic placeholder image" class="img-fluid img-thumbnail rounded-circle"
                 style="width: 150px; z-index: 1">
-              <button type="button" class="btn btn-outline-dark" data-mdb-ripple-color="dark"
-                style="z-index: 1;">
-                Edit profile
-              </button>
-            </div>
-            <div class="ms-3" style="margin-top: 130px;">
-              <h5>{{ user.get_full_name }}</h5>
-              <p>New York</p>
             </div>
           </div>
-          <div class="p-4 text-black" style="background-color: #f8f9fa;">
-            <div class="d-flex justify-content-end text-center py-1">
-              <div>
-                <p class="mb-1 h5">253</p>
-                <p class="small text-muted mb-0">Photos</p>
-              </div>
-              <div class="px-3">
-                <p class="mb-1 h5">1026</p>
-                <p class="small text-muted mb-0">Followers</p>
-              </div>
-              <div>
-                <p class="mb-1 h5">478</p>
-                <p class="small text-muted mb-0">Following</p>
-              </div>
+
+          <div class="p-4 pb-1 text-black" style="background-color: #f8f9fa;">
+            <div class="d-flex float-start text-left py-1">
+                <div>
+                    <h5>{{profile.get_full_name}}</h5>
+                    <h6>San Diego, CA</h6>
+
+                    <script>
+                        const profileId = "{{profile.pk_as_str}}";
+                    </script>
+                    <div id="profile"></div>
+                    {% if profile.get_friend_count %}
+                    <a href="#">{{profile.get_friend_count}} Budd{{profile.get_friend_count|pluralize:"y,ies"}}</a>
+                    {% endif %}
+                </div>
             </div>
           </div>
+
+        <div class="p-4 pt-1 text-black" style="background-color: #f8f9fa;">
+            <div class="d-flex float-start text-center py-1">
+                {% if request.is_user %}
+                {% else %}
+                <div>
+                    <div id="confirmbuddy" class="d-none d-inline-block">
+                        <span class="pe-3">{{profile.first_name}} wants to be a buddy</span>
+                        <button class="btn btn-primary" onclick="confirmRequest()">Connect</button>
+                        <button class="btn btn-primary" onclick="cancelBuddyRequest()">Delete Buddy Request</button>
+                    </div>
+                    <button class="btn btn-primary d-none" onclick="addBuddy()" id="addbuddy">Connect</button>
+                    <button class="btn btn-primary d-none" onclick="cancelBuddyRequest()" id="cancelrequest">Cancel Buddy Request</button>
+
+                    <div class="btn-group">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                            More
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                            <li><a class="dropdown-item" href="#">Action</a></li>
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li><a class="dropdown-item d-none" href="#" onclick="removeLink()" id="removeLink" >Unlink</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="doBlock()">Block</a></li>
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+          </div>
+
+
           <div class="card-body p-4 text-black">
             <div class="mb-5">
               <p class="lead fw-normal mb-1">About</p>
@@ -96,7 +128,10 @@ input[type=number]:focus,
                 <p class="font-italic mb-0">Photographer</p>
               </div>
             </div>
+            {% block profile %}
+            <div id="root"></div>
             <div class="d-flex justify-content-between align-items-center mb-4">
+                <div id="profile_container"></div>
               <p class="lead fw-normal mb-0">Recent photos</p>
               <p class="mb-0"><a href="#!" class="text-muted">Show all</a></p>
             </div>
@@ -120,6 +155,7 @@ input[type=number]:focus,
                   alt="image 1" class="w-100 rounded-3">
               </div>
             </div>
+            {% endblock %}
           </div>
         </div>
       </div>
@@ -127,14 +163,7 @@ input[type=number]:focus,
 </section>
 
 
-
-
-
-
-
-
-
-{% if is_user %}
+{% if request.is_user %}
 this is me!!!!!!
 {% else %}
     <div class="frnd ctr"></div>
@@ -185,6 +214,130 @@ Respond to user friend request<br/>
 <a class="link friend ignore" data-id="{{ profile.account.first.guid }}">Ignore</a>
 </script>
 
+<script>
+    const username = "{{profile.username}}";
+    const userid = "{{profile.pk_as_str}}";
+
+    const headers = {
+        'Content-Type': 'application/json',
+        'X-CSRFToken':  Cookies.get('csrftoken'),
+    };
+
+    const addBuddy = () => {
+        fetch('/api/profile/buddy/add', {
+            headers: headers,
+            method: 'POST',
+            body: JSON.stringify({userid:userid})
+        })
+        .then(response => response.json())
+        .then(() => {
+            deactivateAll();
+            activateCancelRequest();
+         });
+    }
+
+    const cancelBuddyRequest = () => {
+        fetch('/api/profile/buddy/cancel', {
+            headers: headers,
+            method: 'POST',
+            body: JSON.stringify({userid:userid})
+        })
+        .then(response => response.json())
+        .then(resp => {
+            deactivateAll();
+            activateAddBuddy();
+        });
+    }
+
+const doBlock = () => {
+    fetch('/api/profile/block', {
+        headers: headers,
+        method: 'POST',
+        body: JSON.stringify({username:username})
+    })
+    .then(response => response.json())
+    .then(x => {
+        fetch('/api/ui/message', {
+            headers: headers,
+            method: 'POST',
+            body: JSON.stringify({message:x.msg})
+        })
+        .then(response = () => {
+            location.href='/home';
+        });
+    });
+}
+
+const confirmRequest = () => {
+    fetch('/api/profile/buddy/confirm', {
+        headers: headers,
+        method: 'POST',
+        body: JSON.stringify({userid:userid})
+    })
+    .then(response => response.json())
+    .then(x => {
+    });
+}
+
+
+const setBuddyStatus = (status) => {
+    switch(status.state) {
+        case 0:
+            activateAddBuddy();
+            break;
+        case 1:
+            activateCancelRequest();
+            break;
+        case 2:
+            activateRemoveLink();
+            break;
+        case 3:
+            activateConfirmBuddy();
+            break;
+        default:
+            alert("BAD");
+    }
+}
+
+const deactivateAll = () => {
+    ['addbuddy', 'cancelrequest', 'removeLink'].forEach(f => {
+        document.getElementById(f).classList.add('d-none');
+    });
+}
+
+const activateAddBuddy = () => {
+    showRequest('addbuddy');
+}
+
+const activateConfirmBuddy = () => {
+    showRequest('confirmbuddy');
+}
+
+const activateCancelRequest = () => {
+    showRequest('cancelrequest');
+}
+
+const activateRemoveLink = () => {
+    showRequest('removeLink');
+}
+
+const showRequest = (id) => {
+    document.getElementById(id).classList.remove('d-none');
+}
+
+{% if not request.is_user %}
+document.addEventListener("DOMContentLoaded", () => {
+    fetch('/api/buddies/status?userid=' + userid)
+    .then(response => response.json())
+    .then(response = (r) => {
+        setBuddyStatus(r);
+    });
+});
+    {% endif %}
+
+
+</script>
+
 <script type="text/template" id="isfriend">
 You are friends<br/>
 <a class="link friend unfriend" data-id="{{profile.account.first.guid }}">Unfriend</a><br/>
@@ -202,7 +355,7 @@ var friendId    =   '{{friendship.id}}',
 var friendId=null;
 {% endif %}
 
-SM.account.profile.init();SM.friends.index.init();</script>
+</script>
 
 {% include "messenger/message.html" %}
 

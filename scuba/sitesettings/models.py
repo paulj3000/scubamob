@@ -6,7 +6,7 @@ from django.db import models
 from scuba.libs.exceptions import ChatServerDownException
 from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.sitesettings.exceptions import InvalidConfigurationException
-from scuba.sitesettings.settings import SYSTEM_SETTINGS, SYSTEM_APIS, SOCKET_SERVER_SETTINGS
+from scuba.sitesettings.settings import SYSTEM_SETTINGS, SYSTEM_APIS, SOCKET_SERVER_SETTINGS, DIVELOG_APIS
 
 
 class SystemApi(UUIDModel):
@@ -82,9 +82,26 @@ class SystemApi(UUIDModel):
     def get_alerting_url():
         return SystemApi.get_url_by_key('ALERTING_URL')
 
+    def get_alerting_alerts():
+        endpoint = SystemApi.get_url_by_key('ALERTING_ALERTS')
+        return SystemApi.get_alerting_endpoint(endpoint)
+
+    def get_alerting_buddy_request():
+        endpoint = SystemApi.get_url_by_key('ALERTING_BUDDY_REQUEST')
+        return SystemApi.get_alerting_endpoint(endpoint)
+
     @staticmethod
     def get_chat_server():
         return SystemApi.get_url_by_key('CHAT_SERVER', False)
+
+    @staticmethod
+    def get_divelog_server():
+        return SystemApi.get_url_by_key('DIVELOG_SERVER', False)
+
+    @staticmethod
+    def get_alerting_endpoint(endpoint):
+        domain = SystemApi.get_url_by_key('ALERTING_SERVER')
+        return urljoin(domain, endpoint)
 
     @staticmethod
     def get_alert_notify_staff():
@@ -127,7 +144,27 @@ class SystemSetting(UUIDModel):
 
             raise InvalidConfigurationException(f"System setting key {key} does not exist")
 
+    def __str__(self):
+        """ return a string representation of the page """
+        return self.key
+
+
+class DiveLogApi(UUIDModel):
+    key = models.CharField(max_length=128, db_index=True, choices=DIVELOG_APIS, unique=True)
+    value = models.CharField(max_length=128)
 
     def __str__(self):
         """ return a string representation of the page """
         return self.key
+
+    class Meta:
+        """ define models, fields, etc """
+        db_table = 'divelog_api'
+        app_label = 'sitesettings'
+        ordering = ['key',]
+
+    @staticmethod
+    def get_divelog_url():
+        divelog_server = SystemApi.get_divelog_server()
+        url = SystemApi.objects.get(key='GET_DIVELOGS').value
+        return f"{divelog_server}/{url}"

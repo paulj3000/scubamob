@@ -13,6 +13,8 @@ import scuba.galleries.api as galleries_api
 
 
 urlpatterns = [
+    path('daily', galleries_api.GetDailyPicApi.as_view()),
+
     re_path(r'deletealbum/(?P<album_id>[0-9A-Fa-f-]{32,36})$',
         galleries_api.json_deletealbum,
         name='delete_album'),
