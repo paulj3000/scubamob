@@ -21,7 +21,7 @@ python manage.py makemigrations accounts sitesettings home galleries
 python manage.py migrate
 python manage.py compress --force
 python manage.py collectstatic --noinput
-python manage.py loaddata scuba/home/fixtures/home.json scuba/sitesettings/fixtures/site_settings.json
+python manage.py loaddata scuba/home/fixtures/home.json scuba/sitesettings/fixtures/site_settings.json scuba/accounts/fixtures/firstuser.json
 
 rm gulpfile.js
 rm webpack.config.js
