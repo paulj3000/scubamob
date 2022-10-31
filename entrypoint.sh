@@ -26,6 +26,5 @@ python manage.py loaddata scuba/home/fixtures/home.json scuba/sitesettings/fixtu
 rm gulpfile.js
 rm webpack.config.js
 rm .babelrc
-rm manage.py
 
 exec "$@"
