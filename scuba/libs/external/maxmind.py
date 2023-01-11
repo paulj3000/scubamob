@@ -1,21 +1,21 @@
+import geoip2.database
+
 import json
 from pprint import pprint
 
-from scuba import settings
+from scuba.settings import MAXMIND_CITY_DB
 
 
-class MaxMind():
+class MaxMind:
     @staticmethod
-    def get_client_ip(request):
-        if settings.DEBUG:
-            return settings.DEBUG_IP
+    def get_city_data(ip):
+        with geoip2.database.Reader(MAXMIND_CITY_DB) as reader:
+            response = reader.city(ip)
+            print(response.country.iso_code)
+            print(response.city)
+            print(response.location)
 
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-        if x_forwarded_for:
-            ip = x_forwarded_for.split(',')[0]
-        else:
-            ip = request.META.get('REMOTE_ADDR')
-        return ip
+            return response.city, response.location
 
     @staticmethod
     def lookup(ip):

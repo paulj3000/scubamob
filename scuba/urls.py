@@ -6,6 +6,7 @@ from django.contrib.auth.views import LogoutView
 
 import scuba.settings
 import scuba.home.views as home_views
+import scuba.home.apis as home_apis
 import scuba.accounts.views.profiles as account_profiles
 import scuba.accounts.views.login as login_views
 import scuba.accounts.views.signup as signup_views
@@ -56,11 +57,14 @@ urlpatterns = [
     path('api/home/', include('scuba.home.urls_home_api')),
     path('api/galleries/', include('scuba.galleries.urls_api')),
     path('api/divesites/', include('scuba.divesites.urls_api')),
+    path('api/search', home_apis.SearchApi.as_view()),
     path('api/settings/', include('scuba.accounts.urls_settings_api')),
     path('api/sitesettings', GetSystemSettingsApi.as_view()),
     path('api/sitesettings/all', GetSystemSettingsApi.as_view()),
     path('api/register/', account_api.RegisterUserApi.as_view()),
     path('api/login/', account_api.LoginUserApi.as_view()),
+
+    path('iapi/settings/', include('scuba.accounts.urls_settings_iapi')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

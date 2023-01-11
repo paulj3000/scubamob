@@ -1,15 +1,16 @@
-SETTING_DARK_MODE = 0
+SETTING_DISPLAY_MODE = 0
 
 SETTINGS_KEYS = {
-    'dark-mode': SETTING_DARK_MODE,
+    'dark-mode': SETTING_DISPLAY_MODE,
+    'display_mode': SETTING_DISPLAY_MODE,
 }
 
 SETTINGS = (
-    (SETTING_DARK_MODE, 'Dark Mode'),
+    (SETTING_DISPLAY_MODE, 'Display Mode'),
 )
 
 SETTINGS_VALUES = {
-    SETTING_DARK_MODE: [
+    SETTING_DISPLAY_MODE: [
         {
             'title': 'Device Settings',
             'default': True

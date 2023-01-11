@@ -22,6 +22,9 @@ const Layout = () => {
           <li>
             <Link to={`/settings/settings2`}>Settings 2</Link>
           </li>
+          <li>
+            <Link to={`/settings/settings2`}>Blocking</Link>
+          </li>
         </ul>
       </nav>
         </Col>
@@ -29,13 +32,8 @@ const Layout = () => {
         <Col>
             <Outlet />
         </Col>
-
-
-
       </Row>
     </div>
-
-
     </>
   )
 };

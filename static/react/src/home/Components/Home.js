@@ -8,8 +8,8 @@ import DailyImage from './DailyImage'
 
 const Home = () => {
     const navigate = useNavigate();
-    const navigateDarkMode = () => {
-        navigate('/settings/item/dark-mode');
+    const navigateDisplayMode = () => {
+        navigate('/settings/item/display-mode');
     };
 
     return(
@@ -20,7 +20,7 @@ const Home = () => {
                     <li className="list-group-item">
                         <h5>Display</h5>
                     </li>
-                    <li className="list-group-item d-flex justify-content-between align-items-center" onClick={navigateDarkMode}>
+                    <li className="list-group-item d-flex justify-content-between align-items-center" onClick={navigateDisplayMode}>
                         Dark Mode
                             <span>
                                 <i className="bi bi-arrow-right"></i>

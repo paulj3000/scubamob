@@ -6,7 +6,7 @@ from django.db import models
 from scuba.libs.exceptions import ChatServerDownException
 from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.sitesettings.exceptions import InvalidConfigurationException
-from scuba.sitesettings.settings import SYSTEM_SETTINGS, SYSTEM_APIS, SOCKET_SERVER_SETTINGS, DIVELOG_APIS
+from scuba.sitesettings.settings import SYSTEM_SETTINGS, SYSTEM_APIS, SOCKET_SERVER_SETTINGS, DIVELOG_APIS, SETTINGS_APIS
 
 
 class SystemApi(UUIDModel):
@@ -99,6 +99,10 @@ class SystemApi(UUIDModel):
         return SystemApi.get_url_by_key('DIVELOG_SERVER', False)
 
     @staticmethod
+    def get_settings_server():
+        return SystemApi.get_url_by_key('SETTINGS_SERVER', False)
+
+    @staticmethod
     def get_alerting_endpoint(endpoint):
         domain = SystemApi.get_url_by_key('ALERTING_SERVER')
         return urljoin(domain, endpoint)
@@ -148,9 +152,16 @@ class SystemSetting(UUIDModel):
         """ return a string representation of the page """
         return self.key
 
+class BaseAPI(UUIDModel):
+    def __init__(self, *args, **kwargs):
 
-class DiveLogApi(UUIDModel):
-    key = models.CharField(max_length=128, db_index=True, choices=DIVELOG_APIS, unique=True)
+        if not hasattr(self, 'choices'):
+            raise Exception()
+
+        super().__init__(*args, **kwargs)
+        self._meta.get_field('key').choices = self.choices
+
+    key = models.CharField(max_length=128, db_index=True, unique=True)
     value = models.CharField(max_length=128)
 
     def __str__(self):
@@ -159,7 +170,7 @@ class DiveLogApi(UUIDModel):
 
     class Meta:
         """ define models, fields, etc """
-        db_table = 'divelog_api'
+        abstract = True
         app_label = 'sitesettings'
         ordering = ['key',]
 
@@ -168,3 +179,45 @@ class DiveLogApi(UUIDModel):
         divelog_server = SystemApi.get_divelog_server()
         url = SystemApi.objects.get(key='GET_DIVELOGS').value
         return f"{divelog_server}/{url}"
+
+class DiveLogApi(BaseAPI):
+    choices = DIVELOG_APIS
+    class Meta:
+        db_table = 'divelog_api'
+
+class SettingsApi(BaseAPI):
+    choices = SETTINGS_APIS
+    class Meta:
+        db_table = 'settings_api'
+
+    @staticmethod
+    def get_add_user_setting(userid):
+        settings_server = SystemApi.get_settings_server()
+        endpoint = SettingsApi.objects.get(key='ADD_USER_SETTING').value
+
+        url = f"{settings_server}{endpoint}"
+        return url.replace(':userid', userid)
+
+    @staticmethod
+    def get_user_settings_with_options(userid, keys):
+        settings_server = SystemApi.get_settings_server()
+        endpoint = SettingsApi.objects.get(key='GET_USER_SETTINGS_WITH_OPTIONS').value
+
+        url = f"{settings_server}{endpoint}?setting={(',').join(keys)}"
+        return url.replace(':userid', userid)
+
+    @staticmethod
+    def get_user_setting_list(userid, keys):
+        settings_server = SystemApi.get_settings_server()
+        endpoint = SettingsApi.objects.get(key='GET_USER_SETTING_LIST').value
+
+        url = f"{settings_server}{endpoint}?setting={(',').join(keys)}"
+        return url.replace(':userid', userid)
+
+    @staticmethod
+    def post_user_settings(userid):
+        settings_server = SystemApi.get_settings_server()
+        endpoint = SettingsApi.objects.get(key='POST_USER_SETTINGS').value
+
+        url = f"{settings_server}{endpoint}"
+        return url.replace(':userid', userid)

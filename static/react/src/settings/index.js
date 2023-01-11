@@ -6,12 +6,12 @@ import { BrowserRouter, Routes, Route, Outlet, Link } from "react-router-dom";
 
 import SignInAndSecurity from "./Components/SignInAndSecurity";
 import Layout from "./Components/Layout";
-//import Dashboard from "./Components/Dashboard";
 import EmailAddresses from "./Components/EmailAddresses";
 import ManageEmailAddresses from "./Components/ManageEmailAddresses";
 
 import Home from "./Components/Home";
-import DarkMode from "./Components/AccountPreferences/DarkMode.js";
+import DisplayMode from "./Components/AccountPreferences/DisplayMode.js";
+import BasicInfo from "./Components/AccountPreferences/BasicInfo.js";
 
 import NoMatch from "./Components/NoMatch";
 
@@ -23,8 +23,10 @@ root.render(
     <BrowserRouter>
       <Routes>
         <Route path="settings/" element={<Layout />}>
+          <Route exact path="" home element={<Home />} />
           <Route exact path="category/account" home element={<Home />} />
-          <Route exact path="item/dark-mode" element={<DarkMode />} />
+          <Route exact path="item/display-mode" element={<DisplayMode />} />
+          <Route exact path="item/basic-info" element={<BasicInfo />} />
 
           <Route exact path="category/sign-in-and-security" home element={<SignInAndSecurity />} />
           <Route exact path="item/manage-email-addresses" element={<ManageEmailAddresses />} />

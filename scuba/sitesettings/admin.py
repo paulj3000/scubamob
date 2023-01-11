@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib import messages
 
-from scuba.sitesettings.models import SystemApi, SystemSetting, DiveLogApi
+from scuba.sitesettings.models import SystemApi, SystemSetting, DiveLogApi, SettingsApi
 from scuba.libs.exceptions import ChatServerDownException
 
 class SystemApiAdmin(admin.ModelAdmin):
@@ -33,7 +33,11 @@ class SystemSettingAdmin(admin.ModelAdmin):
 class DiveLogApiAdmin(admin.ModelAdmin):
     list_display = ('key', 'value',)
 
+class SettingsApiAdmin(admin.ModelAdmin):
+    list_display = ('key', 'value',)
+    #change_form_template = 'sitesettings/admin/change_settingsapi_form.html'
 
 admin.site.register(SystemApi, SystemApiAdmin)
 admin.site.register(DiveLogApi, DiveLogApiAdmin)
+admin.site.register(SettingsApi, SettingsApiAdmin)
 admin.site.register(SystemSetting, SystemSettingAdmin)
