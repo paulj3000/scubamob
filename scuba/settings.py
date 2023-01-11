@@ -270,6 +270,8 @@ MOBILE_HEADER_DEVICES = {'smandroid': 'am', 'smios': 'io'}
 MAXMIND_URL = 'https://geoip.maxmind.com/geoip/v2.0/city/%s'
 MAXMIND_LICENSE = 'hVeqTCTxxU5H'
 MAXMIND_USER = '75205'
+MAXMIND_CITY_DB = f"{BASE_DIR}/GeoLite2-City.mmdb"
+MAXMIND_USE_DB = True
 
 # define the mongo collections
 MONGO_DIVELOGS		= 'divelogs'
@@ -320,9 +322,27 @@ COMPRESS_YUGLIFY_BINARY = f"{BASE_DIR}/node_modules/yuglify/bin/yuglify"
 CORS_ORIGIN_ALLOW_ALL=True
 CORS_ALLOW_ALL_ORIGINS = True
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'settings': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
+
 try:
     import sys
     sys.path.append('/scuba')
     from system.settings import *
 except ImportError as exp:
-    print('localsettings.py was not loaded. Continuing with standard settings.\n%s' % exp)
+    print('system.settings was not loaded. Continuing with standard settings.\n%s' % exp)

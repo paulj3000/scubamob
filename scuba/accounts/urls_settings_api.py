@@ -12,5 +12,10 @@ urlpatterns = [
         settings_api.SetPrimaryEmailObjectApi.as_view()
     ),
     path('emails/', settings_api.UserEmailApi.as_view()),
+    re_path('list/general',
+        settings_api.UserGeneralSettingListApi.as_view()
+    ),
+    re_path('list/options', settings_api.UserSettingApi.as_view()),
+    re_path('list', settings_api.UserSettingListApi.as_view()),
     re_path('(?P<setting>[\w-]+)', settings_api.UserSettingApi.as_view()),
 ]

@@ -4,8 +4,10 @@ SYSTEM_APIS = (
     ('ALERTING_NOTIFY_STAFF',   'Alerting Notify Staff'),
 
     ('ALERTING_SERVER',     'Alerting Server'),
+    ('SETTINGS_SERVER',     'Settings Server'),
     ('CHAT_SERVER',         'Chat Server'),
     ('DIVE_SERVER',         'Dive Server'),
+    ('SETTINGS_SERVER',     'Settings Server'),
     ('API_SERVER',          'API Server'),
     ('AWS_S3_BUCKET',       'AWS S3 Bucket'),
     ('AWS_S3_FILE_DELETE',  'AWS S3 File Delete'),
@@ -18,7 +20,6 @@ SYSTEM_APIS = (
 
     ('BILLING_PROCESSORS',  'Billing Processors'),
     ('BILLING_AUTHORIZE_CC', 'Billing Authorize CC'),
-
 )
 
 DIVELOG_APIS = (
@@ -26,9 +27,15 @@ DIVELOG_APIS = (
     ('ADD_DIVELOG', 'Add Dive Logs'),
 )
 
+SETTINGS_APIS = (
+    ('ADD_USER_SETTING', 'Add User Setting'),
+    ('GET_USER_SETTING_LIST', 'Get User Setting List'),
+    ('GET_USER_SETTINGS_WITH_OPTIONS', 'Get User Settings with Options'),
+    ('POST_USER_SETTINGS', 'Post User Settings'),
+)
 
 SYSTEM_SETTINGS = [
-    ('CHAT_SERVER_ACTIVE',  'Chat Server Active'),
+    ('CHAT_SERVER_ACTIVE', 'Chat Server Active'),
 ]
 
 SOCKET_SERVER_SETTINGS = [

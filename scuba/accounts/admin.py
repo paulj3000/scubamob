@@ -125,7 +125,7 @@ class UserAdmin(admin.ModelAdmin):
 
     readonly_fields = ['get_token', 'last_login_date',]
 
-    fieldsets = (
+    xfieldsets = (
         (None,
             {'fields':
                 ('first_name', 'last_name', 'email', 'last_login_date', 'get_token')
@@ -143,7 +143,12 @@ class UserAdmin(admin.ModelAdmin):
 
         make sure only superusers are allowed to access permissions
         """
-        retval = self.fieldsets
+        retval = super().fieldsets
+
+        from pprint import pprint
+        pprint(retval)
+
+
         if not request.user.is_superuser:
             old_fields = self.fieldsets[0][1]['fields']
             new_fields = [field for field in old_fields if field != 'is_admin']

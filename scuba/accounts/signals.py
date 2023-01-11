@@ -10,7 +10,6 @@ Add some signal stuff for account creation stuff
 import pytz
 from pprint import pprint
 import logging
-from geoip import geolite2
 
 from django.utils import timezone
 from django.dispatch import receiver
@@ -19,6 +18,7 @@ from django.contrib.auth.signals import user_logged_in
 
 from scuba.accounts.models import User
 from scuba.libs.stringutils import StringUtils
+from scuba.libs.external.maxmind import MaxMind
 
 
 @receiver(pre_save, sender=User)
@@ -41,10 +41,13 @@ def post_login(sender, user, request, **kwargs):
     # get the IP address
     ip_address = request.META.get('HTTP_X_REAL_IP')
     tz = None
+    city = None
 
     if ip_address:
-        data = geolite2.lookup(ip_address)
-        tz = data.timezone
+        data = MaxMind.get_city_data(ip_address)
+        pprint(data)
+        #data = geolite2.lookup(ip_address)
+        tz = data[1].time_zone
     else:
         tz = 'America/Los_Angeles'
 
