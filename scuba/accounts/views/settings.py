@@ -29,4 +29,4 @@ def settings(us_request, mode, formname):
         form = formname(instance=account)
 
     context = { 'form': form, 'mode': mode }
-    return render(us_request, "account/settings/settings.html", context)
+    return render(us_request, "settings/index.html", context)

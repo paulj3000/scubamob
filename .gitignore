@@ -2,12 +2,12 @@
 /.*\.orig$
 /.*\.swp$
 ^\.DS_Store
-senv/
 env/
+static/react/dist
 static/components
 static/CACHE
 static/django_extensions
-db.sqlite3
+db.sqlite3*
 *.pyc
 test_results.xml
 test_result.log
@@ -15,4 +15,3 @@ testdata
 test.sqlite3
 static/admin
 node_modules/*
-migrations/

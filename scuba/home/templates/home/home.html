@@ -1,0 +1,56 @@
+{% extends 'layout.html' %}
+{% load static compress %}
+
+{% block reactscript %}
+
+{% compress js file profile %}
+<script type="module" src="{% static 'react/dist/home.js' %}"></script>
+{% endcompress %}
+{% endblock %}
+
+{% block leftmenu %}
+{% endblock %}
+
+
+{% block content %}
+        <div id="home"></div>
+        <div class="spot-block">
+            <div class="spot-left">
+                <h2>My Favorites Dive Spots</h2>
+                {% if divesites %}
+
+                {% for d in divesites %}
+                <div class="spot-field">
+                    <h3>{{ d.title }}</h3>
+                    <div class="spot-text-field">
+                        <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td rowspan="3" valign="top" style="padding-right:10px"><img src="{{ d.weather.icon_url }}" alt="icon" /></td>
+                                <td class="spot-text">Tide:  {{ d.weather.tide.maxheight }}f</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-top:5px;" class="spot-text">Weather:  {{ d.weather.temp_f }} F</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-top:5px;" class="spot-text">Reported Visibility:  10ft</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                {% endfor %}
+
+                {% else %}
+                <div class="spot-field">
+                    <h3>You do not have any favorite dive sites yet</h3>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="equip-block">
+            <h2>Equipment Maintenance</h2>
+            <div class="equip-text">Required in (<span>3 Days</span>)</div>
+            <div align="center" class="prepand">
+                <img src="{% static 'images/scubamob-img3.png' %}" alt="equipment" />
+            </div>
+        </div>
+{% endblock %}

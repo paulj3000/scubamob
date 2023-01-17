@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% load static compress %}
+
+{% block container %}container-fluid mt-3{% endblock %}
+{% block maincontent %}
+
+<div id="settings"></div>
+
+{% if messages %}
+<ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+{% endif %}
+{% endblock %}
+
+{% block reactscript %}
+{% compress js file settings %}
+<script type="module" src="{% static 'react/dist/settings.js' %}"></script>
+{% endcompress %}
+{% endblock %}

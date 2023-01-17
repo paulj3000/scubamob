@@ -9,11 +9,9 @@
 #
 # Author: Pauljames "The Juggernaut" Dimitriu
 # -----------------------------------------------------------------------------
-from pprint import pprint
-
 from django import forms
 
-from utils.core.forms import NoSQLForm
+from scuba.libs.nosql.forms import NoSQLForm
 from scuba.divesites.mongo import DiveSite
 from bson.objectid import ObjectId
 
@@ -47,7 +45,6 @@ class SiteForm(NoSQLForm):
         if self.site_id:
             #data = self.Object.collection.find_one({ '_id': ObjectId(self.site_id), 'user_id': self.user_id })
             data = self.Object.collection.find_one({ '_id': ObjectId(self.site_id) })
-            pprint(data)
             if data:
                 # first, let's normalize the data...
                 for k, v in data['address'].iteritems():

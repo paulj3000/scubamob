@@ -1,4 +1,3 @@
-from pprint import pprint
 import re
 import uuid
 import datetime
@@ -6,16 +5,14 @@ from PIL import Image
 from io import StringIO
 
 from django.db import models
-from django.db.models import fields, Q
 from django.conf import settings
 
 #from boto3.s3.connection import S3Connection
 
 from scuba.accounts.models import User
 from scuba.libs.fileutils import FileUtils
-
-from utils import uuidmodel
-from utils.core.models import Timestamped
+from scuba.libs.models.awsmodel import AWSModel
+from scuba.libs.models.uuidmodel import UUIDModel
 
 
 IMAGE_TYPE_EXTENSIONS = {
@@ -26,7 +23,7 @@ IMAGE_TYPE_EXTENSIONS = {
 }
 
 
-class Media(models.Model):
+class Media(UUIDModel):
     user = models.ForeignKey(User, related_name='media', on_delete=models.CASCADE)
     image = models.CharField(max_length=255)
     title = models.CharField(max_length=100)
@@ -38,12 +35,12 @@ class Media(models.Model):
     @staticmethod
     def generate_image_name(guid, album_id, filename):
         # generate a new filename
-        return  '%s/%s/%s' % (guid, album_id, filename)
+        return '%s/%s/%s' % (guid, album_id, filename)
 
     @staticmethod
     def generate_image_thumbnail_name(guid, album_id, filename):
         # generate a new filename
-        return  '%s/%s/p206x206/%s' % (guid, album_id, filename)
+        return '%s/%s/p206x206/%s' % (guid, album_id, filename)
 
     def get_image(self):
         return settings.PRODUCTION_GALLERY_URL + self.image
@@ -83,11 +80,13 @@ class Media(models.Model):
         return Media.objects.create(filename=name, content_type=content_type, aws_filename=aws_filename)
 
 
-class Album(Timestamped, models.Model):
+class Album(UUIDModel):
     user = models.ForeignKey(User, related_name='albums', on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=255)
     guid = models.CharField(max_length=125, db_index=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     def add_image(self, uploaded_image):
         # seek to the beginning of the script
@@ -97,7 +96,7 @@ class Album(Timestamped, models.Model):
 
         account = self.user.get_account()
         gallery_file = AlbumImage.generate_image_name(account.guid, self.guid, filename)
-        header = {'Content-Type' : uploaded_image.content_type}
+        header = {'Content-Type': uploaded_image.content_type}
 
         conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
         b = conn.get_bucket(settings.GALLERY_BUCKET)
@@ -116,7 +115,7 @@ class Album(Timestamped, models.Model):
 
         account = self.user.get_account()
         gallery_file_thumbnail = AlbumImage.generate_image_thumbnail_name(account.guid, self.guid, filename)
-        header = {'Content-Type' : uploaded_image.content_type}
+        header = {'Content-Type': uploaded_image.content_type}
 
         conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
         b = conn.get_bucket(settings.GALLERY_BUCKET)
@@ -157,38 +156,35 @@ class Album(Timestamped, models.Model):
         if not self.guid:
             self.guid = str(uuid.uuid1()).replace('-', '')
 
-        super(Album, self).save(*args, **kwargs)
-
-    def delete(self):
-        pprint(self.album_image.all())
-        #super(Album, self).delete(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'gallery_album'
 
     def to_json(self):
-        return { 'title': self.title, 'description': self.description, 'id': self.id, 'guid': self.guid }
+        return {'title': self.title, 'description': self.description, 'id': self.id, 'guid': self.guid}
 
 
-class AlbumImage(Timestamped, models.Model):
+class AlbumImage(UUIDModel):
     album = models.ForeignKey(Album, related_name='album_image', on_delete=models.CASCADE)
     image = models.CharField(max_length=255)
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=255)
     thumbnail = models.CharField(max_length=255)
     guid = models.CharField(max_length=125, db_index=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     # define a couple of static functions which will define an image name
     @staticmethod
     def generate_image_name(guid, album_id, filename):
         # generate a new filename
-        return  '%s/%s/%s' % (guid, album_id, filename)
+        return '%s/%s/%s' % (guid, album_id, filename)
 
     @staticmethod
     def generate_image_thumbnail_name(guid, album_id, filename):
         # generate a new filename
-        return  '%s/%s/p206x206/%s' % (guid, album_id, filename)
-
+        return '%s/%s/p206x206/%s' % (guid, album_id, filename)
 
     def save(self, *args, **kwargs):
         # save the album
@@ -208,7 +204,7 @@ class AlbumImage(Timestamped, models.Model):
         db_table = 'gallery_album_image'
 
 
-class AlbumMedia(models.Model):
+class AlbumMedia(UUIDModel):
     album = models.ForeignKey(Album, on_delete=models.CASCADE)
     media = models.ForeignKey(Album, related_name='media', on_delete=models.CASCADE)
     pos = models.PositiveSmallIntegerField()
@@ -216,3 +212,11 @@ class AlbumMedia(models.Model):
     class Meta:
         verbose_name_plural = 'album media'
         db_table = 'album_media'
+
+
+class DailyImage(AWSModel):
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name_plural = 'daily images'
+        db_table = 'daily_image'

@@ -4,7 +4,6 @@ from urllib.parse import urljoin
 
 from django.core.exceptions import MultipleObjectsReturned
 from django.db import models
-from django.templatetags.static import static
 from mimetypes import guess_extension
 
 from scuba.libs.models.uuidmodel import UUIDModel

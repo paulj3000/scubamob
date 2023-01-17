@@ -1,20 +1,14 @@
-# Create your views here.
-from pprint import pprint
-
-from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views.generic import TemplateView
+from django.views import View
+from django.http import JsonResponse
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
-from django.http import HttpResponse, Http404
-from django.template import RequestContext
-from django.views.decorators.http import require_http_methods
-from django.http import HttpResponseBadRequest, HttpResponse
 
-# define the user data for this account
-from scuba.accounts.forms import EmailInviteForm
-from scuba.accounts.models import UserFriendRequest, UserFriend
+from scuba.accounts.models import UserBuddyRequest, UserBuddy, User
+from scuba.accounts.decorators import can_view_profile
+from scuba.sitesettings.models import SystemSetting
 
 
 @login_required
@@ -23,35 +17,47 @@ def profile(us_request, username):
 
     # let's get the user based on the uidb36 coming in
     profile = None
-    authorized = False
-    is_user = False
-
-    if user.username == username:
-        profile = user
-        is_user = True
 
     # let's try and get the user
     profile = get_object_or_404(User, username=username)
 
-    # is the user looking at his profile?
-    if profile == user:
-        authorized = True
-    else:
-        # nope, is it a possible friend?
-        if len(UserFriend.objects.filter(user=user, friend=profile)) or \
-            len(UserFriendRequest.objects.filter(user=profile, friend=user)):
-                authorized = True
+    # nope, is it a possible friend?
+    if len(UserBuddy.objects.filter(user=user, friend=profile)) or \
+        len(UserBuddyRequest.objects.filter(user=profile, friend=user)):
+            authorized = True
 
     context = {
-        'title': 'My Friends',
-        'is_user': is_user,
-        'user': profile,
-        'friends': user.get_all_friends()
+        'chat_server_active': SystemSetting.get_chat_server_active(),
+        'profile': self.request.profile,
     }
 
-    UserFriendRequest.objects.update_friend_request_active(user)
-    friend_list = us_request.user.friend_user.order_by('friend__first_name')
+    UserBuddyRequest.update_friend_request_active(user)
     friend_request_list = us_request.user.friend_requested.order_by('friend__first_name')
 
-    context.update(friend_list=friend_list, friend_request_list=friend_request_list)
-    return render(us_request, "account/user/profile.html", context)
+    context.update(friend_request_list=friend_request_list)
+    #return render(us_request, "accounts/profile.html", context)
+
+
+@method_decorator([login_required, can_view_profile], name='dispatch')
+class ProfileView(TemplateView):
+    template_name = "accounts/profile.html"
+
+    def get_context_data(self, **kwargs):
+        """ get_context_data
+
+        override the get_context_data. add some extra data
+        """
+        context = super().get_context_data(**kwargs)
+        context['chat_server_active'] = SystemSetting.get_chat_server_active()
+        context['profile'] = self.request.profile
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class AddUIMessageView(View):
+    def post(self, request):
+        if request.get('message'):
+            print(request['message'])
+
+            messages.add_message(request, messages.INFO, 'Hello world.')
+        return JsonResponse()

@@ -9,7 +9,7 @@ Add some signal stuff for account creation stuff
 """
 import logging
 from django.dispatch import receiver
-from django.db.models.signals import pre_delete, pre_save
+from django.db.models.signals import pre_delete, pre_save, post_save
 
 from scuba.home.models import Jumbotron
 from scuba.libs.fileutils import FileUtils

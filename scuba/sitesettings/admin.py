@@ -1,8 +1,45 @@
 from django.contrib import admin
-from scuba.sitesettings.models import *
+from django.contrib import messages
+
+from scuba.sitesettings import models
+from scuba.sitesettings.models import SystemApi, SystemSetting, AWSApi, LogbookApi
+from scuba.libs.exceptions import ChatServerDownException
 
 class SystemApiAdmin(admin.ModelAdmin):
-    list_display = ('key', 'url',)
+    list_display = ('key', 'value',)
+
+    def sync_settings(self, request, queryset):
+        try:
+            for setting in queryset:
+                setting.sync_settings()
+
+            # set a success message
+            messages.add_message(request,
+                    messages.INFO, "Settings have been sync'd")
+        except ChatServerDownException:
+            messages.add_message(request,
+                    messages.ERROR, "Cannot connect to chat server")
+
+    sync_settings.short_description = "Sync system apis"
+
+    actions = [
+        sync_settings,
+    ]
 
 
-admin.site.register(SystemApi, SystemApiAdmin)
+class GenericKeyValueApiAdmin(admin.ModelAdmin):
+    #list_display = ('key', 'value',)
+    change_form_template = 'admin/change_endpoint_form.html'
+
+
+class SystemSettingAdmin(admin.ModelAdmin):
+    list_display = ('key', 'value',)
+
+admin.site.register(models.AlertingApi, GenericKeyValueApiAdmin)
+admin.site.register(models.AWSApi, GenericKeyValueApiAdmin)
+admin.site.register(models.BillingApi, GenericKeyValueApiAdmin)
+admin.site.register(models.ChatApi, GenericKeyValueApiAdmin)
+admin.site.register(models.SystemApi, GenericKeyValueApiAdmin)
+admin.site.register(models.LogbookApi, GenericKeyValueApiAdmin)
+admin.site.register(models.SettingsApi, GenericKeyValueApiAdmin)
+admin.site.register(SystemSetting, SystemSettingAdmin)

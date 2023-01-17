@@ -9,7 +9,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous"/>
+
+        <link rel="stylesheet" href="{% static 'bootstrap-icons/font/bootstrap-icons.css' %}" media="all" />
 
         {% compress css file style %}
         <link rel="stylesheet" href="{% static 'css/style.css' %}" media="all" />
@@ -20,15 +21,24 @@
         {% endcompress %}
 
         {% compress js file vendor %}
-        <script src="{% static 'mustache/mustache.js' %}"></script>
+        <script src="{% static 'js-cookie/dist/js.cookie.js' %}"></script>
         <script src="{% static 'bootstrap/dist/js/bootstrap.bundle.js' %}"></script>
         {% endcompress %}
 
         {% compress js file scripts %}
-        <script src="{% static 'js/sm.core.js' %}"></script>
-        <script src="{% static 'js/sm.poll.js' %}"></script>
-        <script src="{% static 'js/core.js' %}"></script>
+        <script src="{% static 'js/comms.js' %}"></script>
+
+        {% if user.is_authenticated %}
+        <script src="{% static 'socket.io/client-dist/socket.io.js' %}"></script>
+        <script src="{% static 'js/socket.js' %}"></script>
+        <script src="{% static 'js/alerts.js' %}"></script>
+
+        <script src="{% static 'jquery-autocomplete/jquery.autocomplete.js' %}"></script>
+        {% endif %}
+
         {% endcompress %}
+
+        <link rel="stylesheet" href="{% static 'jquery-autocomplete/jquery.autocomplete.css' %}" media="all" />
 
         {% block includes %}
         {% endblock %}
@@ -45,7 +55,7 @@
 
 /* HEADER STYLE */
 header .navbar {
-  padding: 30px 0;
+  padding: 10px 0;
   border-top: 2px solid #e11d25;
 }
 
@@ -60,17 +70,6 @@ header .navbar-nav .nav-item:hover .nav-link {
   color: #e11d25
 }
 
-header .navbar-brand {
-  position: absolute;
-  top: -20px;
-  left: 12px;
-  width: 100px;
-  display: block;
-}
-
-header .navbar-collapse {
-  margin-left: 120px;
-}
 
 .dropdown-toggle::after {
   display: none !important;
@@ -97,9 +96,6 @@ header .navbar-toggler:focus {
     width: 90px;
 
   } */
-  header .navbar-collapse {
-    margin-left: 0;
-  }
 
   header .navbar-collapse .navbar-nav:first-child {
     margin-top: 100px;
@@ -111,6 +107,338 @@ header .navbar-toggler:focus {
     left: 0;
   }
 }
+
+
+*.icon-blue {color: #0088cc}
+*.icon-grey {color: grey}
+i.wide {
+    width:100px;
+    text-align:center;
+    vertical-align:middle;
+    position: relative;
+}
+.xbadge:after{
+    content:attr(data-count);
+    position: absolute;
+    background: rgba(0,0,255,1);
+    height:2rem;
+    top:1rem;
+    right:1.5rem;
+    width:2rem;
+    text-align: center;
+    line-height: 2rem;;
+    font-size: 1rem;
+    border-radius: 50%;
+    color:white;
+    border:1px solid blue;
+}
+
+       /* start the chat box */
+.popup-box {
+   background-color: #ffffff;
+    border: 1px solid #b0b0b0;
+    bottom: 0;
+    display: none;
+    height: 815px;
+    position: fixed;
+    right: 70px;
+    width: 450px;
+    font-family: 'Open Sans', sans-serif;
+}
+.round.hollow {
+    margin: 40px 0 0;
+}
+.round.hollow a {
+    border: 2px solid #ff6701;
+    border-radius: 35px;
+    color: red;
+    color: #ff6701;
+    font-size: 23px;
+    padding: 10px 21px;
+    text-decoration: none;
+    font-family: 'Open Sans', sans-serif;
+}
+.round.hollow a:hover {
+    border: 2px solid #000;
+    border-radius: 35px;
+    color: red;
+    color: #000;
+    font-size: 23px;
+    padding: 10px 21px;
+    text-decoration: none;
+}
+.popup-box-on {
+    display: block !important;
+}
+.popup-box .popup-head {
+    background-color: #fff;
+    clear: both;
+    color: #7b7b7b;
+    display: inline-table;
+    font-size: 21px;
+    padding: 7px 10px;
+    width: 100%;
+     font-family: Oswald;
+}
+.bg_none i {
+    border: 1px solid #ff6701;
+    border-radius: 25px;
+    color: #ff6701;
+    font-size: 17px;
+    height: 33px;
+    line-height: 30px;
+    width: 33px;
+}
+.bg_none:hover i {
+    border: 1px solid #000;
+    border-radius: 25px;
+    color: #000;
+    font-size: 17px;
+    height: 33px;
+    line-height: 30px;
+    width: 33px;
+}
+.bg_none {
+    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+    border: medium none;
+}
+.popup-box .popup-head .popup-head-right {
+    margin: 11px 7px 0;
+}
+.popup-box .popup-messages {
+}
+.popup-head-left img {
+    border: 1px solid #7b7b7b;
+    border-radius: 50%;
+    width: 44px;
+}
+.popup-messages-footer > textarea {
+    border-bottom: 1px solid #b2b2b2 !important;
+    height: 34px !important;
+    margin: 7px;
+    padding: 5px !important;
+     border: medium none;
+    width: 95% !important;
+}
+.popup-messages-footer {
+    background: #fff none repeat scroll 0 0;
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+}
+.popup-messages-footer .btn-footer {
+    overflow: hidden;
+    padding: 2px 5px 10px 6px;
+    width: 100%;
+}
+.simple_round {
+    background: #d1d1d1 none repeat scroll 0 0;
+    border-radius: 50%;
+    color: #4b4b4b !important;
+    height: 21px;
+    padding: 0 0 0 1px;
+    width: 21px;
+}
+
+.popup-box .popup-messages {
+    background: #3f9684 none repeat scroll 0 0;
+    height: 275px;
+    overflow: auto;
+}
+.direct-chat-messages {
+    overflow: auto;
+    padding: 10px;
+    transform: translate(0px, 0px);
+
+}
+.popup-messages .chat-box-single-line {
+    border-bottom: 1px solid #a4c6b5;
+    height: 12px;
+    margin: 7px 0 20px;
+    position: relative;
+    text-align: center;
+}
+.popup-messages abbr.timestamp {
+    background: #3f9684 none repeat scroll 0 0;
+    color: #fff;
+    padding: 0 11px;
+}
+
+.popup-head-right .btn-group {
+    display: inline-flex;
+	margin: 0 8px 0 0;
+	vertical-align: top !important;
+}
+.chat-header-button {
+    background: transparent none repeat scroll 0 0;
+    border: 1px solid #636364;
+    border-radius: 50%;
+    font-size: 14px;
+    height: 30px;
+    width: 30px;
+}
+.popup-head-right .btn-group .dropdown-menu {
+    border: medium none;
+    min-width: 122px;
+	padding: 0;
+}
+.popup-head-right .btn-group .dropdown-menu li a {
+    font-size: 12px;
+    padding: 3px 10px;
+	color: #303030;
+}
+
+.popup-messages abbr.timestamp {
+    background: #3f9684  none repeat scroll 0 0;
+    color: #fff;
+    padding: 0 11px;
+}
+.popup-messages .chat-box-single-line {
+    border-bottom: 1px solid #a4c6b5;
+    height: 12px;
+    margin: 7px 0 20px;
+    position: relative;
+    text-align: center;
+}
+.popup-messages .direct-chat-messages {
+    height: auto;
+}
+.popup-messages .direct-chat-text {
+    background: #dfece7 none repeat scroll 0 0;
+    border: 1px solid #dfece7;
+    border-radius: 2px;
+    color: #1f2121;
+}
+
+.popup-messages .direct-chat-timestamp {
+    color: #fff;
+    opacity: 0.6;
+}
+
+.popup-messages .direct-chat-name {
+	font-size: 15px;
+	font-weight: 600;
+	margin: 0 0 0 49px !important;
+	color: #fff;
+	opacity: 0.9;
+}
+.popup-messages .direct-chat-info {
+    display: block;
+    font-size: 12px;
+    margin-bottom: 0;
+}
+.popup-messages  .big-round {
+    margin: -9px 0 0 !important;
+}
+.popup-messages  .direct-chat-img {
+    border: 1px solid #fff;
+	background: #3f9684  none repeat scroll 0 0;
+    border-radius: 50%;
+    float: left;
+    height: 40px;
+    margin: -21px 0 0;
+    width: 40px;
+}
+.direct-chat-reply-name {
+    color: #fff;
+    font-size: 15px;
+    margin: 0 0 0 10px;
+    opacity: 0.9;
+}
+
+.direct-chat-img-reply-small
+{
+    border: 1px solid #fff;
+    border-radius: 50%;
+    float: left;
+    height: 20px;
+    margin: 0 8px;
+    width: 20px;
+	background:#3f9684;
+}
+
+.popup-messages .direct-chat-msg {
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.popup-messages .doted-border::after {
+	background: transparent none repeat scroll 0 0 !important;
+    border-right: 2px dotted #fff !important;
+	bottom: 0;
+    content: "";
+    left: 17px;
+    margin: 0;
+    position: absolute;
+    top: 0;
+    width: 2px;
+	 display: inline;
+	  z-index: -2;
+}
+
+.popup-messages .direct-chat-msg::after {
+    background: #fff none repeat scroll 0 0;
+    border-right: medium none;
+    bottom: 0;
+    content: "";
+    left: 17px;
+    margin: 0;
+    position: absolute;
+    top: 0;
+    width: 2px;
+	 display: inline;
+	  z-index: -2;
+}
+.direct-chat-text::after, .direct-chat-text::before {
+
+    border-color: transparent #dfece7 transparent transparent;
+}
+.direct-chat-text::after, .direct-chat-text::before {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    border-color: transparent #d2d6de transparent transparent;
+    border-image: none;
+    border-style: solid;
+    border-width: medium;
+    content: " ";
+    height: 0;
+    pointer-events: none;
+    position: absolute;
+    right: 100%;
+    top: 15px;
+    width: 0;
+}
+.direct-chat-text::after {
+    border-width: 5px;
+    margin-top: -5px;
+}
+.popup-messages .direct-chat-text {
+    background: #dfece7 none repeat scroll 0 0;
+    border: 1px solid #dfece7;
+    border-radius: 2px;
+    color: #1f2121;
+}
+.direct-chat-text {
+    background: #d2d6de none repeat scroll 0 0;
+    border: 1px solid #d2d6de;
+    border-radius: 5px;
+    color: #444;
+    margin: 5px 0 0 50px;
+    padding: 5px 10px;
+    position: relative;
+}
+
+.alert-fixed {
+    position:fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    z-index:9999;
+    border-radius:0px
+}
+
         </style>
 
 
@@ -118,17 +446,54 @@ header .navbar-toggler:focus {
 
     <body>
         {% compress js file core %}
-        <script src="{% static 'js/sm.core.js' %}"></script>
-        <script src="{% static 'js/sm.poll.js' %}"></script>
         <script src="{% static 'js/sm.common.js' %}"></script>
         {% endcompress %}
         <script>
         var image_url = "/";
         var divemarker  = "{% static 'images/icons/divemarker.png' %}";
-        $(document).ready(function()
-        {
-            doPoll();
+
+        {% if user.is_authenticated %}
+        $(document).ready(function() {
+            $('#searchbox').autocomplete({
+                openOnFocus: true,
+
+                render: function( item, source, pid, query ) {
+                    console.log(" FOO ");
+                    var value = item[this.valueKey],
+                    title = item[this.titleKey];
+                    return '<div '+(value==query?'class="active"':'')+
+                        ' data-value="'+
+                        encodeURIComponent(value)+'">'+
+                        title+
+                        '</div>';
+                },
+
+                source: [
+  function( q, add ){
+   $.getJSON("/api/search?q="+encodeURIComponent(q), function(resp) {
+       console.log(resp.search);
+    add(resp.search)
+   })
+  }
+                ],
+
+
+                xsource: [{
+                    url:"/api/search?query=demodata&q=%QUERY%",
+                    type:'remote'
+                }],
+            }).on('selected.xdsoft',function(e, datum) {
+                console.log(datum);
+ alert(datum.id);
+ alert(datum.title);
+});
+
+
+
+            ;
         });
+        {% endif %}
+
         </script>
 
         <!-- Navbar -->
@@ -136,9 +501,16 @@ header .navbar-toggler:focus {
           <nav class="navbar navbar-expand-lg bg-light">
             <div class="container position-relative justify-content-end">
               <!-- LOGO -->
-                <a class="navbar-brand" href="#">
-                  <img class="w-100" src="{% static 'images/logo_small_80.png' %}" alt="Logo">
+                <a class="navbar-brand" href="{% url 'index' %}">
+                  <img class="w-75" src="{% static 'images/logo_small_80.png' %}" alt="Logo">
                 </a>
+
+                {% if user.is_authenticated %}
+                <form class="d-flex">
+                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="searchbox" />
+                </form>
+                {% endif %}
+
                 <!-- LOGO -->
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -148,13 +520,13 @@ header .navbar-toggler:focus {
                 {% block headermenu %}
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                   <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="#">Logs</a>
+                    <a class="nav-link" href="{% url 'logbook_home' %}">Logs</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="#">Gallary</a>
+                    <a class="nav-link" href="{% url 'galleries_home' %}">Galleries</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="#">Dive Sites</a>
@@ -174,9 +546,22 @@ header .navbar-toggler:focus {
                     {% block rightmenu %}
                     <ul class="navbar-nav flex-row ms-lg-auto mb-2 mb-lg-0">
                         {% if user.is_authenticated %}
-                        <li class="nav-item dropdown">
+
+                        <li class="nav-item dropdown" id="messagebell">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-bell-fill"></i>
+                                <i data-count="3" class="bi bi-messenger" style="font-size:1.5em" id="messagecount"></i>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="#">Action 1</a></li>
+                                <li><a class="dropdown-item" href="#">Another action 2</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'messenger' %}">See all in Messenger</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item dropdown" id="alertbell">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-bell" style="font-size:1.5em" id="alertcount"></i>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="#">Action</a></li>
@@ -187,16 +572,15 @@ header .navbar-toggler:focus {
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="{{user.profile_image}}" class="rounded-circle" height="25" alt="Black and White Portrait of a Man" loading="lazy">
+                                <img src="{{user.get_profile_image}}" class="rounded-circle" height="25" alt="user.get_full_name" loading="lazy">
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="#">Profile</a></li>
-                                <li><a class="dropdown-item" href="{% url 'settings_home' %}">Setting</a></li>
+                                <li><a class="dropdown-item" href="{% url 'settings_home' %}">Settings</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'logout' %}">Log Out</a></li>
                             </ul>
                         </li>
-
                         {% else %}
 
                         {# start the login button section #}
@@ -222,10 +606,66 @@ header .navbar-toggler:focus {
         {% block jumbotron %}{% endblock %}
 
         <div id="fb-root"></div>
-        <div class="container">
+        <div class="{% block container %}container mt-3{% endblock %}">
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }} %}{% else %}alert-success{% endif %} alert-dismissible fade show alert-fixed" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block maincontent  %}
             <div class="row">
                 {% if user.is_authenticated %}
-                <div class="col-3">
+                {% block leftmenu %}
+                <div class="col-2">
+
+                    <div class="card mb-4">
+                        <div class="card-body text-center">
+                            <a href="{% url 'profile' username=user.username %}">
+                                <img src="{{user.profile_image}}" alt="profile image for {{user.get_full_name}}"
+                                class="rounded-circle img-fluid" style="width: 150px;" />
+                            </a>
+                            <h6 class="my-3">
+                                <a href="{% url 'profile' username=user.username %}">{{user.get_full_name}}</a>
+                            </h6>
+                            <p class="text-muted mb-1">Full Stack Developer</p>
+                            <p class="text-muted mb-4">Bay Area, San Francisco, CA</p>
+                            <div class="d-flex justify-content-center mb-2">
+                                <button type="button" class="btn btn-primary">Follow</button>
+                                <button type="button" class="btn btn-outline-primary ms-1">Message</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-4 mb-lg-0">
+                        <div class="card-body p-0">
+                            <ul class="list-group list-group-flush rounded-3">
+                                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                    <i class="fas fa-globe fa-lg text-warning"></i>
+                                    <p class="mb-0">https://mdbootstrap.com</p>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                    <i class="fab fa-github fa-lg" style="color: #333333;"></i>
+                                    <p class="mb-0">mdbootstrap</p>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                    <i class="fab fa-twitter fa-lg" style="color: #55acee;"></i>
+                                    <p class="mb-0">@{{user.username}}</p>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                    <i class="fab fa-instagram fa-lg" style="color: #ac2bac;"></i>
+                                    <p class="mb-0">mdbootstrap</p>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                    <i class="fab fa-facebook-f fa-lg" style="color: #3b5998;"></i>
+                                    <p class="mb-0">mdbootstrap</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
                     {% if page_title %}
                     <h2>{{ page_title }}</h2>
                     {% endif %}
@@ -244,6 +684,7 @@ header .navbar-toggler:focus {
                         {% endblock %}
                     </div>
                 </div>
+                {% endblock %}
                 {% endif %}
 
                 <div class="col">
@@ -251,16 +692,121 @@ header .navbar-toggler:focus {
                     {% endblock %}
                 </div>
             </div>
+            {% endblock %}
         </div>
+
+        {% if user.is_authenticated %}
+        <div class="popup-box chat-popup" id="qnimate">
+            <div class="popup-head">
+			    <div class="popup-head-left float-start"><img src="http://bootsnipp.com/img/avatars/bcf1c0d13e5500875fdd5a7e8ad9752ee16e7462.jpg" alt="iamgurdeeposahan"> Gurdeep Osahan</div>
+			    <div class="popup-head-right float-end">
+				    <div class="btn-group">
+    				    <button class="chat-header-button" data-toggle="dropdown" type="button" aria-expanded="false"><i class="bi bi-gear"></i></button>
+                        <ul role="menu" class="dropdown-menu float-end">
+						    <li><a href="#">Media</a></li>
+							<li><a href="#">Block</a></li>
+							<li><a href="#">Clear Chat</a></li>
+							<li><a href="#">Email Chat</a></li>
+                        </ul>
+                    </div>
+
+					<button data-widget="remove" id="removeClass" class="chat-header-button float-end" type="button"><i class="bi bi-power"></i></button>
+                </div>
+            </div>
+			<div class="popup-messages">
+			    <div class="direct-chat-messages">
+					<div class="chat-box-single-line">
+                        <abbr class="timestamp">October 8th, 2015</abbr>
+					</div>
+
+					<!-- Message. Default to the left -->
+                    <div class="direct-chat-msg doted-border">
+                        <div class="direct-chat-info clearfix">
+                            <span class="direct-chat-name float-start">Osahan</span>
+                        </div>
+                        <!-- /.direct-chat-info -->
+                        <img alt="message user image" src="http://bootsnipp.com/img/avatars/bcf1c0d13e5500875fdd5a7e8ad9752ee16e7462.jpg" class="direct-chat-img"><!-- /.direct-chat-img -->
+                        <div class="direct-chat-text">
+                            Hey bro, how’s everything going ?
+                        </div>
+					    <div class="direct-chat-info clearfix">
+                            <span class="direct-chat-timestamp float-end">3.36 PM</span>
+                        </div>
+					    <div class="direct-chat-info clearfix">
+                            <span class="direct-chat-img-reply-small float-start"></span>
+						    <span class="direct-chat-reply-name">Singh</span>
+				        </div>
+                    <!-- /.direct-chat-text -->
+                    </div>
+                    <!-- /.direct-chat-msg -->
+
+
+					<div class="chat-box-single-line">
+						<abbr class="timestamp">October 9th, 2015</abbr>
+					</div>
+
+
+
+					<!-- Message. Default to the left -->
+                    <div class="direct-chat-msg doted-border">
+                      <div class="direct-chat-info clearfix">
+                        <span class="direct-chat-name float-start">Osahan</span>
+                      </div>
+                      <!-- /.direct-chat-info -->
+                      <img alt="iamgurdeeposahan" src="http://bootsnipp.com/img/avatars/bcf1c0d13e5500875fdd5a7e8ad9752ee16e7462.jpg" class="direct-chat-img"><!-- /.direct-chat-img -->
+                      <div class="direct-chat-text">
+                        Hey bro, how’s everything going ?
+                      </div>
+					  <div class="direct-chat-info clearfix">
+                        <span class="direct-chat-timestamp float-end">3.36 PM</span>
+                      </div>
+						<div class="direct-chat-info clearfix">
+						  <img alt="iamgurdeeposahan" src="http://bootsnipp.com/img/avatars/bcf1c0d13e5500875fdd5a7e8ad9752ee16e7462.jpg" class="direct-chat-img big-round">
+						<span class="direct-chat-reply-name">Singh</span>
+						</div>
+                      <!-- /.direct-chat-text -->
+                    </div>
+                    <!-- /.direct-chat-msg -->
+
+
+
+
+
+
+                  </div>
+
+
+
+
+
+
+
+
+
+			</div>
+			<div class="popup-messages-footer">
+			    <textarea id="status_message" placeholder="Type a message..." rows="10" cols="40" name="message"></textarea>
+                <div class="btn-footer">
+                    <button class="bg_none"><i class="bi bi-film"></i> </button>
+                    <button class="bg_none"><i class="bi bi-camera"></i> </button>
+                    <button class="bg_none"><i class="bi bi-paperclip"></i> </button>
+                    <button class="bg_none float-end"><i class="bi bi-hand-thumbs-up"></i> </button>
+                </div>
+			</div>
+	  </div>
+        {% endif %}
+
+
+
 
         <footer>
             <div class="container-fluid">
                 <div class="copy-rght container">
                     <div class="row footer">
                         <div class="col-sm-6">
-                            <a href="{{social_media.FACEBOOK}}" target="_blank" class="btn btn-primary btn-lg btn-floating" title="facebook"><i class="fab fa-facebook-f"></i></a>
-                            <a href="{{social_media.TWITTER}}" target="_blank" class="btn btn-primary btn-lg btn-floating" title="twitter"><i class="fab fa-twitter"></i></a>
-                            <a href="{{social_media.INSTAGRAM}}" target="_blank" class="btn btn-primary btn-lg btn-floating" title="instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="{{social_media.FACEBOOK}}" target="_blank" class="btn btn-primary btn-lg btn-floating" title="facebook"><i class="bi bi-facebook"></i></a>
+                            <a href="{{social_media.TWITTER}}" target="_blank" class="btn btn-primary btn-lg btn-floating" title="twitter"><i class="bi bi-twitter"></i></a>
+                            <a href="{{social_media.INSTAGRAM}}" target="_blank" class="btn btn-primary btn-lg btn-floating" title="instagram"><i class="bi bi-instagram"></i></a>
                         </div>
                         <div class="col-sm-6">
                             <ul class="footerlinks">
@@ -276,5 +822,37 @@ header .navbar-toggler:focus {
             </div>
             <div class="container-fluid text-center" style="background-color:#1a2027;color: #d6d4d3;font-size: 13px;padding-top: 5px;padding-bottom: 5px;">xxx</div>
         </footer>
+
+        {% block reactjs %}
+
+        {% compress css file react %}
+        <link rel="stylesheet" href="{% static 'bootstrap-icons/font/bootstrap-icons.css' %}" />
+        {% endcompress %}
+
+        {% compress js file react %}
+
+        {% if is_production %}
+        <script src="{% static 'react/umd/react.production.min.js' %}" crossorigin></script>
+        <script src="{% static 'react-dom/umd/react-dom.production.min.js' %}"></script>
+        {% else %}
+        <script src="{% static 'react/umd/react.development.js' %}" crossorigin></script>
+        <script src="{% static 'react-dom/umd/react-dom.development.js' %}"></script>
+        {% endif %}
+
+        {% endcompress %}
+
+        {% endblock %}
+        {% block reactscript %}
+        {% endblock %}
     </body>
 </html>
+
+<!--
+    http://jsfiddle.net/zxVhL/18/
+    https://www.nicesnippets.com/snippet/bootstrap-4-chat-box-design-like-facebook
+    https://bootsnipp.com/snippets/GXzyP
+    https://bootsnipp.com/snippets/KGmqx
+
+    autocomplete
+    https://xdsoft.net/jqplugins/autocomplete/
+-->
