@@ -11,6 +11,7 @@ from django.core.files.base import ContentFile
 from django.conf import settings
 
 from scuba.logbooks.forms import DiveForm
+>>>>>>> 42b77be5243571b2dcbc318d5f4682a29ea17ede
 from scuba.galleries.models import Album, AlbumImage
 
 

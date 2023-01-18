@@ -39,28 +39,6 @@ class Home extends React.Component {
                 isLoaded: true
             });
         });
-
-        /*
-            .then(
-                (result) => {
-                    const settings = result.settings;
-                    this.setState({
-                        displayMode: settings.display_mode,
-                        isLoaded: true
-                    });
-                },
-
-                // Note: it's important to handle errors here
-                // instead of a catch() block so that we don't swallow
-                // exceptions from actual bugs in components.
-                (error) => {
-                    this.setState({
-                        isLoaded: true,
-                        error
-                    });
-                }
-            )
-        */
     }
 
     render() {

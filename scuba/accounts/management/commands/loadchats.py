@@ -62,4 +62,4 @@ class Command(BaseCommand):
                 'userId': users[uid],
             }
 
-            requests.post(f"{SystemApi.get_chat_server()}/api/messages/add", json=params);
+            requests.post(f"{SystemApi.get_chat_server()}/api/messages/add", json=params)

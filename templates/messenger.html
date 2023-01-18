@@ -1,13 +1,11 @@
 {% extends 'layout.html' %}
 {% load static compress %}
 
-{% block reactscript %}
-{% compress js file messenger %}
-<script type="module" src="{% static 'react/dist/messenger.js' %}"></script>
-{% endcompress %}
-{% endblock %}
-
 {% block leftmenu %}{% endblock %}
+
+{% block includes %}
+<script src="{% static 'js/messenger.js' %}"></script>
+{% endblock %}
 
 {% block content %}
 <style>
@@ -241,6 +239,9 @@ body{
     right: 20px;
 }
 */
+.chat input::-webkit-input-placeholder {
+   color: #fff;
+}
 
 .chat input:-moz-placeholder { /* Firefox 18- */
    color: #fff;
@@ -257,20 +258,43 @@ body{
     -webkit-appearance: none;
     border-radius: 0;
 }
-
-.nooverflow {
-    overflow: scroll,
-    outline: none
-}
-
-
 </style>
 
 <div class="container pt-5 pb-5">
-    <div class="content container-fluid bootstrap snippets bootdey">
-        <div id="messenger"></div>
+<div class="content container-fluid bootstrap snippets bootdey">
+      <div class="row row-broken">
+        <div class="col-sm-3 col-xs-12">
+          <div class="col-inside-lg decor-default chat" style="overflow: scroll; outline: none;" tabindex="5000">
+            <div class="chat-users">
+                    <h6>Online</h6>
+                <div id="chats-list"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm col-xs-12 chat" style="outline: none;" tabindex="5001">
+            <div class="chat-header" style="display:flex; flex:wrap;width:100%;padding:20px;padding-top:5px;padding-bottom:10px">
+                <h6 class="chat-title" style="flex:1 1 auto;width:1%">Mini Chat</h6>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">O</button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><button class="dropdown-item" type="button" onclick="changeTitle()">Change Chat Title</button></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-inside-lg decor-default" style="overflow:scroll" id="chat-window">
+                <div class="chat-body">
+                    <div id="chat-messages"></div>
+                </div>
+            </div>
+            <div class="input-group answer-add">
+                <input placeholder="Write a message" id="chatbox" name="chatbox" class="form-control me-2" autocomplete="off" />
+                <button class="px-2 me-1"><i class="bi bi-paperclip"></i></button>
+                <button class="px-2"><i class="bi bi-send" onclick="sendMessage()"></i></button>
+            </div>
+        </div>
+      </div>
     </div>
-</div>
+ </div>
 
 <template id="tmpl_chat">
     <div class="user">

@@ -1,16 +1,13 @@
 from datetime import datetime, timedelta
 from urllib.parse import urljoin
-import random
-import decimal
 from mimetypes import guess_extension
 
-from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 
-from scuba.accounts.models import *
+from scuba.accounts.models import User
 from scuba.sitesettings.models import SystemApi
 from scuba.libs.fileutils import FileUtils
 from scuba.libs.stringutils import StringUtils

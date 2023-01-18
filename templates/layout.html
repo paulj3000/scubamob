@@ -471,8 +471,7 @@ i.wide {
                 source: [
   function( q, add ){
    $.getJSON("/api/search?q="+encodeURIComponent(q), function(resp) {
-       console.log(resp.search);
-    add(resp.search)
+        add(resp.search)
    })
   }
                 ],

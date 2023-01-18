@@ -59,6 +59,7 @@ SETTINGS_APIS = (
     ('POST_USER_SETTINGS', 'Post User Settings'),
 )
 
+
 DIVELOG_APIS = (
     ('GET_DIVELOGS', 'Get Dive Logs'),
     ('ADD_DIVELOG', 'Add Dive Logs'),
