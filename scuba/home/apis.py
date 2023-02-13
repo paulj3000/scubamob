@@ -2,9 +2,12 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
+from django.core.cache import cache
+
 from scuba.home.models import Jumbotron
 from scuba.home.serializers import JumbotronSerializer
 from scuba.accounts.models import User
+from scuba.libs.external.weather import Weather
 
 
 class GetJumbotronApi(generics.GenericAPIView):
@@ -39,3 +42,22 @@ class SearchApi(generics.GenericAPIView):
                 retval.append({'id': user.pk_as_str, 'title': user.get_full_name()})
 
         return Response({'search': retval})
+
+
+class GetWeatherFromZip(generics.GenericAPIView):
+    serializer_class = JumbotronSerializer
+    def get(self, request):
+
+        return Response({
+            'jumbotron': 'x'
+        })
+
+
+class GetHomescreenApi(generics.GenericAPIView):
+    def get(self, request):
+
+        return Response({
+            'home': {
+                'weather': Weather.get_current_by_postal_code('92107')
+             }
+        })

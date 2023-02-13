@@ -1,3 +1,7 @@
+API_KEYS = [
+    ('WEATHER_API', 'Weather API'),
+]
+
 SYSTEM_APIS = (
     ('ALERTING_SERVER', 'Alerting Server'),
     ('SETTINGS_SERVER', 'Settings Server'),
@@ -81,4 +85,11 @@ SOCKET_SERVER_SETTINGS = [
     'SOCKET_SERVER_ACTIVE',
     'SOCKET_SERVER_URL',
     'CHAT_SERVER',
+]
+
+APPS = [
+    ('DIVESITE', 'Dive Site'),
+    ('HOME', 'Home'),
+    ('LOGBOOK', 'Logbook'),
+    ('USER', 'User'),
 ]

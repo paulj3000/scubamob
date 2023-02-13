@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 
-from scuba.sitesettings.models import SystemApi
+from scuba.sitesettings.models import SystemApi, ApiEndpoint
 
 
 class SystemApiSerializer(serializers.ModelSerializer):
@@ -15,4 +15,11 @@ class SystemApiSerializer(serializers.ModelSerializer):
         """ define models, fields, etc """
         model = SystemApi
         fields = '__all__'
+
+
+class SystemEndpointApi(serializers.ModelSerializer):
+    class Meta:
+        """ define models, fields, etc """
+        model = ApiEndpoint
+        fields = ('app', 'key', 'url',)
 

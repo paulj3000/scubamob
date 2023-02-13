@@ -1,6 +1,5 @@
 /.*\.pyc$
 /.*\.orig$
-/.*\.swp$
 ^\.DS_Store
 env/
 static/react/dist
@@ -9,6 +8,7 @@ static/CACHE
 static/django_extensions
 db.sqlite3*
 *.pyc
+*.swp
 test_results.xml
 test_result.log
 testdata

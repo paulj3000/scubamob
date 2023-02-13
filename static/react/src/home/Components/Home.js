@@ -3,46 +3,64 @@ import {Routes, Route, useNavigate} from 'react-router-dom';
 
 import React from 'react';
 
-import DailyImage from './DailyImage'
 
+class Home extends React.Component {
 
-const Home = () => {
+    /*
     const navigate = useNavigate();
     const navigateDisplayMode = () => {
         navigate('/settings/item/display-mode');
     };
+    */
 
-    return(
-        <div className="App">
-            <DailyImage />
-            <div className="col-8 mx-auto">
-                <ul className="list-group mb-4">
-                    <li className="list-group-item">
-                        <h5>Display</h5>
-                    </li>
-                    <li className="list-group-item d-flex justify-content-between align-items-center" onClick={navigateDisplayMode}>
-                        Dark Mode
-                            <span>
-                                <i className="bi bi-arrow-right"></i>
-                            </span>
-                    </li>
-                </ul>
+    constructor(props) {
+        super(props);
+    }
 
 
-                <ul className="list-group">
-                    <li className="list-group-item">
-                        <h5>Account Management</h5>
-                    </li>
-                    <li className="list-group-item d-flex justify-content-between align-items-center">
-                        Close Account
-                            <span>
-                                <i className="bi bi-arrow-right"></i>
-                            </span>
-                    </li>
-                </ul>
+    componentDidMount() {
+        fetch(`/api/home`)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    console.log(result);
+                },
+
+                // Note: it's important to handle errors here
+                // instead of a catch() block so that we don't swallow
+                // exceptions from actual bugs in components.
+                (error) => {
+                    this.setState({
+                        isLoaded: true,
+                        error
+                    });
+                }
+            )
+    }
+
+
+
+
+
+    render() {
+        return(
+            <div className="App">
+                <div className="col-8 mx-auto">
+                    <ul className="list-group">
+                        <li className="list-group-item">
+                            <h5>Account Management</h5>
+                        </li>
+                        <li className="list-group-item d-flex justify-content-between align-items-center">
+                            Close Account
+                                <span>
+                                    <i className="bi bi-arrow-right"></i>
+                                </span>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
-    )
+        )
+    }
 }
 
 export default Home;

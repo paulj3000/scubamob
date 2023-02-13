@@ -53,6 +53,7 @@ def post_login(sender, user, request, **kwargs):
 
     timezone.activate(pytz.timezone(tz))
     request.session['timezone'] = tz
+    request.session['zipcode'] = 92107
 
 
 @receiver(post_save, sender=User)

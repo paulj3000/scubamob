@@ -6,3 +6,6 @@ class ChatServerDownException(Exception):
 
 class LogbookServerDownException(Exception):
     """ LogbookServerDownExecption """
+
+class InvalidAPIKeyException(Exception):
+    """ Key does not exist """

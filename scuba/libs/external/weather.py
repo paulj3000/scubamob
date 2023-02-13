@@ -2,16 +2,35 @@ import logging
 import requests
 import json
 
+from django.core.cache import cache
+
 from scuba import settings
 from scuba.libs.memcache import MemcacheClient
+from scuba.sitesettings.models import APIKey
 
+
+# weatherapi.com settings
+WEATHER_API = {
+    'current': 'http://api.weatherapi.com/v1/current.json',
+    'forecast': 'http://api.weatherapi.com/v1/forecast.json',
+}
 
 class Weather:
-    def __init__(self):
-        self.interface = settings.WEATHER_UNDERGROUND
-        self.settings = settings.EXTERNAL_INTERFACES[self.interface]
 
-    def get_data_city_state(self, city, state):
+    @staticmethod
+    def get_api_key():
+        return APIKey.get_weather_api_key()
+
+    @staticmethod
+    def gen_param_lat_lon(lat, lng):
+        return f'q={lat},{lng}'
+
+    @staticmethod
+    def gen_param_postal(lat, lng):
+        return f'q={lat},{lng}'
+
+    @staticmethod
+    def get_data_city_state(city, state):
         city = city.replace(' ', '_').lower()
         settings = self.settings
         url = self.settings['url'] % (self.settings['apikey'], state.lower(), city.lower())
@@ -28,8 +47,29 @@ class Weather:
         except:
             raise ValueError("Error")
 
-    def get_data_latlng(self, lat, lon):
 
+    @classmethod
+    def get_current_by_postal_code(cls, postal_code):
+
+
+        #weather = cache.get(f'weather_{postal_code}')
+        key = f'weather_{postal_code}'
+        print(f'key: weather_{postal_code}')
+        retval = cache.get(key)
+
+        if not retval:
+            res = requests.get(WEATHER_API['current'], {'key': cls.get_api_key(), 'q': postal_code})
+            retval = res.json()
+            cache.set(key, retval, 3600)
+
+        return retval
+
+    @classmethod
+    def get_current_by_lat_lng(cls, lat, lng):
+        res = requests.get(WEATHER_API['current'], {'key': cls.get_api_key(), 'q': f'{lat},{lng}'})
+        return res.json()
+
+        '''
         try:
             memcache = MemcacheClient('weather')
             memcache_key = "%s_%s" % (lat, lon)
@@ -50,6 +90,7 @@ class Weather:
 
         # let's return
         return res
+        '''
 
     def do_comm(self, url):
 

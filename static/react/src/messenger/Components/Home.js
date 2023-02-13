@@ -3,9 +3,6 @@ import {Routes, Route, useNavigate} from 'react-router-dom';
 
 import React from 'react';
 
-import DailyImage from './DailyImage'
-
-
 const Home = () => {
     const navigate = useNavigate();
     const navigateDisplayMode = () => {
@@ -14,7 +11,6 @@ const Home = () => {
 
     return(
         <div className="App">
-            <DailyImage />
             <div className="col-8 mx-auto">
                 <ul className="list-group mb-4">
                     <li className="list-group-item">
