@@ -59,7 +59,7 @@ class User(AbstractUser, UUIDModel):
         return obj.key
 
     # -----------------------------------------------------------------------------
-    # start Friendship stuff
+    # start Buddy stuff
     # -----------------------------------------------------------------------------
     def get_active_friend_requests(self):
         # let's get our user object
@@ -145,6 +145,27 @@ class User(AbstractUser, UUIDModel):
         # check if the user is blocking for the friend.
         return UserBlocked.objects.filter(Q(user=buddy, buddy=self) |
                                           Q(user=self, buddy=buddy)).count()
+
+    # -----------------------------------------------------------------------------
+    # start confirmation code stuff
+    # -----------------------------------------------------------------------------
+    def generate_confirmation_code(self):
+        # check if the user is blocking for the friend.
+        if hasattr(self, 'userconfirmationcode'):
+            self.userconfirmationcode.delete()
+
+        code = random.randint(100000, 999999)
+        return UserConfirmationCode.objects.create(code=code, user=self)
+
+    def verify_confirmation_code(self, code):
+        # check if the user is blocking for the friend.
+        if hasattr(self, 'userconfirmationcode'):
+            print(self.userconfirmationcode.code)
+            if self.userconfirmationcode.code == code:
+                self.userconfirmationcode.delete()
+                return True
+
+        return False
 
     # -----------------------------------------------------------------------------
     # start profile image stuff
@@ -280,6 +301,15 @@ class User(AbstractUser, UUIDModel):
         return (html, email_txt)
 
 
+class UserConfirmationCode(UUIDModel):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    code = models.PositiveSmallIntegerField()
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'user_confirmation_code'
+
+
 class Account(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
@@ -292,14 +322,6 @@ class Account(models.Model):
 
     apikey = models.CharField(max_length=32)
     secret = models.CharField(max_length=16)
-
-    mongo_obj = None
-
-    def get_mongo(self):
-        if not self.mongo_obj:
-            self.mongo_obj = AccountMongo(user_id=self.id)
-
-        return self.mongo_obj
 
     class Meta:
         db_table = 'account'

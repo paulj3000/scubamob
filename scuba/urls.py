@@ -14,7 +14,7 @@ import scuba.accounts.views as account_views
 import scuba.accounts.apis.account as account_api
 import scuba.accounts.apis.profile as profile_api
 
-from scuba.sitesettings.apis import GetSystemSettingsApi
+from scuba.sitesettings.apis import GetSystemSettingsApi, GetSystemEndpointsApi
 
 
 from django.contrib import admin
@@ -48,6 +48,7 @@ urlpatterns = [
 
     #path('api/1.0/mobile/account', include('api.urls_account')),
     path('api/accounts/', include('scuba.accounts.urls_accounts_api')),
+    path('api/signup/', include('scuba.accounts.urls_signup_api')),
     path('api/profile/', profile_api.GetMeProfileApi.as_view()),
     re_path('api/profile/(?P<id>[a-fA-F0-9]+)/', include('scuba.accounts.urls_profile_api')),
     path('api/buddies/', include('scuba.accounts.urls_buddies_api')),
@@ -60,6 +61,7 @@ urlpatterns = [
     path('api/divesites/', include('scuba.divesites.urls_api')),
     path('api/search', home_apis.SearchApi.as_view()),
     path('api/settings/', include('scuba.accounts.urls_settings_api')),
+    path('api/endpoints', GetSystemEndpointsApi.as_view()),
     path('api/sitesettings', GetSystemSettingsApi.as_view()),
     path('api/sitesettings/all', GetSystemSettingsApi.as_view()),
     path('api/register/', account_api.RegisterUserApi.as_view()),

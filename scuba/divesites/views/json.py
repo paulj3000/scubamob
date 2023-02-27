@@ -11,7 +11,7 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 
 # define the user data for this account
-from scuba.accounts.mongo import Account as AccountMongo
+#from scuba.accounts.mongo import Account as AccountMongo
 #from home.forms import AccountForm, UserCreateForm
 from scuba.libs.external.weather import Weather
 
@@ -81,8 +81,8 @@ def getdivesiteinfo(us_request, siteid):
         retval['tide'] = tide_info
 
         user_id = us_request.user.id
-        account = AccountMongo(user_id=user_id)
-        retval['favorite'] = account.is_favorite(siteid)
+        #account = AccountMongo(user_id=user_id)
+        #retval['favorite'] = account.is_favorite(siteid)
 
     except:
         print("exception thrown.....")

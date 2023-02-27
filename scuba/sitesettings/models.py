@@ -8,8 +8,25 @@ from scuba.sitesettings import exceptions
 from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.sitesettings.exceptions import InvalidConfigurationException
 from scuba.sitesettings.settings import (SYSTEM_SETTINGS, SYSTEM_APIS, SOCKET_SERVER_SETTINGS,\
-    LOGBOOK_APIS, SETTINGS_APIS, AWS_APIS, BILLING_APIS)
+    LOGBOOK_APIS, SETTINGS_APIS, AWS_APIS, BILLING_APIS, APPS)
 from scuba.sitesettings import settings
+
+
+class ApiEndpoint(UUIDModel):
+    app = models.CharField(max_length=128, db_index=True, choices=APPS)
+    key = models.CharField(max_length=128)
+    url = models.CharField(max_length=128)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        """ define models, fields, etc """
+        db_table = 'api_endpoint'
+        #app_label = 'api endpoints'
+        unique_together = [['app', 'key']]
+
+    @staticmethod
+    def get_active_endpoints():
+        return ApiEndpoint.objects.filter(is_active=True)
 
 
 class SystemApi(UUIDModel):
@@ -32,7 +49,7 @@ class SystemApi(UUIDModel):
                     'value': self.value,
                 }
 
-                update_url = f"{chat_server}api/system/setting/update"
+                update_url = urljoin(chat_server, 'api/system/setting/update')
                 req = requests.post(update_url, json=data)
             except requests.ConnectionError:
                 raise exceptions.ChatServerDownException
@@ -333,3 +350,25 @@ class SettingsApi(BaseAPI):
 
         url = f"{settings_server}{endpoint}"
         return url.replace(':userid', userid)
+
+
+class APIKey(UUIDModel):
+    key = models.CharField(db_index=True,
+        unique=True,
+        max_length=128,
+        choices=settings.API_KEYS)
+    value = models.CharField(max_length=128)
+
+    class Meta:
+        db_table = 'api_key'
+
+    def __str__(self):
+        """ return a string representation of the page """
+        return self.key
+
+    @staticmethod
+    def get_weather_api_key():
+        try:
+            return APIKey.objects.get(key='WEATHER_API').value
+        except APIKey.DoesNotExist:
+            raise exceptions.InvalidAPIKeyException

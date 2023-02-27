@@ -8,7 +8,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.forms.models import model_to_dict
 
 from scuba.accounts.models import UserBuddyRequest
-from scuba.accounts.mongo import Account as AccountMongo
 
 
 @csrf_exempt
@@ -23,8 +22,8 @@ def setfavorite(us_request):
     if not divesiteid or not favorite:
         return HttpResponseBadRequest()
 
-    account = AccountMongo(user_id=user_id)
-    account.set_favorite(divesiteid, favorite)
+    #account = AccountMongo(user_id=user_id)
+    #account.set_favorite(divesiteid, favorite)
 
     response = {}
     return HttpResponse(response, content_type='application/json; charset=utf-8')
@@ -34,8 +33,8 @@ def setfavorite(us_request):
 def getfavorites(us_request):
     user_id = us_request.user.id
 
-    account = AccountMongo(user_id=user_id)
-    account.get_favorites()
+    #account = AccountMongo(user_id=user_id)
+    #account.get_favorites()
 
     response = {}
     return HttpResponse(response, content_type='application/json; charset=utf-8')
@@ -45,8 +44,8 @@ def getfavorites(us_request):
 def deletefriend(us_request):
     user_id = us_request.user.id
 
-    account = AccountMongo(user_id=user_id)
-    account.get_favorites()
+    #account = AccountMongo(user_id=user_id)
+    #account.get_favorites()
 
     response = {}
     return HttpResponse(response, content_type='application/json; charset=utf-8')

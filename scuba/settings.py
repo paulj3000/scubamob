@@ -207,7 +207,6 @@ NOSQL = 'mongo'
 PRODUCTION_GALLERY_URL = '//s3-us-west-1.amazonaws.com/scubamob.gallery.dev/'
 
 
-WEATHER_UNDERGROUND = 'weather_underground'
 FACEBOOK = 'facebook'
 GOOGLE_MAPS = 'google_maps'
 GOOGLE_ADDRESS = 'google_address'
@@ -217,13 +216,6 @@ FACEBOOK_APP_ID = ''
 FACEBOOK_API_SECRET = ''
 
 EXTERNAL_INTERFACES = {
-    WEATHER_UNDERGROUND: {
-        'url': 'http://api.wunderground.com/api/%s/conditions/astronomy/rawtide/q/%s/%s.json',
-        'url_latlng': 'http://api.wunderground.com/api/%s/geolookup/conditions/astronomy/rawtide/q/%s,%s.json',
-        'method': 'http://api.wunderground.com/api/%s/conditions/q/%s/%s.json',
-        'apikey': 'd41784195576cec0',
-    },
-
     FACEBOOK: {
         'app': '178799865530799',
         'secret': '502a5c37f483495170f0559afa4ad1ca',

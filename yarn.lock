@@ -1825,11 +1825,6 @@
     "raw-body" "~1.1.0"
     "safe-json-parse" "~1.0.1"
 
-"bootstrap-autocomplete@^2.3.7":
-  "integrity" "sha512-YD2bev4bDTLsAzkr6lSTuMZOcE7k2+c2BYbtIT+j/XpPnM5ADLlbhR4NnpSsfg6Vde5xQckG/IbdRKrLlAtXOw=="
-  "resolved" "https://registry.npmjs.org/bootstrap-autocomplete/-/bootstrap-autocomplete-2.3.7.tgz"
-  "version" "2.3.7"
-
 "bootstrap-icons@^1.8.3":
   "integrity" "sha512-d4ZkO30MIkAhQ2nNRJqKXJVEQorALGbLWTuRxyCTJF96lRIV6imcgMehWGJUiJMJhglN0o2tqLIeDnMdiQEE9g=="
   "resolved" "https://registry.npmjs.org/bootstrap-icons/-/bootstrap-icons-1.9.1.tgz"

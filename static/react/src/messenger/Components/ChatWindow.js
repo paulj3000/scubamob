@@ -3,8 +3,6 @@ import {Routes, Route, useNavigate} from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import React, { useEffect, useRef } from 'react'
 
-import DailyImage from './DailyImage'
-
 
 export function withRouter(Children){
     return(props) => {

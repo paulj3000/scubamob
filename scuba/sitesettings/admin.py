@@ -35,6 +35,16 @@ class GenericKeyValueApiAdmin(admin.ModelAdmin):
 class SystemSettingAdmin(admin.ModelAdmin):
     list_display = ('key', 'value',)
 
+
+class APIKeyAdmin(admin.ModelAdmin):
+    list_display = ('key', 'value',)
+
+
+class ApiEndpointAdmin(admin.ModelAdmin):
+    list_display = ('app', 'key', 'url',)
+
+admin.site.register(models.ApiEndpoint, ApiEndpointAdmin)
+admin.site.register(models.APIKey, APIKeyAdmin)
 admin.site.register(models.AlertingApi, GenericKeyValueApiAdmin)
 admin.site.register(models.AWSApi, GenericKeyValueApiAdmin)
 admin.site.register(models.BillingApi, GenericKeyValueApiAdmin)

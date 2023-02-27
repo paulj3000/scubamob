@@ -8,7 +8,6 @@ from django.views.generic import TemplateView
 from scuba.divesites.models import Divesite
 from scuba.divesites.mongo import DiveSite as DiveSiteMongo
 from scuba.accounts.forms import AccountForm
-from scuba.accounts.mongo import Account as AccountMongo
 from scuba.home.models import Jumbotron
 
 
@@ -60,8 +59,7 @@ def home(us_request):
     weather = Weather()
 
     # let's get the favorites for this particular user
-    mongo_obj = AccountMongo(user_id=user.pk_as_str)
-    user_favorites = mongo_obj.get_favorites()
+    user_favorites = []
     context = {'divesites': []}
 
     for fav in user_favorites:
@@ -74,8 +72,6 @@ def home(us_request):
         divesite_data['weather'] = weather_data
 
         context['divesites'].append(divesite_data)
-
-    account = AccountMongo(user_id=user_id)
 
     # render the appropriate template
     return render(us_request, template, context)
