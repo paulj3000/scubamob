@@ -1,0 +1,15 @@
+Dockerfile
+README*
+appspec.yaml
+coverage*
+db.sqlite3
+entrypoint.sh
+gulpfile.js
+node_modules
+package-lock.json
+requirements.txt
+runserver.sh
+webpack.config.js
+yarn.lock
+xunittest.xml
+scripts/rsync/ignore.txt
