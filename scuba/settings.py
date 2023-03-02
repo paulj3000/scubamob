@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django_extensions',
+    'django_nose',
     'corsheaders',
     #'test_pep8',
     'compressor',
@@ -171,11 +172,10 @@ LOGIN_URL = '/login'
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
-
 USE_I18N = True
 
 USE_TZ = True
+#TIME_ZONE = 'UTC'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
@@ -331,6 +331,18 @@ LOGGING = {
         'level': 'DEBUG',
     },
 }
+
+# Use nose to run all tests
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+# Tell nose to measure coverage on the 'foo' and 'bar' apps
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-xml',
+    '--with-xunit',
+    '--xunit-file=xunittest.xml',
+    '--verbosity=2',
+]
 
 try:
     import sys

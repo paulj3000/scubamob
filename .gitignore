@@ -15,3 +15,7 @@ testdata
 test.sqlite3
 static/admin
 node_modules/*
+xunittest.xml
+coverage.xml
+coverage
+.coverage
