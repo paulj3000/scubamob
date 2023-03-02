@@ -25,7 +25,7 @@ class ConfirmationCode(generics.GenericAPIView):
         if user.verify_confirmation_code(request.data.get('code')):
             return Response({'code': True})
 
-        return Response({'code': False})
+        return Response({'code': False}, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
         """ post
@@ -36,11 +36,10 @@ class ConfirmationCode(generics.GenericAPIView):
         return Response({'code': user.generate_confirmation_code().code})
 
 
-class SetPassword(generics.GenericAPIView):
+class SetPasswordApi(generics.GenericAPIView):
     serializer_class = serializers.SetPasswordSerializer
-    permission_classes = (AllowAny,)
 
-    def post(self, request):
+    def put(self, request):
         """ post
 
         Do the actual posting of the password reset
@@ -48,18 +47,17 @@ class SetPassword(generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data,
                                            context={'user': request.user})
 
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
+        if serializer.is_valid():
+            return Response()
 
-        retval = UserSerializer(user).data
-        return Response(retval, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class SetUsername(generics.GenericAPIView):
+class SetUsernameApi(generics.GenericAPIView):
     serializer_class = serializers.SetUsernameSerializer
     permission_classes = (AllowAny,)
 
-    def post(self, request):
+    def put(self, request):
         """ post
 
         Do the actual posting of the password reset
@@ -68,7 +66,11 @@ class SetUsername(generics.GenericAPIView):
                                            context={'user': request.user})
 
         serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
+        user = serializer.validated_data['username']
 
-        retval = UserSerializer(user).data
-        return Response(retval, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CreateUserApi(generics.CreateAPIView):
+    serializer_class = serializers.CreateUserSerializer
+    permission_classes = (AllowAny,)

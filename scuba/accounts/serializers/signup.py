@@ -1,3 +1,6 @@
+import datetime
+from dateutil.relativedelta import relativedelta
+
 from django.shortcuts import get_object_or_404
 from django.conf.urls.static import static
 from django.utils.translation import gettext_lazy as _
@@ -32,16 +35,14 @@ class SetUsernameSerializer(serializers.Serializer):
 class SetPasswordSerializer(serializers.Serializer):
     password = serializers.CharField()
 
-    def xvalidate_password(self, password):
-        """ validate_plan
+    @staticmethod
+    def validate_password(password):
+        """ validate password """
 
-        Validate the plan id coming in
-        """
+        if len(password) < 8:
+            raise serializers.ValidationError("Password needs to be longer")
 
-        if User.objects.filter(username=username).count():
-            raise serializers.ValidationError(f"Username {username} is already registered")
-
-        return username
+        return password
 
     def update(self, instance, validated_data):
         """ A stub for the update method. This does nothing """
@@ -50,3 +51,46 @@ class SetPasswordSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         raise NotImplementedError
+
+
+class CreateUserSerializer(serializers.Serializer):
+    username = serializers.CharField(read_only=True)
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    email = serializers.EmailField()
+    date_of_birth = serializers.DateField(write_only=True)
+    token = serializers.SerializerMethodField(read_only=True)
+    setup_complete = serializers.BooleanField(read_only=True)
+
+    @staticmethod
+    def validate_email(email):
+        if User.objects.filter(email=email).count():
+            raise serializers.ValidationError(f"'{email}' has already registered")
+        return email
+
+    @staticmethod
+    def validate_date_of_birth(date_of_birth):
+        ''' make sure the user is at least 13 years old.
+        COPPA laws will get us
+        '''
+        THIRTEEN_YEARS = 13
+
+        if relativedelta(datetime.date.today(), date_of_birth).years < THIRTEEN_YEARS:
+            raise serializers.ValidationError('user is not 13 years old')
+        return date_of_birth
+
+    @staticmethod
+    def get_token(data):
+        return data.get_api_token()
+
+    def update(self, instance, validated_data):
+        """ A stub for the update method. This does nothing """
+        raise NotImplementedError
+
+    def create(self, validated_data):
+        date_of_birth = validated_data['date_of_birth']
+        first_name = validated_data['first_name']
+        last_name = validated_data['last_name']
+        email = validated_data['email']
+
+        return User.create_user(first_name, last_name, email, date_of_birth)
