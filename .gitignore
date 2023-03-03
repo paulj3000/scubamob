@@ -17,5 +17,6 @@ static/admin
 node_modules/*
 xunittest.xml
 coverage.xml
+test.xml
 coverage
 .coverage

@@ -57,7 +57,7 @@ class APIConfirmationCode(TestCase):
         }
 
         response = client.post('/api/signup/confirmation_code/', payload, format='json')
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertIn('code', response.json())
         self.assertTrue(response.json()['code'])
 
@@ -83,6 +83,6 @@ class APIConfirmationCode(TestCase):
         }
 
         response = client.post('/api/signup/confirmation_code/', payload, format='json')
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
         self.assertIn('code', response.json())
         self.assertFalse(response.json()['code'])

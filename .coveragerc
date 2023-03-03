@@ -1,12 +1,12 @@
 [run]
-omit = 
+omit =
     env/*
     xml/*
     scuba/**/migrations/*
 
 
 [report]
-omit = 
+omit =
     env/*
     xml/*
     scuba/**/migrations/*

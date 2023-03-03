@@ -36,7 +36,7 @@ class APISetPassword(TestCase):
         }
 
         response = client.put('/api/signup/password/', payload, format='json')
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_set_bad_password(self):
         """
@@ -52,4 +52,4 @@ class APISetPassword(TestCase):
         }
 
         response = client.put('/api/signup/password/', payload, format='json')
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
