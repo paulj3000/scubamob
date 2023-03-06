@@ -201,6 +201,8 @@ MONGO = {
     'DATABASE': 'scubamob'
 }
 
+NOSQL = 'mongo'
+
 
 PRODUCTION_GALLERY_URL = '//s3-us-west-1.amazonaws.com/scubamob.gallery.dev/'
 

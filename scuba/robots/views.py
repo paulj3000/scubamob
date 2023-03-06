@@ -7,8 +7,6 @@ Author: Pauljames "The Juggernaut" Dimitriu
 
 The views for the robot stuff
 """
-import re
-
 from django.contrib.sitemaps import views as sitemap_views
 from django.contrib.sites.models import Site
 from django.views.decorators.cache import cache_page
@@ -35,8 +33,7 @@ class RuleList(ListView):
         get the current site from something (I'm tired of doing module strings)
         """
         if hasattr(settings, 'SITE_BY_REQUEST'):
-            domain = re.sub(':\d+', '', request.get_host())
-            return Site.objects.get(domain=domain)
+            return Site.objects.get(domain=request.get_host())
 
         return Site.objects.get_current()
 
