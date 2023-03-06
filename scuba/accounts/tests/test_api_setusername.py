@@ -37,8 +37,8 @@ class APISetUsername(TestCase):
         }
 
         response = client.put('/api/signup/username/', payload, format='json')
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(response.json()['username'], new_username)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['username'], new_username)
 
     def test_set_bad_username(self):
         """
@@ -59,7 +59,7 @@ class APISetUsername(TestCase):
         }
 
         response = client.put('/api/signup/username/', payload, format='json')
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
         print(response.json())
         print(response.json())
         print(response.json())

@@ -25,12 +25,12 @@ class APICreateUser(TestCase):
         }
 
         response = client.post('/api/signup/createuser/', payload, format='json')
-        self.assertEquals(response.status_code, 201)
-        self.assertEquals(response.json().get('first_name'), 'first')
-        self.assertEquals(response.json().get('last_name'), 'last')
-        self.assertEquals(response.json().get('setup_complete'), False)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json().get('first_name'), 'first')
+        self.assertEqual(response.json().get('last_name'), 'last')
+        self.assertEqual(response.json().get('setup_complete'), False)
         self.assertRegex(response.json().get('username'), r'^newuser_')
-        self.assertEquals(len(response.json().get('token')), 40)
+        self.assertEqual(len(response.json().get('token')), 40)
 
     def test_create_user_duplicate_email(self):
         """
@@ -47,7 +47,7 @@ class APICreateUser(TestCase):
         # call the request twice, verify the email address is already in the system
         response = client.post('/api/signup/createuser/', payload, format='json')
         response = client.post('/api/signup/createuser/', payload, format='json')
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
         self.assertIn('email', response.json())
 
     def test_create_user_coppa(self):
@@ -65,5 +65,5 @@ class APICreateUser(TestCase):
 
         # call the request twice, verify the email address is already in the system
         response = client.post('/api/signup/createuser/', payload, format='json')
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
         self.assertIn('date_of_birth', response.json())
