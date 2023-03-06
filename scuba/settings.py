@@ -332,8 +332,9 @@ LOGGING = {
 }
 
 try:
-    import sys
-    sys.path.append('/scuba')
-    from system.settings import *
+    if not os.environ.get('IS_TESTING'):
+        import sys
+        sys.path.append('/scuba')
+        from system.settings import *
 except ImportError as exp:
     print('system.settings was not loaded. Continuing with standard settings.\n%s' % exp)
