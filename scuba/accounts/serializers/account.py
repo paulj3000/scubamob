@@ -18,6 +18,7 @@ class RegisterUserSerializer(serializers.Serializer):
     username = serializers.CharField()
     token = serializers.SerializerMethodField(read_only=True)
     profile_image = serializers.CharField(read_only=True)
+    username = serializers.CharField()
 
     @staticmethod
     def get_token(data):
@@ -54,20 +55,19 @@ class RegisterUserSerializer(serializers.Serializer):
         return user
 
 
-class AuthTokenSerializer(serializers.Serializer):
-    """
-    AuthTokenSerializer
-
-    This class handles the validation of the user from way of the API,
-    records all login instances and returns
-    """
-    username = serializers.CharField(label=_("Username"))
+class LoginSerializer(serializers.ModelSerializer):
+    date_joined = serializers.DateTimeField(required=False, read_only=True)
+    profile_image = serializers.SerializerMethodField(read_only=True)
+    token = serializers.SerializerMethodField(read_only=True)
     password = serializers.CharField(
         label=_("Password"),
         style={'input_type': 'password'},
-        trim_whitespace=False
+        trim_whitespace=False,
+        write_only=True,
     )
-    device = serializers.CharField(default='mobile', help_text="The device type and build")
+    
+    username = serializers.CharField(label=_("Username"))
+    device = serializers.CharField(default='mobile', help_text="The device type and build", write_only=True)
 
     def validate(self, attrs):
         """ validate
@@ -94,43 +94,9 @@ class AuthTokenSerializer(serializers.Serializer):
             msg = _('Must include "email" or "username" and "password".')
             raise serializers.ValidationError(msg, code='authorization')
 
-        attrs['user'] = user
-        return attrs
-
-    def create(self, validated_data):
-        """ A stub for the create method. This does nothing """
-        raise NotImplementedError
-
-    def update(self, instance, validated_data):
-        """ A stub for the update method. This does nothing """
-        raise NotImplementedError
-
-
-class UserSerializer(serializers.ModelSerializer):
-    date_joined = serializers.DateTimeField(required=False, read_only=True)
-    profile_image = serializers.SerializerMethodField()
-    token = serializers.SerializerMethodField()
-    password = serializers.CharField(
-        label=_("Password"),
-        style={'input_type': 'password'},
-        trim_whitespace=False,
-        write_only=True,
-    )
-
-    @staticmethod
-    def validate_full_name(full_name):
-        """ validate_full_name
-
-        make sure the name coming is at least eight characters long
-        """
-        if len(full_name) < 8:
-            raise serializers.ValidationError(f"Your full name must be at least 8 characters")
-
-        if full_name.endswith('whofe'):
-            raise serializers.ValidationError(f"This name cannot be registered")
-
-
-        return full_name
+        return user
+        #attrs['user'] = user
+        #return attrs
 
     @staticmethod
     def get_profile_image(data):
@@ -155,18 +121,28 @@ class UserSerializer(serializers.ModelSerializer):
         return the user's token
         """
         return data.get_api_token()
+    
+    @staticmethod
+    def get_id(data):
+        """ get_token
+
+        return the user's token
+        """
+        return data.pk_as_str
 
     class Meta:
         model = User
         extra_kwargs = {
             'password': {'write_only': True},
-            #'full_name': {'read_only': True},
             'date_joined': {'read_only': True},
             'profile_image': {'read_only': True},
+            'email': {'read_only': True},
+            'first_name': {'read_only': True},
+            'last_name': {'read_only': True},
             'token': {'read_only': True}}
 
-        fields = ('id', 'first_name', 'last_name', 'email', 'token',
-                  'date_joined', 'password', 'profile_image')
+        fields = ('id', 'first_name', 'last_name', 'email', 'token', 'device',
+                  'date_joined', 'password', 'profile_image', 'username',)
 
     def create(self, validated_data):
         """ create
@@ -181,17 +157,3 @@ class UserSerializer(serializers.ModelSerializer):
         user.generate_default_playlists()
 
         return user
-
-    def to_representation(self, instance):
-        """ Modify the return data based on what we're sending in
-
-        If we are looking for something "simple", we don't have to return
-        most of the files
-        """
-        # get the original representation
-        ret = super().to_representation(instance)
-
-        # change the date
-        ret['date_joined'] = instance.date_joined.strftime("%m/%d/%Y")
-        # return the modified representation
-        return ret

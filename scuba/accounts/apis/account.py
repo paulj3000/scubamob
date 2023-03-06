@@ -11,7 +11,7 @@ from rest_framework.permissions import AllowAny
 
 from scuba.accounts.models import User
 from scuba.accounts.exceptions import InvalidUserIdException
-from scuba.accounts.serializers.account import RegisterUserSerializer, AuthTokenSerializer, UserSerializer
+from scuba.accounts.serializers.account import RegisterUserSerializer, LoginSerializer
 
 
 class RegisterUserApi(generics.CreateAPIView):
@@ -20,7 +20,7 @@ class RegisterUserApi(generics.CreateAPIView):
     This class handles the API calls of the password reset functionality
     of the site
     """
-    serializer_class = UserSerializer
+    serializer_class = LoginSerializer
     permission_classes = (AllowAny,)
 
 
@@ -30,7 +30,7 @@ class LoginUserApi(generics.GenericAPIView):
     This class handles the API calls of the password reset functionality
     of the site
     """
-    serializer_class = AuthTokenSerializer
+    serializer_class = LoginSerializer
     permission_classes = (AllowAny,)
 
     def post(self, request):
@@ -38,11 +38,15 @@ class LoginUserApi(generics.GenericAPIView):
 
         Do the actual posting of the password reset
         """
-        serializer = self.serializer_class(data=request.data,
-                                           context={'user': request.user})
-
+        import pprint
+        f = open("/tmp/data", "a")
+        f.write("HELLO")
+        f.write(f"content type: {request.content_type}\n")
+        f.write(pprint.pformat(request.data, indent=4))
+        f.write("bye")
+        f.close()
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-
-        retval = UserSerializer(user).data
-        return Response(retval, status=status.HTTP_200_OK)
+        #user = serializer.validated_data['user']
+        #retval = UserSerializer(user).data
+        return Response(serializer.data, status=status.HTTP_200_OK)
