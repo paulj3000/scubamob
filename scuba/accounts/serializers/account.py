@@ -80,6 +80,7 @@ class LoginSerializer(serializers.ModelSerializer):
         username = attrs.get('username')
         password = attrs.get('password')
         device = attrs.get('device')
+        ip_address = attrs.get('ip_address')
 
         if username and password:
             user = authenticate(request=self.context.get('request'),
@@ -97,7 +98,7 @@ class LoginSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(msg, code='authorization')
 
         # now add the user's login info
-        user.add_login(attrs.get('ip_address'), 'US', attrs.get('device'))
+        user.add_login(ip_address, 'US', attrs.get('device'))
 
         return user
         #attrs['user'] = user
