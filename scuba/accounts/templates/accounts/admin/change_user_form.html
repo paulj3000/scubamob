@@ -16,7 +16,7 @@
   <div class="tabular inline-related last-related">
 <fieldset class="module ">
     <h2>User Logins</h2>
-   
+
     <table>
         <thead>
             <tr>
@@ -27,14 +27,14 @@
         </thead>
 
         <tbody>
-            {% for login in original.get_logins %}
+            {% for login in original.get_all_logins %}
             <tr class="form-row" id="xuser_billing_cycle-empty">
                 <td class="xfield-start_date">{{login.login_date}}</td>
                 <td class="xfield-start_date">{{login.ip_address}}</td>
                 <td class="xfield-start_date">{{login.device}}</td>
             </tr>
             {% endfor %}
-        </tbody> 
+        </tbody>
    </table>
 </fieldset>
   </div>
