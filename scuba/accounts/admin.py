@@ -8,11 +8,6 @@ from scuba.accounts.models import User, UserBlocked, UserBuddyRequest, UserBuddy
 import scuba.accounts.models as account_models
 
 
-class UserLoginInline(admin.StackedInline):
-    model = account_models.UserLogin
-    extra = 0
-
-
 class UserAdmin(admin.ModelAdmin):
     """ UserAdmin
 
@@ -146,8 +141,6 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ['email', 'username',]
 
     change_form_template = 'accounts/admin/change_user_form.html'
-
-    inlines = [UserLoginInline,]
 
 
 class UserBlockedAdmin(admin.ModelAdmin):
