@@ -6,6 +6,7 @@ db.sqlite3
 entrypoint.sh
 gulpfile.js
 node_modules
+env/
 package-lock.json
 requirements.txt
 runserver.sh
