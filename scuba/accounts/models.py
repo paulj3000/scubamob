@@ -208,6 +208,9 @@ class User(AbstractUser, UUIDModel):
         self.last_login_date = datetime.datetime.now()
         self.save()
 
+    def get_all_logins(self):
+        return self.logins.all().order_by('login_date')
+
     # -----------------------------------------------------------------------------
     # start profile image stuff
     # -----------------------------------------------------------------------------
@@ -560,7 +563,7 @@ class UserLogin(UUIDModel):
 
     Keep a record of the user's login information
     """
-    user = models.ForeignKey(User, related_name='user_logins', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='logins', on_delete=models.CASCADE)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     device = models.CharField(max_length=512)
     iso_country = models.CharField(max_length=2, default='US')

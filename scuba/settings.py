@@ -118,12 +118,8 @@ AUTH_USER_MODEL = 'accounts.User'
 
 DATABASES = {
     "default": {
-        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("SQL_DATABASE", f"{BASE_DIR}/db.sqlite3"),
-        "USER": os.environ.get("SQL_USER", "user"),
-        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
-        "HOST": os.environ.get("SQL_HOST", "localhost"),
-        "PORT": os.environ.get("SQL_PORT", "3306"),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
@@ -331,9 +327,10 @@ LOGGING = {
     },
 }
 
-try:
-    import sys
-    sys.path.append('/scuba')
-    from system.settings import *
-except ImportError as exp:
-    print('system.settings was not loaded. Continuing with standard settings.\n%s' % exp)
+if os.environ.get('IS_PRODUCTION'):
+    try:
+        import sys
+        sys.path.append('/scuba')
+        from system.settings import *
+    except ImportError as exp:
+        print('system.settings was not loaded. Continuing with standard settings.\n%s' % exp)
