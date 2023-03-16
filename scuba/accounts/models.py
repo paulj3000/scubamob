@@ -192,6 +192,23 @@ class User(AbstractUser, UUIDModel):
         return False
 
     # -----------------------------------------------------------------------------
+    # start login tracking
+    # -----------------------------------------------------------------------------
+    def add_login(self, ip_address, country, device):
+        """ add_login
+
+        add the user's login. If the user's id is in USER_IGNORE_TRACKING,
+        ignore it
+        """
+        # ignore specific users
+        #if str(self.id).replace('-', '') in USER_IGNORE_TRACKING:
+        #    return
+
+        UserLogin.objects.create(user=self, ip_address=ip_address, device=device, iso_country=country)
+        self.last_login_date = datetime.datetime.now()
+        self.save()
+
+    # -----------------------------------------------------------------------------
     # start profile image stuff
     # -----------------------------------------------------------------------------
     def get_profile_image(self):
@@ -536,3 +553,25 @@ class UserProfileImage(UUIDModel):
         of the profile image, sans the 'profiles/' prefix
         """
         return f"{CLOUDFRONT}{self.image_cleaned}"
+
+
+class UserLogin(UUIDModel):
+    """ UserLogin
+
+    Keep a record of the user's login information
+    """
+    user = models.ForeignKey(User, related_name='user_logins', on_delete=models.CASCADE)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    device = models.CharField(max_length=512)
+    iso_country = models.CharField(max_length=2, default='US')
+    login_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        """ define database tables, etc """
+        db_table = 'user_login'
+        verbose_name_plural = 'user logins'
+        ordering = ['-login_date']
+
+    def __str__(self):
+        """ return a string representation of the user login """
+        return self.user.get_full_name()

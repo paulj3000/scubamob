@@ -8,6 +8,11 @@ from scuba.accounts.models import User, UserBlocked, UserBuddyRequest, UserBuddy
 import scuba.accounts.models as account_models
 
 
+class UserLoginInline(admin.StackedInline):
+    model = account_models.UserLogin
+    extra = 0
+
+
 class UserAdmin(admin.ModelAdmin):
     """ UserAdmin
 
@@ -125,7 +130,7 @@ class UserAdmin(admin.ModelAdmin):
 
     readonly_fields = ['get_token', 'last_login_date',]
 
-    xfieldsets = (
+    fieldsets = (
         (None,
             {'fields':
                 ('first_name', 'last_name', 'email', 'last_login_date', 'get_token')
@@ -138,31 +143,11 @@ class UserAdmin(admin.ModelAdmin):
     def get_token(self, obj):
         return obj.get_api_token()
 
-    def get_fieldsets(self, request, obj=None):
-        """ get_fieldsets
-
-        make sure only superusers are allowed to access permissions
-        """
-        retval = super().fieldsets
-
-        from pprint import pprint
-        pprint(retval)
-
-
-        if not request.user.is_superuser:
-            old_fields = self.fieldsets[0][1]['fields']
-            new_fields = [field for field in old_fields if field != 'is_admin']
-
-            if obj and obj.is_admin:
-                new_fields = [field for field in old_fields if field != 'is_staff_member']
-            retval = [(None, {'fields': new_fields})]
-
-        # return the normal stuff
-        return retval
-
     search_fields = ['email', 'username',]
 
     change_form_template = 'accounts/admin/change_user_form.html'
+
+    inlines = [UserLoginInline,]
 
 
 class UserBlockedAdmin(admin.ModelAdmin):

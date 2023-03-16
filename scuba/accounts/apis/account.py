@@ -38,13 +38,6 @@ class LoginUserApi(generics.GenericAPIView):
 
         Do the actual posting of the password reset
         """
-        import pprint
-        f = open("/tmp/data", "a")
-        f.write("HELLO")
-        f.write(f"content type: {request.content_type}\n")
-        f.write(pprint.pformat(request.data, indent=4))
-        f.write("bye")
-        f.close()
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         #user = serializer.validated_data['user']

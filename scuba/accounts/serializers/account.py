@@ -65,9 +65,10 @@ class LoginSerializer(serializers.ModelSerializer):
         trim_whitespace=False,
         write_only=True,
     )
-    
+
     username = serializers.CharField(label=_("Username"))
-    device = serializers.CharField(default='mobile', help_text="The device type and build", write_only=True)
+    device = serializers.CharField(default='mobile', write_only=True)
+    ip_address = serializers.CharField(default='0.0.0.0', write_only=True)
 
     def validate(self, attrs):
         """ validate
@@ -90,9 +91,13 @@ class LoginSerializer(serializers.ModelSerializer):
             if not user:
                 msg = _('Unable to log in with provided credentials.')
                 raise serializers.ValidationError(msg, code='authorization')
+
         else:
             msg = _('Must include "email" or "username" and "password".')
             raise serializers.ValidationError(msg, code='authorization')
+
+        # now add the user's login info
+        user.add_login(attrs.get('ip_address'), 'US', attrs.get('device'))
 
         return user
         #attrs['user'] = user
@@ -121,7 +126,7 @@ class LoginSerializer(serializers.ModelSerializer):
         return the user's token
         """
         return data.get_api_token()
-    
+
     @staticmethod
     def get_id(data):
         """ get_token
@@ -139,10 +144,12 @@ class LoginSerializer(serializers.ModelSerializer):
             'email': {'read_only': True},
             'first_name': {'read_only': True},
             'last_name': {'read_only': True},
+            'device': {'write_only': True},
+            'ip_address': {'write_only': True},
             'token': {'read_only': True}}
 
         fields = ('id', 'first_name', 'last_name', 'email', 'token', 'device',
-                  'date_joined', 'password', 'profile_image', 'username',)
+                  'date_joined', 'password', 'profile_image', 'username', 'ip_address',)
 
     def create(self, validated_data):
         """ create
