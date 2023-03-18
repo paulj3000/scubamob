@@ -54,6 +54,7 @@ class SetPasswordSerializer(serializers.Serializer):
 
 
 class CreateUserSerializer(serializers.Serializer):
+    id = serializers.SerializerMethodField(read_only=True)
     username = serializers.CharField(read_only=True)
     first_name = serializers.CharField()
     last_name = serializers.CharField()
@@ -78,6 +79,10 @@ class CreateUserSerializer(serializers.Serializer):
         if relativedelta(datetime.date.today(), date_of_birth).years < THIRTEEN_YEARS:
             raise serializers.ValidationError('user is not 13 years old')
         return date_of_birth
+
+    @staticmethod
+    def get_id(data):
+        return data.pk_as_str
 
     @staticmethod
     def get_token(data):
