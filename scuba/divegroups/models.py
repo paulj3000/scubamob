@@ -14,7 +14,7 @@ class Group(models.Model):
 
 
     class Meta:
-        db_table = 'divegroup'
+        db_table = 'divegroups'
 
     def is_user_admin(self, user):
         return True if self.groups.filter(user=user).count() else False
