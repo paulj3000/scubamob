@@ -27,6 +27,7 @@ class APICreateUser(TestCase):
         response = client.post('/api/signup/createuser/', payload, format='json')
         self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(response.json().get('id'))
+        self.assertIsNotNone(response.json().get('profile_image'))
         self.assertEqual(response.json().get('first_name'), 'first')
         self.assertEqual(response.json().get('last_name'), 'last')
         self.assertEqual(response.json().get('setup_complete'), False)

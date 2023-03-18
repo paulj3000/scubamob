@@ -61,6 +61,7 @@ class CreateUserSerializer(serializers.Serializer):
     email = serializers.EmailField()
     date_of_birth = serializers.DateField(write_only=True)
     token = serializers.SerializerMethodField(read_only=True)
+    profile_image = serializers.SerializerMethodField(read_only=True)
     setup_complete = serializers.BooleanField(read_only=True)
 
     @staticmethod
@@ -83,6 +84,10 @@ class CreateUserSerializer(serializers.Serializer):
     @staticmethod
     def get_id(data):
         return data.pk_as_str
+
+    @staticmethod
+    def get_profile_image(data):
+        return data.profile_image
 
     @staticmethod
     def get_token(data):
