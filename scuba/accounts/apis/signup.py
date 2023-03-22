@@ -1,16 +1,8 @@
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
-from django.db.models import Q
-from django.db import IntegrityError
-import json
-
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
-from scuba.accounts.models import User
-from scuba.accounts.exceptions import InvalidUserIdException
 import scuba.accounts.serializers.signup as serializers
 
 

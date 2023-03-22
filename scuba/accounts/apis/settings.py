@@ -3,17 +3,16 @@ import logging
 
 from rest_framework.response import Response
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny
 from rest_framework import status
 
-from django.http import Http404
-
-
-from scuba.accounts.serializers.settings import UserEmailSerializer, PrimaryEmailSerializer, UserSettingSerializer
-from scuba.accounts.settings import SETTINGS_KEYS
+from scuba.accounts.serializers.settings import UserEmailSerializer, UserSettingSerializer
 from scuba.accounts.models import UserEmail, User
-from scuba.accounts.exceptions import InvalidEmailIdException, PrimaryEmailIdException, EmailInUseException
+from scuba.accounts.exceptions import InvalidEmailIdException, PrimaryEmailIdException
 from scuba.sitesettings.models import SettingsApi
+
+
+logger = logging.getLogger(__name__)
 
 
 class UserEmailApi(generics.ListCreateAPIView):
@@ -132,7 +131,6 @@ class UserSettingListApi(generics.GenericAPIView):
             res = requests.get(url)
             return Response(res.json(), status=res.status_code)
         except requests.exceptions.ConnectionError:
-            logger = logging.getLogger('settings')
             logger.error(url)
 
             return Response({'error': 'cannot connect to settings'}, status=500)
