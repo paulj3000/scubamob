@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'django_rest_passwordreset',
     'django_extensions',
     'corsheaders',
     #'test_pep8',
