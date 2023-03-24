@@ -1,24 +1,27 @@
 import logging
 
+from django.contrib.auth.forms import PasswordResetForm
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
-from rest_framework.views import APIView
+from rest_framework import generics
 
-from django.contrib.auth.forms import PasswordResetForm
+from scuba.accounts.serializers.password import PasswordResetSerializer
+
 
 logger = logging.getLogger(__name__)
 
 
-class PasswordResetApi(APIView):
+class PasswordResetApi(generics.GenericAPIView):
     permission_classes = (AllowAny,)
+    serializer_class = PasswordResetSerializer
     def post(self, request):
         """ post
 
         Do the actual posting of the password reset
         """
-        user = request.user
-        #self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
         form = PasswordResetForm(request.data)
 
