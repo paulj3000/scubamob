@@ -2,6 +2,15 @@
 {% load crispy_forms_tags static %}
 
 {% block content %}
+
+<style>
+.loginform {
+    max-width:360px;
+    margin:0 auto;
+}
+</style>
+
+
 <div class="container">
     <div class="row">
         {% if messages %}
@@ -13,7 +22,7 @@
         {% endif %}
 
         <!-- start body -->
-        <div class="body-signup">
+        <div class="body-signup loginform">
             <div class="form-in no-gutters">
                 <div class="centered">
                     <h3>Log into {{html_name | safe}}</h3>
