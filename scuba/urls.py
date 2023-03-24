@@ -48,6 +48,7 @@ urlpatterns = [
 
     #path('api/1.0/mobile/account', include('api.urls_account')),
     path('api/accounts/', include('scuba.accounts.urls_accounts_api')),
+    path('api/password/', include('scuba.accounts.urls_password_api')),
     path('api/signup/', include('scuba.accounts.urls_signup_api')),
     path('api/profile/', profile_api.GetMeProfileApi.as_view()),
     re_path('api/profile/(?P<id>[a-fA-F0-9]+)/', include('scuba.accounts.urls_profile_api')),
