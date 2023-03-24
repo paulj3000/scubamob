@@ -605,6 +605,7 @@ i.wide {
         {% block jumbotron %}{% endblock %}
 
         <div id="fb-root"></div>
+        <div class="wrapper">
         <div class="{% block container %}container mt-3{% endblock %}">
             {% if messages %}
                 {% for message in messages %}
@@ -692,6 +693,7 @@ i.wide {
                 </div>
             </div>
             {% endblock %}
+        </div>
         </div>
 
         {% if user.is_authenticated %}

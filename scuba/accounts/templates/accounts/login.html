@@ -2,45 +2,57 @@
 {% load crispy_forms_tags static %}
 
 {% block content %}
-<style>
-.loginform {
-    max-width:360px;
-    margin:0 auto;
-}
-</style>
+<div class="container">
+    <div class="row">
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }} alert alert-success"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
 
-{% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
-{% endif %}
+        <!-- start body -->
+        <div class="body-signup">
+            <div class="form-in no-gutters">
+                <div class="centered">
+                    <h3>Log into {{html_name | safe}}</h3>
+                </div>
 
-<div class="inputform">
-    <form method="post" action="{% url 'login' %}">
-        {% csrf_token %}
-        <div class="loginform">
-            <div class="text-center">
-                <h1>Log into {{SITE_NAME}}</h1>
-            </div>
-            {{ form|crispy }}
-            <div class="loginoption">
-                <button class="btn btn-primary" type="submit">Login</button>
+                <form method="post" action="{% url 'login' %}" id="f_login">
+                    {% csrf_token %}
+
+                    {% if form.errors %}
+                    <div class="errors alert alert-danger" role="alert">
+                        <span>Please check your email and password combination</span>
+                    </div>
+                    {% endif %}
+
+
+{{ form|crispy }}
+
+
+                    <div class="form-row loginsuffix">
+                        <div class="form-group col-md-6" style="text-align:right">
+                            <a href="{% url 'forgot_password' %}">Forgot password</a>
+                        </div>
+                    </div>
+
+                    <div class="form-group no-gutters">
+                        <!-- Button -->
+                        <div class="col-md-12">
+                            <button id="btn-login" type="submit" class="btn btn-primary btn-block">Log in</button>
+                        </div>
+                    </div>
+                    <div class="login_footer">
+                        <div class="separator"></div>
+                        <div class="signup">
+                            Don't have an account? <a href="{% url 'signup' %}">Sign Up</a>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
-
-        <input type="hidden" name="next" value="{{ next }}" />
-    </form>
+    </div>
 </div>
-
-<ul>
-{% for name in social_auth.backends.oauth2 %}
-   <li><a rel="nofollow" href="{% url "socialauth_begin" name %}">{{ name|title }}</a></li>
-{% endfor %}
-</ul>
-
-<script>
-$('.formsubmit').click(function()
-{
-    $(this).closest('form').submit();
-});
-</script>
-
 {% endblock %}

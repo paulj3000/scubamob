@@ -98,6 +98,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'scuba.libs.context_processors.scuba.Scuba',
             ],
         },
     },
@@ -308,6 +309,11 @@ xCOMPRESS_YUGLIFY_BINARY = f"{BASE_DIR}/node_modules/yuglify/bin/yuglify"
 
 CORS_ORIGIN_ALLOW_ALL=True
 CORS_ALLOW_ALL_ORIGINS = True
+
+SITE_TITLE = 'ScubaMob'
+TITLE_HTML = 'ScubaMob&reg;'
+IS_PRODUCTION = False
+
 
 LOGGING = {
     'version': 1,
