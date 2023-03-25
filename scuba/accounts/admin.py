@@ -120,7 +120,7 @@ class UserAdmin(admin.ModelAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ('username', 'first_name', 'last_name', 'email', 'is_active', 'date_joined',
+    list_display = ('first_name', 'last_name', 'email', 'is_active', 'date_joined',
                     'last_login_date')
 
     readonly_fields = ['get_token', 'last_login_date',]
@@ -138,7 +138,7 @@ class UserAdmin(admin.ModelAdmin):
     def get_token(self, obj):
         return obj.get_api_token()
 
-    search_fields = ['email', 'username',]
+    search_fields = ['email', 'last_name',]
 
     change_form_template = 'accounts/admin/change_user_form.html'
 

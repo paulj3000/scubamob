@@ -31,7 +31,6 @@ class APICreateUser(TestCase):
         self.assertEqual(response.json().get('first_name'), 'first')
         self.assertEqual(response.json().get('last_name'), 'last')
         self.assertEqual(response.json().get('setup_complete'), False)
-        self.assertRegex(response.json().get('username'), r'^newuser_')
         self.assertEqual(len(response.json().get('token')), 40)
 
     def test_create_user_duplicate_email(self):

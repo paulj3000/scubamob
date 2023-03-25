@@ -15,24 +15,12 @@ class RegisterUserSerializer(serializers.Serializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
     password = serializers.CharField(write_only=True)
-    username = serializers.CharField()
     token = serializers.SerializerMethodField(read_only=True)
     profile_image = serializers.CharField(read_only=True)
-    username = serializers.CharField()
 
     @staticmethod
     def get_token(data):
         return data.get_api_token()
-
-    def validate_username(self, username):
-        """ validate_plan
-
-        Validate the plan id coming in
-        """
-        if User.objects.filter(username=username).count():
-            raise serializers.ValidationError(f"Username {username} is already registered")
-
-        return username
 
     def validate_email(self, email):
         """ validate_plan
@@ -46,7 +34,7 @@ class RegisterUserSerializer(serializers.Serializer):
 
 
     def create(self, validated_data):
-        user = User.objects.create(username=validated_data['username'],
+        user = User.objects.create(
                 first_name=validated_data['first_name'],
                 last_name=validated_data['last_name'],
                 email=validated_data['email'])
@@ -66,7 +54,7 @@ class LoginSerializer(serializers.ModelSerializer):
         write_only=True,
     )
 
-    username = serializers.CharField(label=_("Username"))
+    email = serializers.CharField(label=_("Email"))
     device = serializers.CharField(default='mobile', write_only=True)
     ip_address = serializers.CharField(default='0.0.0.0', write_only=True)
 
@@ -77,14 +65,14 @@ class LoginSerializer(serializers.ModelSerializer):
         return it.
         Raises: validation exception if the user has cannot authenticate
         """
-        username = attrs.get('username')
+        email = attrs.get('email')
         password = attrs.get('password')
         device = attrs.get('device')
         ip_address = attrs.get('ip_address')
 
-        if username and password:
+        if email and password:
             user = authenticate(request=self.context.get('request'),
-                                username=username, password=password)
+                                email=email, password=password)
 
             # The authenticate call simply returns None for is_active=False
             # users. (Assuming the default ModelBackend authentication
@@ -94,7 +82,7 @@ class LoginSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(msg, code='authorization')
 
         else:
-            msg = _('Must include "email" or "username" and "password".')
+            msg = _('Must include "email" and "password".')
             raise serializers.ValidationError(msg, code='authorization')
 
         # now add the user's login info
@@ -150,7 +138,7 @@ class LoginSerializer(serializers.ModelSerializer):
             'token': {'read_only': True}}
 
         fields = ('id', 'first_name', 'last_name', 'email', 'token', 'device',
-                  'date_joined', 'password', 'profile_image', 'username', 'ip_address',)
+                  'date_joined', 'password', 'profile_image', 'ip_address',)
 
     def create(self, validated_data):
         """ create

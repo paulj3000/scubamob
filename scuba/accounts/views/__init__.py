@@ -7,36 +7,7 @@ from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
 
 # define the user data for this account
-from scuba.accounts.forms import AccountForm
 from scuba.accounts.models import User
-
-
-def register(us_request):
-    if us_request.POST:
-        account_form = AccountForm(us_request.POST)
-
-        if account_form.is_valid():
-            a = account_form.save()
-
-            user = authenticate(
-                us_request,
-                username=us_request.POST['email'],
-                password=us_request.POST['password1'])
-
-            # log the user in
-            login(us_request, user)
-
-            # and redirect them home
-            return redirect('home')
-
-    else:
-        # instantiate the user create forms
-        account_form = AccountForm()
-
-    # now let's render everything
-    c = {'account_form': account_form}
-
-    return render(us_request, "account/register.html", c)
 
 
 @login_required

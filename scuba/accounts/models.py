@@ -4,30 +4,60 @@ import random
 import uuid
 import string
 
+from django.db import models
 from django.contrib.auth.models import (
-    AbstractUser
+    AbstractBaseUser, BaseUserManager, PermissionsMixin
 )
 
-from django.db import models
-from django.db.models import Q
-from django.db.models.signals import post_save
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.db.models import Q
 from django.templatetags.static import static
 from django.core.exceptions import ValidationError
 
 from rest_framework.authtoken.models import Token
 
 from scuba.accounts.settings import SETTINGS_KEYS, SETTINGS_VALUES
-from scuba.accounts.exceptions import InvalidUserIdException
 from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.libs.alerting import Alerting
 from scuba.settings import PROFILE_BLANK_URL, AWS_CLOUDFRONT
-from scuba.accounts.exceptions import InvalidEmailIdException, PrimaryEmailIdException, EmailInUseException
+from scuba.accounts.exceptions import InvalidEmailIdException, PrimaryEmailIdException, EmailInUseException, InvalidUserIdException
 from scuba.accounts.settings import SETTINGS
 from scuba.sitesettings.models import SystemSetting
 
 
-class User(AbstractUser, UUIDModel):
+class UserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        """
+        Creates and saves a User with the given email and password.
+        """
+        if not email:
+            raise ValueError('The given email must be set')
+
+        now = timezone.now()
+        email = self.normalize_email(email)
+        user = self.model(email=email, last_login=now, date_joined=now, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+
+        # return the new user
+        return user
+
+    def create_superuser(self, email, password, **extra_fields):
+        ''' override the create superuser function '''
+        user = self.create_user(email, password=password)
+        user.is_admin = True
+        user.is_superuser = True
+        user.save(using=self._db)
+        return user
+
+
+class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
+    email = models.EmailField(max_length=255, unique=True, db_index=True)
+    first_name = models.CharField(max_length=40)
+    last_name = models.CharField(max_length=40)
+
+    is_active = models.BooleanField(default=True)
     aws_id = models.CharField(max_length=10, blank=True)
     date_of_birth = models.DateField()
     last_login_date = models.DateTimeField(null=True)
@@ -36,9 +66,16 @@ class User(AbstractUser, UUIDModel):
     is_private = models.BooleanField(default=False)
     setup_complete = models.BooleanField(default=False)
 
+    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+    last_login_date = models.DateTimeField(null=True)
+
+    objects = UserManager()
+
     class Meta:
         db_table = 'user'
         ordering = ['-date_joined']
+
+    USERNAME_FIELD = 'email'
 
     @property
     def profile_image(self):
@@ -47,27 +84,14 @@ class User(AbstractUser, UUIDModel):
     def __str__(self):
         return self.get_full_name()
 
-
     @staticmethod
     def create_user(first_name, last_name, email, date_of_birth):
-        def generate_new_username():
-            rnd = random.randint(10000, 99999)
-            return f'newuser_{rnd}'
-
-        new_username = generate_new_username()
-        user = User.objects.filter(username=new_username)
-
-        while user.count():
-            new_username = generate_new_username()
-            user = User.objects.filter(username=new_username)
-
         return User.objects.create(
             first_name=first_name,
             last_name=last_name,
             email=email,
             date_of_birth=date_of_birth,
-            setup_complete=False,
-            username=new_username)
+            setup_complete=False)
 
     # -----------------------------------------------------------------------------
     # start API stuff (token based)
@@ -357,9 +381,6 @@ class UserConfirmationCode(UUIDModel):
 class Account(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    is_blocked = models.BooleanField(default=False)
-    aws_id = models.CharField(max_length=10, blank=True)
-    guid = models.CharField(max_length=40)
     can_add_divesites = models.BooleanField(default=False)
     reputation = models.PositiveSmallIntegerField(default=0)
     is_private = models.BooleanField(default=False)
@@ -381,7 +402,7 @@ class Account(models.Model):
     def get_abbreviated_name(self):
         return "%s %s." % (self.first_name, self.last_name[0])
 
-    def __unicode__(self):
+    def __str__(self):
         return self.get_full_name()
 
     @property

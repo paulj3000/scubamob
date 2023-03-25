@@ -21,7 +21,6 @@ class APIConfirmationCode(TestCase):
             first_name='First',
             last_name='Last',
             date_of_birth='1970-04-01',
-            username='someuser',
             email='foo@nowhere.com')
 
     @staticmethod

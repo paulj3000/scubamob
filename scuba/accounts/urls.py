@@ -15,5 +15,4 @@ urlpatterns = [
 #    url(r'^invited/?$', 'account.views.friends.index', name='account_friend_invited'),
 
     path('socket/', account_api.SocketApi.as_view()),
-    path('register/', account_views.register, name='account_register'),
 ]

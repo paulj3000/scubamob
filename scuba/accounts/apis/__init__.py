@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
 
-from scuba.accounts.forms import AccountForm
+from scuba.accounts.forms.signup import AccountForm
 from scuba.sitesettings.models import SystemApi
 
 

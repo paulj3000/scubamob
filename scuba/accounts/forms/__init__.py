@@ -3,67 +3,99 @@ from datetime import datetime
 import uuid
 
 from django import forms
+from django.utils.translation import gettext_lazy as _
 from django.forms import ModelForm
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.forms import UserCreationForm
 from django.core.validators import validate_email
 from django.contrib.auth.models import User
 
 from scuba.accounts.models import UserBuddyRequest, UserBuddy, Account
 
 
-class LoginForm(AuthenticationForm):
-    def __init__(self, *args, **kwargs):
+class AuthenticationForm(forms.Form):
+    email = forms.CharField()
+    password = forms.CharField()
+    remember_me = forms.BooleanField(required=False, widget=forms.CheckboxInput())
+
+    error_messages = {
+        'invalid_login': _(
+            "Please enter a correct %(username)s and password. Note that both "
+            "fields may be case-sensitive."
+        ),
+        'inactive': _("This account is inactive."),
+        'blocked': _("This account is blocked."),
+        'cannot_process': _("This request cannot be processed."),
+    }
+
+    def __init__(self, request=None, *args, **kwargs):
+        self.request = request
+        self.user_cache = None
         super().__init__(*args, **kwargs)
-        self.fields['username'].widget.attrs['class'] = 'home-form-input create-account';
-        self.fields['username'].label = 'Username or Email';
-        self.fields['password'].widget.attrs['class'] = 'home-form-input create-account';
 
+    def set_ip_address(self, ip_address):
+        self.ip_address = ip_address
 
-class AccountForm(UserCreationForm):
-    username = forms.CharField(label="", widget=forms.TextInput(attrs={'placeholder':'Username'}), required=True)
-    email = forms.EmailField(label="", widget=forms.TextInput(attrs={'placeholder':'Email'}), required=True)
-    password1 = forms.CharField(label="", widget=forms.PasswordInput(attrs={'placeholder':'Password'}), required=True)
-    password2 = forms.CharField(label="", widget=forms.PasswordInput(attrs={'placeholder':'Verify Password'}), required=True)
-    first_name = forms.CharField(label="", widget=forms.TextInput(attrs={'placeholder':'First Name'}), required=True)
-    last_name = forms.CharField(label="", widget=forms.TextInput(attrs={'placeholder':'Last Name'}), required=True)
-
-    class Meta:
-        model = User
-        fields = ('username', "first_name", "last_name", "email",)
-        #exclude = ('password1',)
-
-    def clean_password2(self):
-        password = self.cleaned_data.get('password')
-        password2 = self.cleaned_data.get('password2')
-
-        if password and password2 and password != password2:
-            raise forms.ValidationError("Passwords do not match")
-
-        # return the cleaned password
-        return password2
-
-    def clean_email(self):
+    def clean(self):
         email = self.cleaned_data.get('email')
+        password = self.cleaned_data.get('password')
 
-        # check to see if this email address has already been used
-        if User.objects.filter(email=email):
+        message = {'form_data': self.cleaned_data}
+        Log.objects.create(system='LOGIN', message=json.dumps(message))
+
+        blocked, country = BlockedCountry.is_ip_available(getattr(self, 'ip_address'))
+        blocked_name = 'Unknown'
+
+        if blocked:
+            blocked_name = blocked.name
+            InvalidCountry.objects.create(email=email, \
+                view=InvalidCountry.VIEW_LOGIN, \
+                ip_address=self.ip_address, blocked_country=blocked)
+
+            raise forms.ValidationError("This request cannot be processed", code='cannot_process')
+
+        self.login_country = country
+
+        if email is not None and password:
+            self.user_cache = authenticate(self.request, username=email, password=password)
+            if self.user_cache is None:
+                raise forms.ValidationError(
+                    self.error_messages['invalid_login'],
+                    code='invalid_login',
+                    params={'email': email},
+                )
+
+            self.confirm_login_allowed(self.user_cache)
+
+        if not self.cleaned_data.get('remember_me'):
+            self.request.session.set_expiry(0)
+
+        return self.cleaned_data
+
+    def confirm_login_allowed(self, user):
+        """ confirm_login_allowed
+
+        make sure the user can log in. Is the account active, inactive?
+        let's find out
+        """
+        if not user.is_active:
             raise forms.ValidationError(
-                '%s is already registered' % email
+                self.error_messages['inactive'],
+                code='inactive',
             )
 
-        # return the cleaned password
-        return email
+        if user.is_blocked:
+            raise forms.ValidationError(
+                self.error_messages['blocked'],
+                code='blocked',
+            )
 
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.set_password(self.cleaned_data['password1'])
+    def get_user_id(self):
+        if self.user_cache:
+            return self.user_cache.id
+        return None
 
-        if commit:
-            user.save()
-            Account.objects.create(user=user)
-
-        return user
+    def get_user(self):
+        return self.user_cache
 
 
 class SettingsForm(ModelForm):
