@@ -55,10 +55,10 @@ class SetPasswordSerializer(serializers.Serializer):
 
 class CreateUserSerializer(serializers.Serializer):
     id = serializers.SerializerMethodField(read_only=True)
-    username = serializers.CharField(read_only=True)
     first_name = serializers.CharField()
     last_name = serializers.CharField()
     email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
     date_of_birth = serializers.DateField(write_only=True)
     token = serializers.SerializerMethodField(read_only=True)
     profile_image = serializers.SerializerMethodField(read_only=True)
@@ -69,6 +69,14 @@ class CreateUserSerializer(serializers.Serializer):
         if User.objects.filter(email=email).count():
             raise serializers.ValidationError(f"'{email}' has already registered")
         return email
+
+    @staticmethod
+    def validate_password(password):
+        # for now, validate the password is at least eight chars
+        if len(password) < 8:
+            raise serializers.ValidationError("Password must be eight characters")
+
+        return password
 
     @staticmethod
     def validate_date_of_birth(date_of_birth):
@@ -101,6 +109,7 @@ class CreateUserSerializer(serializers.Serializer):
         date_of_birth = validated_data['date_of_birth']
         first_name = validated_data['first_name']
         last_name = validated_data['last_name']
+        password = validated_data['password']
         email = validated_data['email']
 
-        return User.create_user(first_name, last_name, email, date_of_birth)
+        return User.create_user(first_name, last_name, email, password, date_of_birth)

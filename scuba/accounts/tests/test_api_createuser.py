@@ -21,6 +21,7 @@ class TestCreateUserAPI(TestCase):
             'first_name': "first",
             'last_name': "last",
             'date_of_birth': "1980-10-31",
+            'password': "someweirdpassword",
             'email': "foo@nowhere.com"
         }
 
@@ -45,6 +46,7 @@ class TestCreateUserAPI(TestCase):
         payload = {
             'first_name': "first",
             'last_name': "last",
+            'password': "someweirdpassword",
             'date_of_birth': "1980-10-31",
             'email': "foo@nowhere.com"
         }
@@ -64,6 +66,7 @@ class TestCreateUserAPI(TestCase):
         payload = {
             'first_name': "first",
             'last_name': "last",
+            'password': "somewoorirdpass",
             'date_of_birth': twelve_years_ago,
             'email': "foo@nowhere.com"
         }

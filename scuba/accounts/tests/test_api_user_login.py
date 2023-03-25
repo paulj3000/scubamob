@@ -29,7 +29,7 @@ class TestUserLoginAPI(TestCase):
         """
         Test simple create user
         """
-        user = TestUserLogin.create_test_user()
+        user = TestUserLoginAPI.create_test_user()
         client = APIClient()
         payload = {
             'password': 'password',
@@ -58,7 +58,7 @@ class TestUserLoginAPI(TestCase):
         """
         Test simple create user
         """
-        user = TestUserLogin.create_test_user()
+        user = TestUserLoginAPI.create_test_user()
         client = APIClient()
         payload = {
             'email': 'foo@nowhere.com',

@@ -98,11 +98,12 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         return self.get_full_name()
 
     @staticmethod
-    def create_user(first_name, last_name, email, date_of_birth):
+    def create_user(first_name, last_name, email, password, date_of_birth):
         return User.objects.create(
             first_name=first_name,
             last_name=last_name,
             email=email,
+            password=password,
             date_of_birth=date_of_birth,
             setup_complete=False)
 
