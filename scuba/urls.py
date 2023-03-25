@@ -11,6 +11,7 @@ import scuba.accounts.views.profiles as account_profiles
 import scuba.accounts.views.login as login_views
 import scuba.accounts.views.signup as signup_views
 import scuba.accounts.views as account_views
+import scuba.content.views as content_views
 import scuba.accounts.apis.account as account_api
 import scuba.accounts.apis.profile as profile_api
 
@@ -40,6 +41,13 @@ urlpatterns = [
     path('env/', include('scuba.environ.urls')),
 
     path('password/', include('scuba.accounts.urls_password')),
+
+    # start the legal stuff
+    path('privacy', content_views.ContentView.as_view(), name='privacy'),
+    path('terms', content_views.ContentView.as_view(), name='terms'),
+    path('cookies', content_views.ContentView.as_view(), name='cookies'),
+    path('about', content_views.ContentView.as_view(), name='about'),
+    path('faq', content_views.FAQView.as_view(), name='faq'),
 
     #path('api/1.0/divelogs/', include('api.urls_divelogs')),
     #path('api/1.0/diveshops/', include('api.urls_diveshops')),
@@ -85,11 +93,6 @@ urlpatterns = [
         TemplateView.as_view(template_name="messenger.html"),
         name='messenger',
     ),
-
-    # let's go ahead and add some static pages (about and all of those things....)
-    path('terms/', TemplateView.as_view(template_name="static/terms.html")),
-    path('aboutus/', TemplateView.as_view(template_name="static/about.html")),
-    path('privacy/', TemplateView.as_view(template_name="static/privacy.html"), name='privacy_policy'),
 
     # start the legal stuff
     #path('privacy', content_views.ContentView.as_view(), name='privacy'),

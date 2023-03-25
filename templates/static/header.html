@@ -1,0 +1,15 @@
+    {% if not hidebreadcrumbs and not mobile %}
+    <div class="breadcrumb-wrap site">
+        <div class="breadcrumb">
+            <span itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb">
+                <span class="breadcrumb-link-wrap">
+                    <a href="{% url 'index' %}" itemprop="url"><span itemprop="title">Home</span></a>
+                </span> &gt; {% if title %}{{ title }}{% elif name %}{{ name }}{% endif %}
+            </span>
+        </div>
+    </div>
+    {% endif %}
+
+    <header class="entry-header">
+        <h1>{% if title %}{{ title }}{% elif name %}{{ name }}{% endif %}</h1>
+    </header>

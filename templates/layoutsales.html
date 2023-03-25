@@ -1,0 +1,63 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<style type="text/css">
+.container.sales {
+    margin-top:25px;
+    margin-left:15px;
+}
+.sidemenu {
+    width:25rem;
+    padding-bottom:5rem;
+    border:0;
+}
+
+.sidemenu li {
+    list-style: none;
+}
+
+.sidemenu li.item {
+    padding-bottom:15px;
+}
+
+.sidemenu li.item a.active {
+    border-bottom:2px solid #000;
+}
+
+.list-group-item {
+    padding:.25rem .75rem;
+    color:#555;
+}
+
+.list-group-item.active {
+    color:#fff;
+    border-color:#007791;
+    background-color:#007791;
+}
+
+.list-group-item:hover:not(.active) {
+    color:#000;
+    border-color:#f5f3f1;
+    background-color:#f5f3f1;
+}
+
+</style>
+
+<div class="container sales">
+    <div class="row">
+        {% if not mobile %}
+            <div class="col-lg-3 sidemenu">
+                {% block sidemenu %}
+                {% endblock %}
+            </div>
+        {% endif %}
+
+        <!-- /.col-lg-3 -->
+        <div class="{% if mobile %}col{% else %}col-lg-9{% endif %}">
+            {% block salescontent %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}

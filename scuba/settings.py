@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'scuba.accounts',
+    'scuba.content',
     'scuba.divegroups',
     'scuba.diveshops',
     'scuba.divesites',

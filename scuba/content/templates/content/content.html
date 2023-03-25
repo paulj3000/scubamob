@@ -1,0 +1,17 @@
+{% extends 'layoutsales.html' %} 
+
+{% block sidemenu %}
+{% include 'static/sidemenu.html' with active=page_name %}
+{% endblock %}
+
+{% block salescontent %}
+<div class="cbox">
+
+    {{tx}}
+
+    {% include 'static/header.html' with name=page.name title=page.title %}
+    <div class="content entry-content">
+        {{page.content|safe}}
+    </div>
+</div>
+{% endblock %}

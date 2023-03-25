@@ -1,0 +1,8 @@
+            <div class="list-group">
+                <a href="{% url 'about' %}" class="list-group-item {% if active == 'about' %}active{% endif %}">About Us</a>
+                <a href="{% url 'privacy' %}" class="list-group-item {% if active == 'privacy' %}active{% endif %}">Privacy Policy</a>
+                <a href="{% url 'cookies' %}" class="list-group-item {% if active == 'cookies' %}active{% endif %}">Cookie Policy</a>
+                <a href="{% url 'terms' %}" class="list-group-item {% if active == 'terms' %}active{% endif %}">Terms of Use</a>
+                <a href="{% url 'faq' %}" class="list-group-item {% if active == 'faq' %}active{% endif %}">Frequently Asked Questions</a>
+                <a href="{ url 'contactus' %}" class="list-group-item {% if active == 'contactus' %}active{% endif %}">Contact Us</a>
+            </div>
