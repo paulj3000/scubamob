@@ -47,6 +47,7 @@ class LoginSerializer(serializers.ModelSerializer):
     date_joined = serializers.DateTimeField(required=False, read_only=True)
     profile_image = serializers.SerializerMethodField(read_only=True)
     token = serializers.SerializerMethodField(read_only=True)
+    id = serializers.SerializerMethodField(read_only=True)
     password = serializers.CharField(
         label=_("Password"),
         style={'input_type': 'password'},
@@ -118,9 +119,9 @@ class LoginSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_id(data):
-        """ get_token
+        """ get_id
 
-        return the user's token
+        return the user's id (as uuid) without the dashes
         """
         return data.pk_as_str
 

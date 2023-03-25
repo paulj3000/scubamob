@@ -37,9 +37,14 @@ class TestUserLogin(TestCase):
         }
 
         response = client.post('/api/login/', payload, format='json')
+
+        id = response.json().get('id')
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json().get('first_name'), 'First')
         self.assertEqual(response.json().get('last_name'), 'Last')
+        self.assertEqual(len(response.json().get('id')), 32)
+        self.assertNotIn('-', id)
 
         # check the login stuff, make sure there is one login
         self.assertEqual(len(user.get_all_logins()), 1)
