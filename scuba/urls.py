@@ -41,8 +41,6 @@ urlpatterns = [
 
     path('password/', include('scuba.accounts.urls_password')),
 
-    #url(r'^profile/', include('scuba.accounts.urls_profile')),
-
     #path('api/1.0/divelogs/', include('api.urls_divelogs')),
     #path('api/1.0/diveshops/', include('api.urls_diveshops')),
 
@@ -113,5 +111,5 @@ urlpatterns = [
     #    account_profiles.BuddiesView.as_view(),
     #    name='buddies'),
     #re_path(r'^p/(?P<username>[\w_]+)/$',  account_profiles.profile, name='profile'),
-    re_path(r'^p/(?P<username>[\w_]+)/',  include('scuba.accounts.urls_profile')),
+    re_path(r'^p/(?P<id>[\w]+)/',  include('scuba.accounts.urls_profile')),
 ]

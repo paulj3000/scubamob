@@ -574,7 +574,7 @@ i.wide {
                                 <img src="{{user.get_profile_image}}" class="rounded-circle" height="25" alt="user.get_full_name" loading="lazy">
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="#">Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'profile' id=user.pk_as_str %}">Profile</a></li>
                                 <li><a class="dropdown-item" href="{% url 'settings_home' %}">Settings</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'logout' %}">Log Out</a></li>
@@ -624,12 +624,12 @@ i.wide {
 
                     <div class="card mb-4">
                         <div class="card-body text-center">
-                            <a href="{% url 'profile' username=user.username %}">
+                            <a href="{% url 'profile' id=user.pk_as_str %}">
                                 <img src="{{user.profile_image}}" alt="profile image for {{user.get_full_name}}"
                                 class="rounded-circle img-fluid" style="width: 150px;" />
                             </a>
                             <h6 class="my-3">
-                                <a href="{% url 'profile' username=user.username %}">{{user.get_full_name}}</a>
+                                <a href="{% url 'profile' id=user.pk_as_str %}">x {{user.get_full_name}}</a>
                             </h6>
                             <p class="text-muted mb-1">Full Stack Developer</p>
                             <p class="text-muted mb-4">Bay Area, San Francisco, CA</p>
@@ -672,7 +672,7 @@ i.wide {
                     <div class="menu-block" style="margin-top: 50px;">
                         {% block sidemenu %}
                         <ul>
-                            <li><a href="{% url 'profile' username=user.username %}">{{ fullname }}</a></li>
+                            <li><a href="{ url 'profile' username=user.username %}">{{ fullname }}</a></li>
                             <li><a href="{% url 'home' %}">Home</a></li>
                             <li><a href="{% url 'logbook_home' %}">Logs</a></li>
                             <li><a href="{% url 'galleries_home' %}">Gallery</a></li>

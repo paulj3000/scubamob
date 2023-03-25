@@ -13,9 +13,9 @@ def can_view_profile(view_func):
         """
         # simple check. are there programs available?
         user = request.user
-        username = kwargs.get('username')
+        id = kwargs.get('id')
 
-        if user.username == username:
+        if user.pk_as_str == id:
             # that's this user. he's obviously cleared
             setattr(request, 'is_user', True)
             setattr(request, 'profile', user)

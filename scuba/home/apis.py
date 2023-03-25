@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 from django.core.cache import cache
 
+from django.db.models import Q
 from scuba.home.models import Jumbotron
 from scuba.home.serializers import JumbotronSerializer
 from scuba.accounts.models import User
@@ -34,7 +35,8 @@ class SearchApi(generics.GenericAPIView):
     def get(self, request):
 
         q_param = request.query_params.get('q')
-        users = User.objects.filter(username__icontains=q_param)
+        users = User.objects.filter(Q(last_name__icontains=q_param) |
+                                    Q(first_name__icontains=q_param))
 
         retval = []
         if q_param:
