@@ -10,13 +10,21 @@ from scuba.settings import PROFILE_BLANK_URL
 
 
 class RegisterUserSerializer(serializers.Serializer):
-    id = serializers.CharField(read_only=True)
+    id = serializers.SerializerMethodField(read_only=True)
     email = serializers.EmailField()
     first_name = serializers.CharField()
     last_name = serializers.CharField()
     password = serializers.CharField(write_only=True)
     token = serializers.SerializerMethodField(read_only=True)
     profile_image = serializers.CharField(read_only=True)
+
+    @staticmethod
+    def get_id(data):
+        """ get_id
+
+        return the user's id (as uuid) without the dashes
+        """
+        return data.pk_as_str
 
     @staticmethod
     def get_token(data):
@@ -44,10 +52,10 @@ class RegisterUserSerializer(serializers.Serializer):
 
 
 class LoginSerializer(serializers.ModelSerializer):
+    id = serializers.SerializerMethodField(read_only=True)
     date_joined = serializers.DateTimeField(required=False, read_only=True)
     profile_image = serializers.SerializerMethodField(read_only=True)
     token = serializers.SerializerMethodField(read_only=True)
-    id = serializers.SerializerMethodField(read_only=True)
     password = serializers.CharField(
         label=_("Password"),
         style={'input_type': 'password'},

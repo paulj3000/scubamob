@@ -13,7 +13,7 @@ from rest_framework.test import APIClient
 from scuba.accounts.models import User
 
 
-class TestUserLogin(TestCase):
+class TestUserLoginAPI(TestCase):
     @staticmethod
     def create_test_user(email='foo@nowhere.com'):
         user = User.objects.create(
@@ -43,7 +43,7 @@ class TestUserLogin(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json().get('first_name'), 'First')
         self.assertEqual(response.json().get('last_name'), 'Last')
-        self.assertEqual(len(response.json().get('id')), 32)
+        self.assertEqual(len(id), 32)
         self.assertNotIn('-', id)
 
         # check the login stuff, make sure there is one login

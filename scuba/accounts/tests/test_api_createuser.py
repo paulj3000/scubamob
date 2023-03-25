@@ -11,7 +11,7 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 
 
-class APICreateUser(TestCase):
+class TestCreateUserAPI(TestCase):
     def test_create_user_1(self):
         """
         Test simple create user
@@ -25,8 +25,12 @@ class APICreateUser(TestCase):
         }
 
         response = client.post('/api/signup/createuser/', payload, format='json')
+
+        id = response.json().get('id')
         self.assertEqual(response.status_code, 201)
-        self.assertIsNotNone(response.json().get('id'))
+        self.assertIsNotNone(id)
+        self.assertEqual(len(id), 32)
+        self.assertNotIn('-', id)
         self.assertIsNotNone(response.json().get('profile_image'))
         self.assertEqual(response.json().get('first_name'), 'first')
         self.assertEqual(response.json().get('last_name'), 'last')
