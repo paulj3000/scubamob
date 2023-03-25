@@ -58,6 +58,8 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
     last_name = models.CharField(max_length=40)
 
     is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+
     aws_id = models.CharField(max_length=10, blank=True)
     date_of_birth = models.DateField()
     last_login_date = models.DateTimeField(null=True)
@@ -80,6 +82,10 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
     @property
     def profile_image(self):
         return self.get_profile_image()
+
+    @property
+    def is_staff(self):
+        return self.is_admin
 
     def get_full_name(self):
         """ get_full_name
@@ -411,10 +417,6 @@ class Account(models.Model):
 
     def __str__(self):
         return self.get_full_name()
-
-    @property
-    def is_staff(self):
-        return self.is_admin
 
     def has_perm(self, perm, obj=None):
         return True
