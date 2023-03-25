@@ -81,6 +81,13 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
     def profile_image(self):
         return self.get_profile_image()
 
+    def get_full_name(self):
+        """ get_full_name
+
+        get the user's full name
+        """
+        return f"{self.first_name.strip()} {self.last_name.strip()}"
+
     def __str__(self):
         return self.get_full_name()
 
