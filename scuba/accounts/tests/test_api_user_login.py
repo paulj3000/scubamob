@@ -43,6 +43,7 @@ class TestUserLoginAPI(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json().get('first_name'), 'First')
         self.assertEqual(response.json().get('last_name'), 'Last')
+        self.assertIsNotNone(response.json().get('confirmed'))
         self.assertEqual(len(id), 32)
         self.assertNotIn('-', id)
 

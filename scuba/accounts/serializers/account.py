@@ -63,6 +63,7 @@ class LoginSerializer(serializers.ModelSerializer):
         write_only=True,
     )
 
+    confirmed = serializers.SerializerMethodField(read_only=True)
     email = serializers.CharField(label=_("Email"))
     device = serializers.CharField(default='mobile', write_only=True)
     ip_address = serializers.CharField(default='0.0.0.0', write_only=True)
@@ -98,8 +99,6 @@ class LoginSerializer(serializers.ModelSerializer):
         user.add_login(ip_address, 'US', attrs.get('device'))
 
         return user
-        #attrs['user'] = user
-        #return attrs
 
     @staticmethod
     def get_profile_image(data):
@@ -108,6 +107,10 @@ class LoginSerializer(serializers.ModelSerializer):
         return the user's profile image
         """
         return data.get_profile_image()
+
+    @staticmethod
+    def get_confirmed(data):
+        return data.confirmed
 
     @staticmethod
     def get_date_joined(data):
@@ -147,6 +150,7 @@ class LoginSerializer(serializers.ModelSerializer):
             'token': {'read_only': True}}
 
         fields = ('id', 'first_name', 'last_name', 'email', 'token', 'device',
+                  'confirmed',
                   'date_joined', 'password', 'profile_image', 'ip_address',)
 
     def create(self, validated_data):

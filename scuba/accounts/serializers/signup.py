@@ -61,6 +61,7 @@ class CreateUserSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
     date_of_birth = serializers.DateField(write_only=True)
     token = serializers.SerializerMethodField(read_only=True)
+    confirmed = serializers.SerializerMethodField(read_only=True)
     profile_image = serializers.SerializerMethodField(read_only=True)
     setup_complete = serializers.BooleanField(read_only=True)
 
@@ -96,6 +97,10 @@ class CreateUserSerializer(serializers.Serializer):
     @staticmethod
     def get_profile_image(data):
         return data.profile_image
+
+    @staticmethod
+    def get_confirmed(data):
+        return data.confirmed
 
     @staticmethod
     def get_token(data):

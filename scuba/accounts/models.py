@@ -66,7 +66,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
     can_add_divesites = models.BooleanField(default=False)
     reputation = models.PositiveSmallIntegerField(default=0)
     is_private = models.BooleanField(default=False)
-    setup_complete = models.BooleanField(default=False)
+    confirmed = models.BooleanField(default=False)
 
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
     last_login_date = models.DateTimeField(null=True)
@@ -105,7 +105,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
             email=email,
             password=password,
             date_of_birth=date_of_birth,
-            setup_complete=False)
+            confirmed=False)
 
     # -----------------------------------------------------------------------------
     # start API stuff (token based)

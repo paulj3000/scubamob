@@ -33,9 +33,10 @@ class TestCreateUserAPI(TestCase):
         self.assertEqual(len(id), 32)
         self.assertNotIn('-', id)
         self.assertIsNotNone(response.json().get('profile_image'))
+        self.assertFalse(response.json().get('confirmed'))
         self.assertEqual(response.json().get('first_name'), 'first')
         self.assertEqual(response.json().get('last_name'), 'last')
-        self.assertEqual(response.json().get('setup_complete'), False)
+        self.assertEqual(response.json().get('confirmed'), False)
         self.assertEqual(len(response.json().get('token')), 40)
 
     def test_create_user_duplicate_email(self):
