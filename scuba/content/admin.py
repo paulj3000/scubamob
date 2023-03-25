@@ -98,7 +98,7 @@ class ImageAdmin(admin.ModelAdmin):
         return JsonResponse({'images': retval})
 
     list_display = ('title',)
-    change_form_template = 'content/admin/change_image_form.html'
+    change_form_template = 'admin/content/change_image_form.html'
 
 
 class FAQEntryAdmin(admin.ModelAdmin):
