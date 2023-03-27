@@ -40,10 +40,9 @@ class EmailTemplateAdmin(admin.ModelAdmin):
 
         for user in User.objects.filter(
                 Q(is_superuser=True) |
-                Q(is_admin=True) |
-                Q(settings__setting="IS_STAFF")):
+                Q(is_admin=True)):
 
-            user.send_welcome_email(email_template)
+            user.send_confirmation_code_email(email_template)
 
         messages.add_message(
             request,
