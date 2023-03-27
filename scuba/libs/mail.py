@@ -38,10 +38,6 @@ def generate_email(user, template, context):
     return t.render(context)
 
 
-def generate_tracker():
-    return str(uuid.uuid1())
-
-
 def send_mail(user, subject, html_content, text_content=""):
     msg = EmailMultiAlternatives(subject, text_content, EMAIL_FROM, [user.email], bcc=[EMAIL_BCC])
     msg.attach_alternative(html_content, "text/html")

@@ -1,5 +1,5 @@
 """
-# cfk/libs/aws/s3.py
+# scuba/libs/aws/s3.py
 
 (C) Copyright 2015-2020, Pjs Midnight Labs.  All rights reserved.
 
@@ -7,13 +7,9 @@ Author: Pauljames "The Juggernaut" Dimitriu
 
 Some utility methods to upload stuff and download stuff from / to AWS
 """
-import os
-
-import json
 import boto3
 import botocore
-
-from botocore.exceptions import ClientError
+from scuba.settings import AWS_PROFILE, AWS_S3_BUCKET
 
 
 class S3:
@@ -24,65 +20,51 @@ class S3:
     A lot of these functions are now staticmethods, but some of them are still
     using class instantiation.
     """
+    def __init__(self, bucket_name):
+        print(bucket_name)
+        #session = boto3.Session(profile_name='default')
+        session = boto3.Session(profile_name=AWS_PROFILE)
+        #self.conn = boto3.resource('s3')
+        self.conn = session.resource('s3')
+
+        # now assign the bucket
+        self.bucket = bucket_name
+        self.bucket_obj = self.conn.Bucket(bucket_name)
+
     @staticmethod
-    def get_session(aws_profile='default', **kwargs):
+    def get_session():
         """ get session
 
         This will create a session which will connect to S3 by
         way of our profile id
         """
-        if os.getenv('DEBUG'):
-            return boto3.client('s3')
-
-        session = boto3.Session(profile_name=aws_profile)
-
-        if kwargs.get('region'):
-            return session.resource('s3', region_name=kwargs['region'])
-
+        session = boto3.Session(profile_name=AWS_PROFILE)
         return session.resource('s3')
 
     @staticmethod
-    def list_all_buckets():
-        """ list all buckets
+    def print_all_files(bucket=AWS_S3_BUCKET):
+        """ print_all_files
 
-        return a list of all the buckets available to this account
+        Get the list of files from S3 and do a simple "print"
         """
-        retval = []
-        s3 = boto3.client('s3')
-
-        response = s3.list_buckets()
-
-        for bucket in response['Buckets']:
-            retval.append(bucket['Name'])
-
-        # return the bucket list
-        return retval
+        for my_bucket_object in S3.list_all_files(bucket):
+            print(my_bucket_object)
 
     @staticmethod
-    def list_bucket_contents(bucket, prefix=None):
+    def list_all_files(bucket=AWS_S3_BUCKET):
         """ list_all_files
 
         Get a list of all of the files from S3
         """
         # get the bucket
-        s3 = boto3.resource('s3')
-        bucket = s3.Bucket(bucket)
+        session = S3.get_session()
+        bucket_obj = session.Bucket(bucket)
 
-        retval = []
-
-        files = None
-        if prefix:
-            files = bucket.objects.filter(Prefix=prefix)
-        else:
-            files = bucket.objects.all()
-
-        for file in files:
-            retval.append(file.key)
-
-        return retval
+        # and return the list
+        return bucket_obj.objects.all()
 
     @staticmethod
-    def verify_file(key, bucket):
+    def verify_file(key, bucket=AWS_S3_BUCKET):
         """ verify_file
 
         Verify a file exists.
@@ -98,11 +80,11 @@ class S3:
         return None
 
     @staticmethod
-    def upload_file_content(bucket, key, fileobj, **headers):
+    def upload_raw_data(bucket, name, fileobj, **headers):
         """ Upload raw data to Amazon S3. Pass in the name, the actual
         object, and optionally extra data metadata"""
         to_send = {
-            'Key': key,
+            'Key': name,
             'Body': fileobj,
         }
 
@@ -110,40 +92,18 @@ class S3:
         for key, val in headers.items():
             to_send[key] = val
 
-        s3 = boto3.resource('s3')
-        return s3.Bucket(bucket).put_object(**to_send)
+        session = S3.get_session()
+        session.Bucket(bucket).put_object(**to_send)
 
     @staticmethod
-    def delete_file(bucket, key):
+    def delete_file(filename, bucket=AWS_S3_BUCKET):
         """ delete_file
 
         Delete the file from S3
         """
-        s3 = boto3.resource('s3')
-        return s3.Object(bucket, key).delete()
-
-    @staticmethod
-    def get_file_headers(bucket, key):
-        s3 = boto3.resource('s3')
-
-        try:
-            obj = s3.Object(bucket, key)
-
-            retval = {}
-            temp = {
-                'content_disposition': obj.content_disposition,
-                'content_type': obj.content_type,
-                'metadata': obj.metadata
-            }
-
-            for key, value in temp.items():
-                if value:
-                    retval[key] = value
-
-            return retval
-
-        except botocore.exceptions.ClientError:
-            raise AWS404Exception
+        s3_obj = S3.get_session()
+        obj = s3_obj.Object(bucket, filename)
+        obj.delete()
 
     def upload_data(self, name, data, **kwargs):
         """ upload_data
@@ -165,48 +125,21 @@ class S3:
         self.bucket_obj.upload_file(filename, name, to_send)
 
     @staticmethod
-    def get_file_metadata(bucket, key):
-        s3_obj = S3.get_session()
-
-    @staticmethod
-    def rename_file(bucket, old_name, new_name):
+    def rename_file(old_name, new_name, bucket=AWS_S3_BUCKET):
         """ rename_file
 
         Rename a file on S3
         """
-        s3 = boto3.resource('s3')
-        s3.Object(bucket, new_name).copy_from(CopySource=f"{bucket}/{old_name}")
-        s3.Object(bucket, old_name).delete()
+        s3_obj = S3.get_session()
+        s3_obj.Object(bucket, new_name).copy_from(CopySource=f"{bucket}/{old_name}")
+        s3_obj.Object(bucket, old_name).delete()
 
     @staticmethod
-    def upload_public_file(bucket, filename, key, **kwargs):
+    def upload_public_file(filename, key, **kwargs):
         """ upload_public_file
 
         Upload a file to the public (normal) bucket.
         """
         s3_obj = S3.get_session()
-        bucket_obj = s3_obj.Bucket(bucket)
+        bucket_obj = s3_obj.Bucket(AWS_S3_BUCKET)
         bucket_obj.upload_file(filename, key, kwargs)
-
-    @staticmethod
-    def create_bucket(bucket_name, region=None):
-        """Create an S3 bucket in a specified region
-
-        If a region is not specified, the bucket is created in the S3 default
-        region (us-east-1).
-
-        :param bucket_name: Bucket to create
-        :param region: String region to create bucket in, e.g., 'us-west-2'
-        :return: True if bucket created, else False
-        """
-        # Create bucket
-        if region is None:
-            s3_client = boto3.client('s3')
-            s3_client.create_bucket(Bucket=bucket_name)
-        else:
-            s3_client = boto3.client('s3', region_name=region)
-            location = {'LocationConstraint': region}
-            s3_client.create_bucket(Bucket=bucket_name, CreateBucketConfiguration=location)
-
-# https://aws.amazon.com/blogs/compute/uploading-to-amazon-s3-directly-from-a-web-or-mobile-application/
-# https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-presigned-urls.html

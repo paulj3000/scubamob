@@ -47,7 +47,7 @@ class EmailTemplateAdmin(admin.ModelAdmin):
                 Q(is_admin=True)):
 
             func = getattr(user, to_send_email[email_template.template_type])
-            func(email_template)
+            func('123456')
             #user.send_confirmation_code_email(email_template, '123456')
 
         messages.add_message(

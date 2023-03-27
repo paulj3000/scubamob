@@ -15,6 +15,8 @@ from django.db.models import Q
 from django.templatetags.static import static
 from django.core.exceptions import ValidationError
 
+from bs4 import BeautifulSoup
+
 from rest_framework.authtoken.models import Token
 
 from scuba.accounts.settings import SETTINGS_KEYS, SETTINGS_VALUES
@@ -25,7 +27,7 @@ from scuba.accounts.exceptions import InvalidEmailIdException, PrimaryEmailIdExc
 from scuba.accounts.settings import SETTINGS
 from scuba.sitesettings.models import SystemSetting
 
-from scuba.libs.mail import generate_email, generate_tracker, send_mail
+from scuba.libs.mail import generate_email, send_mail
 from scuba.content.models import EmailTemplate
 
 
@@ -225,7 +227,6 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
     def verify_confirmation_code(self, code):
         # check if the user is blocking for the friend.
         if hasattr(self, 'userconfirmationcode'):
-            print(self.userconfirmationcode.code)
             if self.userconfirmationcode.code == code:
                 self.userconfirmationcode.delete()
                 return True
@@ -238,19 +239,16 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         Send a confirmation code email to the user.
         """
         email_template = EmailTemplate.get_confirmation_code_email()
-        data = self.generate_confirmation_code_email(email_template, code, generate_tracker())
+        data = self.generate_confirmation_code_email(email_template, code)
 
         subject = email_template.subject
         subject = subject.replace('##CONFIRMATION_CODE##', code)
         subject = subject.replace('##FIRST_NAME##', self.first_name.title())
 
-        if EMAIL_BACKEND:
-            # now store the email
-            send_mail(self, subject, data[0], data[1])
-        else:
-            raise Exception("Email Backend was not set")
+        # now store the email
+        send_mail(self, subject, data[0], data[1])
 
-    def generate_confirmation_code_email(self, email_template, code, tracker=""):
+    def generate_confirmation_code_email(self, email_template, code):
         '''
         This will generate the welcome email and return the
         rendered value
@@ -261,7 +259,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         email_txt = soup.get_text()
 
         html = generate_email(self, 'content/emails/confirmation_code.html',
-            {'content': content, 'short_code': email_template.short_code}, tracker)
+            {'content': content, 'short_code': email_template.short_code})
 
         return (html, email_txt)
 

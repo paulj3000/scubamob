@@ -280,6 +280,7 @@ PROFILE_BLANK_URL = 'images/profiles/profile-blank.png'
 AWS_S3_BUCKET = os.environ.get("AWS_S3_BUCKET", "scubamob-dev")
 AWS_S3_BUCKET_PRIVATE = os.environ.get("AWS_S3_BUCKET_PRIVATE", "scubamob-private")
 AWS_S3_BUCKET_PRIVATE_REGION = 'us-east-1'
+AWS_PROFILE = 'default'
 AWS_EMAIL_STORAGE_ROOT = 'emailsent/skmradio'
 AWS_CLOUDFRONT = os.environ.get('AWS_CLOUDFRONT', 'https://d2pw8lka09f5g5.cloudfront.net/')
 
