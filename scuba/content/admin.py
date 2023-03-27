@@ -38,13 +38,13 @@ class EmailTemplateAdmin(admin.ModelAdmin):
         """
         email_template = get_object_or_404(EmailTemplate, pk=id)
 
-        to_send_email = {
-            2: user.send_confirmation_code_email
-        }
-
         for user in User.objects.filter(
                 Q(is_superuser=True) |
                 Q(is_admin=True)):
+
+            to_send_email = {
+                2: user.send_confirmation_code_email
+            }
 
             to_send_email[email_template.template_type](email_template)
             #user.send_confirmation_code_email(email_template, '123456')
