@@ -25,6 +25,9 @@ from scuba.accounts.exceptions import InvalidEmailIdException, PrimaryEmailIdExc
 from scuba.accounts.settings import SETTINGS
 from scuba.sitesettings.models import SystemSetting
 
+from scuba.libs.mail import generate_email, generate_tracker, send_mail
+from scuba.content.models import EmailTemplate
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -229,6 +232,35 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
 
         return False
 
+    def send_confirmation_code_email(self, code):
+        """ send_welcome_email
+
+        Send a confirmation code email to the user.
+        """
+        email_template = EmailTemplate.get_confirmation_code_email()
+        data = self.generate_confirmation_code_email(email_template, generate_tracker())
+
+        if EMAIL_BACKEND:
+            # now store the email
+            send_mail(self, email_template.subject, data[0], data[1])
+        else:
+            raise Exception("Email Backend was not set")
+
+    def generate_confirmation_code_email(self, email_template, tracker=""):
+        '''
+        This will generate the welcome email and return the
+        rendered value
+        '''
+        # now let's send something....
+        content = email_template.content.replace('##CONFIRMATION_CODE##', self.get_full_name())
+        soup = BeautifulSoup(content, 'lxml')
+        email_txt = soup.get_text()
+
+        html = generate_email(self, 'content/emails/confirmation_code.html',
+            {'content': content, 'short_code': email_template.short_code}, tracker)
+
+        return (html, email_txt)
+
     # -----------------------------------------------------------------------------
     # start login tracking
     # -----------------------------------------------------------------------------
@@ -406,7 +438,7 @@ class Account(models.Model):
         db_table = 'account'
 
     def get_full_name(self):
-        full_name = '%s %s' % (self.first_name, self.last_name)
+        full_name = '%s %s' % (self.first_name.title(), self.last_name.title())
         return full_name.strip()
 
     def get_short_name(self):

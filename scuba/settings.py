@@ -17,6 +17,8 @@ import django.conf.global_settings as DEFAULT_SETTINGS
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_URL = 'scubamob.com'
+SITE_URL = 'scubamob.com'
 PROJECT_DIR = f"{BASE_DIR}/scuba"
 STATIC_ROOT = os.path.join(BASE_DIR, './static')
 LOG_DIRECTORY = '/tmp'
@@ -187,7 +189,8 @@ YARN_ROOT_PATH = BASE_DIR
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-SERVER_EMAIL = 'no-reply@scubamob.com'
+EMAIL_FROM = 'no-reply@scubamob.com'
+EMAIL_BCC = 'no-reply@scubamob.com'
 
 MONGO = {
     'USE_REPLICASET': False,
@@ -275,6 +278,9 @@ TEST_PEP8_DIRS = [PROJECT_DIR]
 # start AWS stuff
 PROFILE_BLANK_URL = 'images/profiles/profile-blank.png'
 AWS_S3_BUCKET = os.environ.get("AWS_S3_BUCKET", "scubamob-dev")
+AWS_S3_BUCKET_PRIVATE = os.environ.get("AWS_S3_BUCKET_PRIVATE", "scubamob-private")
+AWS_S3_BUCKET_PRIVATE_REGION = 'us-east-1'
+AWS_EMAIL_STORAGE_ROOT = 'emailsent/skmradio'
 AWS_CLOUDFRONT = os.environ.get('AWS_CLOUDFRONT', 'https://d2pw8lka09f5g5.cloudfront.net/')
 
 #STATIC_URL = AWS_CLOUDFRONT

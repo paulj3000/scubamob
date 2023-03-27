@@ -15,7 +15,7 @@ class PageAdmin(admin.ModelAdmin):
     change_form_template = 'admin/content/change_page_form.html'
 
 class EmailTemplateAdmin(admin.ModelAdmin):
-    change_form_template = 'content/admin/change_email_template_form.html'
+    change_form_template = 'admin/content/change_email_template_form.html'
 
     def get_urls(self):
         """ get_urls

@@ -25,7 +25,8 @@ class ConfirmationCode(generics.GenericAPIView):
         Do the actual posting of the password reset
         """
         user = request.user
-        return Response({'code': user.generate_confirmation_code().code})
+        user.send_confirmation_code_email(user.generate_confirmation_code().code)
+        return Response({})
 
 
 class SetPasswordApi(generics.GenericAPIView):

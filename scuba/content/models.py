@@ -38,9 +38,11 @@ class EmailTemplate(UUIDModel):
     """
     EMAIL_WELCOME_FREE = 0
     EMAIL_WELCOME_PREMIUM = 1
+    EMAIL_CONFIRMATION_CODE = 2
     EMAIL_TEMPLATES = (
         (EMAIL_WELCOME_FREE, 'Welcome Free Account'),
         (EMAIL_WELCOME_PREMIUM, 'Welcome Premium Account'),
+        (EMAIL_CONFIRMATION_CODE, 'Confirmation Code'),
     )
 
     template_type = models.PositiveSmallIntegerField(choices=EMAIL_TEMPLATES, unique=True)
@@ -67,6 +69,17 @@ class EmailTemplate(UUIDModel):
 
         # we don't have a valid configuration. Throw an exception
         raise InvalidConfigrationException("Missing free email template")
+
+    @classmethod
+    def get_confirmation_code_email(cls):
+        email = cls.objects.filter(template_type=cls.EMAIL_CONFIRMATION_CODE).first()
+
+        # do we have a valid email
+        if email:
+            return email
+
+        # we don't have a valid configuration. Throw an exception
+        raise InvalidConfigrationException("Missing confirmation code email template")
 
 
 class Image(AWSModel):
