@@ -238,21 +238,25 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         Send a confirmation code email to the user.
         """
         email_template = EmailTemplate.get_confirmation_code_email()
-        data = self.generate_confirmation_code_email(email_template, generate_tracker())
+        data = self.generate_confirmation_code_email(email_template, code, generate_tracker())
+
+        subject = email_template.subject
+        subject = subject.replace('##CONFIRMATION_CODE##', code)
+        subject = subject.replace('##FIRST_NAME##', self.first_name.title())
 
         if EMAIL_BACKEND:
             # now store the email
-            send_mail(self, email_template.subject, data[0], data[1])
+            send_mail(self, subject, data[0], data[1])
         else:
             raise Exception("Email Backend was not set")
 
-    def generate_confirmation_code_email(self, email_template, tracker=""):
+    def generate_confirmation_code_email(self, email_template, code, tracker=""):
         '''
         This will generate the welcome email and return the
         rendered value
         '''
         # now let's send something....
-        content = email_template.content.replace('##CONFIRMATION_CODE##', self.get_full_name())
+        content = email_template.content.replace('##CONFIRMATION_CODE##', code)
         soup = BeautifulSoup(content, 'lxml')
         email_txt = soup.get_text()
 
