@@ -254,7 +254,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         rendered value
         '''
         # now let's send something....
-        content = email_template.content.replace('##CONFIRMATION_CODE##', code)
+        content = email_template.content.replace('##CONFIRMATION_CODE##', str(code))
         soup = BeautifulSoup(content, 'lxml')
         email_txt = soup.get_text()
 
