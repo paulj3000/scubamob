@@ -419,7 +419,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
 
 class UserConfirmationCode(UUIDModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    code = models.PositiveSmallIntegerField()
+    code = models.PositiveIntegerField()
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
