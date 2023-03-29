@@ -242,7 +242,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         data = self.generate_confirmation_code_email(email_template, code)
 
         subject = email_template.subject
-        subject = subject.replace('##CONFIRMATION_CODE##', code)
+        subject = subject.replace('##CONFIRMATION_CODE##', str(code))
         subject = subject.replace('##FIRST_NAME##', self.first_name.title())
 
         # now store the email
