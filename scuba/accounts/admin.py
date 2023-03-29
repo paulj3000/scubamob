@@ -4,8 +4,17 @@ from django.contrib import admin
 from django.contrib.sessions.models import Session
 from django.urls import re_path
 
-from scuba.accounts.models import User, UserBlocked, UserBuddyRequest, UserBuddy
+from scuba.accounts.models import User, UserBlocked, UserBuddyRequest, UserBuddy, UserConfirmationCode
 import scuba.accounts.models as account_models
+
+
+class UserConfirmationCodeAdminInline(admin.StackedInline):
+    """ UserConfirmationCodeAdminInline
+
+    Class representation of the confirmation codes assigned to this user
+    """
+    model = UserConfirmationCode
+    extra = 0
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -141,6 +150,7 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ['email', 'last_name',]
 
     change_form_template = 'accounts/admin/change_user_form.html'
+    inlines = (UserConfirmationCodeAdminInline,)
 
 
 class UserBlockedAdmin(admin.ModelAdmin):
