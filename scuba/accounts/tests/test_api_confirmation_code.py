@@ -33,6 +33,14 @@ class TestConfirmationCode(TestCase):
 
         self.assertEqual(len(str(code1.code)), 6)
 
+    def test_invalid_code_tested(self):
+        user = self.create_test_user()
+        code = user.generate_confirmation_code()
+        to_test = code.code + 10
+
+        with self.assertRaises(InvalidConfirmationCodeException) as context:
+            user.verify_confirmation_code(to_test)
+
     def test_generate_multiple_confirmation_code(self):
         """
         Test generate multiple confirmation codes
@@ -74,10 +82,6 @@ class TestConfirmationCode(TestCase):
         client = APIClient()
         client.force_authenticate(user=user)
 
-        payload = {
-            'password': "ThisisAGoodPassword%",
-        }
-
         try:
             response = client.get('/api/signup/confirmation_code', format='json')
         except InvalidConfigrationException:
@@ -90,3 +94,25 @@ class TestConfirmationCode(TestCase):
 
         response = client.post('/api/signup/confirmation_code/', payload, format='json')
         self.assertEqual(response.status_code, 200)
+
+    def test_get_and_set_invalid_confirmation_code(self):
+        """
+        Test setting good password
+        """
+        user = self.create_test_user()
+
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        try:
+            response = client.get('/api/signup/confirmation_code', format='json')
+        except InvalidConfigrationException:
+            pass
+
+        code = user.confirmation_codes.all().first()
+        payload = {
+            'code': code.code - 10
+        }
+
+        response = client.post('/api/signup/confirmation_code/', payload, format='json')
+        self.assertEqual(response.status_code, 400)

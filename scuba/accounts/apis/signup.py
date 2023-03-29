@@ -17,7 +17,7 @@ class ConfirmationCode(generics.GenericAPIView):
 
         try:
             user.verify_confirmation_code(request.data.get('code'))
-            return Response({'code': True})
+            return Response(status=status.HTTP_200_OK)
         except InvalidConfirmationCodeException:
             pass
 
