@@ -11,6 +11,8 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 
 from scuba.accounts.models import User
+from scuba.accounts.exceptions import InvalidConfirmationCodeException
+from scuba.content.exceptions import InvalidConfigrationException
 
 
 class TestConfirmationCode(TestCase):
@@ -24,9 +26,67 @@ class TestConfirmationCode(TestCase):
 
     def test_generate_confirmation_code(self):
         """
-        Test generate cnfirmation codes
+        Test generate confirmation codes
         """
         user = self.create_test_user()
         code1 = user.generate_confirmation_code()
 
         self.assertEqual(len(str(code1.code)), 6)
+
+    def test_generate_multiple_confirmation_code(self):
+        """
+        Test generate multiple confirmation codes
+        """
+        user = self.create_test_user()
+        code1 = user.generate_confirmation_code()
+        self.assertEqual(len(str(code1.code)), 6)
+
+        code2 = user.generate_confirmation_code()
+        self.assertEqual(len(str(code2.code)), 6)
+
+        code3 = user.generate_confirmation_code()
+        self.assertEqual(len(str(code3.code)), 6)
+
+    def test_reedeem_confirmation_code(self):
+        """
+        Test the redeeming of cnfirmation codes
+        """
+        user = self.create_test_user()
+        code1 = user.generate_confirmation_code()
+        code2 = user.generate_confirmation_code()
+        code3 = user.generate_confirmation_code()
+
+        try:
+            user.verify_confirmation_code(code2.code)
+            code = user.confirmation_codes.get(code=code2.code)
+            self.assertTrue(code.redeemed)
+        except InvalidConfirmationCodeException:
+            self.fail("Code was not found")
+        except UserConfirmationCode.DoesNotExist:
+            self.fail("Code was not found")
+
+    def test_get_and_set_confirmation_code(self):
+        """
+        Test setting good password
+        """
+        user = self.create_test_user()
+
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        payload = {
+            'password': "ThisisAGoodPassword%",
+        }
+
+        try:
+            response = client.get('/api/signup/confirmation_code', format='json')
+        except InvalidConfigrationException:
+            pass
+
+        code = user.confirmation_codes.all().first()
+        payload = {
+            'code': code.code
+        }
+
+        response = client.post('/api/signup/confirmation_code/', payload, format='json')
+        self.assertEqual(response.status_code, 200)
