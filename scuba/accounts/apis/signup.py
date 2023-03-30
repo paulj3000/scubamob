@@ -21,7 +21,9 @@ class ConfirmationCode(generics.GenericAPIView):
         except InvalidConfirmationCodeException:
             pass
 
-        return Response({'code': False}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            'code': 'You supplied an invalid confirmation code'},
+            status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
         """ post
