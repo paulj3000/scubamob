@@ -644,3 +644,17 @@ class UserLogin(UUIDModel):
     def __str__(self):
         """ return a string representation of the user login """
         return self.user.get_full_name()
+
+
+class UserFavoriteDivesite(UUIDModel):
+    """ UserFavoriteDivesites
+
+    The user's favorite divesites
+    """
+    user = models.ForeignKey(User, related_name='favorite_divesites', on_delete=models.CASCADE)
+    divesite = models.ForeignKey('divesites.Divesite', on_delete=models.CASCADE)
+    notify = models.BooleanField(default=True)
+
+    class Meta:
+        """ define database tables, etc """
+        db_table = 'user_favorite_divesites'

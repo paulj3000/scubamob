@@ -10,7 +10,6 @@
 from django.urls import path, re_path
 
 import scuba.divesites.views as divesites_views
-import scuba.divesites.views.json as divesites_json
 
 
 urlpatterns = [

@@ -6,6 +6,9 @@ static/react/dist
 static/components
 static/CACHE
 static/django_extensions
+static/ycssmin
+static/yuglify
+static/webpack
 db.sqlite3*
 *.pyc
 *.swp
