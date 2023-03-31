@@ -14,6 +14,7 @@ import scuba.divesites.views as divesites_views
 
 urlpatterns = [
     path('', divesites_views.index, name="divesites_home"),
+    re_path(r'(?P<url>[\w-]*)$', divesites_views.site, name="site"),
     re_path(r'^edit/([0-9A-Fa-f]{20,36})?$', divesites_views.newsite, name="divesites_new"),
     #path('json/locations/', divesites_json.getdivesites),
     #re_path(r'^json/getdivesiteinfo/([0-9A-Fa-f]{20,36})/?$', divesites_json.getdivesiteinfo),

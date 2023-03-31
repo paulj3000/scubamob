@@ -10,8 +10,15 @@ from django.contrib import messages
 from scuba.divesites.forms import SiteForm
 
 
-@login_required
 def index(us_request):
+
+    context = {}
+
+    # render the appropriate template
+    return render(us_request, 'divesites/index.html', context)
+
+
+def site(us_request, url):
 
     context = {}
 

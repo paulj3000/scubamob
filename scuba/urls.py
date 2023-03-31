@@ -34,7 +34,7 @@ urlpatterns = [
     #path('friends/', include('scuba.friends.urls')),
     path('groups/', include('scuba.divegroups.urls')),
     path('logbooks/', include('scuba.logbooks.urls')),
-    path('divesites/', include('scuba.divesites.urls')),
+    path('sites/', include('scuba.divesites.urls')),
     path('diveshops/', include('scuba.diveshops.urls')),
     path('gallery/', include('scuba.galleries.urls')),
     path('equipment/', include('scuba.equipment.urls')),
