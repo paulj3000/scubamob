@@ -2,13 +2,10 @@
 /.*\.orig$
 ^\.DS_Store
 env/
-static/react/dist
-static/components
-static/CACHE
-static/django_extensions
-static/ycssmin
-static/yuglify
-static/webpack
+static/*
+!static/react/src
+!static/js
+!static/css/**.css
 db.sqlite3*
 *.pyc
 *.swp
