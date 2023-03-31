@@ -4,4 +4,7 @@ from django.contrib import admin
 import scuba.divesites.models as divesites_models
 
 
-admin.site.register(divesites_models.Divesite)
+class DivesiteAdmin(admin.ModelAdmin):
+    readonly_fields = ['url',]
+
+admin.site.register(divesites_models.Divesite, DivesiteAdmin)
