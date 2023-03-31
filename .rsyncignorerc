@@ -13,3 +13,5 @@ webpack.config.js
 yarn.lock
 xunittest.xml
 scripts/rsync/ignore.txt
+__pycache__
+**.pyc
