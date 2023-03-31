@@ -11,7 +11,7 @@ class FAQView(TemplateView):
 
     display the frequently asked quesitons page
     """
-    template_name = 'home/faq.html'
+    template_name = 'content/faq.html'
     def get_context_data(self, **kwargs):
         """ get_context_data
 

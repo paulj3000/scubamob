@@ -1,0 +1,75 @@
+{% extends 'layoutsales.html' %} 
+
+
+{% block sidemenu %}
+{% include 'static/sidemenu.html' with active='faq' %}
+{% endblock %}
+
+{% block salescontent %}
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">
+.accordion {
+    padding-bottom:30px;
+}
+.accordion h5 {
+    margin-left:10px;
+    margin-bottom:5px;
+}
+.accordion .card-header:after {
+    font-family: 'FontAwesome';
+    content: "\f068";
+    float: right;
+    font-size:12px;
+    line-height:15px;
+    padding-top:7px;
+}
+.accordion .card-header.collapsed:after {
+    /* symbol for "collapsed" panels */
+    content: "\f067";
+}
+.card-header {
+    padding-bottom:5px;
+    padding-top:5px;
+    font-weight:400;
+}
+
+.card {
+    border-radius:10px !important;
+    cursor:pointer;
+}
+</style>
+
+<div class="cbox">
+
+    {% include 'static/header.html' with title='FAQ' %}
+    <div class="content entry-content">
+        <section class="section1" style="margin-right: 1.2em;">     
+            <div class="general-title">
+
+                <!-- faq content start -->
+                {% for faq in faqs %}
+                <div id="accordion" class="accordion">
+                    <h5>{{faq.title}}</h5>
+                    <div class="card mb-0">
+                        {% for entry in faq.get_entries %}
+                        <div class="card-header collapsed" data-toggle="collapse" href="#collapse{{entry.id}}">
+                            <a class="card-title">
+                                {{ entry.title}}
+                            </a>
+                        </div>
+                        <div id="collapse{{entry.id}}" class="card-body collapse" data-parent="#accordion" >
+                            {{ entry.description|safe }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div style="clear: both; height: 120px;"> </div> 
+        <!-- faq content End -->
+        </section>      
+    </div>
+
+</div>
+{% endblock %}
