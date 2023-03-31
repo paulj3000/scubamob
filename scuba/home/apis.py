@@ -7,7 +7,7 @@ from django.core.cache import cache
 from django.db.models import Q
 from scuba.home.models import Jumbotron
 from scuba.home.serializers import JumbotronSerializer
-from scuba.accounts.serializers.buddies import BuddySerializer
+from scuba.accounts.serializers.buddies import BuddySerializer, BuddyRecentActivity
 from scuba.accounts.models import User
 from scuba.libs.external.weather import Weather
 
@@ -67,6 +67,6 @@ class GetHomescreenApi(generics.GenericAPIView):
                     'list': BuddySerializer(user.get_all_buddies(), many=True).data,
                 },
                 'weather': Weather.get_current_by_postal_code('92107'),
-                'recent_activity': user.get_all_buddies_recent_activity(),
+                'recent_activity': BuddyRecentActivity(user.get_all_buddies_recent_activity(), many=True).data,
              }
         })
