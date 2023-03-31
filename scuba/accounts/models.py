@@ -156,6 +156,10 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         # return all of the buddies that is not us!
         return self.buddies.all()
 
+    def get_all_buddies_recent_activity(self):
+        # return all of the buddies that is not us!
+        return self.buddies.all().order_by('-user__activities__activity_date')
+
     def confirm_buddy_request(self, buddy):
         self.buddies.create(buddy=buddy)
         buddy.buddies.create(buddy=self)
@@ -672,3 +676,17 @@ class UserDivesiteRecentlyViewed(UUIDModel):
     class Meta:
         """ define database tables, etc """
         db_table = 'user_divesites_recently_viewed'
+
+
+class UserRecentActivity(UUIDModel):
+    """ UserRecentActivity
+
+    The last thing the user did
+    """
+    user = models.ForeignKey(User, related_name='activities', on_delete=models.CASCADE)
+    #divesite = models.ForeignKey('divesites.Divesite', on_delete=models.CASCADE)
+    activity_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        """ define database tables, etc """
+        db_table = 'user_recent_activity'

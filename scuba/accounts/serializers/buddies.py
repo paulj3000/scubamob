@@ -138,3 +138,30 @@ class BuddySerializer(serializers.Serializer):
     @staticmethod
     def get_id(data):
         return data.pk_as_str
+
+
+class BuddyRecentActivity(serializers.ModelSerializer):
+    id = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+
+        fields = ('id', 'activity_date',)
+
+    @staticmethod
+    def get_id(data):
+        return data.pk_as_str
+
+    def create(self, validated_data):
+        """ create
+
+        Create a new user and all around good stuff here
+        """
+        raise NotImplementedError
+
+    def update(self, instance, validated_data):
+        """ update
+
+        Create a new user and all around good stuff here
+        """
+        raise NotImplementedError

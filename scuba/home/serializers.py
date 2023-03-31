@@ -20,4 +20,3 @@ class JumbotronSerializer(serializers.ModelSerializer):
         """ define models, fields, etc """
         model = Jumbotron
         fields = ['url', 'type',]
-
