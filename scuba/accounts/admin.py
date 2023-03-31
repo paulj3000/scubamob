@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.sessions.models import Session
 from django.urls import re_path
 
-from scuba.accounts.models import User, UserBlocked, UserBuddyRequest, UserBuddy, UserConfirmationCode
+from scuba.accounts.models import User, UserBlocked, UserBuddyRequest, UserBuddy
 import scuba.accounts.models as account_models
 
 
@@ -22,7 +22,16 @@ class UserFavoriteDivesiteAdminInline(admin.StackedInline):
 
     Class representation of the user's favorite divesites
     """
-    model = account_models.UserFavoriteDivesite
+    model = account_models.UserDivesiteFavorite
+    extra = 0
+
+
+class UserDivesiteRecentlyViewedAdminInline(admin.StackedInline):
+    """ UserFavoriteDivesiteAdminInline
+
+    Class representation of the user's favorite divesites
+    """
+    model = account_models.UserDivesiteRecentlyViewed
     extra = 0
 
 
@@ -159,7 +168,10 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ['email', 'last_name',]
 
     change_form_template = 'accounts/admin/change_user_form.html'
-    inlines = (UserConfirmationCodeAdminInline, UserFavoriteDivesiteAdminInline)
+    inlines = (
+        UserConfirmationCodeAdminInline,
+        UserFavoriteDivesiteAdminInline,
+        UserDivesiteRecentlyViewedAdminInline)
 
 
 class UserBlockedAdmin(admin.ModelAdmin):

@@ -646,15 +646,29 @@ class UserLogin(UUIDModel):
         return self.user.get_full_name()
 
 
-class UserFavoriteDivesite(UUIDModel):
+class UserDivesiteFavorite(UUIDModel):
     """ UserFavoriteDivesites
 
     The user's favorite divesites
     """
-    user = models.ForeignKey(User, related_name='favorite_divesites', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='divesites_favorites', on_delete=models.CASCADE)
     divesite = models.ForeignKey('divesites.Divesite', on_delete=models.CASCADE)
     notify = models.BooleanField(default=True)
 
     class Meta:
         """ define database tables, etc """
-        db_table = 'user_favorite_divesites'
+        db_table = 'user_divesites_favorites'
+
+
+class UserDivesiteRecentlyViewed(UUIDModel):
+    """ UserDivesiteRecentlyViewed
+
+    The user's favorite divesites
+    """
+    user = models.ForeignKey(User, related_name='divesites_recently_viewed', on_delete=models.CASCADE)
+    divesite = models.ForeignKey('divesites.Divesite', on_delete=models.CASCADE)
+    viewed = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        """ define database tables, etc """
+        db_table = 'user_divesites_recently_viewed'
