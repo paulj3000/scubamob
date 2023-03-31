@@ -1,13 +1,30 @@
-# Create your views here.
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseNotFound, Http404
-from django.contrib.auth import authenticate, login
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.views.generic import TemplateView
 
-# define the user data for this account
 from scuba.divesites.forms import SiteForm
+
+
+
+class IndexView(TemplateView):
+    """ IndexView
+
+    display the home page
+    """
+    template_name = 'divesites/index.html'
+
+    def get_context_data(self, **kwargs):
+        """ get_context_data
+
+        add more parameters to the context data
+        """
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'sites': Divesites.get_all_active_divesites(),
+        })
+
+        return context
 
 
 def index(us_request):

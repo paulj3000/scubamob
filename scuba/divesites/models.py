@@ -9,10 +9,15 @@ class Divesite(UUIDModel):
     url = models.URLField(max_length=255)
     lat = models.DecimalField(max_digits=9, decimal_places=6)
     long = models.DecimalField(max_digits=9, decimal_places=6)
+    is_active = models.BooleanField(default=True)
     difficulty = models.PositiveSmallIntegerField(choices=DIFFICULTY_CHOICES)
 
     class Meta:
         db_table = 'divesites'
+
+    @staticmethod
+    def get_all_active_divesites():
+        return Divesite.objects.all(is_active=True)
 
 
 class DivesiteReview(UUIDModel):
