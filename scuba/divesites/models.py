@@ -6,6 +6,7 @@ from scuba.divesites.settings import REVIEW_CHOICES, DIFFICULTY_CHOICES
 
 class Divesite(UUIDModel):
     name = models.CharField(max_length=100)
+    description = models.TextField()
     url = models.URLField(max_length=255, db_index=True)
     lat = models.DecimalField(max_digits=9, decimal_places=6)
     long = models.DecimalField(max_digits=9, decimal_places=6)
