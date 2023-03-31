@@ -24,3 +24,11 @@ class DivesiteReview(UUIDModel):
 
     class Meta:
         db_table = 'divesite_reviews'
+
+
+class DivesiteBanner(UUIDModel):
+    divesite = models.OneToOneField(Divesite, on_delete=models.CASCADE)
+    banner = models.CharField(max_length=128)
+
+    class Meta:
+        db_table = 'divesite_banner'
