@@ -1,7 +1,7 @@
 from django.db import models
 
 from scuba.libs.models.uuidmodel import UUIDModel
-from scuba.divesites.settings import REVIEW_CHOICES
+from scuba.divesites.settings import REVIEW_CHOICES, DIFFICULTY_CHOICES
 
 
 class Divesite(UUIDModel):
@@ -9,6 +9,7 @@ class Divesite(UUIDModel):
     url = models.URLField(max_length=255)
     lat = models.DecimalField(max_digits=9, decimal_places=6)
     long = models.DecimalField(max_digits=9, decimal_places=6)
+    difficulty = models.PositiveSmallIntegerField(choices=DIFFICULTY_CHOICES)
 
     class Meta:
         db_table = 'divesites'
