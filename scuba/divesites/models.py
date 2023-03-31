@@ -17,7 +17,7 @@ class Divesite(UUIDModel):
 
     @staticmethod
     def get_all_active_divesites():
-        return Divesite.objects.all(is_active=True)
+        return Divesite.objects.filter(is_active=True)
 
 
 class DivesiteReview(UUIDModel):

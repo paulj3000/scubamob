@@ -2,9 +2,11 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.generic import TemplateView
+from django.shortcuts import get_object_or_404
 
 from scuba.divesites.forms import SiteForm
 
+from scuba.divesites.models import Divesite
 
 
 class IndexView(TemplateView):
@@ -21,26 +23,34 @@ class IndexView(TemplateView):
         """
         context = super().get_context_data(**kwargs)
         context.update({
-            'sites': Divesites.get_all_active_divesites(),
+            'sites': Divesite.get_all_active_divesites(),
         })
 
         return context
 
 
-def index(us_request):
+class SiteView(TemplateView):
+    """ IndexView
 
-    context = {}
+    display the home page
+    """
+    template_name = 'divesites/site.html'
 
-    # render the appropriate template
-    return render(us_request, 'divesites/index.html', context)
+    def get_context_data(self, **kwargs):
+        """ get_context_data
 
+        add more parameters to the context data
+        """
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'site': Divesite.get_all_active_divesites(),
+        })
 
-def site(us_request, url):
+        return context
 
-    context = {}
-
-    # render the appropriate template
-    return render(us_request, 'divesites/index.html', context)
+    def dispatch(self, request, *args, **kwargs):
+        kwargs['site'] = get_object_or_404(Divesite, url=kwargs.get('url'))
+        return super().dispatch(request, *args, **kwargs)
 
 
 @login_required
