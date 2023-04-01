@@ -16,10 +16,14 @@ import scuba.accounts.apis.account as account_api
 import scuba.accounts.apis.profile as profile_api
 
 from scuba.sitesettings.apis import GetSystemSettingsApi, GetSystemEndpointsApi
-
+from scuba.settings import SITE_TITLE
 
 from django.contrib import admin
 admin.autodiscover()
+
+admin.site.site_title = SITE_TITLE
+admin.site.site_header = f"{SITE_TITLE} - Admin Section"
+
 
 urlpatterns = [
     # Examples:
