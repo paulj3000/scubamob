@@ -421,9 +421,10 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         This will generate the welcome email and return the
         rendered value
         '''
-
-        _, created = self.divesites_recently_viewed.objects.update_or_create(
+        obj, created = self.divesites_recently_viewed.update_or_create(
             divesite=divesite, defaults={},)
+
+        return obj
 
 
 class UserConfirmationCode(UUIDModel):
@@ -680,7 +681,7 @@ class UserDivesiteRecentlyViewed(UUIDModel):
     """
     user = models.ForeignKey(User, related_name='divesites_recently_viewed', on_delete=models.CASCADE)
     divesite = models.ForeignKey('divesites.Divesite', on_delete=models.CASCADE)
-    viewed = models.DateTimeField(auto_now=True)
+    viewed_date = models.DateTimeField(auto_now=True)
 
     class Meta:
         """ define database tables, etc """

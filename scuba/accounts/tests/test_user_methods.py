@@ -7,6 +7,7 @@ Replace this with more appropriate tests for your application.
 from django.test import TestCase
 
 from scuba.accounts.models import User
+from scuba.divesites.models import Divesite
 
 
 class TestUserMethods(TestCase):
@@ -35,3 +36,18 @@ class TestUserMethods(TestCase):
         user = User.objects.get(email='test2@user.com')
         self.assertFalse(user.is_admin)
         self.assertFalse(user.is_staff)
+
+    def test_user_add_divesite_recently_viewed(self):
+        """
+        Test adding a divesite to a user's recently viewed
+        """
+        divesite = Divesite.objects.all().first()
+        user = User.objects.get(email='test2@user.com')
+
+        obj = user.add_divesite_recently_viewed(divesite)
+        viewed_date = obj.viewed_date
+        obj = user.add_divesite_recently_viewed(divesite)
+
+        self.assertNotEqual(viewed_date, obj.viewed_date)
+
+
