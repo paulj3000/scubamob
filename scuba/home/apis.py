@@ -65,8 +65,8 @@ class GetHomescreenApi(generics.GenericAPIView):
                 'buddies': {
                     'count': user.get_buddies_count(),
                     'list': BuddySerializer(user.get_all_buddies(), many=True).data,
+                    'recent_activity': BuddyRecentActivity(user.get_all_buddies_recent_activity(), many=True).data,
                 },
                 'weather': Weather.get_current_by_postal_code('92107'),
-                'recent_activity': BuddyRecentActivity(user.get_all_buddies_recent_activity(), many=True).data,
              }
         })
