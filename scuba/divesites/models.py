@@ -9,8 +9,8 @@ class Divesite(UUIDModel):
     name = models.CharField(max_length=100)
     description = models.TextField()
     url = models.URLField(max_length=255, db_index=True, blank=True)
-    lat = models.DecimalField(max_digits=9, decimal_places=6)
-    long = models.DecimalField(max_digits=9, decimal_places=6)
+    lat = models.DecimalField(max_digits=15, decimal_places=9)
+    long = models.DecimalField(max_digits=15, decimal_places=9)
     is_active = models.BooleanField(default=True)
     difficulty = models.PositiveSmallIntegerField(choices=DIFFICULTY_CHOICES)
 
