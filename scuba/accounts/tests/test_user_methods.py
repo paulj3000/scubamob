@@ -10,31 +10,20 @@ from scuba.accounts.models import User
 
 
 class TestUserMethods(TestCase):
+    fixtures = ["test_users.json", "test_divesites.json"]
+
     def test_user_get_full_name(self):
         """
         Test simple user get name
         """
-        user = User.objects.create(
-            first_name='First',
-            last_name='Last',
-            date_of_birth='1970-01-01',
-            email='test@user.com')
-        user.set_password('password')
-        user.save()
+        user = User.objects.get(email='test2@user.com')
         self.assertEqual(user.get_full_name(), "First Last")
 
     def test_user_is_admin_1(self):
         """
         Test simple user get name
         """
-        user = User.objects.create(
-            first_name='First',
-            last_name='Last',
-            is_admin=True,
-            date_of_birth='1970-01-01',
-            email='test@user.com')
-        user.set_password('password')
-        user.save()
+        user = User.objects.get(email='test@admin.com')
 
         self.assertTrue(user.is_admin)
         self.assertTrue(user.is_staff)
@@ -43,13 +32,6 @@ class TestUserMethods(TestCase):
         """
         Test simple user get name
         """
-        user = User.objects.create(
-            first_name='First',
-            last_name='Last',
-            date_of_birth='1970-01-01',
-            email='test2@user.com')
-        user.set_password('password')
-        user.save()
-
+        user = User.objects.get(email='test2@user.com')
         self.assertFalse(user.is_admin)
         self.assertFalse(user.is_staff)

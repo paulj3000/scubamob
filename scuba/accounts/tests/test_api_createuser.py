@@ -12,6 +12,8 @@ from rest_framework.test import APIClient
 
 
 class TestCreateUserAPI(TestCase):
+    fixtures = ["test_users.json"]
+
     def test_create_user_1(self):
         """
         Test simple create user
@@ -22,7 +24,7 @@ class TestCreateUserAPI(TestCase):
             'last_name': "last",
             'date_of_birth': "1980-10-31",
             'password': "someweirdpassword",
-            'email': "foo@nowhere.com"
+            'email': "newuser@nowhere.com"
         }
 
         response = client.post('/api/signup/createuser/', payload, format='json')

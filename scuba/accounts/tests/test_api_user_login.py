@@ -14,22 +14,23 @@ from scuba.accounts.models import User
 
 
 class TestUserLoginAPI(TestCase):
-    @staticmethod
-    def create_test_user(email='foo@nowhere.com'):
-        user = User.objects.create(
-            first_name='First',
-            last_name='Last',
-            date_of_birth='1970-01-01',
-            email=email)
-        user.set_password('password')
-        user.save()
-        return user
+    fixtures = ["test_users.json"]
 
     def test_login_user_1(self):
         """
         Test simple create user
         """
-        user = TestUserLoginAPI.create_test_user()
+        from pprint import pprint
+        pprint(User.objects.all())
+        pprint(User.objects.all())
+        pprint(User.objects.all())
+        pprint(User.objects.all())
+        pprint(User.objects.all())
+        pprint(User.objects.filter(email='foo@nowhere.com'))
+
+
+        #user = TestUserLoginAPI.create_test_user()
+        user = User.objects.get(email='foo@nowhere.com')
         client = APIClient()
         payload = {
             'password': 'password',
@@ -59,7 +60,8 @@ class TestUserLoginAPI(TestCase):
         """
         Test simple create user
         """
-        user = TestUserLoginAPI.create_test_user()
+        #user = TestUserLoginAPI.create_test_user()
+        user = User.objects.get(email='foo@nowhere.com')
         client = APIClient()
         payload = {
             'email': 'foo@nowhere.com',

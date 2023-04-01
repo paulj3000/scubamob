@@ -49,7 +49,14 @@ class SiteView(TemplateView):
         return context
 
     def dispatch(self, request, *args, **kwargs):
-        kwargs['site'] = get_object_or_404(Divesite, url=kwargs.get('url'))
+        site = get_object_or_404(Divesite, url=kwargs.get('url'))
+
+        # add the site to the user's recently viewed pages
+        if request.user.is_authenticated:
+            request.user.add_divesite_recently_viewed(site)
+
+        kwargs['site'] = site
+
         return super().dispatch(request, *args, **kwargs)
 
 

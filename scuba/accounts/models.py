@@ -416,6 +416,15 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
 
         return (html, email_txt)
 
+    def add_divesite_recently_viewed(self, divesite):
+        '''
+        This will generate the welcome email and return the
+        rendered value
+        '''
+
+        _, created = self.divesites_recently_viewed.objects.update_or_create(
+            divesite=divesite, defaults={},)
+
 
 class UserConfirmationCode(UUIDModel):
     user = models.ForeignKey(User, related_name='confirmation_codes', on_delete=models.CASCADE)
