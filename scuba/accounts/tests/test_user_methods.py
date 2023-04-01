@@ -50,4 +50,37 @@ class TestUserMethods(TestCase):
 
         self.assertNotEqual(viewed_date, obj.viewed_date)
 
+    def test_user_add_divesite_to_favorite(self):
+        """
+        Add a divesite to user's favorite list
+        """
+        divesite = Divesite.objects.all().first()
+        user = User.objects.get(email='test2@user.com')
 
+        user.set_divesite_favorite(divesite)
+        favorite = user.divesites_favorites.filter(divesite=divesite)
+        self.assertIsNotNone(favorite)
+
+        # make sure there is only one record for this divesite
+        user.divesites_favorites.filter(divesite=divesite)
+        user.divesites_favorites.filter(divesite=divesite)
+        user.divesites_favorites.filter(divesite=divesite)
+        favorites = user.divesites_favorites.filter(divesite=divesite)
+        self.assertEqual(favorites.count(), 1)
+
+    def test_user_remove_divesite_from_favorites(self):
+        """
+        Remove a divesite from user's favorite list
+        """
+        divesite = Divesite.objects.all().first()
+        user = User.objects.get(email='test2@user.com')
+
+        # make sure it got into the database
+        user.set_divesite_favorite(divesite)
+        favorite = user.divesites_favorites.filter(divesite=divesite)
+        self.assertIsNotNone(favorite)
+
+        # now remove it
+        user.set_divesite_favorite(divesite, False)
+        favorites = user.divesites_favorites.filter(divesite=divesite)
+        self.assertEqual(favorites.count(), 0)

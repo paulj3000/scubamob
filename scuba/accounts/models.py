@@ -416,6 +416,9 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
 
         return (html, email_txt)
 
+    # -----------------------------------------------------------------------------
+    # Start divesite methods
+    # -----------------------------------------------------------------------------
     def add_divesite_recently_viewed(self, divesite):
         '''
         This will generate the welcome email and return the
@@ -425,6 +428,16 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
             divesite=divesite, defaults={},)
 
         return obj
+
+    def set_divesite_favorite(self, divesite, is_favorite=True):
+        '''
+        Add a divesite to a user's favorite list
+        '''
+        if is_favorite:
+            _, _ = self.divesites_favorites.get_or_create(
+                divesite=divesite, defaults={})
+        else:
+            self.divesites_favorites.filter(divesite=divesite).delete()
 
 
 class UserConfirmationCode(UUIDModel):
@@ -448,15 +461,10 @@ class Account(models.Model):
     reputation = models.PositiveSmallIntegerField(default=0)
     is_private = models.BooleanField(default=False)
 
-    apikey = models.CharField(max_length=32)
     secret = models.CharField(max_length=16)
 
     class Meta:
         db_table = 'account'
-
-    def get_full_name(self):
-        full_name = '%s %s' % (self.first_name.title(), self.last_name.title())
-        return full_name.strip()
 
     def get_short_name(self):
         "Returns the short name for the user."
@@ -479,36 +487,6 @@ class Account(models.Model):
         Sends an email to this User.
         """
         send_mail(subject, message, from_email, [self.email])
-
-    # -----------------------------------------------------------------------------
-    # start API stuff (token based)
-    # -----------------------------------------------------------------------------
-    def get_api_token(self):
-        """ get_api_token
-
-        Get the API token for a particular user. If it does not exist, create id
-        Returns: API Token
-        """
-        # send the email
-        obj, _ = Token.objects.get_or_create(user=self)
-        return obj.key
-
-    def init_guid(self):
-        retval = 0
-        for i in list(str(datetime.date.today().year)):
-            retval += int(i)
-
-        retval = "%i-%s" % (retval, str(uuid.uuid1()).replace('-',''))
-
-        # ok, we have a new account id.  return it
-        return retval
-
-    def save(self, *args, **kwargs):
-        if not self.apikey and not self.secret:
-            self.apikey = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(24))
-            self.secret = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
-
-        super().save(*args, **kwargs)
 
 
 class UserBuddy(UUIDModel):
