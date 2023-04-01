@@ -12,7 +12,6 @@
 from django import forms
 
 from scuba.libs.nosql.forms import NoSQLForm
-from scuba.divesites.mongo import DiveSite
 from bson.objectid import ObjectId
 
 CLASSIFICATION_CHOICES = (('shark', 'Shark'),('reef', 'Reef'), ('wall', 'Wall'),
@@ -124,7 +123,6 @@ class SiteForm(NoSQLForm):
 
     class Meta:
         model = 'divesites'
-        mongo = DiveSite
         id = 'site_id'
 
     def findsite(self, id):

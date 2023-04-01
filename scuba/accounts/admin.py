@@ -8,6 +8,33 @@ from scuba.accounts.models import User, UserBlocked, UserBuddyRequest, UserBuddy
 import scuba.accounts.models as account_models
 
 
+class UserConfirmationCodeAdminInline(admin.StackedInline):
+    """ UserConfirmationCodeAdminInline
+
+    Class representation of the confirmation codes assigned to this user
+    """
+    model = account_models.UserConfirmationCode
+    extra = 0
+
+
+class UserFavoriteDivesiteAdminInline(admin.StackedInline):
+    """ UserFavoriteDivesiteAdminInline
+
+    Class representation of the user's favorite divesites
+    """
+    model = account_models.UserDivesiteFavorite
+    extra = 0
+
+
+class UserDivesiteRecentlyViewedAdminInline(admin.StackedInline):
+    """ UserFavoriteDivesiteAdminInline
+
+    Class representation of the user's favorite divesites
+    """
+    model = account_models.UserDivesiteRecentlyViewed
+    extra = 0
+
+
 class UserAdmin(admin.ModelAdmin):
     """ UserAdmin
 
@@ -141,6 +168,10 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ['email', 'last_name',]
 
     change_form_template = 'accounts/admin/change_user_form.html'
+    inlines = (
+        UserConfirmationCodeAdminInline,
+        UserFavoriteDivesiteAdminInline,
+        UserDivesiteRecentlyViewedAdminInline)
 
 
 class UserBlockedAdmin(admin.ModelAdmin):

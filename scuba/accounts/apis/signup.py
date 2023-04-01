@@ -4,6 +4,7 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
 import scuba.accounts.serializers.signup as serializers
+from scuba.accounts.exceptions import InvalidConfirmationCodeException
 
 
 class ConfirmationCode(generics.GenericAPIView):
@@ -14,10 +15,15 @@ class ConfirmationCode(generics.GenericAPIView):
         """
         user = request.user
 
-        if user.verify_confirmation_code(request.data.get('code')):
-            return Response({'code': True})
+        try:
+            user.verify_confirmation_code(request.data.get('code'))
+            return Response(status=status.HTTP_200_OK)
+        except InvalidConfirmationCodeException:
+            pass
 
-        return Response({'code': False}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            'code': 'You supplied an invalid confirmation code'},
+            status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
         """ post

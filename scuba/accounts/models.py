@@ -23,7 +23,7 @@ from scuba.accounts.settings import SETTINGS_KEYS, SETTINGS_VALUES
 from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.libs.alerting import Alerting
 from scuba.settings import PROFILE_BLANK_URL, AWS_CLOUDFRONT
-from scuba.accounts.exceptions import InvalidEmailIdException, PrimaryEmailIdException, EmailInUseException, InvalidUserIdException
+from scuba.accounts.exceptions import InvalidEmailIdException, PrimaryEmailIdException, EmailInUseException, InvalidUserIdException, InvalidConfirmationCodeException
 from scuba.accounts.settings import SETTINGS
 from scuba.sitesettings.models import SystemSetting
 
@@ -156,6 +156,10 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         # return all of the buddies that is not us!
         return self.buddies.all()
 
+    def get_all_buddies_recent_activity(self):
+        # return all of the buddies that is not us!
+        return self.buddies.all().order_by('-user__activities__activity_date')
+
     def confirm_buddy_request(self, buddy):
         self.buddies.create(buddy=buddy)
         buddy.buddies.create(buddy=self)
@@ -218,20 +222,16 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
     # -----------------------------------------------------------------------------
     def generate_confirmation_code(self):
         # check if the user is blocking for the friend.
-        if hasattr(self, 'userconfirmationcode'):
-            self.userconfirmationcode.delete()
-
         code = random.randint(100000, 999999)
         return UserConfirmationCode.objects.create(code=code, user=self)
 
     def verify_confirmation_code(self, code):
         # check if the user is blocking for the friend.
-        if hasattr(self, 'userconfirmationcode'):
-            if self.userconfirmationcode.code == code:
-                self.userconfirmationcode.delete()
-                return True
-
-        return False
+        try:
+            confirmation = self.confirmation_codes.get(code=code)
+            confirmation.set_redeemed()
+        except UserConfirmationCode.DoesNotExist:
+            raise InvalidConfirmationCodeException
 
     def send_confirmation_code_email(self, code):
         """ send_welcome_email
@@ -242,7 +242,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         data = self.generate_confirmation_code_email(email_template, code)
 
         subject = email_template.subject
-        subject = subject.replace('##CONFIRMATION_CODE##', code)
+        subject = subject.replace('##CONFIRMATION_CODE##', str(code))
         subject = subject.replace('##FIRST_NAME##', self.first_name.title())
 
         # now store the email
@@ -254,7 +254,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         rendered value
         '''
         # now let's send something....
-        content = email_template.content.replace('##CONFIRMATION_CODE##', code)
+        content = email_template.content.replace('##CONFIRMATION_CODE##', str(code))
         soup = BeautifulSoup(content, 'lxml')
         email_txt = soup.get_text()
 
@@ -418,12 +418,17 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
 
 
 class UserConfirmationCode(UUIDModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    code = models.PositiveSmallIntegerField()
+    user = models.ForeignKey(User, related_name='confirmation_codes', on_delete=models.CASCADE)
+    code = models.PositiveIntegerField()
+    redeemed = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'user_confirmation_code'
+
+    def set_redeemed(self):
+        self.redeemed = True
+        self.save()
 
 
 class Account(models.Model):
@@ -643,3 +648,45 @@ class UserLogin(UUIDModel):
     def __str__(self):
         """ return a string representation of the user login """
         return self.user.get_full_name()
+
+
+class UserDivesiteFavorite(UUIDModel):
+    """ UserFavoriteDivesites
+
+    The user's favorite divesites
+    """
+    user = models.ForeignKey(User, related_name='divesites_favorites', on_delete=models.CASCADE)
+    divesite = models.ForeignKey('divesites.Divesite', on_delete=models.CASCADE)
+    notify = models.BooleanField(default=True)
+
+    class Meta:
+        """ define database tables, etc """
+        db_table = 'user_divesites_favorites'
+
+
+class UserDivesiteRecentlyViewed(UUIDModel):
+    """ UserDivesiteRecentlyViewed
+
+    The user's favorite divesites
+    """
+    user = models.ForeignKey(User, related_name='divesites_recently_viewed', on_delete=models.CASCADE)
+    divesite = models.ForeignKey('divesites.Divesite', on_delete=models.CASCADE)
+    viewed = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        """ define database tables, etc """
+        db_table = 'user_divesites_recently_viewed'
+
+
+class UserRecentActivity(UUIDModel):
+    """ UserRecentActivity
+
+    The last thing the user did
+    """
+    user = models.ForeignKey(User, related_name='activities', on_delete=models.CASCADE)
+    #divesite = models.ForeignKey('divesites.Divesite', on_delete=models.CASCADE)
+    activity_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        """ define database tables, etc """
+        db_table = 'user_recent_activity'

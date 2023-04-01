@@ -9,3 +9,6 @@ class PrimaryEmailIdException(Exception):
 
 class EmailInUseException(Exception):
     pass
+
+class InvalidConfirmationCodeException(Exception):
+    pass

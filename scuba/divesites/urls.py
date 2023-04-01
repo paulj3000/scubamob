@@ -10,12 +10,12 @@
 from django.urls import path, re_path
 
 import scuba.divesites.views as divesites_views
-import scuba.divesites.views.json as divesites_json
 
 
 urlpatterns = [
-    path('', divesites_views.index, name="divesites_home"),
-    re_path(r'^edit/([0-9A-Fa-f]{20,36})?$', divesites_views.newsite, name="divesites_new"),
+    path('', divesites_views.IndexView.as_view(), name='divesites_home'),
+    re_path(r'(?P<url>[\w-]*)$', divesites_views.SiteView.as_view(), name="site"),
+    #re_path(r'^edit/([0-9A-Fa-f]{20,36})?$', divesites_views.newsite, name="divesites_new"),
     #path('json/locations/', divesites_json.getdivesites),
     #re_path(r'^json/getdivesiteinfo/([0-9A-Fa-f]{20,36})/?$', divesites_json.getdivesiteinfo),
 ]

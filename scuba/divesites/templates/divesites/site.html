@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block content %}
+<script src="//maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=AIzaSyCZcaPxfE_UnCFqYFEuZU1lI7kIMSMLvfs" type="text/javascript"></script>
+<script src="{% static 'js/divesites/sm.divesites.js' %}"></script>
+
+<style type="text/css">
+    #map_canvas { height: 554px;width: 758px }
+    body { overflow:visible;width:100% }
+    .togglebtn { cursor:pointer; } 
+</style>
+
+    <script type="text/javascript"> 
+var sitemarker="{% static 'images/icons/divemarker.png' %}";
+$(document).ready(function()
+{
+    $(window).resize(function()     
+    {
+        SM.DiveSites.initScreenSize();
+    });
+
+    SM.DiveSites.initUserLocation();
+    SM.DiveSites.displayMap();
+});
+
+</script>
+
+<div class="sales">
+    <h1 style="margin-bottom:10px">Dive Sites</h1>
+</div>
+
+    <div class="right-field">
+        <div id="map_canvas"></div>   
+        <div class="divshop-address2" style="display:none" id="divshop-address2">
+            <div class="divshop-address-details" id="divsite-detail">
+            </div>
+        </div>   
+    </div>
+    <div style="clear:both"></div>
+
+    {% verbatim %}
+    <div id="infopane_wrapper" style="display:none">
+
+        <h4>{{ divesiteinfo.title }}</h4>
+        <div class="prepand2"><img src="{{ weather.icon_url }}" alt="Image" /></div>
+        <div class="font2">Current weather: <span>{{ weather.weather }}</span></div>
+        <div class="font2">Current time: <span>{{ current_time }}</span></div>
+        <div class="font2">Sunrise:  <span>{{ sunrise }}</span></div>
+        <div class="font2">Sunset:  <span>{{ sunset }}</span></div>
+        <div class="font2">Moon Phase:  <span>{{ moonphase }} %</span></div>
+        <div class="font2">High Tide:  <span>{{ tide.maxheight }} feet</span></div>
+        <div class="font2">Low Tide:  <span>{{ tide.minheight }} feet</span></div>
+        <div class="font2">Water Visibility:  <span>{{ tide.minheight }} feet</span></div>
+
+        <table width="160" cellpadding="0" cellspacing="0" border="0">
+            <tbody>
+                <tr>
+                Set as favorite:
+                    <td width="20" class="prepand2">
+                        {{#favorite }}
+                        <input type="checkbox" class="favorite" checked="checked" value="{{ id }}" />
+                        {{/favorite }}
+                        
+                        {{^favorite }}
+                        <input type="checkbox" class="favorite" value="{{ id }}" />
+                        {{/favorite }}
+                    </td>
+                    <td width="140" class="font3 prepand2">Set as Favorite</td>
+                </tr>
+                Set as favorite:
+            </tbody>
+        </table>
+    </div>
+    {% endverbatim %}
+
+
+{% endblock %}

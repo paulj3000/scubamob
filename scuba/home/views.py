@@ -6,7 +6,6 @@ from django.views.generic import TemplateView
 
 # define the user data for this account
 from scuba.divesites.models import Divesite
-from scuba.divesites.mongo import DiveSite as DiveSiteMongo
 from scuba.home.models import Jumbotron
 
 
