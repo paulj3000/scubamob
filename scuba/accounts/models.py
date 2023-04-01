@@ -650,6 +650,7 @@ class UserDivesiteFavorite(UUIDModel):
     class Meta:
         """ define database tables, etc """
         db_table = 'user_divesites_favorites'
+        unique_together = (('user', 'divesite'), )
 
 
 class UserDivesiteRecentlyViewed(UUIDModel):
