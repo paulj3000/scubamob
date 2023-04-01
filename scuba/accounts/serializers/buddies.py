@@ -3,7 +3,7 @@ from django.conf.urls.static import static
 
 from rest_framework import serializers
 
-from scuba.accounts.models import User
+from scuba.accounts.models import User, UserRecentActivity
 from scuba.settings import PROFILE_BLANK_URL
 
 
@@ -144,8 +144,7 @@ class BuddyRecentActivity(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
 
     class Meta:
-        model = User
-
+        model = UserRecentActivity
         fields = ('id', 'activity_date',)
 
     @staticmethod
