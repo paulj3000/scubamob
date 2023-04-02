@@ -17,6 +17,9 @@ class Divesite(UUIDModel):
     class Meta:
         db_table = 'divesites'
 
+    def __str__(self):
+        return self.name
+
     def save(self, *args, **kwargs):
         # generate a url for the divesite
         self.url = StringUtils.generate_url_from_string(self.name)
