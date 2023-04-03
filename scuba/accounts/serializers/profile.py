@@ -11,7 +11,6 @@ class ProfileSerializer(serializers.Serializer):
     id = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
     buddies_count = serializers.SerializerMethodField()
-    username = serializers.CharField()
     profile_image = serializers.SerializerMethodField()
 
     @staticmethod
