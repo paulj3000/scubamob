@@ -29,7 +29,7 @@ class DivesiteListApi(generics.ListAPIView):
         lng = self.request.query_params.get('long', None)
         distance = self.request.query_params.get('distance', None)
 
-        return Divesites.get_local_diveshops(lat, lng, distance)
+        return Divesites.get_local_divesites(lat, lng, distance)
 
     def get_queryset(self):
         """ get_queryset
@@ -41,13 +41,12 @@ class DivesiteListApi(generics.ListAPIView):
         lon = float(us_request.GET['lon'])
         lat = float(us_request.GET['lat'])
         '''
-
         return Divesite.objects.all()
 
     def list(self, request):
         queryset = self.get_queryset()
         retval = {
-            'diveshops': self.serializer_class(queryset, many=True).data
+            'divesites': self.serializer_class(queryset, many=True).data
         }
 
         return Response(retval)
