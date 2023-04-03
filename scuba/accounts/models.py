@@ -434,8 +434,10 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         Add a divesite to a user's favorite list
         '''
         if is_favorite:
-            _, _ = self.divesites_favorites.get_or_create(
+            obj, _ = self.divesites_favorites.get_or_create(
                 divesite=divesite, defaults={})
+
+            return obj
         else:
             self.divesites_favorites.filter(divesite=divesite).delete()
 
@@ -650,6 +652,7 @@ class UserDivesiteFavorite(UUIDModel):
     class Meta:
         """ define database tables, etc """
         db_table = 'user_divesites_favorites'
+        unique_together = (('user', 'divesite'), )
 
 
 class UserDivesiteRecentlyViewed(UUIDModel):

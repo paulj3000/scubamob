@@ -10,10 +10,25 @@ class DivesiteSerializer(serializers.ModelSerializer):
     Function takes in a program object and converts it to appropriate
     json objects
     """
+    id = serializers.SerializerMethodField()
+    difficulty_display = serializers.SerializerMethodField(read_only=True)
+
+    @staticmethod
+    def get_id(data):
+        return data.pk_as_str
+
+    @staticmethod
+    def get_difficulty_display(data):
+        return data.get_difficulty_display()
+
     class Meta:
         """ define models, fields, etc """
         model = Divesite
-        fields = '__all__'
+        #fields = '__all__'
+        fields = (
+            'id', 'name', 'description', 'lat', 'long', 'difficulty',
+            'difficulty_display',
+        )
 
     def create(self, validated_data):
         retval = []

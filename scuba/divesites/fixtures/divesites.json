@@ -1,0 +1,1 @@
+[{"model": "divesites.divesite", "pk": "d705665f-c2c4-4a21-b11e-2b0b1093702b", "fields": {"name": "White Point", "description": "White Point", "url": "white-point", "lat": "33.714741100", "long": "-118.314238300", "is_active": true, "difficulty": 0}}]

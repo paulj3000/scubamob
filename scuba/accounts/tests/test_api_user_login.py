@@ -20,15 +20,6 @@ class TestUserLoginAPI(TestCase):
         """
         Test simple create user
         """
-        from pprint import pprint
-        pprint(User.objects.all())
-        pprint(User.objects.all())
-        pprint(User.objects.all())
-        pprint(User.objects.all())
-        pprint(User.objects.all())
-        pprint(User.objects.filter(email='foo@nowhere.com'))
-
-
         #user = TestUserLoginAPI.create_test_user()
         user = User.objects.get(email='foo@nowhere.com')
         client = APIClient()

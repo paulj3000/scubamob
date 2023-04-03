@@ -25,7 +25,6 @@ class Divesite(UUIDModel):
         self.url = StringUtils.generate_url_from_string(self.name)
         super().save(*args, **kwargs)
 
-
     @staticmethod
     def get_all_active_divesites():
         return Divesite.objects.filter(is_active=True)

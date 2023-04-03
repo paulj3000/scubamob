@@ -23,7 +23,7 @@ from scuba.accounts.serializers.buddies import BuddySerializer
 
 
 class GetProfileApi(generics.RetrieveAPIView):
-    lookup_field = 'username'
+    lookup_field = 'email'
     permission_classes = (IsAuthenticated,)
     serializer_class = ProfileSerializer
 

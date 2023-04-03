@@ -14,19 +14,13 @@ from scuba.accounts.models import User
 
 
 class APISetPassword(TestCase):
-    @staticmethod
-    def create_test_user():
-        return User.objects.create(
-            first_name='First',
-            last_name='Last',
-            date_of_birth='1970-04-01',
-            email='foo@nowhere.com')
+    fixtures = ["test_users.json"]
 
     def test_set_good_password(self):
         """
         Test setting good password
         """
-        user = self.create_test_user()
+        user = User.objects.get(email='foo@nowhere.com')
 
         client = APIClient()
         client.force_authenticate(user=user)
@@ -42,7 +36,7 @@ class APISetPassword(TestCase):
         """
         Test setting bad password
         """
-        user = self.create_test_user()
+        user = User.objects.get(email='foo@nowhere.com')
 
         client = APIClient()
         client.force_authenticate(user=user)
