@@ -55,15 +55,3 @@ class UserDivesiteFavorite(generics.RetrieveDestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
-
-    def xxxpost(self, request, divesiteid):
-        divesite = get_object_or_404(Divesite, id=divesiteid)
-
-        user = request.user
-        if request.data.get('is_favorite') and \
-            request.data['is_favorite'] == 0:
-                user.set_divesite_favorite(divesite, false)
-                return Response(status=status.HTTP_204_NO_CONTENT)
-
-        user.set_divesite_favorite(divesite)
-        return Response(status=status.HTTP_201_CREATED)
