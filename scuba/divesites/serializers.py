@@ -12,10 +12,15 @@ class DivesiteSerializer(serializers.ModelSerializer):
     """
     id = serializers.SerializerMethodField()
     difficulty_display = serializers.SerializerMethodField(read_only=True)
+    banner = serializers.SerializerMethodField(read_only=True)
 
     @staticmethod
     def get_id(data):
         return data.pk_as_str
+
+    @staticmethod
+    def get_banner(data):
+        return data.banner
 
     @staticmethod
     def get_difficulty_display(data):
@@ -27,7 +32,7 @@ class DivesiteSerializer(serializers.ModelSerializer):
         #fields = '__all__'
         fields = (
             'id', 'name', 'description', 'lat', 'long', 'difficulty',
-            'difficulty_display',
+            'difficulty_display', 'banner',
         )
 
     def create(self, validated_data):

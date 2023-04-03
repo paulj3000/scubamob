@@ -10,7 +10,7 @@ from scuba.sitesettings.exceptions import InvalidConfigurationException
 from scuba.sitesettings.settings import (SYSTEM_SETTINGS, SYSTEM_APIS, SOCKET_SERVER_SETTINGS,\
     LOGBOOK_APIS, SETTINGS_APIS, AWS_APIS, BILLING_APIS, APPS)
 from scuba.sitesettings import settings
-from scuba.settings import PROFILE_BLANK_URL
+from scuba.settings import PROFILE_BLANK_URL, BANNER_BLANK_URL
 
 
 class ApiEndpoint(UUIDModel):
@@ -172,6 +172,10 @@ class SystemSetting(UUIDModel):
     @staticmethod
     def get_default_profile_image():
         return SystemSetting.get_url_by_key('DEFAULT_PROFILE_IMAGE', PROFILE_BLANK_URL)
+
+    @staticmethod
+    def get_default_banner_image():
+        return SystemSetting.get_url_by_key('DEFAULT_BANNER_IMAGE', BANNER_BLANK_URL)
 
     @staticmethod
     def get_url_by_key(key, default=None):

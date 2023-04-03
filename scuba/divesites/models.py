@@ -1,8 +1,11 @@
 from django.db import models
+from django.templatetags.static import static
 
 from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.divesites.settings import REVIEW_CHOICES, DIFFICULTY_CHOICES
 from scuba.libs.stringutils import StringUtils
+from scuba.sitesettings.models import SystemSetting
+from scuba.settings import AWS_CLOUDFRONT
 
 
 class Divesite(UUIDModel):
@@ -20,6 +23,10 @@ class Divesite(UUIDModel):
     def __str__(self):
         return self.name
 
+    @property
+    def banner(self):
+        return self.get_banner()
+
     def save(self, *args, **kwargs):
         # generate a url for the divesite
         self.url = StringUtils.generate_url_from_string(self.name)
@@ -28,6 +35,21 @@ class Divesite(UUIDModel):
     @staticmethod
     def get_all_active_divesites():
         return Divesite.objects.filter(is_active=True)
+
+    # -----------------------------------------------------------------------------
+    # start banner image stuff
+    # -----------------------------------------------------------------------------
+    def get_banner(self):
+        """ get_banner
+
+        return a banner for the divesite. If one does not exist, get a blank / default
+        one
+        """
+        if hasattr(self, 'divesitebanner'):
+            return self.divesitebanner.get_banner_image()
+
+        # No profile image. just return a default
+        return static(SystemSetting.get_default_banner_image())
 
 
 class DivesiteReview(UUIDModel):
@@ -47,3 +69,15 @@ class DivesiteBanner(UUIDModel):
 
     class Meta:
         db_table = 'divesite_banner'
+
+    @property
+    def image_cleaned(self):
+        return self.image.replace('programs/', '')
+
+    def get_banner_image(self):
+        """ get_banner_image
+
+        sanitize the profile image. This will return the full url path
+        of the profile image, sans the 'profiles/' prefix
+        """
+        return f"{AWS_CLOUDFRONT}{self.image_cleaned}"
