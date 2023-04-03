@@ -50,6 +50,24 @@ class TestUserBuddiesAPI(TestCase):
         accept = response.json()
         self.assertIn('accept', accept)
 
+    def test_blocked_buddy_request(self):
+        """
+        Test the making of a buddy request
+        """
+        user = User.objects.get(email='foo@nowhere.com')
+        user1 = User.objects.get(email='test@tester.com')
+        request = user1.add_buddy_request(user)
+
+        # block the buddy
+        user1.block_buddy(user)
+
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        response = client.post(f'/api/user/buddies/requests/{request.pk_as_str}/accept', format='json')
+        self.assertEqual(response.status_code, 400)
+
+
     def test_add_bad_buddy_id_request(self):
         """
         Test the making of a buddy request

@@ -96,6 +96,9 @@ class AcceptBuddyRequestSerializer(serializers.Serializer):
         if not request or not request.is_active:
             raise serializers.ValidationError(f"{request_id} is not a valid request")
 
+        if user.is_blocked(request.user):
+            raise serializers.ValidationError(f"{request_id} is no longer valid")
+
         setattr(self, 'request', request)
         return request_id
 
