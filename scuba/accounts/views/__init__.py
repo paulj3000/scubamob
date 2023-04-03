@@ -11,16 +11,6 @@ from scuba.accounts.models import User
 
 
 @login_required
-def home(us_request):
-    template = 'home/home.html'
-
-    context = {}
-
-    # render the appropriate template
-    return render(us_request, template, context)
-
-
-@login_required
 def poll(us_request):
 
     retval = {'data': {'items': []}}
