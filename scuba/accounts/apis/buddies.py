@@ -13,8 +13,7 @@ from scuba.accounts.models import User
 from scuba.accounts.exceptions import InvalidUserIdException
 from scuba.accounts.models import UserBlocked
 from scuba.accounts.serializers.buddies import BlockUserSerializer, \
-    AddBuddySerializer, CancelBuddyRequestSerializer, \
-    ConfirmBuddyRequestSerializer, BuddySerializer
+    AddBuddySerializer, AcceptBuddyRequestSerializer, BuddySerializer
 
 
 class GetBuddiesListApi(generics.ListAPIView):
@@ -99,58 +98,51 @@ class AddBuddyApi(generics.CreateAPIView):
             status=status.HTTP_201_CREATED)
 
 
-    def xpost(self, request):
-        to_add = self.serializer_class(data=request.data, context={'user': request.user})
-        if to_add.is_valid():
-            to_add.save()
-            return Response({'msg': 'request sent'}, status=status.HTTP_202_ACCEPTED)
+class BuddyRequestListApi(generics.ListAPIView):
+    """ Buddy Request List
 
-        # return the response of the password generation
-        return Response({'errors': to_add.errors}, status=status.HTTP_400_BAD_REQUEST)
+    Get a list of buddies the user has requested
+    """
+    serializer_class = BuddySerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return user.get_all_buddy_requests()
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return Response({
+            'requests': response.data
+       })
 
 
-class CancelBuddyRequestApi(generics.GenericAPIView):
+class BuddyRequestApi(generics.RetrieveDestroyAPIView):
     """ Block User
 
-    This class handles the API calls of the password reset functionality
-    of the site
+    Cancel a buddy request
     """
-    serializer_class = CancelBuddyRequestSerializer
-
-    def post(self, request):
-        """ post
-
-        Do the actual posting of the password reset
-        """
-        to_cancel = self.serializer_class(data=request.data, context={'user': request.user})
-        if to_cancel.is_valid():
-            to_cancel.save()
-            return Response({'msg': 'user blocked'}, status=status.HTTP_202_ACCEPTED)
-
-        # return the response of the password generation
-        return Response({'errors': to_block.errors}, status=status.HTTP_400_BAD_REQUEST)
+    serializer_class = BuddySerializer
 
 
-class ConfirmBuddyRequestApi(generics.GenericAPIView):
-    """ Block User
+class AcceptBuddyRequestApi(generics.CreateAPIView):
+    """ Accept Buddy Request
 
-    This class handles the API calls of the password reset functionality
-    of the site
+    Accept a buddy request
     """
-    serializer_class = ConfirmBuddyRequestSerializer
+    serializer_class = AcceptBuddyRequestSerializer
+    def create(self, request, *args, **kwargs):
 
-    def post(self, request):
-        """ post
+        from pprint import pprint
+        pprint(kwargs)
+        serializer = self.get_serializer(data=kwargs)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
 
-        Do the actual posting of the password reset
-        """
-        to_cancel = self.serializer_class(data=request.data, context={'user': request.user})
-        if to_cancel.is_valid():
-            to_cancel.save()
-            return Response({'msg': 'user blocked'}, status=status.HTTP_202_ACCEPTED)
+        return Response({
+            'accept': serializer.data
+        }, status=status.HTTP_201_CREATED)
 
-        # return the response of the password generation
-        return Response({'errors': to_cancel.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @login_required
@@ -208,24 +200,6 @@ def invited(us_request):
 
         response['resp'] = 'ok'
         return JSONResponse( response )
-
-
-class GetBuddyStatusApi(generics.GenericAPIView):
-    """ Block User
-
-    This class handles the API calls of the password reset functionality
-    of the site
-    """
-    def get(self, request):
-        from pprint import pprint
-        userid = request.query_params.get('userid')
-
-        try:
-            buddy_status = request.user.get_buddy_status(userid)
-            return Response({'status': buddy_status}, status=status.HTTP_200_OK)
-        except InvalidUserIdException:
-            error = f"'{userid}' is an invalid user id"
-            return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @login_required
@@ -325,24 +299,6 @@ def add_friend(us_request):
             UserFriendRequest.objects.create(user=friend, friend=user)
         except IntegrityError:
             response['error'] = True
-
-    return JSONResponse( response )
-
-@login_required
-@require_http_methods(["DELETE"])
-def cancel_request(us_request):
-    response = {}
-    user = us_request.user
-
-    if us_request.is_ajax():
-        request_data = json.loads(us_request.body)
-        fid = request_data['fid']
-        friend = None
-
-        try:
-            UserFriendRequest.objects.get(friend=user, user__account__guid=fid).delete()
-        except:
-            raise
 
     return JSONResponse( response )
 

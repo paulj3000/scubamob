@@ -161,8 +161,13 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         return self.buddies.all().order_by('-user__activities__activity_date')
 
     def add_buddy(self, buddy):
-        self.buddies.create(buddy=buddy)
+        """ add_buddy
+
+        add a buddy for the user
+        """
+        retval = self.buddies.create(buddy=buddy)
         buddy.buddies.create(buddy=self)
+        return retval
 
     def get_buddy_status(self, userid):
         # return all of the buddies that is not us!
@@ -185,15 +190,20 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         except (ValidationError, User.DoesNotExist):
             raise InvalidUserIdException
 
+    def get_all_buddy_requests(self):
+        ''' get_all_buddy_requests
+
+        Get all of the buddy requests
+        '''
+        return self.buddy_requests.all()
+
     def add_buddy_request(self, buddy):
         obj, created = self.buddy_requests.update_or_create(
             buddy=buddy,
             defaults={'is_active': True},
         )
 
-        #if created:
-        #    Alerting.send_buddy_request(self.pk_as_str, buddy.pk_as_str)
-
+        # return the object
         return obj
 
     def is_add_buddy_requested(self, buddy):
@@ -532,6 +542,7 @@ class UserBuddyRequest(UUIDModel):
     user = models.ForeignKey(User, null=True, related_name='buddy_requests', on_delete=models.CASCADE)
     buddy = models.ForeignKey(User, related_name='buddy_requested', on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
+    is_accepted = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -539,9 +550,14 @@ class UserBuddyRequest(UUIDModel):
         db_table = 'user_buddy_request'
         unique_together = (('user', 'buddy'),)
 
-    def update_friend_request_active(self, user):
-        # now, create the new blacklist version
-        UserBuddyRequest.objects.filter(friend=user, active=True).update(active=False)
+    def accept_request(self):
+        """ accept_request
+
+        accept the buddy request
+        """
+        self.is_accepted = True
+        self.is_active = False
+        self.save()
 
 
 class UserEmail(UUIDModel):

@@ -77,56 +77,52 @@ class AddBuddySerializer(serializers.Serializer):
         return user.add_buddy_request(self.to_add)
 
 
-class CancelBuddyRequestSerializer(serializers.Serializer):
-    userid = serializers.CharField()
+class AcceptBuddyRequestSerializer(serializers.Serializer):
+    id = serializers.CharField(write_only=True)
+    buddy = serializers.SerializerMethodField()
 
-    def validate_userid(self, userid):
-        """ validate_plan
+    @staticmethod
+    def get_buddy(data):
+        return BuddySerializer(data).data
 
-        Validate the plan id coming in
+    def validate_id(self, request_id):
+        """ validate_id
+
+        Validate the buddy request coming in
         """
-        user = self.context['user']
+        user = self.context['request'].user
+        request = user.buddy_requested.filter(id=request_id).first()
 
-        if user.id == userid:
-            raise serializers.ValidationError("You cannot block yourself")
+        if not request or not request.is_active:
+            raise serializers.ValidationError(f"{request_id} is not a valid request")
 
-        to_cancel = get_object_or_404(User, pk=userid)
+        setattr(self, 'request', request)
+        return request_id
 
-        setattr(self, 'to_cancel', to_cancel)
-        return userid
+    def create(self, validated_data):
+        """ create
 
-    def save(self):
-        """ A stub for the create method. This does nothing """
-        user = self.context['user']
-        user.cancel_buddy_request(self.to_cancel)
+        Create the buddy object and set the request
 
-        return True
-
-
-class ConfirmBuddyRequestSerializer(serializers.Serializer):
-    userid = serializers.CharField()
-
-    def validate_userid(self, userid):
-        """ validate_plan
-
-        Validate the plan id coming in
+        VERY important. This is the USER accepting the BUDDY's request,
+        not the other way around.
         """
-        user = self.context['user']
+        request = getattr(self, 'request')
+        request.accept_request()
 
-        if user.id == userid:
-            raise serializers.ValidationError("You cannot block yourself")
+        # remember, the current user is the "buddy" being accepted
+        user = self.context['request'].user
+        buddy = request.user
 
-        buddy_user = get_object_or_404(User, pk=userid)
+        # add the buddy
+        return user.add_buddy(buddy)
 
-        setattr(self, 'buddy_user', buddy_user)
-        return userid
+    def update(self, instance, validated_data):
+        """ update
 
-    def save(self):
-        """ A stub for the create method. This does nothing """
-        user = self.context['user']
-        user.confirm_buddy_request(self.buddy_user)
-
-        return True
+        Not implemented
+        """
+        raise NotImplementedError
 
 
 class BuddySerializer(serializers.Serializer):

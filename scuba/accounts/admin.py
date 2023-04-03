@@ -147,15 +147,15 @@ class UserAdmin(admin.ModelAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ('first_name', 'last_name', 'email', 'is_active', 'date_joined',
-                    'last_login_date')
+    list_display = ('first_name', 'last_name', 'email', 'is_active',
+                    'date_joined', 'last_login_date')
 
     readonly_fields = ['get_token', 'last_login_date',]
 
     fieldsets = (
         (None,
             {'fields':
-                ('first_name', 'last_name', 'email', 'last_login_date', 'get_token')
+                ('first_name', 'last_name', 'email', 'date_of_birth', 'last_login_date', 'get_token')
             }
         ),
         ('Permissions', {'fields': ('groups', )}),
