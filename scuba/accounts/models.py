@@ -558,7 +558,7 @@ class UserSetting(UUIDModel):
 
 
 class UserBuddyRequest(UUIDModel):
-    user = models.ForeignKey(User, null=True, related_name='buddy_requests', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='buddy_requests', on_delete=models.CASCADE)
     buddy = models.ForeignKey(User, related_name='buddy_requested', on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
     is_accepted = models.BooleanField(default=False)
