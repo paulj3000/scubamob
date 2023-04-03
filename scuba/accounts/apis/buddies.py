@@ -11,16 +11,14 @@ from rest_framework.permissions import IsAuthenticated
 
 from scuba.accounts.models import User
 from scuba.accounts.exceptions import InvalidUserIdException
-from scuba.accounts.models import UserBlocked
 from scuba.accounts.serializers.buddies import BlockUserSerializer, \
     AddBuddySerializer, AcceptBuddyRequestSerializer, BuddySerializer
 
 
 class GetBuddiesListApi(generics.ListAPIView):
-    """ Block User
+    """ Get Buddies List
 
-    This class handles the API calls of the password reset functionality
-    of the site
+    Return all of the buddies for this particular user
     """
     serializer_class = BuddySerializer
 
@@ -35,26 +33,16 @@ class GetBuddiesListApi(generics.ListAPIView):
        })
 
 
-class BlockUserApi(generics.GenericAPIView):
+class BlockUserApi(generics.CreateAPIView):
     """ Block User
 
-    This class handles the API calls of the password reset functionality
-    of the site
+    Block a particular user
     """
     serializer_class = BlockUserSerializer
 
-    def post(self, request):
-        """ post
-
-        Do the actual posting of the password reset
-        """
-        to_block = self.serializer_class(data=request.data, context={'user': request.user})
-        if to_block.is_valid():
-            to_block.save()
-            return Response({'msg': 'user blocked'}, status=status.HTTP_202_ACCEPTED)
-
-        # return the response of the password generation
-        return Response({'errors': to_block.errors}, status=status.HTTP_400_BAD_REQUEST)
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        return Response(status=status.HTTP_202_ACCEPTED)
 
 
 class BuddyStatusApi(generics.GenericAPIView):

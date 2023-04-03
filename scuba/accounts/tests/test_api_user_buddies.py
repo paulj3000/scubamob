@@ -34,6 +34,28 @@ class TestUserBuddiesAPI(TestCase):
         response = client.post('/api/user/buddies/add/', payload, format='json')
         self.assertEqual(response.status_code, 201)
 
+    def test_block_buddy_request(self):
+        """
+        Test the blocking of a buddy request
+        """
+        user = User.objects.get(email='foo@nowhere.com')
+        user1 = User.objects.get(email='test@tester.com')
+
+        payload = {
+            'buddy_id': user1.pk_as_str
+        }
+
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        response = client.post(f'/api/user/buddies/block/', payload, format='json')
+        self.assertEqual(response.status_code, 202)
+
+        # now try to add the user again
+        response = client.post('/api/user/buddies/add/', payload, format='json')
+        self.assertEqual(response.status_code, 400)
+
+
     def test_accept_buddy_request(self):
         """
         Test the making of a buddy request

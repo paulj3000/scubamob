@@ -170,6 +170,14 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         buddy.buddies.create(buddy=self)
         return retval
 
+    def remove_buddy(self, buddy):
+        """ remove_buddy
+
+        add the buddy for the user for the user
+        """
+        self.buddies.filter(buddy=buddy).delete()
+        buddy.buddies.filter(buddy=self).delete()
+
     def get_buddy_status(self, userid):
         # return all of the buddies that is not us!
         try:
@@ -214,12 +222,15 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         return self.buddy_requests.filter(buddy=buddy, is_active=True).update(is_active=False)
 
     def block_buddy(self, buddy):
-        # get all of the current buddies
-        UserBlocked.objects.create(user=self, buddy=buddy, blocked_by=self)
+        # remove the buddy if he's already a buddy
+        self.remove_buddy(buddy)
 
-        # now, let's delete all friend requests...
+        # remove all buddy requests
         UserBuddyRequest.objects.filter(Q(user=buddy, buddy=self) |
                                          Q(user=self, buddy=buddy)).delete()
+
+        # get all of the current buddies
+        return UserBlocked.objects.create(user=self, buddy=buddy, blocked_by=self)
 
     def get_blocked_buddies(self):
         # get all of the current buddies

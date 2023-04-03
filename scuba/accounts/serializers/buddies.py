@@ -4,39 +4,44 @@ from django.conf.urls.static import static
 from rest_framework import serializers
 
 from scuba.accounts.models import User, UserRecentActivity
-from scuba.settings import PROFILE_BLANK_URL
 
 
 class BlockUserSerializer(serializers.Serializer):
-    username = serializers.CharField()
+    buddy_id = serializers.CharField()
 
-    def get_serializer_context(self):
-        return {"user": self.request.user}
+    def validate_buddy_id(self, buddy_id):
+        """ validate_buddy_id
 
-    def validate_username(self, username):
-        """ validate_plan
-
-        Validate the plan id coming in
+        Verify the buddy id coming in is not the current user, already
+        blocked, etc.
         """
-        user = self.context['user']
+        user = self.context['request'].user
 
-        if user.username == username:
+        buddy = User.objects.filter(id=buddy_id).first()
+        if not buddy:
+            raise serializers.ValidationError(f"{buddy_id} cannot be blocked")
+
+        if user.pk_as_str == buddy.pk_as_str:
             raise serializers.ValidationError("You cannot block yourself")
 
-        to_block = get_object_or_404(User, username=username)
-
-        if user.is_blocked(to_block):
+        if user.is_blocked(buddy):
             raise serializers.ValidationError("User is already blocked")
 
-        setattr(self, 'to_block', to_block)
-        return username
+        setattr(self, 'to_block', buddy)
+        return buddy_id
 
     def create(self, validated_data):
         """ A stub for the create method. This does nothing """
-        user = self.context['user']
-        user.block_buddy(self.to_block)
+        user = self.context['request'].user
+        user.remove_buddy(self.to_block)
+        return user.block_buddy(self.to_block)
 
-        return True
+    def update(self, instance, validated_data):
+        """ update
+
+        Not implemented
+        """
+        raise NotImplementedError
 
 
 class AddBuddySerializer(serializers.Serializer):
