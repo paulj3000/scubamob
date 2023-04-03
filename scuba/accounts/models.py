@@ -26,6 +26,7 @@ from scuba.settings import PROFILE_BLANK_URL, AWS_CLOUDFRONT
 from scuba.accounts.exceptions import InvalidEmailIdException, PrimaryEmailIdException, EmailInUseException, InvalidUserIdException, InvalidConfirmationCodeException
 from scuba.accounts.settings import SETTINGS
 from scuba.sitesettings.models import SystemSetting
+from scuba.divesites.models import Divesite
 
 from scuba.libs.mail import generate_email, send_mail
 from scuba.content.models import EmailTemplate
@@ -452,6 +453,13 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
             return obj
         else:
             self.divesites_favorites.filter(divesite=divesite).delete()
+
+    def get_divesite_favorites(self):
+        '''
+        Get favorite divesites
+        '''
+        return Divesite.objects.filter(is_active=True, userdivesitefavorite__user=self)
+        #return self.divesites_favorites.filter(divesite__is_active=True)
 
 
 class UserConfirmationCode(UUIDModel):
