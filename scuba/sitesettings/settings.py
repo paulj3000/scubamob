@@ -79,6 +79,7 @@ SETTINGS_APIS = (
 SYSTEM_SETTINGS = [
     ('CHAT_SERVER_ACTIVE', 'Chat Server Active'),
     ('DEFAULT_PROFILE_IMAGE', 'Default Profile Image'),
+    ('DEFAULT_BANNER_IMAGE', 'Default Banner Image'),
 ]
 
 SOCKET_SERVER_SETTINGS = [
