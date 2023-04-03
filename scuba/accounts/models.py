@@ -128,7 +128,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
     # -----------------------------------------------------------------------------
     # start Buddy stuff
     # -----------------------------------------------------------------------------
-    def get_active_friend_requests(self):
+    def get_active_buddy_requests(self):
         # let's get our user object
         user = self.user
 
@@ -191,8 +191,10 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
             defaults={'is_active': True},
         )
 
-        if created:
-            Alerting.send_buddy_request(self.pk_as_str, buddy.pk_as_str)
+        #if created:
+        #    Alerting.send_buddy_request(self.pk_as_str, buddy.pk_as_str)
+
+        return obj
 
     def is_add_buddy_requested(self, buddy):
         return self.buddy_requests.filter(buddy=buddy, is_active=True).count()

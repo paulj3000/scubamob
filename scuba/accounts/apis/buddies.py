@@ -86,7 +86,7 @@ class BuddyStatusApi(generics.GenericAPIView):
                 status=status.HTTP_400_BAD_REQUEST)
 
 
-class AddBuddyApi(generics.GenericAPIView):
+class AddBuddyApi(generics.CreateAPIView):
     """ Block User
 
     This class handles the API calls of the password reset functionality
@@ -94,7 +94,13 @@ class AddBuddyApi(generics.GenericAPIView):
     """
     serializer_class = AddBuddySerializer
 
-    def post(self, request):
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        return Response({'message': 'Buddy Request Sent'},
+            status=status.HTTP_201_CREATED)
+
+
+    def xpost(self, request):
         to_add = self.serializer_class(data=request.data, context={'user': request.user})
         if to_add.is_valid():
             to_add.save()

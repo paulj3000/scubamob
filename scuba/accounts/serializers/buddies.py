@@ -40,34 +40,41 @@ class BlockUserSerializer(serializers.Serializer):
 
 
 class AddBuddySerializer(serializers.Serializer):
-    userid = serializers.CharField()
+    buddy_id = serializers.CharField()
 
-    def validate_userid(self, userid):
-        """ validate_plan
+    def validate_buddy_id(self, buddy_id):
+        """ validate_buddy_id
 
-        Validate the plan id coming in
+        Validate buddy id coming in, make sure it's a
+        legitimate user
         """
-        user = self.context['user']
+        user = self.context['request'].user
 
-        if user.id == userid:
+        if user.pk_as_str == buddy_id:
             raise serializers.ValidationError("You cannot add yourself")
 
-        to_add = get_object_or_404(User, pk=userid)
+        to_add = User.objects.filter(pk=buddy_id).first()
+        if not to_add:
+            raise serializers.ValidationError("Cannot add buddy")
 
+        # is the user blocked??
         if user.is_blocked(to_add):
-            raise serializers.ValidationError("Cannot add user")
+            raise serializers.ValidationError("Cannot add buddy")
 
+        # is there already a user request for this?
         if user.is_add_buddy_requested(to_add):
-            raise serializers.ValidationError("Cannot add user")
+            raise serializers.ValidationError("Cannot add buddy")
 
         setattr(self, 'to_add', to_add)
-        return userid
+        return buddy_id
 
     def create(self, validated_data):
-        user = self.context['user']
-        user.add_buddy_request(self.to_add)
+        """ create
 
-        return True
+        Create the buddy request
+        """
+        user = self.context['request'].user
+        return user.add_buddy_request(self.to_add)
 
 
 class CancelBuddyRequestSerializer(serializers.Serializer):
