@@ -146,6 +146,20 @@ class BuddySerializer(serializers.Serializer):
     def get_id(data):
         return data.pk_as_str
 
+    def create(self, validated_data):
+        """ create
+
+        Not implemented
+        """
+        raise NotImplementedError
+
+    def update(self, instance, validated_data):
+        """ update
+
+        Not implemented
+        """
+        raise NotImplementedError
+
 
 class BuddyRecentActivity(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()

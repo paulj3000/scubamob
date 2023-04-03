@@ -160,7 +160,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         # return all of the buddies that is not us!
         return self.buddies.all().order_by('-user__activities__activity_date')
 
-    def confirm_buddy_request(self, buddy):
+    def add_buddy(self, buddy):
         self.buddies.create(buddy=buddy)
         buddy.buddies.create(buddy=self)
 

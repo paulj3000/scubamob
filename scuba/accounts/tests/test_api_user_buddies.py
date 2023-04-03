@@ -50,25 +50,29 @@ class TestUserBuddiesAPI(TestCase):
         response = client.post('/api/user/buddies/add/', payload, format='json')
         self.assertEqual(response.status_code, 400)
 
-    '''
-    def add_buddy_request(self, buddy):
-        obj, created = self.buddy_requests.update_or_create(
-            buddy=buddy,
-            defaults={'is_active': True},
-        )
+    def test_listing_buddies(self):
+        """
+        Test the listing of user's buddies
+        """
+        user = User.objects.get(email='foo@nowhere.com')
+        user1 = User.objects.get(email='test@tester.com')
+        user2 = User.objects.get(email='test2@tester.com')
 
-        #if created:
-        #    Alerting.send_buddy_request(self.pk_as_str, buddy.pk_as_str)
+        user.add_buddy(user1)
+        user.add_buddy(user2)
 
-
-        payload = {
-            'divesite_id': divesite.pk_as_str
-        }
-
+        # and query for the divesites
         client = APIClient()
-        response = client.post('/api/user/divesites/favorites/', payload, format='json')
-        self.assertEqual(response.status_code, 202)
+        client.force_authenticate(user=user)
 
-        # nope, the user needs to be logged in
-        self.assertEqual(response.status_code, 401)
-    '''
+        response = client.get('/api/user/buddies/', format='json')
+        self.assertEqual(response.status_code, 200)
+        the_list = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('buddies', the_list)
+        self.assertEqual(len(the_list['buddies']), 2)
+
+        for i in range(0, 2):
+            self.assertIn('id', the_list['buddies'][i])
+            self.assertIn('profile_image', the_list['buddies'][i])
+            self.assertIn('full_name', the_list['buddies'][i])

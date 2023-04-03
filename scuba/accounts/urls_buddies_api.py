@@ -5,7 +5,7 @@ import scuba.accounts.apis.buddies as buddies_api
 
 
 urlpatterns = [
-    path('', buddies_api.GetBuddiesApi.as_view()),
+    path('', buddies_api.GetBuddiesListApi.as_view()),
     path('add/', buddies_api.AddBuddyApi.as_view()),
     path('status', buddies_api.BuddyStatusApi.as_view()),
     path('block', buddies_api.BlockUserApi.as_view()),

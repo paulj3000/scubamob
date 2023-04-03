@@ -19,7 +19,7 @@ from scuba.divesites.models import Divesite
 logger = logging.getLogger(__name__)
 
 
-class UserDivesiteFavoriteList(generics.ListCreateAPIView):
+class UserDivesiteFavoriteListApi(generics.ListCreateAPIView):
     """ User Divesite Favorite List
 
     This handles a new email address being added to
@@ -38,7 +38,7 @@ class UserDivesiteFavoriteList(generics.ListCreateAPIView):
        })
 
 
-class UserDivesiteFavorite(generics.RetrieveDestroyAPIView):
+class UserDivesiteFavoriteApi(generics.RetrieveDestroyAPIView):
     """ User Divesite Favorite List
 
     This handles a new email address being added to

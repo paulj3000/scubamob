@@ -17,7 +17,7 @@ from scuba.accounts.serializers.buddies import BlockUserSerializer, \
     ConfirmBuddyRequestSerializer, BuddySerializer
 
 
-class GetBuddiesApi(generics.GenericAPIView):
+class GetBuddiesListApi(generics.ListAPIView):
     """ Block User
 
     This class handles the API calls of the password reset functionality
@@ -25,16 +25,15 @@ class GetBuddiesApi(generics.GenericAPIView):
     """
     serializer_class = BuddySerializer
 
-    def get(self, request):
-        """ get
+    def get_queryset(self):
+        user = self.request.user
+        return user.get_all_buddies()
 
-        Get all of the buddies for the user. Eventually this will include
-        Pagination
-        """
-        buddies = self.serializer_class(request.user.get_all_buddies(), many=True)
-
-        # return the response of the password generation
-        return Response({'buddies': buddies.data})
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return Response({
+            'buddies': response.data
+       })
 
 
 class BlockUserApi(generics.GenericAPIView):
