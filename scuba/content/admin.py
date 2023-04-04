@@ -14,6 +14,7 @@ from scuba.content.forms.admin import ImageForm
 class PageAdmin(admin.ModelAdmin):
     change_form_template = 'admin/content/change_page_form.html'
 
+
 class EmailTemplateAdmin(admin.ModelAdmin):
     change_form_template = 'admin/content/change_email_template_form.html'
 
@@ -47,7 +48,6 @@ class EmailTemplateAdmin(admin.ModelAdmin):
 
             func = getattr(user, to_send_email[email_template.template_type])
             func('123456')
-            #user.send_confirmation_code_email(email_template, '123456')
 
         messages.add_message(
             request,
@@ -57,7 +57,6 @@ class EmailTemplateAdmin(admin.ModelAdmin):
 
         # change appropriately
         return redirect('admin:content_emailtemplate_change', object_id=email_template.id)
-        #f"/admin/content/emailtemplate/{str(email_template.id)}")
 
 
 class ImageAdmin(admin.ModelAdmin):
@@ -65,10 +64,9 @@ class ImageAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
-            return ['filename', 'title',]
-        else: # This is an addition
+            return ['filename', 'title']
+        else:
             return []
-
 
     def get_urls(self):
         """ get_urls
@@ -78,7 +76,7 @@ class ImageAdmin(admin.ModelAdmin):
         """
         urls = super().get_urls()
         my_urls = [
-            path('list',admin.site.admin_view(self.get_image_list),
+            path('list', admin.site.admin_view(self.get_image_list),
                 name='get_image_list'),
         ]
 
@@ -111,7 +109,6 @@ class FAQEntryAdmin(admin.ModelAdmin):
     Override some of the display elements for the admin display
     """
     list_display = ('title', 'position', 'faq_section',)
-    #exclude = ('position',)
     change_form_template = 'sales/admin/change_faq_form.html'
     model = FAQEntry
 
