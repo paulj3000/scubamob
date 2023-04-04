@@ -43,6 +43,7 @@ class APIKeyAdmin(admin.ModelAdmin):
 class ApiEndpointAdmin(admin.ModelAdmin):
     list_display = ('app', 'key', 'url',)
 
+
 admin.site.register(models.ApiEndpoint, ApiEndpointAdmin)
 admin.site.register(models.APIKey, APIKeyAdmin)
 admin.site.register(models.AlertingApi, GenericKeyValueApiAdmin)

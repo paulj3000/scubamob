@@ -46,12 +46,12 @@ def user_password(user, value):
     user.set_password(value)
     return user
 
-USER_FIELDS =  {
-                      'first_name':      { REQUIRED : True, UPDATER : user_first_name },
-                      'last_name':       { REQUIRED : True, UPDATER : user_last_name },
-                      'email':           { REQUIRED : True, UPDATER : user_email },
-                      'password':        { REQUIRED : True, UPDATER : user_password },
-                  }
+USER_FIELDS = {
+    'first_name': {REQUIRED: True, UPDATER: user_first_name},
+    'last_name': {REQUIRED: True, UPDATER: user_last_name},
+    'email': {REQUIRED: True, UPDATER: user_email},
+    'password': {REQUIRED: True, UPDATER: user_password},
+}
 
 REQUIRED_FIELDS = [ i for i in USER_FIELDS.keys() if USER_FIELDS[i].get(REQUIRED) ]
 VALID_PARAMS  = REQUIRED_FIELDS + [ i for i in USER_FIELDS.keys() if USER_FIELDS[i].get(CONFIG) ]
