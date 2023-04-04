@@ -23,7 +23,7 @@ class SocketApi(generics.GenericAPIView):
     Get the user's data, something we can use for the api
     """
     permission_classes = [IsAuthenticated]
-    #serializer_class = UserProfileSerializer
+
     def get(self, request):
         """ get
 
@@ -53,6 +53,7 @@ class AlertsApi(generics.GenericAPIView):
     Get the user's data, something we can use for the api
     """
     permission_classes = [IsAuthenticated]
+
     def get(self, request):
         """ get
 
@@ -66,7 +67,7 @@ class AlertsApi(generics.GenericAPIView):
 
         try:
             url = SystemApi.get_alerting_alerts()
-            alerts = requests.get(url, params=params);
+            alerts = requests.get(url, params=params)
             return Response(alerts.json())
         except requests.exceptions.ConnectionError:
-            return Response({'error': 'cannot reach chat server' }, 500)
+            return Response({'error': 'cannot reach chat server'}, 500)
