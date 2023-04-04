@@ -30,3 +30,4 @@ watchtower==3.0.1
 bs4==0.0.1
 lxml==4.9.2
 django-bootstrap5==22.2
+pycodestyle==2.8.0
