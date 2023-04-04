@@ -155,7 +155,10 @@ class UserAdmin(admin.ModelAdmin):
     fieldsets = (
         (None,
             {'fields':
-                ('first_name', 'last_name', 'email', 'date_of_birth', 'last_login_date', 'get_token')
+                ('first_name', 'last_name', 'email', 'date_of_birth',
+                 'confirmed',
+                 'last_login_date',
+                 'get_token')
             }
         ),
         ('Permissions', {'fields': ('groups', )}),
