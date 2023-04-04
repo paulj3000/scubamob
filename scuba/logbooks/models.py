@@ -30,9 +30,8 @@ class Logbook(models.Model):
         db_table = 'logbook'
         unique_together = (('user', 'name'), )
 
-	#### get our new manager
+    # get our new manager
     objects = LogbookManager()
-
 
 
 class LogbookFolder(models.Model):
@@ -61,7 +60,7 @@ class LogbookTag(models.Model):
 
     def save(self, *args, **kwargs):
 
-        ## make sure we have a valid guid
+        # make sure we have a valid guid
         self.guid   = self.init_guid() if not self.guid else self.guid
 
         # save the object
