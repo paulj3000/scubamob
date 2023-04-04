@@ -34,6 +34,30 @@ class TestUserBuddiesAPI(TestCase):
         response = client.post('/api/user/buddies/add/', payload, format='json')
         self.assertEqual(response.status_code, 201)
 
+    def test_remove_buddy_request(self):
+        """
+        Test the making of a buddy request
+        """
+        user = User.objects.get(email='foo@nowhere.com')
+        user_to_remove = User.objects.get(email='addbuddy@tester.com')
+
+        # first, add the user in the buddy table
+        user.add_buddy(user_to_remove)
+
+        payload = {
+            'buddy_id': user_to_remove.pk_as_str
+        }
+
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        response = client.post('/api/user/buddies/remove/', payload, format='json')
+        self.assertEqual(response.status_code, 202)
+
+        # make sure the buddy does not exist in the user's records
+        self.assertIsNone(user.get_buddy(user_to_remove))
+        self.assertIsNotNone(user.removed.filter(buddy=user_to_remove).first())
+
     def test_block_buddy_request(self):
         """
         Test the blocking of a buddy request

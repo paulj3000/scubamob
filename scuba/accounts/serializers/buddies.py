@@ -189,3 +189,43 @@ class BuddyRecentActivity(serializers.ModelSerializer):
         Create a new user and all around good stuff here
         """
         raise NotImplementedError
+
+
+class RemoveBuddySerializer(serializers.Serializer):
+    buddy_id = serializers.CharField()
+
+    def validate_buddy_id(self, buddy_id):
+        """ validate_buddy_id
+
+        Verify the buddy id coming in is not the current user, removed,
+        blocked, etc.
+        """
+        user = self.context['request'].user
+        buddy = User.objects.filter(id=buddy_id).first()
+
+        if not buddy:
+            raise serializers.ValidationError(f"{buddy_id} cannot be removed")
+
+        if user.pk_as_str == buddy.pk_as_str:
+            raise serializers.ValidationError("You cannot remove yourself")
+
+        if not user.buddies.filter(buddy_id=buddy_id).first():
+            raise serializers.ValidationError(f"{buddy_id} cannot be removed")
+
+        setattr(self, 'to_remove', buddy)
+        return buddy_id
+
+    def create(self, validated_data):
+        # remove the buddy
+        user = self.context['request'].user
+        buddy = getattr(self, 'to_remove')
+
+        user.remove_buddy(buddy)
+        return user.removed.create(buddy=buddy)
+
+    def update(self, instance, validated_data):
+        """ update
+
+        Not implemented
+        """
+        raise NotImplementedError

@@ -143,11 +143,10 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         # now, let's actually run the query and return
         user.friend_requested.filter(active=1).sort('first_name')
 
-    def get_friend(self, friend):
-        # get all of the current buddies
-        return User.objects.filter(
-                Q(friend_friend1__friend1=friend) |
-                Q(friend_friend2__friend2=friend)).first()
+    def get_buddy(self, buddy):
+        return UserBuddy.objects.filter(
+            Q(buddy=buddy) |
+            Q(user=buddy)).first()
 
     def get_buddies_count(self):
         # get all of the current buddies
@@ -533,6 +532,16 @@ class UserBuddy(UUIDModel):
         verbose_name_plural = 'user buddies'
         db_table = 'user_buddy'
         unique_together = (('user', 'buddy'), )
+
+
+class UserBuddyRemove(UUIDModel):
+    user = models.ForeignKey(User, related_name='removed', on_delete=models.CASCADE)
+    buddy = models.ForeignKey(User, on_delete=models.CASCADE)
+    removed_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = 'user buddies removed'
+        db_table = 'user_buddy_removed'
 
 
 class UserBlocked(models.Model):

@@ -12,7 +12,8 @@ from rest_framework.permissions import IsAuthenticated
 from scuba.accounts.models import User
 from scuba.accounts.exceptions import InvalidUserIdException
 from scuba.accounts.serializers.buddies import BlockUserSerializer, \
-    AddBuddySerializer, AcceptBuddyRequestSerializer, BuddySerializer
+    AddBuddySerializer, AcceptBuddyRequestSerializer, BuddySerializer, \
+    RemoveBuddySerializer
 
 
 class GetBuddiesListApi(generics.ListAPIView):
@@ -129,10 +130,12 @@ class AcceptBuddyRequestApi(generics.CreateAPIView):
         }, status=status.HTTP_201_CREATED)
 
 
-@login_required
-@require_http_methods(["DELETE"])
-def delete_friendship(us_request):
-    response = {}
+class RemoveBuddyApi(generics.CreateAPIView):
+    """ Remove Buddy Request
 
-    user = us_request.user
-    return JSONResponse( response )
+    Sadly remove a buddy request
+    """
+    serializer_class = RemoveBuddySerializer
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        return Response(status=status.HTTP_202_ACCEPTED)
