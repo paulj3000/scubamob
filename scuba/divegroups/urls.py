@@ -10,7 +10,7 @@
 from django.conf.urls import include
 from django.urls import path, re_path
 
-import scuba.divegroups.views.ajax as friends_ajax
+#import scuba.divegroups.views.ajax as friends_ajax
 import scuba.divegroups.views as friends_views
 import scuba.accounts.views.json as account_json
 
@@ -22,6 +22,6 @@ urlpatterns = [
     path('json/setfavorite/', account_json.setfavorite, name='setfavorite'),
     path('json/getfavorite/', account_json.getfavorites, name='getfavorites'),
 
-    path('request/accept/', friends_ajax.accept, name='friend_accept'),
-    path('invite/', friends_ajax.invite, name='friends_invite'),
+    #path('request/accept/', friends_ajax.accept, name='friend_accept'),
+    #path('invite/', friends_ajax.invite, name='friends_invite'),
 ]
