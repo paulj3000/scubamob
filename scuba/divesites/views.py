@@ -4,8 +4,6 @@ from django.contrib import messages
 from django.views.generic import TemplateView
 from django.shortcuts import get_object_or_404
 
-from scuba.divesites.forms import SiteForm
-
 from scuba.divesites.models import Divesite
 
 
@@ -58,26 +56,3 @@ class SiteView(TemplateView):
         kwargs['site'] = site
 
         return super().dispatch(request, *args, **kwargs)
-
-
-@login_required
-def newsite(us_request, siteid=None):
-    user = us_request.user
-    #if not user.account.can_add_divesites:
-    #    raise Http404
-
-    # render the appropriate template
-    if us_request.method == 'POST':
-        site_form = SiteForm(us_request.POST, user_id=us_request.user.id, site_id=siteid)
-        if site_form.is_valid():
-            messages.add_message(us_request, messages.INFO, 'Site successfully saved')
-            site_form.save()
-    elif siteid:
-        site_form = SiteForm(user_id=us_request.user.id, site_id=siteid)
-        divelog = site_form.findsite(siteid)
-    else:
-        site_form = SiteForm(user_id=us_request.user.id)
-
-    context = {'site_form': site_form, 'title': 'Create a new Dive Site'}
-
-    return render(us_request, 'divesites/edit.html', context)

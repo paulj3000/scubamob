@@ -37,13 +37,11 @@ class JumbotronAdmin(admin.ModelAdmin):
             self.exclude.append('upload')
         return super().get_form(request, obj, **kwargs)
 
-
     def activate_jumbotron(self, request, queryset):
         Jumbotron.objects.all().update(is_active=False)
 
         jumbo = queryset.first()
         jumbo.set_active()
-
 
         # set a success message
         messages.add_message(request,
