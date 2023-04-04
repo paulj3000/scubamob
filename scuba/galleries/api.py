@@ -43,7 +43,7 @@ class ListAlbumsApi(generics.ListAPIView):
         queryset = self.get_queryset()
         retval = {
             'albums': self.serializer_class(queryset, many=True).data
-       }
+        }
 
         return Response(retval)
 

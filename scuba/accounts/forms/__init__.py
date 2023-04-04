@@ -2,14 +2,14 @@ from pprint import pprint
 from datetime import datetime
 import uuid
 
+from django.core.exceptions import ValidationError
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from django.forms import ModelForm
-from django.contrib.auth.forms import UserCreationForm
 from django.core.validators import validate_email
 from django.contrib.auth.models import User
 
-from scuba.accounts.models import UserBuddyRequest, UserBuddy, Account
+from scuba.accounts.models import UserBuddyRequest, UserBuddy
 
 
 class AuthenticationForm(forms.Form):
@@ -47,8 +47,9 @@ class AuthenticationForm(forms.Form):
 
         if blocked:
             blocked_name = blocked.name
-            InvalidCountry.objects.create(email=email, \
-                view=InvalidCountry.VIEW_LOGIN, \
+            InvalidCountry.objects.create(
+                email=email,
+                view=InvalidCountry.VIEW_LOGIN,
                 ip_address=self.ip_address, blocked_country=blocked)
 
             raise forms.ValidationError("This request cannot be processed", code='cannot_process')
@@ -118,6 +119,7 @@ class SettingsForm(ModelForm):
 
         return user
 
+
 class PasswordForm(ModelForm):
     password = forms.CharField(label="Password", widget=forms.PasswordInput, required=True)
     password2 = forms.CharField(label="Password (again)", widget=forms.PasswordInput, required=True)
@@ -154,8 +156,8 @@ class EmailInviteForm(forms.Form):
         return self.email_invites
 
     class Meta:
-            model = UserBuddyRequest
-            fields = ['email']
+        model = UserBuddyRequest
+        fields = ['email']
 
     def save(self, commit=True):
         # before we even think about saving, let's make sure:
@@ -164,20 +166,19 @@ class EmailInviteForm(forms.Form):
         friend = None
         email = self.cleaned_data['email']
 
-        #UserBuddyRequest.objects.get(friend=friend, user=self.user)
         for email in self.cleaned_data['email'].split(','):
             # let's get the email and check if it's already in the system
             try:
                 # make sure the email address is correct
                 validate_email(email)
-            except:
+            except ValidationError:
                 print(f"bad email:  {email}")
                 continue
 
             friend = None
             try:
                 friend = User.objects.get(email=email)
-            except:
+            except User.DoesNotExist:
                 pass
 
             # ok, so far a valid email address.  now, let's check for a valid user

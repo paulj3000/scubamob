@@ -11,8 +11,5 @@ import scuba.accounts.views.settings as settings_views
 urlpatterns = [
     path('json/setfavorite/', json_views.setfavorite, name='setfavorite'),
     path('json/getfavorite/', json_views.getfavorites, name='getfavorites'),
-
-#    url(r'^invited/?$', 'account.views.friends.index', name='account_friend_invited'),
-
     path('socket/', account_api.SocketApi.as_view()),
 ]

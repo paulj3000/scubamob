@@ -31,13 +31,13 @@ class UserEmailApi(generics.ListCreateAPIView):
         response = super().create(request, *args, **kwargs)
         return Response({
             'emails': response.data
-       })
+        })
 
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
         return Response({
             'emails': response.data
-       })
+        })
 
 
 class RemoveEmailApi(generics.GenericAPIView):
@@ -134,6 +134,7 @@ class UserSettingListApi(generics.GenericAPIView):
             logger.error(url)
 
             return Response({'error': 'cannot connect to settings'}, status=500)
+
 
 # TODO: Find a proper location for this
 class ValidateUserId(generics.GenericAPIView):

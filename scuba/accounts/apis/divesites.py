@@ -35,7 +35,7 @@ class UserDivesiteFavoriteListApi(generics.ListCreateAPIView):
         response = super().list(request, *args, **kwargs)
         return Response({
             'favorites': response.data
-       })
+        })
 
 
 class UserDivesiteFavoriteApi(generics.RetrieveDestroyAPIView):
