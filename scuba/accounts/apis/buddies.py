@@ -31,7 +31,7 @@ class GetBuddiesListApi(generics.ListAPIView):
         response = super().list(request, *args, **kwargs)
         return Response({
             'buddies': response.data
-       })
+        })
 
 
 class BlockUserApi(generics.CreateAPIView):
@@ -67,10 +67,10 @@ class BuddyStatusApi(generics.GenericAPIView):
                 return Response(user.get_buddy_status(buddyid))
             except InvalidUserIdException:
                 return Response({'errors': 'bad buddy id'},
-                        status=status.HTTP_400_BAD_REQUEST)
+                                 status=status.HTTP_400_BAD_REQUEST)
         # return the response of the password generation
         return Response({'errors': 'missing params'},
-                status=status.HTTP_400_BAD_REQUEST)
+                         status=status.HTTP_400_BAD_REQUEST)
 
 
 class AddBuddyApi(generics.CreateAPIView):
@@ -102,7 +102,7 @@ class BuddyRequestListApi(generics.ListAPIView):
         response = super().list(request, *args, **kwargs)
         return Response({
             'requests': response.data
-       })
+        })
 
 
 class BuddyRequestApi(generics.RetrieveDestroyAPIView):
@@ -119,6 +119,7 @@ class AcceptBuddyRequestApi(generics.CreateAPIView):
     Accept a buddy request
     """
     serializer_class = AcceptBuddyRequestSerializer
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=kwargs)
         serializer.is_valid(raise_exception=True)
@@ -136,6 +137,7 @@ class RemoveBuddyApi(generics.CreateAPIView):
     Sadly remove a buddy request
     """
     serializer_class = RemoveBuddySerializer
+
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
         return Response(status=status.HTTP_202_ACCEPTED)

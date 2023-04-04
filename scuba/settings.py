@@ -228,13 +228,6 @@ EXTERNAL_INTERFACES = {
     }
 }
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-        'LOCATION': os.environ.get('MEMCACHE_SERVER', '127.0.0.1:11211')
-    }
-}
-
 # set up the external API stuff
 WEATHER_API_KEY = 'd41784195576cec0' + '-'
 WEATHER_API_URL = 'http://api.wunderground.com/api/%s/conditions/q/%s/%s.json'
