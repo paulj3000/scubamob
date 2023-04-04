@@ -16,7 +16,7 @@ class MemcacheClient:
             raise ConnectionError("memcache not available");
 
     def set(self, key, value, timeout=0):
-        key = "%s%s" % (self.namespace, key) 
+        key = "%s%s" % (self.namespace, key)
         key =   key.encode()
 
         self.memcache_obj.set(key, value, timeout)
