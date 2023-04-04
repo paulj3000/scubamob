@@ -20,4 +20,3 @@ class EquipmentMaintenance(models.Model):
 
     class Meta:
         db_table = 'equipment_maintenance'
-

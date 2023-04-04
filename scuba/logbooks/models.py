@@ -64,9 +64,8 @@ class LogbookTag(models.Model):
         self.guid   = self.init_guid() if not self.guid else self.guid
 
         # save the object
-        super(LogbookTag, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'logbook_tag'
         unique_together = (('user', 'name'), )
-

@@ -10,4 +10,3 @@ urlpatterns = [
     ),
     re_path(r'^([0-9A-Fa-f-]{32,36})$', divesite_apis.DivesiteListApi.as_view()),
 ]
-

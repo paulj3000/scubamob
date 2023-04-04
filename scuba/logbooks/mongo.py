@@ -45,4 +45,3 @@ class DiveLog:
         data['id']  = str(data['_id'])
         del data['_id']
         return data
-

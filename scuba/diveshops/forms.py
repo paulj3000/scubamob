@@ -70,4 +70,3 @@ class DiveShopAddressForm(NoSQLForm):
     class Meta:
         model = 'diveshops'
         mongo   = DiveShop
-

@@ -22,4 +22,3 @@ class SystemEndpointApi(serializers.ModelSerializer):
         """ define models, fields, etc """
         model = ApiEndpoint
         fields = ('app', 'key', 'url',)
-

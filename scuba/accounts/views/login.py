@@ -13,4 +13,3 @@ class LoginView(BaseLoginView):
             'hide_nav_account': True,
         })
         return context
-
