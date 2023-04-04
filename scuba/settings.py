@@ -281,7 +281,7 @@ AWS_CLOUDFRONT = os.environ.get('AWS_CLOUDFRONT', 'https://d2pw8lka09f5g5.cloudf
 
 #STATIC_URL = AWS_CLOUDFRONT
 
-FILE_UPLOAD_HANDLERS = ['django.core.files.uploadhandler.TemporaryFileUploadHandler',]
+FILE_UPLOAD_HANDLERS = ['django.core.files.uploadhandler.TemporaryFileUploadHandler']
 
 SOCKET_SERVER = 'location:3001'
 SOCKET_SERVER_ACTIVE = False
@@ -297,8 +297,8 @@ SITE_ID = 1
 SITE_NAME = 'Scuba Mob'
 
 VIDEO_TYPES = ['mp4']
-IMAGE_TYPES = ['png', 'jpg', 'gif', 'jpeg',]
-VALID_CONTENT_TYPES = ['image/png', 'image/jpg', 'image/jpeg', 'video/mp4',]
+IMAGE_TYPES = ['png', 'jpg', 'gif', 'jpeg']
+VALID_CONTENT_TYPES = ['image/png', 'image/jpg', 'image/jpeg', 'video/mp4']
 
 
 xCOMPRESS_FILTERS = {
