@@ -16,8 +16,10 @@ from django import forms
 from scuba.libs.nosql.forms import NoSQLForm
 from scuba.logbooks.mongo import DiveLog
 
-VISIBILITY_CHOICES = (('bad', 'Bad'), ('average', 'Average'), ('good', 'Good'), ('excellent', 'Excellent'))
 TANK_CHOICES = (('steel', 'Steel'), ('carbon', 'Carbon'), ('aluminium', 'Aluminium'))
+VISIBILITY_CHOICES = (
+    ('bad', 'Bad'), ('average', 'Average'), ('good', 'Good'),
+    ('excellent', 'Excellent'))
 
 
 class DiveForm(NoSQLForm):

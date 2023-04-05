@@ -29,4 +29,4 @@ def getlocaldiveshops(us_request):
     for ds in Diveshop.get_local_diveshops(lon, lat, radius):
         retval.append(ds)
 
-    return JSONResponse(api_response(data={ 'items' : retval }))
+    return JSONResponse(api_response(data={'items': retval}))
