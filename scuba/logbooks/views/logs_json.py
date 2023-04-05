@@ -6,7 +6,6 @@ from django.core import serializers
 
 from scuba.logbooks.forms import DiveForm
 from scuba.logbooks.models import LogbookFolder
-from scuba.logbooks.mongo import DiveLog
 
 
 @login_required

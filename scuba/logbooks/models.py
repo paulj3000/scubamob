@@ -7,7 +7,6 @@ from django.db import models
 from django.db.models.signals import post_save
 from django_extensions.db.fields import CreationDateTimeField, ModificationDateTimeField
 
-from scuba.logbooks.mongo import DiveLog
 from scuba.accounts.models import User
 
 
@@ -25,14 +24,12 @@ class Logbook(models.Model):
         pass
 
 
-
-
 class LogbookFolder(models.Model):
     user = models.ForeignKey(User, related_name='logbook_folders', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
 
     def init_guid(self):
-        return str(uuid.uuid1()).replace('-','')
+        return str(uuid.uuid1()).replace('-', '')
 
     def get_logs(self):
         divelog_mongo = DiveLog()
@@ -49,12 +46,11 @@ class LogbookTag(models.Model):
     name = models.CharField(max_length=255)
 
     def init_guid(self):
-        return str(uuid.uuid1()).replace('-','')
+        return str(uuid.uuid1()).replace('-', '')
 
     def save(self, *args, **kwargs):
-
         # make sure we have a valid guid
-        self.guid   = self.init_guid() if not self.guid else self.guid
+        self.guid = self.init_guid() if not self.guid else self.guid
 
         # save the object
         super().save(*args, **kwargs)

@@ -14,7 +14,7 @@ from pprint import pprint
 from django import forms
 
 from scuba.libs.nosql.forms import NoSQLForm
-from scuba.logbooks.mongo import DiveLog
+
 
 TANK_CHOICES = (('steel', 'Steel'), ('carbon', 'Carbon'), ('aluminium', 'Aluminium'))
 VISIBILITY_CHOICES = (
@@ -63,7 +63,6 @@ class DiveForm(NoSQLForm):
 
     class Meta:
         model = 'divelogs'
-        mongo = DiveLog
         id = 'log_id'
 
     def findlog(self, id):
