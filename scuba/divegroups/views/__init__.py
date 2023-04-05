@@ -19,7 +19,7 @@ from scuba.accounts.models import UserBuddyRequest
 
 @login_required
 def index(us_request, mode=None):
-    context = { 'page_title': 'Manage Friends' }
+    context = {'page_title': 'Manage Friends'}
     user = us_request.user
 
     print(user.get_account())

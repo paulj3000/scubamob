@@ -11,21 +11,20 @@
 # -----------------------------------------------------------------------------
 from django import forms
 
-from utils.core.forms import NoSQLForm
 from utils.external.google_address import GoogleAddress
-from diveshops.mongo import DiveShop
 from bson.objectid import ObjectId
 
-class DiveShopForm(NoSQLForm):
-    address = forms.CharField(max_length=20,label='Address')
+
+class DiveShopForm(forms.Form):
+    address = forms.CharField(max_length=20, label='Address')
     address2 = forms.CharField(max_length=20)
-    city = forms.CharField(max_length=20,label='City')
-    state = forms.CharField(max_length=20,label='State')
-    zip = forms.CharField(max_length=20,label='Zip')
+    city = forms.CharField(max_length=20, label='City')
+    state = forms.CharField(max_length=20, label='State')
+    zip = forms.CharField(max_length=20, label='Zip')
 
     def __init__(self, *args, **kwargs):
         self.site_id = kwargs.pop('site_id') if kwargs.keys().count('site_id') else None
-        super(SiteForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.Meta.id    = self.site_id
         if self.site_id:
@@ -35,25 +34,24 @@ class DiveShopForm(NoSQLForm):
                     self.fields[field].initial = data.get(field, "")
     class Meta:
         model = 'divesite'
-        mongo   = DiveShop
-        id      = 'site_id'
 
     def findsite(self, id):
-        site = self.collection.find_one({'_id': ObjectId(id) })
+        site = self.collection.find_one({'_id': ObjectId(id)})
 
-        site['id']     = str(site['_id'])
+        site['id'] = str(site['_id'])
         del(site['_id'])
 
-        ## let's return our item
+        # let's return our item
         return site
 
-class DiveShopAddressForm(NoSQLForm):
-    name = forms.CharField(max_length=200,label='Dive Shop Name')
-    address = forms.CharField(max_length=200,label='Address')
-    city = forms.CharField(max_length=200,label='City')
-    state = forms.CharField(max_length=200,label='State')
-    zip = forms.CharField(max_length=200,label='Zip Code')
-    phone = forms.CharField(max_length=200,label='Phone')
+
+class DiveShopAddressForm(forms.ModelForm):
+    name = forms.CharField(max_length=200, label='Dive Shop Name')
+    address = forms.CharField(max_length=200, label='Address')
+    city = forms.CharField(max_length=200, label='City')
+    state = forms.CharField(max_length=200, label='State')
+    zip = forms.CharField(max_length=200, label='Zip Code')
+    phone = forms.CharField(max_length=200, label='Phone')
 
     def save(self, *args, **kwargs):
         data    = self.cleaned_data
@@ -63,10 +61,8 @@ class DiveShopAddressForm(NoSQLForm):
                             self.cleaned_data['city'],
                             self.cleaned_data['state'])
 
-
-        data['latlng']    = { 'type': '2d', 'coordinates': [ latlng['longitude'], latlng['latitude'] ] }
-        super(DiveShopAddressForm, self).save(data)
+        data['latlng'] = {'type': '2d', 'coordinates': [latlng['longitude'], latlng['latitude']]}
+        super().save(data)
 
     class Meta:
         model = 'diveshops'
-        mongo   = DiveShop

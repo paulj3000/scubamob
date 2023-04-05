@@ -35,7 +35,6 @@ urlpatterns = [
 
     path('account/', include('scuba.accounts.urls')),
     path('settings/', include('scuba.accounts.urls_settings')),
-    #path('friends/', include('scuba.friends.urls')),
     path('groups/', include('scuba.divegroups.urls')),
     path('logbooks/', include('scuba.logbooks.urls')),
     path('sites/', include('scuba.divesites.urls')),
@@ -53,10 +52,6 @@ urlpatterns = [
     path('about', content_views.ContentView.as_view(), name='about'),
     path('faq', content_views.FAQView.as_view(), name='faq'),
 
-    #path('api/1.0/divelogs/', include('api.urls_divelogs')),
-    #path('api/1.0/diveshops/', include('api.urls_diveshops')),
-
-    #path('api/1.0/mobile/account', include('api.urls_account')),
     path('api/accounts/', include('scuba.accounts.urls_accounts_api')),
     path('api/user/buddies/', include('scuba.accounts.urls_buddies_api')),
     path('api/user/divesites/', include('scuba.accounts.urls_divesites_api')),
@@ -99,14 +94,7 @@ urlpatterns = [
         name='messenger',
     ),
 
-    # start the legal stuff
-    #path('privacy', content_views.ContentView.as_view(), name='privacy'),
-    #path('terms', content_views.ContentView.as_view(), name='terms'),
-    #path('cookies', content_views.ContentView.as_view(), name='cookies'),
-    #path('about', content_views.ContentView.as_view(), name='about'),
-
     # start some user account helper modules
-
     path('login/', login_views.LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(next_page='/'), name="logout"),
 
@@ -114,10 +102,5 @@ urlpatterns = [
 
     # enable the admin section
     path('admin/', admin.site.urls),
-
-    #re_path(r'^p/(?P<username>[\w_]+)/buddies$',
-    #    account_profiles.BuddiesView.as_view(),
-    #    name='buddies'),
-    #re_path(r'^p/(?P<username>[\w_]+)/$',  account_profiles.profile, name='profile'),
     re_path(r'^p/(?P<id>[\w]+)/',  include('scuba.accounts.urls_profile')),
 ]

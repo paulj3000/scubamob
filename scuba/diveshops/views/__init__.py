@@ -7,7 +7,7 @@ from django.contrib import messages
 
 from django.contrib.auth.decorators import login_required
 
-from scuba.diveshops.mongo import DiveShop as DiveShopMongo
+from scuba.diveshops.models import Diveshop
 
 
 @login_required
@@ -25,9 +25,8 @@ def getlocaldiveshops(us_request):
     radius = int(us_request.GET['radius'])
     lon = float(us_request.GET['lon'])
     lat = float(us_request.GET['lat'])
-    dsmongo = DiveShopMongo()
 
-    for ds in dsmongo.get_local_diveshops(lon, lat, radius):
+    for ds in Diveshop.get_local_diveshops(lon, lat, radius):
         retval.append(ds)
 
     return JSONResponse(api_response(data={ 'items' : retval }))

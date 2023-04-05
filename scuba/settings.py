@@ -175,7 +175,7 @@ LANGUAGE_CODE = 'en-us'
 USE_I18N = True
 
 USE_TZ = True
-#TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
@@ -184,7 +184,7 @@ STATIC_URL = '/static/'
 
 STATICFILES_FINDERS = DEFAULT_SETTINGS.STATICFILES_FINDERS + [
     'compressor.finders.CompressorFinder',
-    'yarn.finders.YarnFinder',]
+    'yarn.finders.YarnFinder']
 
 YARN_ROOT_PATH = BASE_DIR
 
@@ -260,7 +260,7 @@ MAXMIND_CITY_DB = f"{BASE_DIR}/GeoLite2-City.mmdb"
 MAXMIND_USE_DB = True
 
 # define the mongo collections
-MONGO_DIVELOGS		= 'divelogs'
+MONGO_DIVELOGS = 'divelogs'
 
 DEBUG_IP = '68.101.214.253'
 

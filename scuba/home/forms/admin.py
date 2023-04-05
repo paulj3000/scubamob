@@ -15,9 +15,7 @@ from django.core.validators import FileExtensionValidator
 from django.utils.translation import gettext as _
 
 from scuba.home.models import Jumbotron
-from scuba.libs.fileutils import FileUtils
 from scuba.libs.exceptions import InvalidHttpStatusCode
-#from skm.libs.aws.s3 import S3
 from scuba.settings import IMAGE_TYPES, VIDEO_TYPES
 
 

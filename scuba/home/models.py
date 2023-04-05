@@ -82,7 +82,6 @@ class Jumbotron(UUIDModel):
             jumbo.set_active()
             return jumbo
 
-
     @staticmethod
     def upload_jumbotron(name, content_type, data):
         # TODO: validate the extension

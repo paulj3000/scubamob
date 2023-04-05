@@ -16,6 +16,7 @@ from scuba.libs.external.weather import Weather
 class GetJumbotronApi(generics.GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = JumbotronSerializer
+
     def get(self, request):
 
         return Response({
@@ -50,8 +51,8 @@ class SearchApi(generics.GenericAPIView):
 
 class GetWeatherFromZip(generics.GenericAPIView):
     serializer_class = JumbotronSerializer
-    def get(self, request):
 
+    def get(self, request):
         return Response({
             'jumbotron': 'x'
         })

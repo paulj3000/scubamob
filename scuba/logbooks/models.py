@@ -8,17 +8,7 @@ from django.db.models.signals import post_save
 from django_extensions.db.fields import CreationDateTimeField, ModificationDateTimeField
 
 from scuba.logbooks.mongo import DiveLog
-from scuba.settings import MONGO_DIVELOGS
 from scuba.accounts.models import User
-
-
-class LogbookManager(models.Manager):
-
-    #class Meta:
-    #	collection	= MONGO_DIVELOGS
-
-    def get_logs(self, user):
-        pass
 
 
 class Logbook(models.Model):
@@ -30,8 +20,11 @@ class Logbook(models.Model):
         db_table = 'logbook'
         unique_together = (('user', 'name'), )
 
-    # get our new manager
-    objects = LogbookManager()
+    @staticmethod
+    def get_logs(user):
+        pass
+
+
 
 
 class LogbookFolder(models.Model):

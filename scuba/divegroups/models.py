@@ -12,12 +12,12 @@ class Group(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-
     class Meta:
         db_table = 'divegroups'
 
     def is_user_admin(self, user):
         return True if self.groups.filter(user=user).count() else False
+
 
 class GroupUser(models.Model):
     group = models.ForeignKey(Group, related_name='groups', on_delete=models.CASCADE)

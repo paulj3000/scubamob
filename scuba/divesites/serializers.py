@@ -29,7 +29,6 @@ class DivesiteSerializer(serializers.ModelSerializer):
     class Meta:
         """ define models, fields, etc """
         model = Divesite
-        #fields = '__all__'
         fields = (
             'id', 'name', 'description', 'lat', 'long', 'difficulty',
             'difficulty_display', 'banner',
