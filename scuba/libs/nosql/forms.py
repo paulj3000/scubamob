@@ -16,7 +16,7 @@ class NoSQLForm(forms.Form):
         self.Object  = self.Meta.mongo()
 
         self.user_id = kwargs.pop('user_id') if 'user_id' in kwargs.keys() else None
-        super(NoSQLForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def save(self, data = None):
         if not data:
