@@ -13,6 +13,7 @@ class Equipment(models.Model):
     class Meta:
         db_table = 'equipment'
 
+
 class EquipmentMaintenance(models.Model):
     equipment = models.ForeignKey(Equipment, related_name='maintenance', on_delete=models.CASCADE)
     requireone = models.CharField(max_length=200)

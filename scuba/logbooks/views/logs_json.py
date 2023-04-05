@@ -23,11 +23,10 @@ def logbookfolderlogs(us_request):
         folder = user.logbook_folders.get(id=id)
 
         divelog_mongo = DiveLog()
-        logs = divelog_mongo.collection.find({ '_id.user': user.id }, { '_id': 1, 'name': 1 })
+        logs = divelog_mongo.collection.find({'_id.user': user.id}, {'_id': 1, 'name': 1})
 
-        response = { 'name': folder.name, 'logs': list(logs) }
-
-    except:
+        response = {'name': folder.name, 'logs': list(logs)}
+    except LogbookFolder.DoesNotExist:
         raise
 
     return JSONResponse(response)
@@ -56,7 +55,7 @@ def logbookfolders(request):
 
     folders = user.logbook_folders.values('id', 'name').order_by('name').all()
 
-    to_search = { '_id.user': user.id }
+    to_search = {'_id.user': user.id}
     if id:
         to_search['meta.folder'] = id
     else:
@@ -65,6 +64,6 @@ def logbookfolders(request):
     logs = []
 
     for x in divelog_mongo.collection.find(to_search):
-        logs.append({ 'id': x['_id']['id'], 'title': x['title'], 'date': x['date'] })
+        logs.append({'id': x['_id']['id'], 'title': x['title'], 'date': x['date']})
 
-    return JSONResponse({ 'folders': list(folders), 'logs': logs })
+    return JSONResponse({'folders': list(folders), 'logs': logs})

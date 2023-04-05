@@ -21,7 +21,7 @@ class EquipmentForm(ModelForm):
         fields = ['addone', 'addtwo', 'addthree', 'addfour']
 
     def save(self, *args, **kwargs):
-        kwargs['commit']=False
+        kwargs['commit'] = False
         obj = super(EquipmentForm, self).save(*args, **kwargs)
         obj.user = self.user
         obj.save()
