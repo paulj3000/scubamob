@@ -55,7 +55,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django_extensions',
     'corsheaders',
-    #'test_pep8',
     'compressor',
     'crispy_forms',
     'crispy_bootstrap5',
@@ -108,7 +107,6 @@ TEMPLATES = [
     },
 ]
 
-#AUTHENTICATION_BACKENDS = DEFAULT_SETTINGS.AUTHENTICATION_BACKENDS + \
 AUTHENTICATION_BACKENDS = [
     'rest_framework.authentication.TokenAuthentication',
     'scuba.libs.middleware.authentication.DefaultBackend',
@@ -227,12 +225,6 @@ EXTERNAL_INTERFACES = {
         'url': 'http://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false'
     }
 }
-
-# set up the external API stuff
-WEATHER_API_KEY = 'd41784195576cec0' + '-'
-WEATHER_API_URL = 'http://api.wunderground.com/api/%s/conditions/q/%s/%s.json'
-#WEATHER_API_LAT_LNG_URL = 'http://api.wunderground.com/api/%s/conditions/q/%s/%s,%s.json'
-WEATHER_API_LAT_LNG_URL = 'http://api.wunderground.com/api/%s/geolookup/conditions/astronomy/rawtide/q/%s,%s.json'
 
 NOSQL_HOST = 'localhost'
 NOSQL_PASSWORD = 'notset'

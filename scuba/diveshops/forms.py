@@ -28,10 +28,11 @@ class DiveShopForm(forms.Form):
 
         self.Meta.id = self.site_id
         if self.site_id:
-            data = self.Object.collection.find_one({ '_id': ObjectId(self.site_id), 'user_id': self.user_id })
+            data = self.Object.collection.find_one({'_id': ObjectId(self.site_id), 'user_id': self.user_id})
             if data:
                 for field in self.fields.iterkeys():
                     self.fields[field].initial = data.get(field, "")
+
     class Meta:
         model = 'divesite'
 
@@ -56,12 +57,15 @@ class DiveShopAddressForm(forms.ModelForm):
     def save(self, *args, **kwargs):
         data    = self.cleaned_data
 
-        gm  = GoogleAddress()
-        latlng  = gm.get_data_city_state(self.cleaned_data['address'],
-                            self.cleaned_data['city'],
-                            self.cleaned_data['state'])
+        gm = GoogleAddress()
+        latlng = gm.get_data_city_state(
+            self.cleaned_data['address'],
+            self.cleaned_data['city'],
+            self.cleaned_data['state'])
 
-        data['latlng'] = {'type': '2d', 'coordinates': [latlng['longitude'], latlng['latitude']]}
+        data['latlng'] = {
+            'type': '2d',
+            'coordinates': [latlng['longitude'], latlng['latitude']]}
         super().save(data)
 
     class Meta:

@@ -18,7 +18,6 @@ class GetJumbotronApi(generics.GenericAPIView):
     serializer_class = JumbotronSerializer
 
     def get(self, request):
-
         return Response({
             'jumbotron': self.serializer_class(Jumbotron.get_active_jumbotron()).data
         })
@@ -26,6 +25,7 @@ class GetJumbotronApi(generics.GenericAPIView):
 
 class GetDailyPicApi(generics.GenericAPIView):
     serializer_class = JumbotronSerializer
+
     def get(self, request):
 
         return Response({
@@ -35,6 +35,7 @@ class GetDailyPicApi(generics.GenericAPIView):
 
 class SearchApi(generics.GenericAPIView):
     permission_classes = (AllowAny,)
+
     def get(self, request):
 
         q_param = request.query_params.get('q')

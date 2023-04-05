@@ -39,7 +39,7 @@ class SystemApi(UUIDModel):
         """ define models, fields, etc """
         db_table = 'system_api'
         app_label = 'sitesettings'
-        ordering = ['key',]
+        ordering = ['key']
 
     def sync_settings(self):
         if self.share_with_chat:

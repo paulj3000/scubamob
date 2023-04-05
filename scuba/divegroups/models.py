@@ -26,7 +26,6 @@ class GroupUser(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-
     class Meta:
         db_table = 'divegroup_user'
         unique_together = (('group', 'user'), )
@@ -37,7 +36,6 @@ class GroupUserJoinRequest(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-
 
     class Meta:
         db_table = 'divegroup_user_join_request'
