@@ -184,10 +184,13 @@ class UserBlockedAdmin(admin.ModelAdmin):
 class UserBuddyRequestAdmin(admin.ModelAdmin):
     list_display = ('user', 'buddy', 'is_active', 'is_deleted',)
 
+class UserBuddyAdmin(admin.ModelAdmin):
+    list_display = ('user', 'buddy',)
+
 
 admin.site.register(User, UserAdmin)
 admin.site.register(UserBuddyRequest, UserBuddyRequestAdmin)
 admin.site.register(UserBlocked, UserBlockedAdmin)
-admin.site.register(UserBuddy)
+admin.site.register(UserBuddy, UserBuddyAdmin)
 admin.site.register(account_models.UserEmail)
 admin.site.register(account_models.UserSetting)
