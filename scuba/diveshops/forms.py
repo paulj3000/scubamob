@@ -26,7 +26,7 @@ class DiveShopForm(forms.Form):
         self.site_id = kwargs.pop('site_id') if kwargs.keys().count('site_id') else None
         super().__init__(*args, **kwargs)
 
-        self.Meta.id    = self.site_id
+        self.Meta.id = self.site_id
         if self.site_id:
             data = self.Object.collection.find_one({ '_id': ObjectId(self.site_id), 'user_id': self.user_id })
             if data:
