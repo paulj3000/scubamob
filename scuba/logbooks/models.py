@@ -4,14 +4,10 @@ import random
 import uuid
 
 from django.db import models
-from django.db.models.signals import post_save
-from django_extensions.db.fields import CreationDateTimeField, ModificationDateTimeField
-
-from scuba.accounts.models import User
 
 
 class Logbook(models.Model):
-    user = models.ForeignKey(User, related_name='logbooks', on_delete=models.CASCADE)
+    user = models.ForeignKey('accounts.User', related_name='logbooks', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=144)
 
