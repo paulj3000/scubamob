@@ -5,24 +5,24 @@ from bson.objectid import ObjectId
 
 from django.db import models
 
-class DiveLog:
-    COLLECTION   = 'divelogs'
+
+class xDiveLog:
+    COLLECTION = 'divelogs'
 
     def __init__(self):
         self._mongo = Mongo()
-        self.collection    = self._mongo[DiveLog.COLLECTION]
+        self.collection = self._mongo[DiveLog.COLLECTION]
 
     def find(self, **kwargs):
         return self.collection.find(kwargs)
 
     def get_count(self, user_id):
-        return self.collection.find( { 'user_id': user_id }).count()
-
+        return self.collection.find({'user_id': user_id}).count()
 
     def get_divelog_subset(self, user_id, start, lim, sortBy):
-        retval  = []
+        retval = []
 
-        data =  self.collection.find({ 'user_id': user_id }).skip(start).limit(lim)
+        data = self.collection.find({'user_id': user_id}).skip(start).limit(lim)
 
         for log in data:
             retval.append(self.clean(log))
@@ -30,18 +30,14 @@ class DiveLog:
         return retval
 
     def get_log(self, **kwargs):
-
         if kwargs.get('id'):
-            id  = kwargs['id']
+            id = kwargs['id']
             del kwargs['id']
-            kwargs['_id']   = ObjectId(id)
+            kwargs['_id'] = ObjectId(id)
 
-        try:
-            return self.collection.find_one(kwargs)
-        except:
-            return {}
+        return self.collection.find_one(kwargs)
 
     def clean(self, data):
-        data['id']  = str(data['_id'])
+        data['id'] = str(data['_id'])
         del data['_id']
         return data

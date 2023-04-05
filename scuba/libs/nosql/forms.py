@@ -13,21 +13,21 @@ class NoSQLForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.db = Mongo()
         self.collection = self.db[self.Meta.model]
-        self.Object  = self.Meta.mongo()
+        self.Object = self.Meta.mongo()
 
         self.user_id = kwargs.pop('user_id') if 'user_id' in kwargs.keys() else None
         super().__init__(*args, **kwargs)
 
-    def save(self, data = None):
+    def save(self, data=None):
         if not data:
-            data   = self.cleaned_data
+            data = self.cleaned_data
 
         if hasattr(self.Meta, 'id') and self.Meta.id:
             # let's perform our update
-            self.collection.update({ '_id': self.Meta.id }, { "$set": data })
+            self.collection.update({'_id': self.Meta.id}, {"$set": data})
         else:
             print("starting the save process here 1234")
-            guid    =   str(uuid.uuid1()).replace('-','')
+            guid = str(uuid.uuid1()).replace('-', '')
             # nope, let's add our new document
-            data.update({ '_id': { 'user': self.user_id, 'guid': guid }, 'user_id': self.user_id })
+            data.update({'_id': {'user': self.user_id, 'guid': guid}, 'user_id': self.user_id})
             self.collection.insert(data)
