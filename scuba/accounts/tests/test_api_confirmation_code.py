@@ -4,6 +4,7 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
+import os
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -16,25 +17,19 @@ from scuba.content.exceptions import InvalidConfigrationException
 
 
 class TestConfirmationCode(TestCase):
-    @staticmethod
-    def create_test_user():
-        return User.objects.create(
-            first_name='First',
-            last_name='Last',
-            date_of_birth='1970-04-01',
-            email='foo@nowhere.com')
+    fixtures = ["test_users.json"]
 
     def test_generate_confirmation_code(self):
         """
         Test generate confirmation codes
         """
-        user = self.create_test_user()
+        user = User.objects.get(email='foo@nowhere.com')
         code1 = user.generate_confirmation_code()
 
         self.assertEqual(len(str(code1.code)), 6)
 
     def test_invalid_code_tested(self):
-        user = self.create_test_user()
+        user = User.objects.get(email='foo@nowhere.com')
         code = user.generate_confirmation_code()
         to_test = code.code + 10
 
@@ -45,7 +40,7 @@ class TestConfirmationCode(TestCase):
         """
         Test generate multiple confirmation codes
         """
-        user = self.create_test_user()
+        user = User.objects.get(email='foo@nowhere.com')
         code1 = user.generate_confirmation_code()
         self.assertEqual(len(str(code1.code)), 6)
 
@@ -59,7 +54,7 @@ class TestConfirmationCode(TestCase):
         """
         Test the redeeming of cnfirmation codes
         """
-        user = self.create_test_user()
+        user = User.objects.get(email='foo@nowhere.com')
         code1 = user.generate_confirmation_code()
         code2 = user.generate_confirmation_code()
         code3 = user.generate_confirmation_code()
@@ -77,15 +72,14 @@ class TestConfirmationCode(TestCase):
         """
         Test setting good password
         """
-        user = self.create_test_user()
+        os.environ['NO_MAIL'] = 'True'
+        user = User.objects.get(email='foo@nowhere.com')
 
         client = APIClient()
         client.force_authenticate(user=user)
 
-        try:
-            response = client.get('/api/signup/confirmation_code', format='json')
-        except InvalidConfigrationException:
-            pass
+        response = client.get('/api/signup/confirmation_code', format='json')
+        self.assertEqual(response.status_code, 200)
 
         code = user.confirmation_codes.all().first()
         payload = {
@@ -99,15 +93,14 @@ class TestConfirmationCode(TestCase):
         """
         Test setting good password
         """
-        user = self.create_test_user()
+        os.environ['NO_MAIL'] = 'True'
+        user = User.objects.get(email='foo@nowhere.com')
 
         client = APIClient()
         client.force_authenticate(user=user)
 
-        try:
-            response = client.get('/api/signup/confirmation_code', format='json')
-        except InvalidConfigrationException:
-            pass
+        response = client.get('/api/signup/confirmation_code', format='json')
+        self.assertEqual(response.status_code, 200)
 
         code = user.confirmation_codes.all().first()
         payload = {

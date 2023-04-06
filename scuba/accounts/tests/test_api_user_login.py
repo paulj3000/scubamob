@@ -20,7 +20,6 @@ class TestUserLoginAPI(TestCase):
         """
         Test simple create user
         """
-        #user = TestUserLoginAPI.create_test_user()
         user = User.objects.get(email='foo@nowhere.com')
         client = APIClient()
         payload = {
@@ -51,7 +50,6 @@ class TestUserLoginAPI(TestCase):
         """
         Test simple create user
         """
-        #user = TestUserLoginAPI.create_test_user()
         user = User.objects.get(email='foo@nowhere.com')
         client = APIClient()
         payload = {

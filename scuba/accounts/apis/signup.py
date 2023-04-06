@@ -1,13 +1,16 @@
+import os
+
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
 
 import scuba.accounts.serializers.signup as serializers
 from scuba.accounts.exceptions import InvalidConfirmationCodeException
 
 
-class ConfirmationCode(generics.GenericAPIView):
+class ConfirmationCode(APIView):
     def post(self, request):
         """ post
 
@@ -31,8 +34,11 @@ class ConfirmationCode(generics.GenericAPIView):
         Do the actual posting of the password reset
         """
         user = request.user
-        user.send_confirmation_code_email(user.generate_confirmation_code().code)
-        return Response({})
+
+        code = user.generate_confirmation_code().code
+        if not os.environ.get('NO_MAIL'):
+            user.send_confirmation_code_email(code)
+        return Response()
 
 
 class SetPasswordApi(generics.GenericAPIView):
