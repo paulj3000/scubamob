@@ -49,18 +49,16 @@ class Weather:
 
     @classmethod
     def get_current_by_postal_code(cls, postal_code):
-        weather = cache.get(f'weather_{postal_code}')
+        key = f'weather_{postal_code}'
+        weather = cache.get(key)
         if weather:
             return weather
 
-        key = f'weather_{postal_code}'
-        print(f'key: weather_{postal_code}')
-        retval = cache.get(key)
-
-        if not retval:
-            res = requests.get(WEATHER_API['current'], {'key': cls.get_api_key(), 'q': postal_code})
-            retval = res.json()
-            cache.set(key, retval, 3600)
+        # call the API and return the data
+        res = requests.get(WEATHER_API['current'],
+                           {'key': cls.get_api_key(), 'q': postal_code})
+        retval = res.json()
+        cache.set(key, retval, 3600)
 
         return retval
 
@@ -68,21 +66,6 @@ class Weather:
     def get_current_by_lat_lng(cls, lat, lng):
         res = requests.get(WEATHER_API['current'], {'key': cls.get_api_key(), 'q': f'{lat},{lng}'})
         return res.json()
-
-    def do_comm(self, url):
-
-        # make the call to weather underground
-        data = self.http_interface.invoke(url)
-
-        # ... and of course, let's return the data
-        try:
-            if str(data['code']) == '200':
-                weather_data = simplejson.loads(data['response'])
-                return self.parse_data(weather_data)
-            else:
-                raise ValueError("Invalid Response")
-        except:
-            raise ValueError("Error")
 
     def parse_data(self, weather_data):
         retval = {}
