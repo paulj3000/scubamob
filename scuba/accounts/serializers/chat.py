@@ -58,8 +58,7 @@ class UploadFileListSerializer(serializers.ListSerializer):
                     'ContentDisposition': f'attachment; filename={filename}',
                     'Metadata': {
                         'userid': userid,
-                        'filename': filename
-                     }
+                        'filename': filename}
                 },
             }
 
