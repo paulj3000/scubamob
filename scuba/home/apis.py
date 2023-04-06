@@ -9,6 +9,7 @@ from scuba.home.models import Jumbotron
 from scuba.home.serializers import JumbotronSerializer
 from scuba.accounts.serializers.buddies import BuddySerializer, BuddyRecentActivity
 from scuba.accounts.models import User
+from scuba.divesites.models import Divesite
 from scuba.divesites.serializers import DivesiteSerializer
 from scuba.libs.external.weather import Weather
 
@@ -71,6 +72,7 @@ class GetHomescreenApi(generics.GenericAPIView):
                 },
                 'weather': Weather.get_current_by_postal_code('92107'),
                 'divesites': {
-                    'favorites': DivesiteSerializer(user.get_divesite_favorites(), many=True).data
+                    'favorites': user.get_divesite_favorites(),
+                    'sites': DivesiteSerializer(Divesite.get_all_active_divesites(), many=True).data
                 }
             })

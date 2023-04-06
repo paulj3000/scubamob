@@ -476,8 +476,14 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         '''
         Get favorite divesites
         '''
-        return Divesite.objects.filter(is_active=True, userdivesitefavorite__user=self)
-        #return self.divesites_favorites.filter(divesite__is_active=True)
+        retval = []
+
+        for item in Divesite.objects.filter(
+                is_active=True, userdivesitefavorite__user=self):
+            retval.append(item.pk_as_str)
+
+        # return the divesites
+        return retval
 
 
 class UserConfirmationCode(UUIDModel):
