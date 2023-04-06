@@ -11,11 +11,8 @@ from django.conf.urls import include
 from django.urls import path, re_path
 
 import scuba.divegroups.views as friends_views
-import scuba.accounts.views.json as account_json
 
 
 urlpatterns = [
     path('', friends_views.index, name='friends_index'),
-    path('json/setfavorite/', account_json.setfavorite, name='setfavorite'),
-    path('json/getfavorite/', account_json.getfavorites, name='getfavorites'),
 ]

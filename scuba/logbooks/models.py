@@ -5,8 +5,10 @@ import uuid
 
 from django.db import models
 
+from scuba.libs.models.uuidmodel import UUIDModel
 
-class Logbook(models.Model):
+
+class Logbook(UUIDModel):
     user = models.ForeignKey('accounts.User', related_name='logbooks', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=144)
@@ -20,8 +22,8 @@ class Logbook(models.Model):
         pass
 
 
-class LogbookFolder(models.Model):
-    user = models.ForeignKey(User, related_name='logbook_folders', on_delete=models.CASCADE)
+class LogbookFolder(UUIDModel):
+    user = models.ForeignKey('accounts.User', related_name='logbook_folders', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
 
     def init_guid(self):
@@ -36,8 +38,8 @@ class LogbookFolder(models.Model):
         unique_together = (('user', 'name'), )
 
 
-class LogbookTag(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+class LogbookTag(UUIDModel):
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE)
     guid = models.CharField(max_length=40)
     name = models.CharField(max_length=255)
 

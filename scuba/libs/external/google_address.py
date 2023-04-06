@@ -5,7 +5,6 @@ import logging
 import urllib
 
 from scuba import settings
-from utils.memcache_client import MemcacheClient
 from utils.httprequest import HttpRequest
 
 

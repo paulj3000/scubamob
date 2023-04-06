@@ -5,7 +5,6 @@ import json
 from django.core.cache import cache
 
 from scuba import settings
-from scuba.libs.memcache import MemcacheClient
 from scuba.sitesettings.models import APIKey
 
 
@@ -50,9 +49,10 @@ class Weather:
 
     @classmethod
     def get_current_by_postal_code(cls, postal_code):
+        weather = cache.get(f'weather_{postal_code}')
+        if weather:
+            return weather
 
-
-        #weather = cache.get(f'weather_{postal_code}')
         key = f'weather_{postal_code}'
         print(f'key: weather_{postal_code}')
         retval = cache.get(key)
@@ -68,29 +68,6 @@ class Weather:
     def get_current_by_lat_lng(cls, lat, lng):
         res = requests.get(WEATHER_API['current'], {'key': cls.get_api_key(), 'q': f'{lat},{lng}'})
         return res.json()
-
-        '''
-        try:
-            memcache = MemcacheClient('weather')
-            memcache_key = "%s_%s" % (lat, lon)
-            res = memcache.get(memcache_key)
-            return simplejson.loads(res)
-        except:
-            pass
-
-        url = self.settings['url_latlng'] % (self.settings['apikey'], lat, lon)
-        res = self.do_comm(url)
-
-        # do the communications
-        try:
-            memcache.set(memcache_key, simplejson.dumps(res), 3600)
-        except:
-            print("memcache not available")
-            pass
-
-        # let's return
-        return res
-        '''
 
     def do_comm(self, url):
 
