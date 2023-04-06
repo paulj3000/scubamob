@@ -256,7 +256,6 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         self.confirmed = True
         self.save()
 
-
     def verify_confirmation_code(self, code):
         # check if the user is blocking for the friend.
         try:
