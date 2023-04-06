@@ -10,14 +10,14 @@ class StringUtils:
     """ Simple class to generate strings and other string objects """
     @staticmethod
     def generate_random_string(string_length):
-        return ''.join(random.choices(string.ascii_uppercase + \
-            string.digits, k=string_length))
+        return ''.join(
+            random.choices(
+                string.ascii_uppercase +
+                string.digits, k=string_length))
 
     @staticmethod
     def generate_random_string_case_insensitive(string_length):
-        chars = string.ascii_uppercase + \
-                string.ascii_lowercase + \
-                string.digits
+        chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
         return ''.join(random.choices(chars, k=string_length))
 
     @staticmethod

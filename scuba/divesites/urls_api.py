@@ -5,7 +5,8 @@ import scuba.divesites.apis as divesite_apis
 
 urlpatterns = [
     path('', divesite_apis.DivesiteListApi.as_view()),
-    path('getlocaldivesites',
+    path(
+        'getlocaldivesites',
         divesite_apis.DivesiteListApi.as_view()
     ),
     re_path(r'^([0-9A-Fa-f-]{32,36})$', divesite_apis.DivesiteListApi.as_view()),

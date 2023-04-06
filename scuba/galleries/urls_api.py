@@ -15,22 +15,27 @@ import scuba.galleries.api as galleries_api
 urlpatterns = [
     path('daily', galleries_api.GetDailyPicApi.as_view()),
 
-    re_path(r'deletealbum/(?P<album_id>[0-9A-Fa-f-]{32,36})$',
+    re_path(
+        r'deletealbum/(?P<album_id>[0-9A-Fa-f-]{32,36})$',
         galleries_api.json_deletealbum,
         name='delete_album'),
 
-    path('createalbum/',
+    path(
+        'createalbum/',
         galleries_api.json_createalbum),
 
-    path('albums',
+    path(
+        'albums',
         galleries_api.ListAlbumsApi.as_view(),
         name="api_listalbums"),
 
-    path('media/',
+    path(
+        'media/',
         galleries_api.MediaUploadApi.as_view(),
         name="api_mediaupload"),
 
-    re_path(r'getalbumimages/(?P<album_id>[0-9A-Fa-f-]{32,36})$',
+    re_path(
+        r'getalbumimages/(?P<album_id>[0-9A-Fa-f-]{32,36})$',
         galleries_api.json_getalbumimages,
         name="json_getalbumimages"),
 ]

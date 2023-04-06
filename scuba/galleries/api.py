@@ -69,8 +69,9 @@ def json_createalbum(us_request):
 
     try:
         # convert the response to JSON
-        album = Album.objects.create(user=us_request.user, title=params['title'],
-                description=params.get('description'), )
+        album = Album.objects.create(
+                    user=us_request.user, title=params['title'],
+                    description=params.get('description'), )
 
         json = album.to_json()
         json['url'] = reverse('show_album', kwargs={'album_id': album.guid})

@@ -66,11 +66,13 @@ class BuddyStatusApi(generics.GenericAPIView):
             try:
                 return Response(user.get_buddy_status(buddyid))
             except InvalidUserIdException:
-                return Response({'errors': 'bad buddy id'},
-                                 status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {'errors': 'bad buddy id'},
+                    status=status.HTTP_400_BAD_REQUEST)
         # return the response of the password generation
-        return Response({'errors': 'missing params'},
-                         status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {'errors': 'missing params'},
+            status=status.HTTP_400_BAD_REQUEST)
 
 
 class AddBuddyApi(generics.CreateAPIView):
@@ -83,7 +85,8 @@ class AddBuddyApi(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
-        return Response({'message': 'Buddy Request Sent'},
+        return Response(
+            {'message': 'Buddy Request Sent'},
             status=status.HTTP_201_CREATED)
 
 

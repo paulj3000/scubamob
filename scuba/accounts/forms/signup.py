@@ -42,7 +42,8 @@ class AccountForm(ModelForm):
             raise forms.ValidationError("This request cannot be processed")
 
         if blocked:
-            InvalidCountry.objects.create(email=email, view=InvalidCountry.VIEW_SIGNUP,
+            InvalidCountry.objects.create(
+                email=email, view=InvalidCountry.VIEW_SIGNUP,
                 ip_address=self.ip_address, iso_country=blocked)
 
             raise forms.ValidationError("This request cannot be processed")

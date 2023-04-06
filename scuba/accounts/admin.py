@@ -48,23 +48,16 @@ class UserAdmin(admin.ModelAdmin):
         urls = super().get_urls()
 
         my_urls = [
-            re_path(r'^(?P<userid>([\w-]+))/emails/welcome/$',
+            re_path(
+                r'^(?P<userid>([\w-]+))/emails/welcome/$',
                 self.send_welcome_email_to_user, name='send_welcome_email'),
 
-            re_path(r'^(?P<userid>([\w-]+))/reset-password/$',
+            re_path(
+                r'^(?P<userid>([\w-]+))/reset-password/$',
                 self.reset_password, name='reset_user_password'),
         ]
 
         return my_urls + urls
-
-    def profile_image(self, obj):
-        return mark_safe(
-            '<img src="%s" alt="%s" style="width:40px;height:auto" />' % \
-            (obj.get_profile_image(), obj.get_full_name())
-        )
-
-    profile_image.short_description = ''
-    profile_image.allow_tags = True
 
     def reset_password(self, request, userid):
         user = get_object_or_404(self.model, pk=userid)
@@ -150,17 +143,13 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'last_name', 'email', 'is_active',
                     'date_joined', 'last_login_date')
 
-    readonly_fields = ['get_token', 'last_login_date',]
+    readonly_fields = ['get_token', 'last_login_date']
 
     fieldsets = (
         (None,
             {'fields':
                 ('first_name', 'last_name', 'email', 'date_of_birth',
-                 'confirmed',
-                 'last_login_date',
-                 'get_token')
-            }
-        ),
+                 'confirmed', 'last_login_date', 'get_token')}),
         ('Permissions', {'fields': ('groups', )}),
     )
 
@@ -168,7 +157,7 @@ class UserAdmin(admin.ModelAdmin):
     def get_token(self, obj):
         return obj.get_api_token()
 
-    search_fields = ['email', 'last_name',]
+    search_fields = ['email', 'last_name']
 
     change_form_template = 'accounts/admin/change_user_form.html'
     inlines = (
@@ -183,6 +172,7 @@ class UserBlockedAdmin(admin.ModelAdmin):
 
 class UserBuddyRequestAdmin(admin.ModelAdmin):
     list_display = ('user', 'buddy', 'is_active', 'is_deleted',)
+
 
 class UserBuddyAdmin(admin.ModelAdmin):
     list_display = ('user', 'buddy',)

@@ -26,7 +26,8 @@ class EmailTemplateAdmin(admin.ModelAdmin):
         urls = super().get_urls()
 
         my_urls = [
-            re_path(r'^send_test_email/(?P<id>[0-9A-Fa-f-]{1,36})/send_test',
+            re_path(
+                r'^send_test_email/(?P<id>[0-9A-Fa-f-]{1,36})/send_test',
                 self.send_test_email, name='send_test_email'),
         ]
 
@@ -76,7 +77,8 @@ class ImageAdmin(admin.ModelAdmin):
         """
         urls = super().get_urls()
         my_urls = [
-            path('list', admin.site.admin_view(self.get_image_list),
+            path(
+                'list', admin.site.admin_view(self.get_image_list),
                 name='get_image_list'),
         ]
 

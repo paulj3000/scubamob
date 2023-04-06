@@ -7,8 +7,6 @@ from io import StringIO
 from django.db import models
 from django.conf import settings
 
-#from boto3.s3.connection import S3Connection
-
 from scuba.accounts.models import User
 from scuba.libs.fileutils import FileUtils
 from scuba.libs.models.awsmodel import AWSModel
@@ -68,9 +66,6 @@ class Media(UUIDModel):
                 name = tmp_name
 
         # TODO: validate the extension
-        #ext = guess_extension(content_type)
-        #if not ext:
-        #    raise InvalidContentTypeException(content_type)
         aws_filename = f"content/{SITE_ID}/{name}"
 
         # upload the file to s3
@@ -90,9 +85,9 @@ class Album(UUIDModel):
 
     def add_image(self, uploaded_image):
         # seek to the beginning of the script
-        #uploaded_image.seek(0)
-        filename = "%s.%s" % (str(uuid.uuid1()).replace('-', ''),
-                    IMAGE_TYPE_EXTENSIONS[uploaded_image.content_type])
+        filename = "%s.%s" % (
+            str(uuid.uuid1()).replace('-', ''),
+            IMAGE_TYPE_EXTENSIONS[uploaded_image.content_type])
 
         account = self.user.get_account()
         gallery_file = AlbumImage.generate_image_name(account.guid, self.guid, filename)
@@ -110,8 +105,9 @@ class Album(UUIDModel):
         # this is really bad!  Refactor
         uploaded_image.seek(0)
 
-        filename = "%s.%s" % (str(uuid.uuid1()).replace('-', ''),
-                    IMAGE_TYPE_EXTENSIONS[uploaded_image.content_type])
+        filename = "%s.%s" % (
+            str(uuid.uuid1()).replace('-', ''),
+            IMAGE_TYPE_EXTENSIONS[uploaded_image.content_type])
 
         account = self.user.get_account()
         gallery_file_thumbnail = AlbumImage.generate_image_thumbnail_name(account.guid, self.guid, filename)
