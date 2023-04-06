@@ -75,6 +75,9 @@ class TestConfirmationCode(TestCase):
         os.environ['NO_MAIL'] = 'True'
         user = User.objects.get(email='foo@nowhere.com')
 
+        # verify the user is NOT confirmed
+        self.assertFalse(user.confirmed)
+
         client = APIClient()
         client.force_authenticate(user=user)
 
@@ -88,6 +91,10 @@ class TestConfirmationCode(TestCase):
 
         response = client.post('/api/signup/confirmation_code/', payload, format='json')
         self.assertEqual(response.status_code, 200)
+
+        # verify the user is confirmed
+        user = User.objects.get(email='foo@nowhere.com')
+        self.assertTrue(user.confirmed)
 
     def test_get_and_set_invalid_confirmation_code(self):
         """

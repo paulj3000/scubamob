@@ -248,6 +248,15 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         code = random.randint(100000, 999999)
         return UserConfirmationCode.objects.create(code=code, user=self)
 
+    def confirm_user(self):
+        """ confirm_user
+
+        confirm the user
+        """
+        self.confirmed = True
+        self.save()
+
+
     def verify_confirmation_code(self, code):
         # check if the user is blocking for the friend.
         try:

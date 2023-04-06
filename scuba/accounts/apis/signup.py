@@ -20,6 +20,7 @@ class ConfirmationCode(APIView):
 
         try:
             user.verify_confirmation_code(request.data.get('code'))
+            user.confirm_user()
             return Response(status=status.HTTP_200_OK)
         except InvalidConfirmationCodeException:
             pass
