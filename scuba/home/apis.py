@@ -64,8 +64,7 @@ class GetHomescreenApi(generics.GenericAPIView):
         user = request.user
 
         return Response({
-            'home': {
-                'buddies': {
+            'buddies': {
                     'count': user.get_buddies_count(),
                     'list': BuddySerializer(user.get_all_buddies(), many=True).data,
                     'recent_activity': BuddyRecentActivity(user.get_all_buddies_recent_activity(), many=True).data,
@@ -73,5 +72,5 @@ class GetHomescreenApi(generics.GenericAPIView):
                 'weather': Weather.get_current_by_postal_code('92107'),
                 'divesites': {
                     'favorites': DivesiteSerializer(user.get_divesite_favorites(), many=True).data
-                }}
+                }
             })
