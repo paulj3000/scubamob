@@ -73,6 +73,6 @@ class GetHomescreenApi(generics.GenericAPIView):
                 'weather': Weather.get_current_by_postal_code('92107'),
                 'divesites': {
                     'favorites': user.get_divesite_favorites(),
-                    'sites': DivesiteSerializer(Divesite.get_all_active_divesites(), many=True).data
+                    'list': DivesiteSerializer(Divesite.get_all_active_divesites(), many=True).data
                 }
             })
