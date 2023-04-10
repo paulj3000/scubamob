@@ -13,6 +13,8 @@ class DivesiteSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
     difficulty_display = serializers.SerializerMethodField(read_only=True)
     banner = serializers.SerializerMethodField(read_only=True)
+    lat = serializers.SerializerMethodField(read_only=True)
+    long = serializers.SerializerMethodField(read_only=True)
 
     @staticmethod
     def get_id(data):
@@ -21,6 +23,14 @@ class DivesiteSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_banner(data):
         return data.banner
+
+    @staticmethod
+    def get_lat(data):
+        return float(data.lat)
+
+    @staticmethod
+    def get_long(data):
+        return float(data.long)
 
     @staticmethod
     def get_difficulty_display(data):
