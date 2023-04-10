@@ -9,7 +9,7 @@ from scuba.divesites.models import Divesite
 from scuba.home.models import Jumbotron
 
 
-from scuba.libs.external.weather import Weather
+from scuba.weather.models import Weather
 
 
 class IndexView(TemplateView):
@@ -53,16 +53,13 @@ def home(us_request):
 
     template = 'home/home.html'
 
-    divesite_mongo = DiveSiteMongo()
-    weather = Weather()
-
     # let's get the favorites for this particular user
     user_favorites = []
     context = {'divesites': []}
 
     for fav in user_favorites:
         fav_data = divesite_mongo.get_divesite_info(fav)
-        weather_data = weather.get_data_latlng(
+        weather_data = Weather.get_current_by_lat_long(
             fav_data['latlng']['latitude'],
             fav_data['latlng']['longitude'])
 

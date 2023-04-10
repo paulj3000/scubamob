@@ -1,19 +1,18 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
-import calendar
+import requests
 import logging
-import urllib
 
 from scuba import settings
-from utils.httprequest import HttpRequest
+from scuba.systemsettings.models import APIKey
 
+logger = logging.getLogger(__name__)
 
 class GoogleAddress:
-    def __init__(self):
-        self.interface = settings.GOOGLE_ADDRESS
-        print self.interface
-        self.settings = settings.EXTERNAL_INTERFACES[self.interface]
-        self.http_interface = HttpRequest()
+    @staticmethod
+    def get_geocode_from_postal_code(postal_code):
+        gmaps = googlemaps.Client(key=APIKey.get_google_maps_key())
+        return gmaps.geocode(postal_code)
 
     def get_data_city_state(self, address, city, state):
         city = city.replace(' ', '_').lower()

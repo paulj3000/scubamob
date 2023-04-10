@@ -377,3 +377,10 @@ class APIKey(UUIDModel):
             return APIKey.objects.get(key='WEATHER_API').value
         except APIKey.DoesNotExist:
             raise exceptions.InvalidAPIKeyException
+
+    @staticmethod
+    def get_google_maps_key():
+        try:
+            return APIKey.objects.get(key='GOOGLE_MAPS').value
+        except APIKey.DoesNotExist:
+            raise exceptions.InvalidAPIKeyException

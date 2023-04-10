@@ -1,5 +1,6 @@
 API_KEYS = [
     ('WEATHER_API', 'Weather API'),
+    ('GOOGLE_MAPS', 'Google Maps'),
 ]
 
 SYSTEM_APIS = (
