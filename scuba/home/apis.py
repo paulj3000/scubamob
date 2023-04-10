@@ -64,14 +64,24 @@ class GetHomescreenApi(generics.GenericAPIView):
     def get(self, request):
         user = request.user
 
-        #'weather': Weather.get_current_by_lat_long(32.7596079, -117.222541)[0].data,
+        data = request.data
+        dist = data.get('distance', 100)
+        if data.get('lat') and data.get('long'):
+            lat = data['lat']
+            long = data['long']
+            weather = Weather.get_current_by_lat_long(lat, long)[0]
+
+        else:
+            code = data.get('postal_code', 92107)
+            weather = Weather.get_current_by_postal_code(code)[0]
+
         return Response({
             'buddies': {
                     'count': user.get_buddies_count(),
                     'list': BuddySerializer(user.get_all_buddies(), many=True).data,
                     'recent_activity': BuddyRecentActivity(user.get_all_buddies_recent_activity(), many=True).data,
                 },
-                'weather': Weather.get_current_by_postal_code('92107'),
+                'weather': weather.data,
                 'divesites': {
                     'favorites': user.get_divesite_favorites(),
                     'list': DivesiteSerializer(Divesite.get_all_active_divesites(), many=True).data
