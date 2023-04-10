@@ -1,10 +1,10 @@
-from datetime import datetime, timedelta
-from decimal import Decimal
 import requests
 import logging
 
+import googlemaps
+
 from scuba import settings
-from scuba.systemsettings.models import APIKey
+from scuba.sitesettings.models import APIKey
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ class GoogleAddress:
 
         # ... and of course, let's return the data
         try:
-            if str(data['code']) = '200':
+            if str(data['code']) == '200':
                 map_data = json.loads(data['response'])
                 return self.parse_data(map_data)
             else:
