@@ -11,7 +11,7 @@ from scuba.accounts.serializers.buddies import BuddySerializer, BuddyRecentActiv
 from scuba.accounts.models import User
 from scuba.divesites.models import Divesite
 from scuba.divesites.serializers import DivesiteSerializer
-from scuba.libs.external.weather import Weather
+from scuba.weather.models import Weather
 
 
 class GetJumbotronApi(generics.GenericAPIView):

@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     'scuba.logbooks',
     'scuba.robots',
     'scuba.sitesettings',
+    'scuba.weather',
     'django.contrib.admindocs',
 ]
 
@@ -200,9 +201,6 @@ MONGO = {
     'DATABASE': 'scubamob'
 }
 
-NOSQL = 'mongo'
-
-
 PRODUCTION_GALLERY_URL = '//s3-us-west-1.amazonaws.com/scubamob.gallery.dev/'
 
 
@@ -225,11 +223,6 @@ EXTERNAL_INTERFACES = {
         'url': 'http://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false'
     }
 }
-
-NOSQL_HOST = 'localhost'
-NOSQL_PASSWORD = 'notset'
-NOSQL_PORT = 27017
-NOSQL_DB = 'scubamob'
 
 # Here is the bucket file pattern.  It goes in the following manner:
 # account guid / album id / file name
