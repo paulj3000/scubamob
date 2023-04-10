@@ -67,10 +67,10 @@ class GetHomescreenApi(generics.GenericAPIView):
 
         data = request.data
         dist = data.get('distance', 100)
-        if data.get('lat') and data.get('long'):
+        if data.get('lat') and data.get('lng'):
             lat = data['lat']
-            long = data['long']
-            weather = Weather.get_current_by_lat_long(lat, long)[0]
+            lng = data['lng']
+            weather = Weather.get_current_by_lat_lng(lat, lng)[0]
         else:
             code = data.get('postal_code', 92107)
             weather = Weather.get_current_by_postal_code(code)[0]
