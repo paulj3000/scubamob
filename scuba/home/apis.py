@@ -63,6 +63,7 @@ class GetWeatherFromZip(generics.GenericAPIView):
 class GetHomescreenApi(generics.GenericAPIView):
     def get(self, request):
         user = request.user
+        buddy_recent_activity = user.get_all_buddies_recent_activity()
 
         data = request.data
         dist = data.get('distance', 100)
@@ -70,20 +71,19 @@ class GetHomescreenApi(generics.GenericAPIView):
             lat = data['lat']
             long = data['long']
             weather = Weather.get_current_by_lat_long(lat, long)[0]
-
         else:
             code = data.get('postal_code', 92107)
             weather = Weather.get_current_by_postal_code(code)[0]
 
         return Response({
             'buddies': {
-                    'count': user.get_buddies_count(),
-                    'list': BuddySerializer(user.get_all_buddies(), many=True).data,
-                    'recent_activity': BuddyRecentActivity(user.get_all_buddies_recent_activity(), many=True).data,
-                },
-                'weather': weather.data,
-                'divesites': {
-                    'favorites': user.get_divesite_favorites(),
-                    'list': DivesiteSerializer(Divesite.get_all_active_divesites(), many=True).data
-                }
-            })
+                'count': user.get_buddies_count(),
+                'list': BuddySerializer(user.get_all_buddies(), many=True).data,
+                'recent_activity': BuddyRecentActivity(buddy_recent_activity, many=True).data,
+            },
+            'weather': weather.data,
+            'divesites': {
+                'favorites': user.get_divesite_favorites(),
+                'list': DivesiteSerializer(Divesite.get_all_active_divesites(), many=True).data
+            }
+        })
