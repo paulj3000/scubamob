@@ -51,14 +51,13 @@ class Weather(UUIDModel):
         RADIUS_MILES = 3959
         sql = f"""SELECT id, ( {RADIUS_MILES} * acos( cos( radians(%s) ) * cos( radians( lat ) )
         * cos( radians( lng ) - radians(%s) ) + sin( radians(%s) ) * sin(radians(lat)) ) )
-        AS distance FROM weather WHERE distance < %s
+        AS distance FROM weather group by id HAVING distance < %s
         ORDER BY distance
         LIMIT 0 , 20"""
 
-        # TODO: FIX THIS!!
-        #weather = Weather.objects.raw(sql, [lat, lng, lat, distance])
-        #if len(weather):
-        #    return weather
+        weather = Weather.objects.raw(sql, [lat, lng, lat, distance])
+        if len(weather):
+            return weather
 
         new_weather = WeatherAPI.get_current_by_lat_lng(lat, lng)
         Weather.add_weather_data(new_weather)
