@@ -64,6 +64,7 @@ class GetHomescreenApi(generics.GenericAPIView):
     def get(self, request):
         user = request.user
 
+        #'weather': Weather.get_current_by_lat_long(32.7596079, -117.222541)[0].data,
         return Response({
             'buddies': {
                     'count': user.get_buddies_count(),

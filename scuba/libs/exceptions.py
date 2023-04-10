@@ -9,3 +9,10 @@ class InvalidHttpStatusCode(Exception):
 
 class ChatServerDownException(Exception):
     pass
+
+class InvalidWeatherDataException(Exception):
+    """ InvalidWeatherDataException
+
+    Thrown when a key from the weather data API is
+    not properly parsed / returned
+    """
