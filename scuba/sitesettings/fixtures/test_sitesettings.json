@@ -1,0 +1,1 @@
+[{"model": "sitesettings.apikey", "pk": "092a05da-6179-40ad-bb24-68503622e75a", "fields": {"key": "WEATHER_API", "value": "b4c9944201d34cd9b4143316232001"}}, {"model": "sitesettings.apikey", "pk": "76d0c905-d7a2-4133-aece-26b12c031de3", "fields": {"key": "GOOGLE_MAPS", "value": "AIzaSyDqOQUMvf6Tdsq_K7KdhHt6LqmsdChv2QI"}}]

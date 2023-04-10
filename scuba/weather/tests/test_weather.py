@@ -27,7 +27,7 @@ data = {
 }
 
 class TestWeather(TestCase):
-    fixtures = ["test_weather.json", "google_settings.json"]
+    fixtures = ["test_weather.json", "test_sitesettings.json"]
 
     def test_weather_by_lat_lng(self):
         """

@@ -60,7 +60,7 @@ class Weather(UUIDModel):
         #if len(weather):
         #    return weather
 
-        new_weather = WeatherAPI.get_current_by_lat_lng(lat, lon)
+        new_weather = WeatherAPI.get_current_by_lat_lng(lat, lng)
         Weather.add_weather_data(new_weather)
 
         return new_weather
