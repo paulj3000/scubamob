@@ -55,9 +55,10 @@ class Weather(UUIDModel):
         ORDER BY distance
         LIMIT 0 , 20"""
 
-        weather = Weather.objects.raw(sql, [lat, lng, lat, distance])
-        if len(weather):
-            return weather
+        # TODO: FIX THIS!!
+        #weather = Weather.objects.raw(sql, [lat, lng, lat, distance])
+        #if len(weather):
+        #    return weather
 
         new_weather = WeatherAPI.get_current_by_lat_lng(lat, lon)
         Weather.add_weather_data(new_weather)
