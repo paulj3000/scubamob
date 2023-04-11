@@ -38,7 +38,14 @@ class Weather(UUIDModel):
         result = GoogleAddress.get_geocode_from_postal_code(postal_code)
         location = result[0]['geometry']['location']
 
-        return Weather.get_current_by_lat_lng(location['lat'], location['lng'], distance)
+        retval = Weather.get_weather_by_postal_code(postal_code)
+        if retval:
+            return retval
+
+        retval = Weather.get_current_by_lat_lng(location['lat'], location['lng'], distance)
+        WeatherPostalCode.objects.create(weather=retval, postal_code=postal_code)
+
+        return retval
 
     @staticmethod
     def get_current_by_lat_lng(lat, lng, distance=100):
@@ -66,6 +73,10 @@ class Weather(UUIDModel):
         return retval
 
     @staticmethod
+    def get_weather_by_postal_code(code):
+        return Weather.objects.filter(postal_codes__postal_code=code).first()
+
+    @staticmethod
     def add_weather_data(data):
         """ add_weather_data
 
@@ -84,3 +95,16 @@ class Weather(UUIDModel):
                 data=data)
         except KeyError as e:
             raise InvalidWeatherDataException(str(e))
+
+
+class WeatherPostalCode(UUIDModel):
+    weather = models.ForeignKey(Weather, related_name='postal_codes', on_delete=models.CASCADE)
+    postal_code = models.CharField(max_length=15)
+
+    class Meta:
+        """ define database tables, etc """
+        db_table = 'weather_postal_code'
+
+    def __str__(self):
+        """ return a string representation of the model """
+        return self.postal_code

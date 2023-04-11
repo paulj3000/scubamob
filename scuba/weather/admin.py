@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from scuba.weather.models import Weather
+from scuba.weather.models import Weather, WeatherPostalCode
 
 
 class WeatherAdmin(admin.ModelAdmin):
@@ -8,3 +8,4 @@ class WeatherAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Weather, WeatherAdmin)
+admin.site.register(WeatherPostalCode)
