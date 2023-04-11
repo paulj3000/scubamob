@@ -28,6 +28,7 @@ class Weather(UUIDModel):
     class Meta:
         """ define database tables, etc """
         db_table = 'weather'
+        verbose_name_plural = 'weather'
 
     def __str__(self):
         """ return a string representation of the model """
