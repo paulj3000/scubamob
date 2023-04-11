@@ -7,7 +7,6 @@ from django.core.cache import cache
 from django.db.models import Q
 from scuba.home.models import Jumbotron
 from scuba.home.serializers import JumbotronSerializer
-from scuba.weather.serializers import WeatherSerializer
 from scuba.accounts.serializers.buddies import BuddySerializer, BuddyRecentActivity
 from scuba.accounts.models import User
 from scuba.divesites.models import Divesite
