@@ -65,15 +65,17 @@ class GetHomescreenApi(generics.GenericAPIView):
         user = request.user
         buddy_recent_activity = user.get_all_buddies_recent_activity()
 
-        data = request.data
+        data = request.query_params
         dist = data.get('distance', 100)
-        if data.get('lat') and data.get('lng'):
-            lat = data['lat']
-            lng = data['lng']
-            weather = Weather.get_current_by_lat_lng(lat, lng)[0]
+        if data.get('q'):
+            if ',' in data['q']:
+                lat, lng = data['q'].split(',')
+                weather = Weather.get_current_by_lat_lng(lat, lng)
+            else:
+                code = data.get('postal_code', data['q'])
+                weather = Weather.get_current_by_postal_code(code)
         else:
-            code = data.get('postal_code', 92107)
-            weather = Weather.get_current_by_postal_code(code)[0]
+            weather = Weather.get_current_by_postal_code('92107')
 
         return Response({
             'buddies': {
