@@ -140,11 +140,11 @@ class BuddySerializer(serializers.Serializer):
 
     @staticmethod
     def get_profile_image(data):
-        return data.user.get_profile_image()
+        return data.buddy.get_profile_image()
 
     @staticmethod
     def get_full_name(data):
-        return data.user.get_full_name()
+        return data.buddy.get_full_name()
 
     @staticmethod
     def get_id(data):

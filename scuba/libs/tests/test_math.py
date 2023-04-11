@@ -16,7 +16,9 @@ class TestMath(TestCase):
         """
         self.assertFalse(Math.isfloat('s12'))
         self.assertTrue(Math.isfloat('1.1234'))
+        self.assertTrue(Math.isfloat('-1.1234'))
         self.assertTrue(Math.isfloat('1'))
+        self.assertTrue(Math.isfloat('-1'))
         self.assertTrue(Math.isfloat('1.0'))
         self.assertTrue(Math.isfloat('.2'))
         self.assertTrue(Math.isfloat('.1'))

@@ -19,14 +19,14 @@ class Command(BaseCommand):
                 new_user = User();
                 new_user.first_name = f'test {i}'
                 new_user.last_name = f'user {i}'
+                new_user.date_of_birth = '1970-04-01'
 
-                new_user.username = username
+                #new_user.username = username
                 new_user.email = email
                 new_user.set_password(f'tester{i}')
                 new_user.save()
 
                 # create the new account
-
                 if me_user:
                     if not i % 10:
                         UserBuddyRequest.objects.create(user=new_user, buddy=me_user)
