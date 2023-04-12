@@ -1,0 +1,53 @@
+{% extends "admin/change_list.html" %}
+
+{% block content %}
+{{ block.super }}
+
+<style>
+#map {
+  height: 300px;
+}
+</style>
+
+    <script>(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
+        ({key: "AIzaSyDqOQUMvf6Tdsq_K7KdhHt6LqmsdChv2QI", key2: "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg", v: "beta"});
+    </script>
+
+<script>
+let map;
+
+
+async function initMap() {
+    let d = document.createElement("div");
+    d.setAttribute("id", "map");
+    document.getElementById('content-main').appendChild(d);
+
+  //@ts-ignore
+  const { Map } = await google.maps.importLibrary("maps");
+  const { AdvancedMarkerView } = await google.maps.importLibrary("marker");
+
+  const map = new Map(document.getElementById("map"), {
+    center: { lat: 32.7000, lng: -117.2467 },
+    zoom: 6,
+      mapId: "divesite_map",
+  });
+
+    const response = await fetch("/admin/divesites/divesite/all");
+    const sites = await response.json();
+
+    sites.sites.forEach(site => {
+        const position = { lat: site.lat, lng: site.long };
+        const marker = new AdvancedMarkerView({
+            map: map,
+            position: position,
+            title: site.name,
+        });
+    });
+}
+
+initMap();
+
+</script>
+
+
+{% endblock %}
