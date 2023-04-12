@@ -9,9 +9,6 @@ from scuba.divesites.models import Divesite
 from scuba.home.models import Jumbotron
 
 
-from scuba.weather.models import Weather
-
-
 class IndexView(TemplateView):
     """ IndexView
 

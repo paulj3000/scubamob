@@ -7,13 +7,12 @@ from django.core.cache import cache
 from django.db.models import Q
 from scuba.home.models import Jumbotron
 from scuba.home.serializers import JumbotronSerializer
-from scuba.weather.serializers import WeatherSerializer
 from scuba.accounts.serializers.buddies import BuddySerializer, BuddyRecentActivity
 from scuba.accounts.models import User
 from scuba.divesites.models import Divesite
 from scuba.divesites.serializers import DivesiteSerializer
 from scuba.sitesettings.models import APIKey
-from scuba.weather.libs.weather import Weather as WeatherAPI
+from scuba.libs.weather import Weather
 
 
 class GetJumbotronApi(generics.GenericAPIView):
@@ -78,7 +77,7 @@ class GetHomescreenApi(generics.GenericAPIView):
                 'recent_activity': BuddyRecentActivity(buddy_recent_activity, many=True).data,
             },
             #'weather': WeatherSerializer(weather, many=True).data,
-            'weather': WeatherAPI.get_current_by_q_param(q_param),
+            'weather': Weather.get_current_by_q_param(q_param),
             'divesites': {
                 'favorites': user.get_divesite_favorites(),
                 'list': DivesiteSerializer(Divesite.get_all_active_divesites(), many=True).data
