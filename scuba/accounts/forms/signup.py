@@ -20,8 +20,8 @@ class SignupForm(ModelForm):
         model = User
         fields = ('first_name', 'last_name', 'date_of_birth', 'email', 'password',)
 
-    def set_is_spam(self, spam):
-        self.is_spam = spam
+    #def set_is_spam(self, spam):
+    #    self.is_spam = spam
 
     def set_ip_address(self, ip_address):
         self.ip_address = ip_address
@@ -34,18 +34,16 @@ class SignupForm(ModelForm):
         #message = {'form_data': cleaned, 'is_spam': self.is_spam, 'iso_country': iso_country, 'blocked': blocked_name}
         #Log.objects.create(system='REGISTER', message=json.dumps(message))
 
-        if hasattr(self, 'is_spam'):
-            raise ValidationError("This request cannot be processed")
+        #if hasattr(self, 'is_spam'):
+        #    raise ValidationError("This request cannot be processed")
 
         if email.endswith('.ru'):
             raise ValidationError("This request cannot be processed")
-
 
         if IS_PRODUCTION:
             # here is the form data submitted
             blocked, iso_country = BlockedCountry.is_ip_available(getattr(self, 'ip_address'))
             blocked_name = blocked.name if blocked else 'Unknown'
-
 
             if blocked:
                 InvalidCountry.objects.create(

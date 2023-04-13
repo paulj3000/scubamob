@@ -137,10 +137,15 @@ class BuddySerializer(serializers.Serializer):
     id = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
+    is_following = serializers.SerializerMethodField()
 
     @staticmethod
     def get_profile_image(data):
         return data.buddy.get_profile_image()
+
+    @staticmethod
+    def get_is_following(data):
+        return data.is_following
 
     @staticmethod
     def get_full_name(data):
