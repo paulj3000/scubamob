@@ -6,8 +6,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 
-from scuba.accounts.forms.signup import AccountForm
-from scuba.settings import FACEBOOK_APP
+from scuba.accounts.forms.signup import SignupForm
+from scuba.security.models import InvalidEmail
+from scuba.settings import FACEBOOK_APP, IS_PRODUCTION
 
 
 # -----------------------------------------------------------------------------
@@ -20,7 +21,7 @@ class SignupView(FormView):
     """
     template_name = 'accounts/signup.html'
     success_url = reverse_lazy('home')
-    form_class = AccountForm
+    form_class = SignupForm
 
     def form_valid(self, form):
         """ form_valid
@@ -56,6 +57,36 @@ class SignupView(FormView):
         })
         return context
 
+    def post(self, request, *args, **kwargs):
+        """
+        Handle POST requests: instantiate a form instance with the passed
+        POST variables and then check if it's valid.
+        """
+        form = self.get_form()
+
+        request = self.request
+        #tosend = {
+        #    'secret': GOOGLE_RECAPTA_SECRET,
+        #    'response': request.POST.get('g-recaptcha-response')
+        #}
+        #captcha = requests.post('https://www.google.com/recaptcha/api/siteverify', tosend)
+        #resp = captcha.json()
+
+        #form.set_is_spam(not resp['success'])
+        print(type(request.META.get('HTTP_X_REAL_IP')))
+
+        if IS_PRODUCTION:
+            form.set_ip_address(request.META.get('HTTP_X_REAL_IP'))
+
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            if request.POST.get('email'):
+                InvalidEmail.objects.create(
+                        email=request.POST['email'],
+                        ip_address=request.META.get("HTTP_X_REAL_IP", '0.0.0.0'))
+            return self.form_invalid(form)
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ValidateEmail(View):
@@ -89,3 +120,30 @@ class ValidateEmail(View):
             retval = 'false'
 
         return JsonResponse(retval, safe=False)
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handle POST requests: instantiate a form instance with the passed
+        POST variables and then check if it's valid.
+        """
+        form = self.get_form()
+
+        request = self.request
+        #tosend = {
+        #    'secret': GOOGLE_RECAPTA_SECRET,
+        #    'response': request.POST.get('g-recaptcha-response')
+        #}
+        #captcha = requests.post('https://www.google.com/recaptcha/api/siteverify', tosend)
+        #resp = captcha.json()
+
+        #form.set_is_spam(not resp['success'])
+        form.set_ip_address(request.META.get('HTTP_X_REAL_IP'))
+
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            if request.POST.get('email'):
+                InvalidEmail.objects.create(
+                        email=request.POST['email'],
+                        ip_address=request.META.get("HTTP_X_REAL_IP"))
+            return self.form_invalid(form)

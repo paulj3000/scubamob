@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'scuba.home',
     'scuba.logbooks',
     'scuba.robots',
+    'scuba.security',
     'scuba.sitesettings',
     'django.contrib.admindocs',
 ]
