@@ -542,7 +542,7 @@ class UserBuddy(UUIDModel):
     # kind of like a "don't see my stories" thing
     hide = models.BooleanField(default=False)
 
-    follow = models.BooleanField(default=True)
+    is_following = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
