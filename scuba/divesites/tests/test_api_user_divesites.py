@@ -40,3 +40,42 @@ class TestUserDivesitesApi(TestCase):
         # now attempt to add another review for today, this one should fail
         response = client.post(url, payload, format='json')
         self.assertEqual(response.status_code, 400)
+
+    def test_follow_divesite(self):
+        """
+        Follow a divesite
+        """
+        user = User.objects.get(email='foo@nowhere.com')
+        divesite = Divesite.objects.get(name='White Point')
+
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        url = f'/api/divesites/{divesite.pk_as_str}/follow/'
+        response = client.post(url, {}, format='json')
+        self.assertEqual(response.status_code, 202)
+
+        following = user.following.get(divesite=divesite)
+        self.assertTrue(following.is_following)
+
+        payload = {
+            'follow': False
+        }
+
+        url = f'/api/divesites/{divesite.pk_as_str}/follow/'
+        response = client.post(url, payload, format='json')
+        self.assertEqual(response.status_code, 202)
+
+        following = user.following.get(divesite=divesite)
+        self.assertFalse(following.is_following)
+
+        payload = {
+            'follow': True
+        }
+
+        url = f'/api/divesites/{divesite.pk_as_str}/follow/'
+        response = client.post(url, payload, format='json')
+        self.assertEqual(response.status_code, 202)
+
+        following = user.following.get(divesite=divesite)
+        self.assertTrue(following.is_following)

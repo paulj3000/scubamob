@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
 from scuba.divesites.models import Divesite
-from scuba.divesites.serializers import DivesiteSerializer, DivesiteReviewSerializer
+from scuba.divesites.serializers import DivesiteSerializer, \
+    DivesiteReviewSerializer, DivesiteFollowingSerializer
 
 
 class DivesiteListApi(generics.ListAPIView):
@@ -80,16 +81,11 @@ class DivesiteReviewListApi(generics.ListAPIView):
 
 
 class AddReviewApi(generics.GenericAPIView):
-    """ Block User
+    """ Add Review API
 
-    Block a particular user
+    Add or remove an API
     """
     serializer_class = DivesiteReviewSerializer
-
-    def xget_serializer_class(self, divesite):
-        data = super().get_serializer_context()
-        data['divesite'] = divesite
-        return data
 
     def post(self, request, id, *args, **kwargs):
         divesite = get_object_or_404(Divesite, id=id)
@@ -98,3 +94,19 @@ class AddReviewApi(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class FollowingApi(generics.GenericAPIView):
+    """ Block User
+
+    Block a particular user
+    """
+    serializer_class = DivesiteFollowingSerializer
+
+    def post(self, request, id, *args, **kwargs):
+        divesite = get_object_or_404(Divesite, id=id)
+
+        serializer = self.get_serializer(divesite=divesite, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_202_ACCEPTED)

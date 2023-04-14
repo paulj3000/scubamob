@@ -11,4 +11,5 @@ urlpatterns = [
     ),
     re_path(r'^([0-9A-Fa-f-]{32,36})$', divesite_apis.DivesiteListApi.as_view()),
     re_path(r'^([0-9A-Fa-f-]{32,36})/reviews/', divesite_apis.AddReviewApi.as_view()),
+    re_path(r'^([0-9A-Fa-f-]{32,36})/follow/', divesite_apis.FollowingApi.as_view()),
 ]
