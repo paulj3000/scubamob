@@ -538,7 +538,11 @@ class Account(models.Model):
 class UserBuddy(UUIDModel):
     user = models.ForeignKey(User, related_name='buddies', on_delete=models.CASCADE)
     buddy = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    # kind of like a "don't see my stories" thing
     hide = models.BooleanField(default=False)
+
+    is_following = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
