@@ -79,7 +79,6 @@ class TestUserBuddiesAPI(TestCase):
         response = client.post('/api/user/buddies/add/', payload, format='json')
         self.assertEqual(response.status_code, 400)
 
-
     def test_accept_buddy_request(self):
         """
         Test the making of a buddy request
@@ -184,3 +183,38 @@ class TestUserBuddiesAPI(TestCase):
             self.assertIn('id', the_list['requests'][i])
             self.assertIn('profile_image', the_list['requests'][i])
             self.assertIn('full_name', the_list['requests'][i])
+
+    def test_follow_buddy_request(self):
+        """
+        Test the following of a buddy
+        """
+        user = User.objects.get(email='foo@nowhere.com')
+        buddy = User.objects.get(email='test@tester.com')
+
+        user.add_buddy(buddy)
+
+        payload = {
+            'follow': False
+        }
+
+        client = APIClient()
+        client.force_authenticate(user=user)
+        url = f'/api/user/buddies/{buddy.pk_as_str}/follow/'
+        response = client.put(url, payload, format='json')
+        self.assertEqual(response.status_code, 202)
+
+        # check if the follow flag is NOT set
+        user_buddy = user.buddies.get(buddy=buddy)
+        self.assertFalse(user_buddy.is_following)
+
+        payload = {
+            'follow': True
+        }
+
+        # now follow the buddy
+        response = client.put(url, payload, format='json')
+        self.assertEqual(response.status_code, 202)
+
+        # ...and check if the follow flag is set
+        user_buddy = user.buddies.get(buddy=buddy)
+        self.assertTrue(user_buddy.is_following)

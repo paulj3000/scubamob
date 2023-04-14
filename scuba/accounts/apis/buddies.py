@@ -13,7 +13,7 @@ from scuba.accounts.models import User
 from scuba.accounts.exceptions import InvalidUserIdException
 from scuba.accounts.serializers.buddies import BlockUserSerializer, \
     AddBuddySerializer, AcceptBuddyRequestSerializer, BuddySerializer, \
-    RemoveBuddySerializer
+    RemoveBuddySerializer, FollowBuddySerializer
 
 
 class GetBuddiesListApi(generics.ListAPIView):
@@ -43,6 +43,23 @@ class BlockUserApi(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
+        return Response(status=status.HTTP_202_ACCEPTED)
+
+
+class FollowBuddyApi(generics.UpdateAPIView):
+    """ Follow / Unfollow Buddy
+
+    Follow or unfollow a particular user
+    """
+    serializer_class = FollowBuddySerializer
+    lookup_field = 'buddy_id'
+
+    def get_queryset(self):
+        user = self.request.user
+        return user.get_my_buddy(self.kwargs['buddy_id'])
+
+    def put(self, request, *args, **kwargs):
+        response = super().put(request, *args, **kwargs)
         return Response(status=status.HTTP_202_ACCEPTED)
 
 

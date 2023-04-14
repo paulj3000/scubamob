@@ -44,6 +44,20 @@ class BlockUserSerializer(serializers.Serializer):
         raise NotImplementedError
 
 
+class FollowBuddySerializer(serializers.Serializer):
+    follow = serializers.BooleanField(default=True)
+
+    def create(self, validated_data):
+        """ A stub for the create method. This does nothing """
+        raise NotImplementedError
+
+    def update(self, instance, validated_data):
+        """ set the buddy's follow flag correctly """
+        user = self.context['request'].user
+        instance.set_follow(validated_data['follow'])
+        return instance
+
+
 class AddBuddySerializer(serializers.Serializer):
     buddy_id = serializers.CharField()
 
@@ -137,15 +151,14 @@ class BuddySerializer(serializers.Serializer):
     id = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
-    is_following = serializers.SerializerMethodField()
 
     @staticmethod
     def get_profile_image(data):
         return data.buddy.get_profile_image()
 
-    @staticmethod
-    def get_is_following(data):
-        return data.is_following
+    #@staticmethod
+    #def get_is_following(data):
+    #    return data.is_following
 
     @staticmethod
     def get_full_name(data):

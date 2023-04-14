@@ -148,6 +148,9 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
             Q(buddy=buddy) |
             Q(user=buddy)).first()
 
+    def get_my_buddy(self, buddy_id):
+        return self.buddies.filter(buddy__id=buddy_id)
+
     def get_buddies_count(self):
         # get all of the current buddies
         return self.buddies.all().count()
@@ -230,6 +233,10 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
 
         # get all of the current buddies
         return UserBlocked.objects.create(user=self, buddy=buddy, blocked_by=self)
+
+    def follow_buddy(self, buddy, follow):
+        # set the user buddy flag to follow
+        self.buddies.filter(buddy=buddy).follow(follow)
 
     def get_blocked_buddies(self):
         # get all of the current buddies
@@ -551,6 +558,9 @@ class UserBuddy(UUIDModel):
         db_table = 'user_buddy'
         unique_together = (('user', 'buddy'), )
 
+    def set_follow(self, follow):
+        self.is_following = follow
+        self.save()
 
 class UserBuddyRemove(UUIDModel):
     user = models.ForeignKey(User, related_name='removed', on_delete=models.CASCADE)
