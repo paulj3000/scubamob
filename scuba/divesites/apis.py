@@ -86,3 +86,15 @@ class DivesiteReviewListApi(generics.ListAPIView):
         }
 
         return Response(retval)
+
+
+class AddReviewApi(generics.CreateAPIView):
+    """ Block User
+
+    Block a particular user
+    """
+    serializer_class = DivesiteReviewSerializer
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        return Response(status=status.HTTP_202_ACCEPTED)
