@@ -57,10 +57,12 @@ class DivesiteReview(UUIDModel):
     user = models.ForeignKey('accounts.User', related_name='reviews', on_delete=models.CASCADE)
     review = models.TextField()
     rating = models.PositiveSmallIntegerField(choices=REVIEW_CHOICES)
+    review_date = models.DateField(auto_now_add=True)
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'divesite_reviews'
+        unique_together = (('user', 'divesite', 'review_date'), )
 
 
 class DivesiteBanner(UUIDModel):
@@ -81,3 +83,12 @@ class DivesiteBanner(UUIDModel):
         of the profile image, sans the 'profiles/' prefix
         """
         return f"{AWS_CLOUDFRONT}{self.image_cleaned}"
+
+
+class DivesiteFollowing(UUIDModel):
+    divesite = models.ForeignKey(Divesite, related_name='followers', on_delete=models.CASCADE)
+    user = models.ForeignKey('accounts.User', related_name='following', on_delete=models.CASCADE)
+    is_following = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'divesite_following'
