@@ -2,7 +2,7 @@ from django.db import models
 from django.templatetags.static import static
 
 from scuba.libs.models.uuidmodel import UUIDModel
-from scuba.divesites.settings import REVIEW_CHOICES, DIFFICULTY_CHOICES
+from scuba.divesites.settings import RATING_CHOICES, DIFFICULTY_CHOICES
 from scuba.libs.stringutils import StringUtils
 from scuba.sitesettings.models import SystemSetting
 from scuba.settings import AWS_CLOUDFRONT
@@ -56,7 +56,7 @@ class DivesiteReview(UUIDModel):
     divesite = models.ForeignKey(Divesite, related_name='reviews', on_delete=models.CASCADE)
     user = models.ForeignKey('accounts.User', related_name='reviews', on_delete=models.CASCADE)
     review = models.TextField()
-    rating = models.PositiveSmallIntegerField(choices=REVIEW_CHOICES)
+    rating = models.PositiveSmallIntegerField(choices=RATING_CHOICES)
     review_date = models.DateField(auto_now_add=True)
     created = models.DateTimeField(auto_now_add=True)
 

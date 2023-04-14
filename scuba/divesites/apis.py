@@ -1,17 +1,8 @@
-import math
-from datetime import datetime, timedelta
-from pprint import pprint
-
-from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
-from django.http import QueryDict
-
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny
 from rest_framework import generics
-from rest_framework.views import APIView
 from rest_framework.response import Response
-
+from django.shortcuts import get_object_or_404
 
 from scuba.divesites.models import Divesite
 from scuba.divesites.serializers import DivesiteSerializer, DivesiteReviewSerializer
@@ -88,13 +79,22 @@ class DivesiteReviewListApi(generics.ListAPIView):
         return Response(retval)
 
 
-class AddReviewApi(generics.CreateAPIView):
+class AddReviewApi(generics.GenericAPIView):
     """ Block User
 
     Block a particular user
     """
     serializer_class = DivesiteReviewSerializer
 
-    def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
-        return Response(status=status.HTTP_202_ACCEPTED)
+    def xget_serializer_class(self, divesite):
+        data = super().get_serializer_context()
+        data['divesite'] = divesite
+        return data
+
+    def post(self, request, id, *args, **kwargs):
+        divesite = get_object_or_404(Divesite, id=id)
+
+        serializer = self.get_serializer(divesite=divesite, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
