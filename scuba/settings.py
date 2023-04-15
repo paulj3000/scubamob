@@ -237,7 +237,6 @@ MOBILE_HEADER_APP = 'scubaapp'
 MOBILE_HEADER_DEVICES = {'smandroid': 'am', 'smios': 'io'}
 
 # maxmind settings
-#MAXMIND_URL = 'https://geoip.maxmind.com/geoip/v2.0/city_isp_org/%s'
 MAXMIND_URL = 'https://geoip.maxmind.com/geoip/v2.0/city/%s'
 MAXMIND_LICENSE = 'hVeqTCTxxU5H'
 MAXMIND_USER = '75205'
@@ -263,8 +262,6 @@ AWS_S3_BUCKET_PRIVATE_REGION = 'us-east-1'
 AWS_PROFILE = 'default'
 AWS_EMAIL_STORAGE_ROOT = 'emailsent/skmradio'
 AWS_CLOUDFRONT = os.environ.get('AWS_CLOUDFRONT', 'https://d2pw8lka09f5g5.cloudfront.net/')
-
-#STATIC_URL = AWS_CLOUDFRONT
 
 FILE_UPLOAD_HANDLERS = ['django.core.files.uploadhandler.TemporaryFileUploadHandler']
 
@@ -295,7 +292,7 @@ xCOMPRESS_FILTERS = {
 
 xCOMPRESS_YUGLIFY_BINARY = f"{BASE_DIR}/node_modules/yuglify/bin/yuglify"
 
-CORS_ORIGIN_ALLOW_ALL=True
+CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_ALL_ORIGINS = True
 
 SITE_TITLE = 'ScubaMob'
