@@ -9,6 +9,7 @@ from scuba.divesites.serializers import DivesiteSerializer
 
 class DivesiteAdmin(admin.ModelAdmin):
     change_list_template = 'admin/divesites/change_list.html'
+    change_form_template = 'admin/divesites/change_form.html'
     readonly_fields = ['url']
 
     def get_urls(self):
