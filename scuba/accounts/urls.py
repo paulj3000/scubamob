@@ -1,10 +1,6 @@
-from django.conf.urls import include
-from django.urls import path, re_path
+from django.urls import path
 
-from scuba.accounts.forms import SettingsForm, PasswordForm
-import scuba.accounts.views as account_views
 import scuba.accounts.apis as account_api
-import scuba.accounts.views.settings as settings_views
 
 
 urlpatterns = [

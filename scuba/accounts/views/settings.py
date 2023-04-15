@@ -28,5 +28,5 @@ def settings(us_request, mode, formname):
     else:
         form = formname(instance=account)
 
-    context = { 'form': form, 'mode': mode }
+    context = {'form': form, 'mode': mode}
     return render(us_request, "settings/index.html", context)
