@@ -42,8 +42,8 @@ class SignupView(FormView):
 
         user = authenticate(
             self.request,
-            username=request.POST['username'],
-            password=request.POST['password1'])
+            email=request.POST['email'],
+            password=request.POST['password'])
 
         login(self.request, user, backend='django.contrib.auth.backends.ModelBackend')
         return super().form_valid(form)
