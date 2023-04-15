@@ -23,6 +23,7 @@ class TestUserBuddiesAPI(TestCase):
         """
         user = User.objects.get(email='foo@nowhere.com')
         user_to_add = User.objects.get(email='addbuddy@tester.com')
+        user_to_add_private = User.objects.get(email='test4@tester.com')
 
         payload = {
             'buddy_id': user_to_add.pk_as_str
@@ -33,6 +34,18 @@ class TestUserBuddiesAPI(TestCase):
 
         response = client.post('/api/buddies/add/', payload, format='json')
         self.assertEqual(response.status_code, 201)
+
+        # let's test if a private account can be added
+        user_to_add_private.is_private = True
+        user_to_add_private.save()
+
+        payload = {
+            'buddy_id': user_to_add_private.pk_as_str
+        }
+
+        response = client.post('/api/buddies/add/', payload, format='json')
+        self.assertEqual(response.status_code, 404, 'Cannot add a private account')
+
 
     def test_remove_buddy_request(self):
         """
@@ -52,7 +65,7 @@ class TestUserBuddiesAPI(TestCase):
         client.force_authenticate(user=user)
 
         response = client.post('/api/buddies/remove/', payload, format='json')
-        self.assertEqual(response.status_code, 202)
+        self.assertEqual(response.status_code, 202, 'Successfully remove a user')
 
         # make sure the buddy does not exist in the user's records
         self.assertIsNone(user.get_buddy(user_to_remove))

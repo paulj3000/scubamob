@@ -86,7 +86,7 @@ class AddBuddySerializer(serializers.Serializer):
             raise serializers.ValidationError("Cannot add buddy")
 
         # is the user blocked??
-        if user.is_blocked(to_add):
+        if user.is_blocked(to_add) or to_add.is_private:
             raise Http404
 
         # is there already a user request for this?
