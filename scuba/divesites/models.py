@@ -85,10 +85,10 @@ class DivesiteBanner(UUIDModel):
         return f"{AWS_CLOUDFRONT}{self.image_cleaned}"
 
 
-class DivesiteFollowing(UUIDModel):
+class DivesiteFavorite(UUIDModel):
     divesite = models.ForeignKey(Divesite, related_name='followers', on_delete=models.CASCADE)
-    user = models.ForeignKey('accounts.User', related_name='following', on_delete=models.CASCADE)
-    is_following = models.BooleanField(default=True)
+    user = models.ForeignKey('accounts.User', related_name='favorites', on_delete=models.CASCADE)
+    is_favorite = models.BooleanField(default=True)
 
     class Meta:
-        db_table = 'divesite_following'
+        db_table = 'divesite_favorite'

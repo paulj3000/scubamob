@@ -3,7 +3,7 @@ from datetime import date
 from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 
-from scuba.divesites.models import Divesite, DivesiteReview, DivesiteFollowing
+from scuba.divesites.models import Divesite, DivesiteReview, DivesiteFavorite
 
 
 class DivesiteSerializer(serializers.ModelSerializer):
@@ -108,18 +108,18 @@ class DivesiteReviewSerializer(serializers.ModelSerializer):
         return DivesiteReview.objects.create(**data)
 
 
-class DivesiteFollowingSerializer(serializers.Serializer):
+class DivesiteFavoriteSerializer(serializers.Serializer):
     def __init__(self, *args, **kwargs):
         divesite = kwargs.pop('divesite', None)
         setattr(self, 'divesite', divesite)
         super().__init__(*args, **kwargs)
 
-    follow = serializers.BooleanField(default=True)
+    favorite = serializers.BooleanField(default=True)
 
     def save(self, **kwargs):
         validated_data = {**self.validated_data, **kwargs}
 
-        return DivesiteFollowing.objects.update_or_create(
+        return DivesiteFavorite.objects.update_or_create(
             divesite=getattr(self, 'divesite'),
             user=self.context['request'].user,
-            defaults={'is_following': validated_data['follow']})
+            defaults={'is_favorite': validated_data['favorite']})

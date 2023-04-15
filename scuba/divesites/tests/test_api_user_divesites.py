@@ -41,9 +41,9 @@ class TestUserDivesitesApi(TestCase):
         response = client.post(url, payload, format='json')
         self.assertEqual(response.status_code, 400)
 
-    def test_follow_divesite(self):
+    def test_favorite_divesite(self):
         """
-        Follow a divesite
+        Verify if a divesite is a favorite
         """
         user = User.objects.get(email='foo@nowhere.com')
         divesite = Divesite.objects.get(name='White Point')
@@ -51,31 +51,31 @@ class TestUserDivesitesApi(TestCase):
         client = APIClient()
         client.force_authenticate(user=user)
 
-        url = f'/api/divesites/{divesite.pk_as_str}/follow/'
+        url = f'/api/divesites/{divesite.pk_as_str}/favorite/'
         response = client.post(url, {}, format='json')
         self.assertEqual(response.status_code, 202)
 
-        following = user.following.get(divesite=divesite)
-        self.assertTrue(following.is_following)
+        favorite = user.favorites.get(divesite=divesite)
+        self.assertTrue(favorite.is_favorite)
 
         payload = {
-            'follow': False
+            'favorite': False
         }
 
-        url = f'/api/divesites/{divesite.pk_as_str}/follow/'
+        url = f'/api/divesites/{divesite.pk_as_str}/favorite/'
         response = client.post(url, payload, format='json')
         self.assertEqual(response.status_code, 202)
 
-        following = user.following.get(divesite=divesite)
-        self.assertFalse(following.is_following)
+        favorite = user.favorites.get(divesite=divesite)
+        self.assertFalse(favorite.is_favorite)
 
         payload = {
-            'follow': True
+            'favorite': True
         }
 
-        url = f'/api/divesites/{divesite.pk_as_str}/follow/'
+        url = f'/api/divesites/{divesite.pk_as_str}/favorite/'
         response = client.post(url, payload, format='json')
         self.assertEqual(response.status_code, 202)
 
-        following = user.following.get(divesite=divesite)
-        self.assertTrue(following.is_following)
+        favorite = user.favorites.get(divesite=divesite)
+        self.assertTrue(favorite.is_favorite)

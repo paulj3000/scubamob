@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 
 from scuba.divesites.models import Divesite
 from scuba.divesites.serializers import DivesiteSerializer, \
-    DivesiteReviewSerializer, DivesiteFollowingSerializer
+    DivesiteReviewSerializer, DivesiteFavoriteSerializer
 
 
 class DivesiteListApi(generics.ListAPIView):
@@ -96,12 +96,12 @@ class AddReviewApi(generics.GenericAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class FollowingApi(generics.GenericAPIView):
-    """ Block User
+class FavoriteApi(generics.GenericAPIView):
+    """ Favorite Divesite
 
-    Block a particular user
+    Indicate if a divesite is a favorite Divesite
     """
-    serializer_class = DivesiteFollowingSerializer
+    serializer_class = DivesiteFavoriteSerializer
 
     def post(self, request, id, *args, **kwargs):
         divesite = get_object_or_404(Divesite, id=id)
