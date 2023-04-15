@@ -2,12 +2,11 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q
 from django.db import IntegrityError
-import json
+from django.shortcuts import get_object_or_404
 
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
 
 from scuba.accounts.models import User
 from scuba.accounts.exceptions import InvalidUserIdException
@@ -34,15 +33,19 @@ class GetBuddiesListApi(generics.ListAPIView):
         })
 
 
-class BlockUserApi(generics.CreateAPIView):
+class BlockUserApi(generics.GenericAPIView):
     """ Block User
 
     Block a particular user
     """
     serializer_class = BlockUserSerializer
 
-    def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
+    def post(self, request, buddy_id, *args, **kwargs):
+        buddy = get_object_or_404(User, id=buddy_id)
+
+        serializer = self.get_serializer(buddy=buddy, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(status=status.HTTP_202_ACCEPTED)
 
 

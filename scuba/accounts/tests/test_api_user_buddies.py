@@ -31,7 +31,7 @@ class TestUserBuddiesAPI(TestCase):
         client = APIClient()
         client.force_authenticate(user=user)
 
-        response = client.post('/api/user/buddies/add/', payload, format='json')
+        response = client.post('/api/buddies/add/', payload, format='json')
         self.assertEqual(response.status_code, 201)
 
     def test_remove_buddy_request(self):
@@ -51,7 +51,7 @@ class TestUserBuddiesAPI(TestCase):
         client = APIClient()
         client.force_authenticate(user=user)
 
-        response = client.post('/api/user/buddies/remove/', payload, format='json')
+        response = client.post('/api/buddies/remove/', payload, format='json')
         self.assertEqual(response.status_code, 202)
 
         # make sure the buddy does not exist in the user's records
@@ -63,21 +63,23 @@ class TestUserBuddiesAPI(TestCase):
         Test the blocking of a buddy request
         """
         user = User.objects.get(email='foo@nowhere.com')
-        user1 = User.objects.get(email='test@tester.com')
-
-        payload = {
-            'buddy_id': user1.pk_as_str
-        }
+        buddy = User.objects.get(email='test@tester.com')
 
         client = APIClient()
         client.force_authenticate(user=user)
 
-        response = client.post(f'/api/user/buddies/block/', payload, format='json')
+        url = f'/api/buddies/{buddy.pk_as_str}/block/'
+
+        response = client.post(url, format='json')
         self.assertEqual(response.status_code, 202)
 
         # now try to add the user again
-        response = client.post('/api/user/buddies/add/', payload, format='json')
-        self.assertEqual(response.status_code, 400)
+        payload = {
+            'buddy_id': buddy.pk_as_str
+        }
+
+        response = client.post('/api/buddies/add/', payload, format='json')
+        self.assertEqual(response.status_code, 404)
 
     def test_accept_buddy_request(self):
         """
@@ -90,7 +92,7 @@ class TestUserBuddiesAPI(TestCase):
         client = APIClient()
         client.force_authenticate(user=user)
 
-        response = client.post(f'/api/user/buddies/requests/{request.pk_as_str}/accept', format='json')
+        response = client.post(f'/api/buddies/requests/{request.pk_as_str}/accept', format='json')
         self.assertEqual(response.status_code, 201)
         accept = response.json()
         self.assertIn('accept', accept)
@@ -109,9 +111,8 @@ class TestUserBuddiesAPI(TestCase):
         client = APIClient()
         client.force_authenticate(user=user)
 
-        response = client.post(f'/api/user/buddies/requests/{request.pk_as_str}/accept', format='json')
+        response = client.post(f'/api/buddies/requests/{request.pk_as_str}/accept', format='json')
         self.assertEqual(response.status_code, 400)
-
 
     def test_add_bad_buddy_id_request(self):
         """
@@ -127,7 +128,7 @@ class TestUserBuddiesAPI(TestCase):
         client = APIClient()
         client.force_authenticate(user=user)
 
-        response = client.post('/api/user/buddies/add/', payload, format='json')
+        response = client.post('/api/buddies/add/', payload, format='json')
         self.assertEqual(response.status_code, 400)
 
     def test_listing_buddies(self):
@@ -145,7 +146,7 @@ class TestUserBuddiesAPI(TestCase):
         client = APIClient()
         client.force_authenticate(user=user)
 
-        response = client.get('/api/user/buddies/', format='json')
+        response = client.get('/api/buddies/', format='json')
         self.assertEqual(response.status_code, 200)
         the_list = response.json()
         self.assertEqual(response.status_code, 200)
@@ -172,7 +173,7 @@ class TestUserBuddiesAPI(TestCase):
         client = APIClient()
         client.force_authenticate(user=user)
 
-        response = client.get('/api/user/buddies/requests/', format='json')
+        response = client.get('/api/buddies/requests/', format='json')
         self.assertEqual(response.status_code, 200)
         the_list = response.json()
         self.assertEqual(response.status_code, 200)
@@ -199,7 +200,7 @@ class TestUserBuddiesAPI(TestCase):
 
         client = APIClient()
         client.force_authenticate(user=user)
-        url = f'/api/user/buddies/{buddy.pk_as_str}/follow/'
+        url = f'/api/buddies/{buddy.pk_as_str}/follow/'
         response = client.put(url, payload, format='json')
         self.assertEqual(response.status_code, 202)
 

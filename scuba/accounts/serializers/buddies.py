@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.conf.urls.static import static
+from django.http import Http404
 
 from rest_framework import serializers
 
@@ -7,7 +8,10 @@ from scuba.accounts.models import User, UserRecentActivity
 
 
 class BlockUserSerializer(serializers.Serializer):
-    buddy_id = serializers.CharField()
+    def __init__(self, *args, **kwargs):
+        buddy = kwargs.pop('buddy', None)
+        setattr(self, 'buddy', buddy)
+        super().__init__(*args, **kwargs)
 
     def validate_buddy_id(self, buddy_id):
         """ validate_buddy_id
@@ -30,11 +34,16 @@ class BlockUserSerializer(serializers.Serializer):
         setattr(self, 'to_block', buddy)
         return buddy_id
 
-    def create(self, validated_data):
+    def save(self):
         """ A stub for the create method. This does nothing """
         user = self.context['request'].user
-        user.remove_buddy(self.to_block)
-        return user.block_buddy(self.to_block)
+        buddy = getattr(self, 'buddy')
+
+        if user.pk_as_str == buddy.pk_as_str:
+            raise serializers.ValidationError("You cannot block yourself")
+
+        user.remove_buddy(buddy)
+        return user.block_buddy(buddy)
 
     def update(self, instance, validated_data):
         """ update
@@ -78,13 +87,13 @@ class AddBuddySerializer(serializers.Serializer):
 
         # is the user blocked??
         if user.is_blocked(to_add):
-            raise serializers.ValidationError("Cannot add buddy")
+            raise Http404
 
         # is there already a user request for this?
         if user.is_add_buddy_requested(to_add):
             raise serializers.ValidationError("Cannot add buddy")
 
-        setattr(self, 'to_add', to_add)
+        setattr(self, 'buddy', to_add)
         return buddy_id
 
     def create(self, validated_data):
@@ -93,7 +102,9 @@ class AddBuddySerializer(serializers.Serializer):
         Create the buddy request
         """
         user = self.context['request'].user
-        return user.add_buddy_request(self.to_add)
+        buddy = getattr(self, 'buddy')
+
+        return user.add_buddy_request(buddy)
 
 
 class AcceptBuddyRequestSerializer(serializers.Serializer):

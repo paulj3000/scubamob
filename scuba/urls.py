@@ -53,7 +53,7 @@ urlpatterns = [
     path('faq', content_views.FAQView.as_view(), name='faq'),
 
     path('api/accounts/', include('scuba.accounts.urls_accounts_api')),
-    path('api/user/buddies/', include('scuba.accounts.urls_buddies_api')),
+    path('api/buddies/', include('scuba.accounts.urls_buddies_api')),
     path('api/user/divesites/', include('scuba.accounts.urls_divesites_api')),
     path('api/password/', include('scuba.accounts.urls_password_api')),
     path('api/signup/', include('scuba.accounts.urls_signup_api')),
