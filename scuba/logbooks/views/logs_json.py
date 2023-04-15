@@ -59,7 +59,7 @@ def logbookfolders(request):
     if id:
         to_search['meta.folder'] = id
     else:
-        to_search['meta.folder'] = {'$exists': False }
+        to_search['meta.folder'] = {'$exists': False}
 
     logs = []
 

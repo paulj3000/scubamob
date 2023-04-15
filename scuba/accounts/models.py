@@ -229,7 +229,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
 
         # remove all buddy requests
         UserBuddyRequest.objects.filter(Q(user=buddy, buddy=self) |
-                                         Q(user=self, buddy=buddy)).delete()
+                                        Q(user=self, buddy=buddy)).delete()
 
         # get all of the current buddies
         return UserBlocked.objects.create(user=self, buddy=buddy, blocked_by=self)
@@ -296,7 +296,8 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         soup = BeautifulSoup(content, 'lxml')
         email_txt = soup.get_text()
 
-        html = generate_email(self, 'content/emails/confirmation_code.html',
+        html = generate_email(
+            self, 'content/emails/confirmation_code.html',
             {'content': content, 'short_code': email_template.short_code})
 
         return (html, email_txt)
@@ -311,7 +312,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         ignore it
         """
         # ignore specific users
-        #if str(self.id).replace('-', '') in USER_IGNORE_TRACKING:
+        # if str(self.id).replace('-', '') in USER_IGNORE_TRACKING:
         #    return
 
         UserLogin.objects.create(user=self, ip_address=ip_address, device=device, iso_country=country)
@@ -341,11 +342,11 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
             uploaded_image_string: a string representation of a profile image
         '''
         # generate the file name the
-        img_length = 5 # the sub key length
+        img_length = 5  # the sub key length
         sub_name = StringUtils.generate_random_number(img_length)
         base_name = "profiles/%s/%s_%d.png" % (self.get_aws_id(), sub_name, int(time.time()))
 
-        #if re.search(r'^data:image\/(jpg|png);base64', uploaded_image_string, re.DOTALL):
+        # if re.search(r'^data:image\/(jpg|png);base64', uploaded_image_string, re.DOTALL):
         result = re.search("data:image/(?P<ext>.*?);base64,(?P<data>.*)", uploaded_image_string)
 
         profile_image = None
@@ -449,7 +450,9 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         soup = BeautifulSoup(content, 'lxml')
         email_txt = soup.get_text()
 
-        html = generate_email(self, 'emails/welcome.html',
+        html = generate_email(
+            self,
+            'emails/welcome.html',
             {'content': content, 'short_code': email_template.short_code}, tracker)
 
         return (html, email_txt)
@@ -562,6 +565,7 @@ class UserBuddy(UUIDModel):
         self.is_following = follow
         self.save()
 
+
 class UserBuddyRemove(UUIDModel):
     user = models.ForeignKey(User, related_name='removed', on_delete=models.CASCADE)
     buddy = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -642,7 +646,6 @@ class UserDiveSiteBuddyFinder(models.Model):
     divesite_id = models.CharField(max_length=100, null=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-
 
     class Meta:
         db_table = 'user_divesite_buddy_finder'
@@ -749,7 +752,7 @@ class UserRecentActivity(UUIDModel):
     The last thing the user did
     """
     user = models.ForeignKey(User, related_name='activities', on_delete=models.CASCADE)
-    #divesite = models.ForeignKey('divesites.Divesite', on_delete=models.CASCADE)
+    # divesite = models.ForeignKey('divesites.Divesite', on_delete=models.CASCADE)
     activity_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:

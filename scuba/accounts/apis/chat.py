@@ -62,7 +62,7 @@ class ChatWUserApi(APIView):
 
             return Response(retval)
         except requests.exceptions.ConnectionError:
-            return Response({'error': 'cannot reach chat server' }, 500)
+            return Response({'error': 'cannot reach chat server'}, 500)
 
     def post(self, request):
         uids = request.data.get('uid')
@@ -81,7 +81,7 @@ class ChatWUserApi(APIView):
             retval['chat']['me'] = user.pk_as_str
             return Response(retval)
         except requests.exceptions.ConnectionError:
-            return Response({'error': 'cannot reach chat server' }, 500)
+            return Response({'error': 'cannot reach chat server'}, 500)
 
 
 class UploadFileApi(APIView):
@@ -127,7 +127,7 @@ class GetAllChatsApi(APIView):
             retval['me'] = user.pk_as_str
             return Response(retval)
         except requests.exceptions.ConnectionError:
-            return Response({'error': 'cannot reach chat server' }, 500)
+            return Response({'error': 'cannot reach chat server'}, 500)
 
 
 class GetChatsApi(APIView):
@@ -149,7 +149,7 @@ class GetChatsApi(APIView):
             retval['me'] = user.pk_as_str
             return Response(retval)
         except requests.exceptions.ConnectionError:
-            return Response({'error': 'cannot reach chat server' }, 500)
+            return Response({'error': 'cannot reach chat server'}, 500)
 
 
 class GetChatMessagesApi(APIView):
@@ -174,4 +174,4 @@ class GetChatMessagesApi(APIView):
             retval['me'] = user.pk_as_str
             return Response(retval)
         except requests.exceptions.ConnectionError:
-            return Response({'error': 'cannot reach chat server' }, 500)
+            return Response({'error': 'cannot reach chat server'}, 500)
