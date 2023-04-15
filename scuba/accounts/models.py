@@ -486,7 +486,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         retval = []
 
         for item in Divesite.objects.filter(
-                is_active=True, userdivesitefavorite__user=self):
+                is_active=True, followers__user=self):
             retval.append(item.pk_as_str)
 
         # return the divesites

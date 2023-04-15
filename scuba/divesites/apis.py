@@ -110,3 +110,19 @@ class FavoriteApi(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=status.HTTP_202_ACCEPTED)
+
+
+class FavoriteListApi(generics.ListAPIView):
+    serializer_class = DivesiteSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Divesite.objects.filter(followers__user=user)
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        retval = {
+            'favorites': self.serializer_class(queryset, many=True).data
+        }
+
+        return Response(retval)

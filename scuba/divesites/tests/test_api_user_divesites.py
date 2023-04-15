@@ -79,3 +79,21 @@ class TestUserDivesitesApi(TestCase):
 
         favorite = user.favorites.get(divesite=divesite)
         self.assertTrue(favorite.is_favorite)
+
+    def test_get_divesite_favorites(self):
+        """
+        Get all of my favorites
+        """
+        user = User.objects.get(email='foo@nowhere.com')
+        divesite = Divesite.objects.get(name='White Point')
+        divesite.add_to_favorite(user)
+
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        url = f'/api/divesites/favorites'
+        response = client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        favorites = response.json().get('favorites')
+        self.assertEqual(len(favorites), 1)
