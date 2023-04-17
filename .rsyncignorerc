@@ -15,3 +15,6 @@ xunittest.xml
 scripts/rsync/ignore.txt
 __pycache__
 **.pyc
+pep8_output.txt
+test_result.xml
+pytest.ini
