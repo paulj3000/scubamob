@@ -87,10 +87,10 @@ class Divesite(UUIDModel):
 
         return None
 
-
     # -----------------------------------------------------------------------------
     # start banner image stuff
     # -----------------------------------------------------------------------------
+
     def get_banner(self):
         """ get_banner
 
@@ -130,12 +130,15 @@ class Divesite(UUIDModel):
 
     def get_divesites_stats(self, date):
         return DivesiteDailyStats.objects.filter(divesite=self).aggregate(
-            avg_temp_c = Coalesce(Avg('temp_c', output_field=models.IntegerField()), models.Value(0)),
-            avg_temp_f = Coalesce(ExpressionWrapper(
-            (
-                Avg((F('temp_c') * (9/5)) + 32)
-            ), output_field=models.IntegerField()), models.Value(0)),
-            avg_visibility=Coalesce(Avg('visibility', output_field=models.IntegerField()), models.Value(0)))
+            avg_temp_c=Coalesce(
+                Avg('temp_c', output_field=models.IntegerField()), models.Value(0)),
+            avg_temp_f=Coalesce(ExpressionWrapper(
+                (
+                    Avg((F('temp_c') * (9 / 5)) + 32)
+                ), output_field=models.IntegerField()), models.Value(0)),
+            avg_visibility=Coalesce(
+                Avg('visibility', output_field=models.IntegerField()),
+                models.Value(0)))
 
 
 class DivesiteReview(UUIDModel):
