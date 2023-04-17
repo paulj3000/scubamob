@@ -9,6 +9,17 @@ from scuba.divesites.serializers import DivesiteSerializer, \
     DivesiteReviewSerializer, DivesiteFavoriteSerializer
 
 
+class GetDivesiteApi(generics.GenericAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = DivesiteSerializer
+
+    def get(self, request, id, *args, **kwargs):
+        divesite = get_object_or_404(Divesite, id=id)
+
+        serializer = self.get_serializer(divesite)
+        return Response({'divesite': serializer.data})
+
+
 class DivesiteListApi(generics.ListAPIView):
     permission_classes = (AllowAny,)
     serializer_class = DivesiteSerializer

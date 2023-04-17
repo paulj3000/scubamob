@@ -97,3 +97,22 @@ class TestUserDivesitesApi(TestCase):
 
         favorites = response.json().get('favorites')
         self.assertEqual(len(favorites), 1)
+
+    def test_get_divesite(self):
+        """
+        Get a divesite
+        """
+        divesite = Divesite.objects.get(name='White Point')
+
+        client = APIClient()
+
+        url = f'/api/divesites/{divesite.pk_as_str}'
+        response = client.get(url, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        divesite = response.json().get('divesite')
+        self.assertIsNotNone(divesite)
+        self.assertEqual(divesite['id'], divesite['id'])
+        self.assertEqual(divesite['name'], divesite['name'])
+        self.assertEqual(divesite['description'], divesite['description'])
+        self.assertEqual(divesite['banner'], divesite['banner'])
