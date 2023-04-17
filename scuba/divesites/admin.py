@@ -11,8 +11,8 @@ from scuba.divesites.serializers import DivesiteSerializer
 
 
 class DivesiteAdmin(admin.ModelAdmin):
-    change_list_template = 'admin/divesites/change_list.html'
-    change_form_template = 'admin/divesites/change_form.html'
+    change_list_template = 'admin/divesites/change_divesite_list.html'
+    change_form_template = 'admin/divesites/change_divesite_form.html'
     readonly_fields = ['url']
 
     def get_urls(self):
@@ -51,5 +51,10 @@ class DivesiteAdmin(admin.ModelAdmin):
         return JsonResponse({'images': 'program.get_active_banner()'})
 
 
+class DivesiteDailyStatsAdmin(admin.ModelAdmin):
+    list_display = ('divesite', 'temp_c', 'visibility', 'stats_date')
+
+
 admin.site.register(divesites_models.Divesite, DivesiteAdmin)
 admin.site.register(divesites_models.DivesiteReview)
+admin.site.register(divesites_models.DivesiteDailyStats, DivesiteDailyStatsAdmin)

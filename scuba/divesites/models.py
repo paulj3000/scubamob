@@ -3,6 +3,8 @@ from random import choice
 
 from django.db import models
 from django.templatetags.static import static
+from django.db.models import Avg, DateTimeField, ExpressionWrapper, F
+from django.db.models.functions import Cast, Coalesce
 
 from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.divesites.settings import RATING_CHOICES, DIFFICULTY_CHOICES
@@ -126,6 +128,15 @@ class Divesite(UUIDModel):
 
         return None
 
+    def get_divesites_stats(self, date):
+        return DivesiteDailyStats.objects.filter(divesite=self).aggregate(
+            avg_temp_c = Coalesce(Avg('temp_c', output_field=models.IntegerField()), models.Value(0)),
+            avg_temp_f = Coalesce(ExpressionWrapper(
+            (
+                Avg((F('temp_c') * (9/5)) + 32)
+            ), output_field=models.IntegerField()), models.Value(0)),
+            avg_visibility=Coalesce(Avg('visibility', output_field=models.IntegerField()), models.Value(0)))
+
 
 class DivesiteReview(UUIDModel):
     divesite = models.ForeignKey(Divesite, related_name='reviews', on_delete=models.CASCADE)
@@ -167,3 +178,14 @@ class DivesiteFavorite(UUIDModel):
 
     class Meta:
         db_table = 'divesite_favorite'
+
+
+class DivesiteDailyStats(UUIDModel):
+    divesite = models.ForeignKey(Divesite, related_name='stats', on_delete=models.CASCADE)
+    user = models.ForeignKey('accounts.User', related_name='stats', on_delete=models.CASCADE)
+    temp_c = models.FloatField()
+    visibility = models.PositiveSmallIntegerField()
+    stats_date = models.DateField()
+
+    class Meta:
+        db_table = 'divesite_daily_stats'
