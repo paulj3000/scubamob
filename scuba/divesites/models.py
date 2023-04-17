@@ -1,9 +1,13 @@
+import string
+from random import choice
+
 from django.db import models
 from django.templatetags.static import static
 
 from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.divesites.settings import RATING_CHOICES, DIFFICULTY_CHOICES
 from scuba.libs.stringutils import StringUtils
+from scuba.libs.imageuploader import ImageUploader
 from scuba.sitesettings.models import SystemSetting
 from scuba.settings import AWS_CLOUDFRONT
 
@@ -14,6 +18,7 @@ class Divesite(UUIDModel):
     url = models.URLField(max_length=255, db_index=True, blank=True)
     lat = models.DecimalField(max_digits=15, decimal_places=9)
     long = models.DecimalField(max_digits=15, decimal_places=9)
+    aws_id = models.CharField(max_length=10, blank=True)
     is_active = models.BooleanField(default=True)
     difficulty = models.PositiveSmallIntegerField(choices=DIFFICULTY_CHOICES)
 
@@ -39,6 +44,48 @@ class Divesite(UUIDModel):
     def get_all_active_divesites():
         return Divesite.objects.filter(is_active=True)
 
+    def get_aws_id(self):
+        """ a small utility to validate we have a valid AWS id
+
+        If the user does not have an AWS id, generate one for
+        him then return it
+        """
+        if self.aws_id is None or self.aws_id == '':
+            self.aws_id = self.generate_aws_id()
+            self.save()
+
+        # return the aws id
+        return self.aws_id
+
+    def generate_aws_id(self):
+        ''' generate a unique aws id for a program '''
+        letters_and_digits = string.ascii_letters + string.digits
+        key_length = 7
+
+        def gen():
+            key = [choice(letters_and_digits) for i in range(key_length)]
+            key = key[:2] + ['/'] + key[2:]
+
+            # a quick little function to generate the key
+            return 'dx' + ''.join(key)
+
+        aws_id = gen()
+        while Divesite.objects.filter(aws_id=aws_id).count():
+            aws_id = gen()
+
+        # return the generated id
+        return aws_id
+
+    def get_active_banner(self):
+        banner = self.banners.filter(is_active=True).first()
+
+        if banner:
+            img = banner.image.replace('divesites/', '')
+            return f"{AWS_CLOUDFRONT}{img}"
+
+        return None
+
+
     # -----------------------------------------------------------------------------
     # start banner image stuff
     # -----------------------------------------------------------------------------
@@ -53,6 +100,31 @@ class Divesite(UUIDModel):
 
         # No profile image. just return a default
         return static(SystemSetting.get_default_banner_image())
+
+    def upload_banner(self, uploaded_image):
+        """ upload_banner
+
+        this will upload a new cover to the site, but before we do that,
+        compress, resize, etc
+        """
+        # generate the key name
+        path = f"divesites/{self.get_aws_id()}"
+        filename = ImageUploader.compress_upload_image(uploaded_image, path)
+
+        active = False
+        if not self.get_active_image():
+            active = True
+
+        return self.banner.create(filename=filename, is_active=active)
+
+    def get_active_banner(self):
+        banner_image = self.banners.filter(is_active=True).first()
+
+        if banner_image:
+            img = banner_image.banner.replace('divesites/', '')
+            return f"{AWS_CLOUDFRONT}{img}"
+
+        return None
 
 
 class DivesiteReview(UUIDModel):
@@ -69,7 +141,7 @@ class DivesiteReview(UUIDModel):
 
 
 class DivesiteBanner(UUIDModel):
-    divesite = models.OneToOneField(Divesite, on_delete=models.CASCADE)
+    divesite = models.ForeignKey(Divesite, related_name='banners', on_delete=models.CASCADE)
     banner = models.CharField(max_length=128)
 
     class Meta:

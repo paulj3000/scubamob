@@ -17,4 +17,21 @@
         height: 500,
       });
     </script>
+
+
+<input id="fileupload" type="file" name="fileupload" />
+<button id="upload-button" onclick="uploadFile()"> Upload </button>
+
+<script>
+async function uploadFile() {
+    let formData = new FormData();
+    formData.append("newbanner", fileupload.files[0]);
+    await fetch("{% url 'admin:ajax_upload_banner' divesiteid=original.id %}", {
+      method: "POST",
+      body: formData
+    });
+    alert('The file has been uploaded successfully.');
+}
+</script>
+
 {% endblock %}
