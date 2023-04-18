@@ -51,6 +51,22 @@ class DivesiteAdmin(admin.ModelAdmin):
         divesite.upload_banner(request.FILES['newbanner'])
         return JsonResponse({'images': 'program.get_active_banner()'})
 
+    def toggle_active_divesite(modeladmin, request, queryset):
+        for obj in queryset:
+            obj.is_active = True
+            obj.save()
+    toggle_active_divesite.short_description = "Set Active"
+
+    def toggle_inactive_divesite(modeladmin, request, queryset):
+        for obj in queryset:
+            obj.is_active = False
+            obj.save()
+    toggle_inactive_divesite.short_description = "Set Inactive"
+
+    # add this to the dropdown
+    actions = [toggle_active_divesite,
+               toggle_inactive_divesite]
+
 
 class DivesiteDailyStatsAdmin(admin.ModelAdmin):
     list_display = ('divesite', 'temp_c', 'visibility', 'stats_date')
