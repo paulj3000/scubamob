@@ -11,7 +11,7 @@ from scuba.divesites.serializers import DivesiteSerializer
 
 
 class DivesiteAdmin(admin.ModelAdmin):
-    list_display = ('name', 'lat', 'long', 'difficulty', 'query_weather')
+    list_display = ('name', 'region', 'lat', 'long', 'query_weather')
     change_list_template = 'admin/divesites/change_divesite_list.html'
     change_form_template = 'admin/divesites/change_divesite_form.html'
     readonly_fields = ['url']
