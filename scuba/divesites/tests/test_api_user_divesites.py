@@ -15,7 +15,7 @@ from scuba.divesites.models import Divesite
 
 
 class TestUserDivesitesApi(TestCase):
-    fixtures = ["test_divesites.json", "test_users.json"]
+    fixtures = ["test_divesites.json", "test_users.json", "test_sitesettings.json"]
 
     def test_add_divesite_review(self):
         """

@@ -2,8 +2,10 @@ from datetime import date
 
 from rest_framework import serializers
 from django.shortcuts import get_object_or_404
+from django.core.cache import cache
 
-from scuba.divesites.models import Divesite, DivesiteReview, DivesiteFavorite
+from scuba.divesites.models import Divesite, DivesiteReview, DivesiteFavorite, DivesiteDailyStats
+from scuba.maps.models import Region
 
 
 class DivesiteSerializer(serializers.ModelSerializer):
@@ -18,10 +20,51 @@ class DivesiteSerializer(serializers.ModelSerializer):
     banner = serializers.SerializerMethodField(read_only=True)
     lat = serializers.SerializerMethodField(read_only=True)
     long = serializers.SerializerMethodField(read_only=True)
+    stats = serializers.SerializerMethodField(read_only=True)
+    #weather = serializers.SerializerMethodField(read_only=True)
 
     @staticmethod
     def get_id(data):
         return data.pk_as_str
+
+    @staticmethod
+    def get_stats(data):
+        weather = None
+        if data.region:
+            key = f'weather_{data.region.pk_as_str}'
+            if cache.get(key):
+                weather = cache.get(key)
+            else:
+                weather, _ = Region.get_weather_by_lat_long(data.lat, data.long)
+                cache.set(key, weather, 3600)
+                data.save()
+        else:
+            weather, region = Region.get_weather_by_lat_long(data.lat, data.long)
+            key = f'weather_{region.pk_as_str}'
+            data.region = region
+            cache.set(key, weather, 3600)
+            data.save()
+
+        # attach the current conditions to the return value
+        retval = data.get_divesite_stats(date.today())
+        retval['condition'] = weather['current']['condition']
+        return retval
+
+    '''
+    @staticmethod
+    def get_weather(data):
+        if data.region:
+            key = f'weather_{data.region.pk_as_str}'
+            if cache.get(key):
+                return cache.get(key)
+
+        weather, region = Region.get_weather_by_lat_long(data.lat, data.long)
+        data.region = region
+        cache.set(key, weather, 3600)
+        data.save()
+
+        return weather
+    '''
 
     @staticmethod
     def get_banner(data):
@@ -44,7 +87,7 @@ class DivesiteSerializer(serializers.ModelSerializer):
         model = Divesite
         fields = (
             'id', 'name', 'description', 'lat', 'long', 'difficulty',
-            'difficulty_display', 'banner',
+            'difficulty_display', 'banner', 'stats',
         )
 
     def create(self, validated_data):

@@ -15,7 +15,7 @@ from scuba.divesites.models import Divesite
 
 
 class TestUserDivesiteFavoriteAPI(TestCase):
-    fixtures = ["test_users.json", "test_divesites.json"]
+    fixtures = ["test_divesites.json", "test_users.json", "test_sitesettings.json"]
 
     def test_unauthenticated_set_divesite_favorite(self):
         """

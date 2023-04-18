@@ -23,6 +23,7 @@ class Divesite(UUIDModel):
     aws_id = models.CharField(max_length=10, blank=True)
     is_active = models.BooleanField(default=True)
     difficulty = models.PositiveSmallIntegerField(choices=DIFFICULTY_CHOICES)
+    region = models.ForeignKey('maps.Region', null=True, blank=True, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'divesites'
@@ -128,7 +129,7 @@ class Divesite(UUIDModel):
 
         return None
 
-    def get_divesites_stats(self, date):
+    def get_divesite_stats(self, date):
         return DivesiteDailyStats.objects.filter(divesite=self).aggregate(
             avg_temp_c=Coalesce(
                 Avg('temp_c', output_field=models.IntegerField()), models.Value(0)),

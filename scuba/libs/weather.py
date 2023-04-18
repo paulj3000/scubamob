@@ -1,8 +1,5 @@
 import logging
 import requests
-import json
-
-from django.core.cache import cache
 
 from scuba import settings
 from scuba.sitesettings.models import APIKey
@@ -49,33 +46,17 @@ class Weather:
 
     @classmethod
     def get_current_by_q_param(cls, q_param):
-        key = f'weather_{q_param}'
-        weather = cache.get(key)
-        if weather:
-            return weather
-
         # call the API and return the data
         res = requests.get(WEATHER_API['current'],
                            {'key': cls.get_api_key(), 'q': q_param})
-        retval = res.json()
-        cache.set(key, retval, 3600)
-
-        return retval
+        return res.json()
 
     @classmethod
     def get_current_by_postal_code(cls, postal_code):
-        key = f'weather_{postal_code}'
-        weather = cache.get(key)
-        if weather:
-            return weather
-
         # call the API and return the data
         res = requests.get(WEATHER_API['current'],
                            {'key': cls.get_api_key(), 'q': postal_code})
-        retval = res.json()
-        cache.set(key, retval, 3600)
-
-        return retval
+        return res.json()
 
     @classmethod
     def get_current_by_lat_lng(cls, lat, lng):

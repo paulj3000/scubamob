@@ -11,8 +11,8 @@ from scuba.accounts.serializers.buddies import BuddySerializer, BuddyRecentActiv
 from scuba.accounts.models import User
 from scuba.divesites.models import Divesite
 from scuba.divesites.serializers import DivesiteSerializer
-from scuba.sitesettings.models import APIKey
 from scuba.libs.weather import Weather
+from scuba.maps.models import Region
 
 
 class GetJumbotronApi(generics.GenericAPIView):
@@ -69,6 +69,10 @@ class GetHomescreenApi(generics.GenericAPIView):
         else:
             weather = Weather.get_current_by_postal_code('92107')
         '''
+        weather = Weather.get_current_by_q_param(q_param)
+        obj = Region.store_weather_region(weather)
+        key = f'weather_{obj.pk_as_str}'
+        cache.set(key, weather, 3600)
 
         return Response({
             'buddies': {
@@ -77,7 +81,7 @@ class GetHomescreenApi(generics.GenericAPIView):
                 'recent_activity': BuddyRecentActivity(buddy_recent_activity, many=True).data,
             },
             #'weather': WeatherSerializer(weather, many=True).data,
-            'weather': Weather.get_current_by_q_param(q_param),
+            'weather': weather,
             'divesites': {
                 'favorites': user.get_divesite_favorites(),
                 'list': DivesiteSerializer(Divesite.get_all_active_divesites(), many=True).data

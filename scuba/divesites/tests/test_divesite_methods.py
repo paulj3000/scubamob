@@ -13,7 +13,7 @@ from scuba.accounts.models import User
 
 
 class TestDivesiteMethods(TestCase):
-    fixtures = ["test_divesites.json", "test_users.json"]
+    fixtures = ["test_divesites.json", "test_users.json", "test_sitesettings.json"]
 
     def test_new_divesite_object(self):
         """
@@ -62,7 +62,7 @@ class TestDivesiteMethods(TestCase):
             visibility=45.2,
             stats_date=today)
 
-        stats = divesite.get_divesites_stats(today)
+        stats = divesite.get_divesite_stats(today)
 
         self.assertEqual(stats['avg_temp_f'], 81)
         self.assertEqual(stats['avg_visibility'], 48)

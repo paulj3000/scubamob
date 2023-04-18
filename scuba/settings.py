@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'scuba.galleries',
     'scuba.home',
     'scuba.logbooks',
+    'scuba.maps',
     'scuba.robots',
     'scuba.security',
     'scuba.sitesettings',
