@@ -6,7 +6,7 @@ from scuba.libs.weather import Weather
 
 
 class Region(UUIDModel):
-    name = models.CharField(max_length=10)
+    name = models.CharField(max_length=100)
     region = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
 
