@@ -25,9 +25,9 @@ class DivesiteAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         my_urls = [
             path('all', self.get_all_divesites),
-            re_path(r'^(?P<divesiteid>[0-9A-Fa-f-]{1,36})/addbanner/$',
+            re_path(r'^(?P<divesiteid>[0-9A-Fa-f-]{1,36})/banner/$',
                 self.admin_site.admin_view(self.upload_banner),
-                name='ajax_upload_banner'),
+                name='api_upload_banner'),
             ]
 
         # add the new url strings to the program stuff
