@@ -62,7 +62,10 @@ class GetHomescreenApi(generics.GenericAPIView):
         if data.get('q'):
             if ',' in data['q']:
                 lat, lng = data['q'].split(',')
-                weather = Weather.get_current_by_lat_lng(lat, lng)
+                if int(lat) == 0 and int(lng) == 0:
+                    weather = Weather.get_current_by_postal_code('92107')
+                else:
+                    weather = Weather.get_current_by_lat_lng(lat, lng)
             else:
                 code = data.get('postal_code', data['q'])
                 weather = Weather.get_current_by_postal_code(code)
