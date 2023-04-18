@@ -57,9 +57,10 @@ class DivesiteSerializer(serializers.ModelSerializer):
                 return {}
 
         # attach the current conditions to the return value
-        retval = data.get_divesite_stats(date.today())
-        retval['condition'] = weather['current'].pop('condition')
+        retval = {}
+        #retval['condition'] = weather['current'].pop('condition')
         retval['weather'] = weather['current']
+        retval['diving'] = data.get_divesite_stats(date.today())
         return retval
 
     '''
