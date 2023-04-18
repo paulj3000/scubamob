@@ -19,8 +19,6 @@ class Region(UUIDModel):
 
     @staticmethod
     def store_weather_region(weather_json):
-        from pprint import pprint
-        pprint(weather_json)
         location = weather_json['location']
 
         obj, _ = Region.objects.get_or_create(

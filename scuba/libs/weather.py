@@ -66,6 +66,10 @@ class Weather:
     @classmethod
     def get_current_by_lat_lng(cls, lat, lng):
         res = requests.get(WEATHER_API['current'], {'key': cls.get_api_key(), 'q': f'{lat},{lng}'})
+
+        if res.status_code >= 400:
+            raise InvalidWeatherDataException()
+
         return res.json()
 
     def parse_data(self, weather_data):
