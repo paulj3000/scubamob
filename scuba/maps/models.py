@@ -14,6 +14,9 @@ class Region(UUIDModel):
         db_table = 'regions'
         unique_together = (('name', 'region', 'country'), )
 
+    def __str__(self):
+        return f"{self.name}, {self.region}  {self.country}"
+
     @staticmethod
     def store_weather_region(weather_json):
         from pprint import pprint
