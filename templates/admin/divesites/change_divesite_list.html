@@ -20,7 +20,7 @@ for(var i = 0; i < inputs.length; i++) {
     if (checkbox.id != 'action-toggle') {
         let tr = checkbox.parentElement.parentElement;
         tr.classList.add("divesite");
-        tr.dataset.id = checkbox.value;
+        tr.dataset.id = `id_${checkbox.value}`;
     }
 }
 
