@@ -194,3 +194,4 @@ class DivesiteDailyStats(UUIDModel):
 
     class Meta:
         db_table = 'divesite_daily_stats'
+        unique_together = (('user', 'divesite', 'stats_date'), )
