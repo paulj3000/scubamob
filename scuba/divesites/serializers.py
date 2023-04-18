@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.core.cache import cache
 
 from scuba.divesites.models import Divesite, DivesiteReview, DivesiteFavorite, DivesiteDailyStats
+from scuba.libs.exceptions import InvalidWeatherDataException
 from scuba.maps.models import Region
 
 
@@ -35,15 +36,25 @@ class DivesiteSerializer(serializers.ModelSerializer):
             if cache.get(key):
                 weather = cache.get(key)
             else:
-                weather, _ = Region.get_weather_by_lat_long(data.lat, data.long)
+                try:
+                    weather, _ = Region.get_weather_by_lat_long(data.lat, data.long)
+                    cache.set(key, weather, 3600)
+                    data.save()
+                except InvalidWeatherDataException:
+                    data.query_weather = False
+                    data.save()
+                    return {}
+        else:
+            try:
+                weather, region = Region.get_weather_by_lat_long(data.lat, data.long)
+                key = f'weather_{region.pk_as_str}'
+                data.region = region
                 cache.set(key, weather, 3600)
                 data.save()
-        else:
-            weather, region = Region.get_weather_by_lat_long(data.lat, data.long)
-            key = f'weather_{region.pk_as_str}'
-            data.region = region
-            cache.set(key, weather, 3600)
-            data.save()
+            except InvalidWeatherDataException:
+                data.query_weather = False
+                data.save()
+                return {}
 
         # attach the current conditions to the return value
         retval = data.get_divesite_stats(date.today())

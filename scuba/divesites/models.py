@@ -22,6 +22,7 @@ class Divesite(UUIDModel):
     long = models.DecimalField(max_digits=15, decimal_places=9)
     aws_id = models.CharField(max_length=10, blank=True)
     is_active = models.BooleanField(default=True)
+    query_weather = models.BooleanField(default=True)
     difficulty = models.PositiveSmallIntegerField(choices=DIFFICULTY_CHOICES)
     region = models.ForeignKey('maps.Region', null=True, blank=True, on_delete=models.CASCADE)
 

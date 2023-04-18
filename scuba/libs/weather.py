@@ -3,6 +3,7 @@ import requests
 
 from scuba import settings
 from scuba.sitesettings.models import APIKey
+from scuba.libs.exceptions import InvalidWeatherDataException
 
 
 # weatherapi.com settings
@@ -49,6 +50,10 @@ class Weather:
         # call the API and return the data
         res = requests.get(WEATHER_API['current'],
                            {'key': cls.get_api_key(), 'q': q_param})
+
+        if res.status_code >= 400:
+            raise InvalidWeatherDataException()
+
         return res.json()
 
     @classmethod
