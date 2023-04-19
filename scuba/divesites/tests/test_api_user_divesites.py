@@ -42,6 +42,7 @@ class TestUserDivesitesApi(TestCase):
         review = response.json()
         self.assertIsNotNone(review)
         self.assertEqual(review['id'], review['id'])
+        self.assertEqual(review['review_date'], review['review_date'])
 
         # now attempt to add another review for today, this one should fail
         response = client.post(url, payload, format='json')

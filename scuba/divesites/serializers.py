@@ -138,6 +138,7 @@ class DivesiteReviewSerializer(serializers.ModelSerializer):
             'rating',
             'temp_c',
             'visibility',
+            'review_date',
         )
 
     @staticmethod
