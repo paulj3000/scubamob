@@ -5,6 +5,7 @@ from scuba.sitesettings import models
 from scuba.sitesettings.models import SystemApi, SystemSetting, AWSApi, LogbookApi
 from scuba.libs.exceptions import ChatServerDownException
 
+
 class SystemApiAdmin(admin.ModelAdmin):
     list_display = ('key', 'value',)
 
@@ -14,11 +15,14 @@ class SystemApiAdmin(admin.ModelAdmin):
                 setting.sync_settings()
 
             # set a success message
-            messages.add_message(request,
-                    messages.INFO, "Settings have been sync'd")
+            messages.add_message(
+                request,
+                messages.INFO, "Settings have been sync'd")
+
         except ChatServerDownException:
-            messages.add_message(request,
-                    messages.ERROR, "Cannot connect to chat server")
+            messages.add_message(
+                request,
+                messages.ERROR, "Cannot connect to chat server")
 
     sync_settings.short_description = "Sync system apis"
 
@@ -28,7 +32,6 @@ class SystemApiAdmin(admin.ModelAdmin):
 
 
 class GenericKeyValueApiAdmin(admin.ModelAdmin):
-    #list_display = ('key', 'value',)
     change_form_template = 'admin/change_endpoint_form.html'
 
 
