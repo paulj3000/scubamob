@@ -40,7 +40,6 @@ class TestUserAccountsAPI(TestCase):
         response = client.post(url, payload, format='json')
         self.assertEqual(response.status_code, 201)
 
-
         client = APIClient()
         client.force_authenticate(user=user2)
         url = f'/api/divesites/{divesite.pk_as_str}/reviews/'
