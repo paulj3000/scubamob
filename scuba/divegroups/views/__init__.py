@@ -9,7 +9,6 @@ from django.contrib.auth import authenticate, login
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
-#from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest, HttpResponse
 
 # define the user data for this account

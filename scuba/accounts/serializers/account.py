@@ -40,12 +40,11 @@ class RegisterUserSerializer(serializers.Serializer):
 
         return email
 
-
     def create(self, validated_data):
         user = User.objects.create(
-                first_name=validated_data['first_name'],
-                last_name=validated_data['last_name'],
-                email=validated_data['email'])
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+            email=validated_data['email'])
 
         user.set_password(validated_data['password'])
         return user
