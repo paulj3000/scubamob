@@ -50,6 +50,11 @@ async function initMap() {
       mapId: "divesite_map",
   });
 
+  const infoWindow = new google.maps.InfoWindow({
+    content: "",
+    disableAutoPan: true,
+  });
+
     const response = await fetch("/admin/divesites/divesite/all");
     const sites = await response.json();
 
@@ -60,7 +65,13 @@ async function initMap() {
             position: position,
             title: site.name,
         });
-        
+     
+         marker.addListener("click", () => {
+      infoWindow.setContent("some label");
+      infoWindow.open(map, marker);
+    });
+     
+     
         return marker;
     });
     
