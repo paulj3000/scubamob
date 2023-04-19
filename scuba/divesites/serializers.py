@@ -4,7 +4,9 @@ from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 from django.core.cache import cache
 
-from scuba.divesites.models import Divesite, DivesiteReview, DivesiteFavorite, DivesiteDailyStats
+from scuba.divesites.models import Divesite, DivesiteReview, \
+    DivesiteFavorite, DivesiteDailyStats, DivesiteCheckin
+
 from scuba.libs.exceptions import InvalidWeatherDataException
 from scuba.maps.models import Region
 
@@ -134,6 +136,8 @@ class DivesiteReviewSerializer(serializers.ModelSerializer):
             'id',
             'review',
             'rating',
+            'temp_c',
+            'visibility',
         )
 
     @staticmethod
@@ -142,6 +146,20 @@ class DivesiteReviewSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(f"{rating} is invalid")
 
         return rating
+
+    @staticmethod
+    def validate_temp_c(temp_c):
+        if temp_c < 0 or temp_c > 100:
+            raise serializers.ValidationError(f"{temp_c} is invalid")
+
+        return temp_c
+
+    @staticmethod
+    def validate_visibility(visibility):
+        if visibility < 0 or visibility > 1000:
+            raise serializers.ValidationError(f"{visibility} is invalid")
+
+        return visibility
 
     def validate(self, attrs):
         divesite = getattr(self, 'divesite')
@@ -179,3 +197,31 @@ class DivesiteFavoriteSerializer(serializers.Serializer):
             divesite=getattr(self, 'divesite'),
             user=self.context['request'].user,
             defaults={'is_favorite': validated_data['favorite']})
+
+
+class DivesiteCheckinSerializer(serializers.Serializer):
+    note = serializers.CharField(required=False)
+
+    def validate(self, attrs):
+        divesite = getattr(self, 'divesite')
+        user = self.context['request'].user
+        today = date.today()
+
+        if DivesiteCheckin.objects.filter(user=user, divesite=divesite, checkin_date=today).count():
+            raise serializers.ValidationError("You already checked in today")
+
+        # everything is good, return
+        return attrs
+
+    def __init__(self, *args, **kwargs):
+        divesite = kwargs.pop('divesite', None)
+        setattr(self, 'divesite', divesite)
+        super().__init__(*args, **kwargs)
+
+    def save(self, **kwargs):
+        validated_data = {**self.validated_data, **kwargs}
+
+        return DivesiteCheckin.objects.update_or_create(
+            divesite=getattr(self, 'divesite'),
+            user=self.context['request'].user,
+            defaults={'note': validated_data['note']})

@@ -6,7 +6,8 @@ from django.shortcuts import get_object_or_404
 
 from scuba.divesites.models import Divesite
 from scuba.divesites.serializers import DivesiteSerializer, \
-    DivesiteReviewSerializer, DivesiteFavoriteSerializer
+    DivesiteReviewSerializer, DivesiteFavoriteSerializer, \
+    DivesiteCheckinSerializer
 
 
 class GetDivesiteApi(generics.GenericAPIView):
@@ -105,6 +106,18 @@ class AddReviewApi(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class CheckinApi(generics.GenericAPIView):
+    serializer_class = DivesiteCheckinSerializer
+
+    def post(self, request, id, *args, **kwargs):
+        divesite = get_object_or_404(Divesite, id=id)
+
+        serializer = self.get_serializer(divesite=divesite, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_202_ACCEPTED)
 
 
 class FavoriteApi(generics.GenericAPIView):

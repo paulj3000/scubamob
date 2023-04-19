@@ -92,7 +92,6 @@ class Divesite(UUIDModel):
     # -----------------------------------------------------------------------------
     # start banner image stuff
     # -----------------------------------------------------------------------------
-
     def get_banner(self):
         """ get_banner
 
@@ -148,6 +147,8 @@ class DivesiteReview(UUIDModel):
     user = models.ForeignKey('accounts.User', related_name='reviews', on_delete=models.CASCADE)
     review = models.TextField()
     rating = models.PositiveSmallIntegerField(choices=RATING_CHOICES)
+    temp_c = models.FloatField(default=0.0)
+    visibility = models.FloatField(default=0.0)
     review_date = models.DateField(auto_now_add=True)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -183,6 +184,17 @@ class DivesiteFavorite(UUIDModel):
 
     class Meta:
         db_table = 'divesite_favorite'
+
+
+class DivesiteCheckin(UUIDModel):
+    divesite = models.ForeignKey(Divesite, related_name='checkins', on_delete=models.CASCADE)
+    user = models.ForeignKey('accounts.User', related_name='checkins', on_delete=models.CASCADE)
+    note = models.TextField()
+    checkin_date = models.DateField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'divesite_checkin'
+        unique_together = (('user', 'divesite', 'checkin_date'), )
 
 
 class DivesiteDailyStats(UUIDModel):
