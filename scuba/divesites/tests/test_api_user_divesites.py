@@ -51,7 +51,6 @@ class TestUserDivesitesApi(TestCase):
         client = APIClient()
         client.force_authenticate(user=user)
 
-
         payload = {
             'review': 'Today is a good day',
             'rating': 4,
@@ -78,8 +77,6 @@ class TestUserDivesitesApi(TestCase):
         payload.update({'temp_c': 32, 'rating': 6})
         response = client.post(url, payload, format='json')
         self.assertEqual(response.status_code, 400, "rating too high")
-
-
 
     def test_checkin_divesite(self):
         """
