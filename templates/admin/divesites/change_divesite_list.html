@@ -53,14 +53,18 @@ async function initMap() {
     const response = await fetch("/admin/divesites/divesite/all");
     const sites = await response.json();
 
-    sites.sites.forEach(site => {
+    const markers = sites.sites.map(site => {
         const position = { lat: site.lat, lng: site.long };
         const marker = new AdvancedMarkerView({
             map: map,
             position: position,
             title: site.name,
         });
+        
+        return marker;
     });
+    
+    new MarkerClusterer({ markers, map });
 }
 
 initMap();
