@@ -112,11 +112,9 @@ class DivesiteSerializer(serializers.ModelSerializer):
 
 
 class DivesiteReviewSerializer(serializers.ModelSerializer):
-    """ CauseSerializer
+    """ DivesiteReviewSerializer
 
-    The serializer for a program
-    Function takes in a program object and converts it to appropriate
-    json objects
+    The serializer for a divesite review
     """
     def __init__(self, *args, **kwargs):
         divesite = kwargs.pop('divesite', None)

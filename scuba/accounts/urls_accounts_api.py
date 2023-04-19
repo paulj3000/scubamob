@@ -1,13 +1,15 @@
 from django.conf.urls import include
 from django.urls import path, re_path
 
-import scuba.accounts.apis as account_api
+import scuba.accounts.apis.account as account_api
+import scuba.accounts.apis.socket as socket_api
 import scuba.accounts.apis.chat as chat_api
 
 
 urlpatterns = [
-    path('socket', account_api.SocketApi.as_view()),
     path('chats/', chat_api.ChatWUserApi.as_view()),
     path('chats', chat_api.ChatWUserApi.as_view()),
-    path('alerts', account_api.AlertsApi.as_view())
+    path('socket', socket_api.SocketApi.as_view()),
+    path('alerts', socket_api.AlertsApi.as_view()),
+    path('reviews', account_api.GetReviewsApi.as_view())
 ]

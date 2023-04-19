@@ -11,7 +11,6 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 
 from scuba.accounts.models import User
-from scuba.divesites.models import Divesite
 
 
 class TestUserBuddiesAPI(TestCase):

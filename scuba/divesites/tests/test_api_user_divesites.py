@@ -22,6 +22,7 @@ class TestUserDivesitesApi(TestCase):
         Write a review
         """
         user = User.objects.get(email='foo@nowhere.com')
+        user2 = User.objects.get(email='test4@tester.com')
         divesite = Divesite.objects.get(name='White Point')
 
         payload = {
@@ -47,6 +48,15 @@ class TestUserDivesitesApi(TestCase):
         # now attempt to add another review for today, this one should fail
         response = client.post(url, payload, format='json')
         self.assertEqual(response.status_code, 400)
+
+        # now, make sure another user can add a review for the same
+        # divesite (they shouldn't clash)
+        client = APIClient()
+        client.force_authenticate(user=user2)
+
+        url = f'/api/divesites/{divesite.pk_as_str}/reviews/'
+        response = client.post(url, payload, format='json')
+        self.assertEqual(response.status_code, 201)
 
     def test_invalid_divesite_review(self):
         user = User.objects.get(email='foo@nowhere.com')

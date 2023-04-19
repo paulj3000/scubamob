@@ -12,6 +12,7 @@ from rest_framework.permissions import AllowAny
 from scuba.accounts.models import User
 from scuba.accounts.exceptions import InvalidUserIdException
 from scuba.accounts.serializers.account import RegisterUserSerializer, LoginSerializer
+from scuba.divesites.serializers import DivesiteReviewSerializer
 
 
 class RegisterUserApi(generics.CreateAPIView):
@@ -41,3 +42,17 @@ class LoginUserApi(generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class GetReviewsApi(generics.ListAPIView):
+    serializer_class = DivesiteReviewSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return user.reviews.all().order_by('review_date')
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return Response({
+            'reviews': response.data
+        })

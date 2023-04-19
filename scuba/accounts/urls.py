@@ -1,8 +1,8 @@
 from django.urls import path
 
-import scuba.accounts.apis as account_api
+import scuba.accounts.apis.socket as socket_api
 
 
 urlpatterns = [
-    path('socket/', account_api.SocketApi.as_view()),
+    path('socket/', socket_api.SocketApi.as_view()),
 ]
