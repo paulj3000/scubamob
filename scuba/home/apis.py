@@ -41,8 +41,9 @@ class SearchApi(generics.GenericAPIView):
     def get(self, request):
 
         q_param = request.query_params.get('q')
-        users = User.objects.filter(Q(last_name__icontains=q_param) |
-                                    Q(first_name__icontains=q_param))
+        users = User.objects.filter(
+            Q(last_name__icontains=q_param) |
+            Q(first_name__icontains=q_param))
 
         retval = []
         if q_param:
@@ -83,7 +84,7 @@ class GetHomescreenApi(generics.GenericAPIView):
                 'list': BuddySerializer(user.get_all_buddies(), many=True).data,
                 'recent_activity': BuddyRecentActivity(buddy_recent_activity, many=True).data,
             },
-            #'weather': WeatherSerializer(weather, many=True).data,
+            # 'weather': WeatherSerializer(weather, many=True).data,
             'weather': weather,
             'divesites': {
                 'favorites': user.get_divesite_favorites(),

@@ -36,7 +36,11 @@ def json_createalbum(us_request):
 
     retval = []
     # convert the response to JSON
-    Album.objects.create(account=us_request.user, title=params['title'], description=params.get('description'))
+    Album.objects.create(
+        account=us_request.user,
+        title=params['title'],
+        description=params.get('description'))
+
     retval = []
     for album in us_request.user.albums.filter():
         json = album.to_json()

@@ -43,9 +43,7 @@ class EmailTemplateAdmin(admin.ModelAdmin):
             2: 'send_confirmation_code_email'
         }
 
-        for user in User.objects.filter(
-                Q(is_superuser=True) |
-                Q(is_admin=True)):
+        for user in User.objects.filter(Q(is_superuser=True) | Q(is_admin=True)):
 
             func = getattr(user, to_send_email[email_template.template_type])
             func('123456')

@@ -45,7 +45,7 @@ class JumbotronAdmin(admin.ModelAdmin):
 
         # set a success message
         messages.add_message(request,
-                messages.INFO, f"Jumbotron {jumbo.name} has been activated")
+            messages.INFO, f"Jumbotron {jumbo.name} has been activated")
 
     activate_jumbotron.short_description = "Activate jumbotron"
 

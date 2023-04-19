@@ -24,6 +24,7 @@ class GetSystemEndpointsApi(generics.GenericAPIView):
 class GetSystemSettingsApi(generics.GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = SystemApiSerializer
+
     def get(self, request):
 
         if request.META['PATH_INFO'] == '/api/sitesettings/all':

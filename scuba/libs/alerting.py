@@ -12,7 +12,7 @@ class Alerting:
 
         to_send = {
             'userId': userId,
-            'buddyUserId':buddyUserId,
+            'buddyUserId': buddyUserId,
         }
 
         r = requests.post(url, json=to_send)
