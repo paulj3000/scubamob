@@ -5,6 +5,7 @@ env/
 static/*
 !static/react/src
 !static/js
+!static/images
 !static/css/**.css
 db.sqlite3*
 *.pyc

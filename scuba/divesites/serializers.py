@@ -3,6 +3,7 @@ from datetime import date
 from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 from django.core.cache import cache
+from django.templatetags.static import static
 
 from scuba.divesites.models import Divesite, DivesiteReview, \
     DivesiteFavorite, DivesiteDailyStats, DivesiteCheckin
@@ -83,7 +84,7 @@ class DivesiteSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_banner(data):
-        return data.banner
+        return static(data.banner)
 
     @staticmethod
     def get_lat(data):

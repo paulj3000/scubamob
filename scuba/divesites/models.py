@@ -2,7 +2,6 @@ import string
 from random import choice
 
 from django.db import models
-from django.templatetags.static import static
 from django.db.models import Avg, DateTimeField, ExpressionWrapper, F
 from django.db.models.functions import Cast, Coalesce
 
@@ -102,7 +101,7 @@ class Divesite(UUIDModel):
             return self.divesitebanner.get_banner_image()
 
         # No profile image. just return a default
-        return static(SystemSetting.get_default_banner_image())
+        return SystemSetting.get_default_banner_image()
 
     def upload_banner(self, uploaded_image):
         """ upload_banner
