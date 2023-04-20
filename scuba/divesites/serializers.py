@@ -123,10 +123,15 @@ class DivesiteReviewSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
 
     id = serializers.SerializerMethodField(read_only=True)
+    review_date = serializers.SerializerMethodField(read_only=True)
 
     @staticmethod
     def get_id(data):
         return data.pk_as_str
+
+    @staticmethod
+    def get_review_date(data):
+        return int(data.review_date.strftime('%s'))
 
     class Meta:
         """ define models, fields, etc """

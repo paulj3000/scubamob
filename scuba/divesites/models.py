@@ -155,6 +155,9 @@ class DivesiteReview(UUIDModel):
         db_table = 'divesite_reviews'
         unique_together = (('user', 'divesite', 'review_date'), )
 
+    def __str__(self):
+        return f"Review of {self.divesite} by {self.user.get_full_name()}"
+
 
 class DivesiteBanner(UUIDModel):
     divesite = models.ForeignKey(Divesite, related_name='banners', on_delete=models.CASCADE)
