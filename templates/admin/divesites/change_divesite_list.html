@@ -65,17 +65,15 @@ async function initMap() {
             position: position,
             title: site.name,
         });
-     
+
          marker.addListener("click", () => {
       infoWindow.setContent("some label");
       infoWindow.open(map, marker);
     });
-     
-     
+
+
         return marker;
     });
-    
-    new MarkerClusterer({ markers, map });
 }
 
 initMap();
