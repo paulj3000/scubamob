@@ -256,7 +256,7 @@ TEST_PEP8_DIRS = [PROJECT_DIR]
 
 # start AWS stuff
 PROFILE_BLANK_URL = 'images/profiles/profile-blank.png'
-BANNER_BLANK_URL = 'images/profiles/profile-blank.png'
+BANNER_BLANK_URL = 'images/divesite-blank.png'
 AWS_S3_BUCKET = os.environ.get("AWS_S3_BUCKET", "scubamob-dev")
 AWS_S3_BUCKET_PRIVATE = os.environ.get("AWS_S3_BUCKET_PRIVATE", "scubamob-private")
 AWS_S3_BUCKET_PRIVATE_REGION = 'us-east-1'
