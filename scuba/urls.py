@@ -80,16 +80,19 @@ urlpatterns = [
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # start the messenger portion of the show
-    path('messenger/new',
+    path(
+        'messenger/new',
         TemplateView.as_view(template_name="messenger.html"),
         name='messenger',
     ),
-    path('messenger',
+    path(
+        'messenger',
         TemplateView.as_view(template_name="messenger.html"),
         name='messenger',
     ),
 
-    re_path('messenger/t/(?P<id>[a-fA-F0-9]+)',
+    re_path(
+        'messenger/t/(?P<id>[a-fA-F0-9]+)',
         TemplateView.as_view(template_name="messenger.html"),
         name='messenger',
     ),

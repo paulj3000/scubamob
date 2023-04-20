@@ -212,7 +212,7 @@ class BaseAPI(UUIDModel):
         """ define models, fields, etc """
         abstract = True
         app_label = 'sitesettings'
-        ordering = ['key',]
+        ordering = ['key']
 
     @staticmethod
     def sub_url_userid(url, userid):

@@ -5,7 +5,8 @@ import scuba.accounts.apis.settings as settings_api
 
 
 urlpatterns = [
-    re_path('emails/(?P<id>[a-fA-F0-9]+)/',
+    re_path(
+        'emails/(?P<id>[a-fA-F0-9]+)/',
         settings_api.RemoveEmailApi.as_view()
     ),
     re_path('emails/setprimary',

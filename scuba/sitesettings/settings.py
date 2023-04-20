@@ -41,7 +41,7 @@ AWS_APIS = (
 
 BILLING_APIS = (
     ('PROCESSORS', 'Billing Processors'),
-    ('AUTHORIZE_CC','Billing Authorize CC'),
+    ('AUTHORIZE_CC', 'Billing Authorize CC')
 )
 
 

@@ -11,7 +11,7 @@ from scuba.accounts.forms.signup import SignupForm
 
 
 class TestAccountFormSignup(TestCase):
-    fixtures = ["test_users.json",]
+    fixtures = ["test_users.json"]
 
     def test_good_form(self):
         """

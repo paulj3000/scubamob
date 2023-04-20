@@ -55,7 +55,7 @@ class DiveShopAddressForm(forms.ModelForm):
     phone = forms.CharField(max_length=200, label='Phone')
 
     def save(self, *args, **kwargs):
-        data    = self.cleaned_data
+        data = self.cleaned_data
 
         gm = GoogleAddress()
         latlng = gm.get_data_city_state(
