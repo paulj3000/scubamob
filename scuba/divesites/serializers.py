@@ -210,8 +210,6 @@ class DivesiteCheckinSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_id(data):
-        from pprint import pprint
-        pprint(data)
         return data.pk_as_str
 
     @staticmethod
@@ -229,6 +227,20 @@ class DivesiteCheckinSerializer(serializers.ModelSerializer):
         # everything is good, return
         return attrs
 
+    @staticmethod
+    def validate_temp_c(temp_c):
+        if temp_c < 0 or temp_c > 100:
+            raise serializers.ValidationError(f"{temp_c} is invalid")
+
+        return temp_c
+
+    @staticmethod
+    def validate_visibility(visibility):
+        if visibility < 0 or visibility > 1000:
+            raise serializers.ValidationError(f"{visibility} is invalid")
+
+        return visibility
+
     def __init__(self, *args, **kwargs):
         divesite = kwargs.pop('divesite', None)
         setattr(self, 'divesite', divesite)
@@ -240,6 +252,8 @@ class DivesiteCheckinSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'note',
+            'visibility',
+            'temp_c',
             'checkin_date',
         )
 
