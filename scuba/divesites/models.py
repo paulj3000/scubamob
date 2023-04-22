@@ -191,7 +191,7 @@ class DivesiteFavorite(UUIDModel):
 class DivesiteCheckin(UUIDModel):
     divesite = models.ForeignKey(Divesite, related_name='checkins', on_delete=models.CASCADE)
     user = models.ForeignKey('accounts.User', related_name='checkins', on_delete=models.CASCADE)
-    note = models.TextField()
+    note = models.TextField(blank=True, null=True)
     checkin_date = models.DateField(auto_now_add=True)
 
     class Meta:

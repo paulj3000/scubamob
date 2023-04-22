@@ -75,4 +75,5 @@ class DivesiteDailyStatsAdmin(admin.ModelAdmin):
 
 admin.site.register(divesites_models.Divesite, DivesiteAdmin)
 admin.site.register(divesites_models.DivesiteReview)
+admin.site.register(divesites_models.DivesiteCheckin)
 admin.site.register(divesites_models.DivesiteDailyStats, DivesiteDailyStatsAdmin)
