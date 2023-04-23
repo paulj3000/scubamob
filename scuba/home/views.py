@@ -41,29 +41,3 @@ class HomeView(TemplateView):
     display the home page
     """
     template_name = 'home/home.html'
-
-
-@login_required
-def home(us_request):
-    user = us_request.user
-    user_id = user.id
-
-    template = 'home/home.html'
-
-    # let's get the favorites for this particular user
-    user_favorites = []
-    context = {'divesites': []}
-
-    for fav in user_favorites:
-        fav_data = divesite_mongo.get_divesite_info(fav)
-        weather_data = Weather.get_current_by_lat_long(
-            fav_data['latlng']['latitude'],
-            fav_data['latlng']['longitude'])
-
-        divesite_data = divesite_mongo.get_divesite_info(fav)
-        divesite_data['weather'] = weather_data
-
-        context['divesites'].append(divesite_data)
-
-    # render the appropriate template
-    return render(us_request, template, context)
