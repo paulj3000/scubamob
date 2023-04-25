@@ -117,7 +117,7 @@ class CheckinApi(generics.GenericAPIView):
         serializer = self.get_serializer(divesite=divesite, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class FavoriteApi(generics.GenericAPIView):

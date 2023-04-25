@@ -25,7 +25,7 @@ class DivesiteSerializer(serializers.ModelSerializer):
     lat = serializers.SerializerMethodField(read_only=True)
     long = serializers.SerializerMethodField(read_only=True)
     stats = serializers.SerializerMethodField(read_only=True)
-    #weather = serializers.SerializerMethodField(read_only=True)
+    # weather = serializers.SerializerMethodField(read_only=True)
 
     @staticmethod
     def get_id(data):
@@ -61,7 +61,7 @@ class DivesiteSerializer(serializers.ModelSerializer):
 
         # attach the current conditions to the return value
         retval = {}
-        #retval['condition'] = weather['current'].pop('condition')
+        # retval['condition'] = weather['current'].pop('condition')
         retval['weather'] = weather['current']
         retval['reviews'] = [data.get_divesite_stats(date.today())]
         return retval
@@ -204,8 +204,17 @@ class DivesiteFavoriteSerializer(serializers.Serializer):
             defaults={'is_favorite': validated_data['favorite']})
 
 
-class DivesiteCheckinSerializer(serializers.Serializer):
-    note = serializers.CharField(required=False)
+class DivesiteCheckinSerializer(serializers.ModelSerializer):
+    id = serializers.SerializerMethodField(read_only=True)
+    checkin_date = serializers.SerializerMethodField(read_only=True)
+
+    @staticmethod
+    def get_id(data):
+        return data.pk_as_str
+
+    @staticmethod
+    def get_checkin_date(data):
+        return int(data.checkin_date.strftime('%s'))
 
     def validate(self, attrs):
         divesite = getattr(self, 'divesite')
@@ -218,15 +227,41 @@ class DivesiteCheckinSerializer(serializers.Serializer):
         # everything is good, return
         return attrs
 
+    @staticmethod
+    def validate_temp_c(temp_c):
+        if temp_c < 0 or temp_c > 100:
+            raise serializers.ValidationError(f"{temp_c} is invalid")
+
+        return temp_c
+
+    @staticmethod
+    def validate_visibility(visibility):
+        if visibility < 0 or visibility > 1000:
+            raise serializers.ValidationError(f"{visibility} is invalid")
+
+        return visibility
+
     def __init__(self, *args, **kwargs):
         divesite = kwargs.pop('divesite', None)
         setattr(self, 'divesite', divesite)
         super().__init__(*args, **kwargs)
 
-    def save(self, **kwargs):
-        validated_data = {**self.validated_data, **kwargs}
+    class Meta:
+        """ define models, fields, etc """
+        model = DivesiteCheckin
+        fields = (
+            'id',
+            'note',
+            'visibility',
+            'temp_c',
+            'checkin_date',
+        )
 
-        return DivesiteCheckin.objects.update_or_create(
-            divesite=getattr(self, 'divesite'),
-            user=self.context['request'].user,
-            defaults={'note': validated_data['note']})
+    def create(self, validated_data):
+        data = {
+            'divesite': getattr(self, 'divesite'),
+            'user': self.context['request'].user,
+            'note': validated_data['note'],
+        }
+
+        return DivesiteCheckin.objects.create(**data)

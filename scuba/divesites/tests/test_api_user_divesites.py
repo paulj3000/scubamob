@@ -107,12 +107,52 @@ class TestUserDivesitesApi(TestCase):
         client.force_authenticate(user=user)
 
         note = 'This was a good day'
+        payload = {
+            'note': note,
+            'temp_c': 23,
+            'visibility': 300,
+        }
         response = client.post(url, {'note': note}, format='json')
-        self.assertEqual(response.status_code, 202)
+        self.assertEqual(response.status_code, 201)
+
+        checkin = response.json()
+        self.assertIsNotNone(checkin['id'])
+        self.assertIsNotNone(checkin['checkin_date'])
+
 
         # try again, make sure we cannot add another checkin for today
         response = client.post(url, {'note': note}, format='json')
         self.assertEqual(response.status_code, 400)
+
+    def test_invalid_checkin(self):
+        payload = {
+            'note': 'Today is a good day',
+            'temp_c': 300.5,
+            'visibility': 200,
+            'review_date': date.today(),
+        }
+
+        # get the checkin url, divesite and user
+        user = User.objects.get(email='foo@nowhere.com')
+        divesite = Divesite.objects.get(name='White Point')
+        url = f'/api/divesites/{divesite.pk_as_str}/checkin/'
+
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        response = client.post(url, payload, format='json')
+        self.assertEqual(response.status_code, 400, "temperature too high")
+
+        payload = {
+            'note': 'Today is a good day',
+            'temp_c': 300.5,
+            'visibility': 200,
+            'review_date': date.today(),
+        }
+
+        payload.update({'temp_c': -32, 'visibility': 50})
+        response = client.post(url, payload, format='json')
+        self.assertEqual(response.status_code, 400, "temperature too low")
 
     def test_favorite_divesite(self):
         """

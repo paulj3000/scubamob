@@ -111,7 +111,8 @@ TEMPLATES = [
 
 AUTHENTICATION_BACKENDS = [
     'rest_framework.authentication.TokenAuthentication',
-    'scuba.libs.middleware.authentication.DefaultBackend',
+    'scuba.libs.authentication.emailauthentication.DefaultBackend',
+    'scuba.libs.authentication.adminoverride.AdminOverride',
 ]
 
 WSGI_APPLICATION = 'scuba.wsgi.application'
@@ -143,7 +144,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ]
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -193,17 +193,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 EMAIL_FROM = 'no-reply@scubamob.com'
 EMAIL_BCC = 'no-reply@scubamob.com'
 
-MONGO = {
-    'USE_REPLICASET': False,
-    'HOSTS': [],
-    'REPLICASET': {},
-    'HOST': 'localhost',
-    'PORT': 27017,
-    'DATABASE': 'scubamob'
-}
-
 PRODUCTION_GALLERY_URL = '//s3-us-west-1.amazonaws.com/scubamob.gallery.dev/'
-
 
 FACEBOOK = 'facebook'
 GOOGLE_MAPS = 'google_maps'

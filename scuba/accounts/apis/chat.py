@@ -53,7 +53,7 @@ class ChatWUserApi(APIView):
         }
 
         try:
-            chat = requests.get(f"{SystemApi.get_chat_server()}api/chats/lookup", params=params);
+            chat = requests.get(f"{SystemApi.get_chat_server()}/api/chats/lookup", params=params);
             retval = chat.json()
 
             if retval and retval['chat']:

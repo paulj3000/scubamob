@@ -15,7 +15,7 @@ from django.contrib.auth.backends import ModelBackend
 from scuba.accounts.models import User
 
 
-class EmailLogin(object):
+class EmailAuthentication(object):
     '''
     Authenticate a user based on email.
     '''
