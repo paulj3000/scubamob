@@ -20,3 +20,21 @@ class JumbotronSerializer(serializers.ModelSerializer):
         """ define models, fields, etc """
         model = Jumbotron
         fields = ['url', 'type']
+
+
+class BuddySerializer(serializers.Serializer):
+    id = serializers.SerializerMethodField()
+    full_name = serializers.SerializerMethodField()
+    profile_image = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_profile_image(data):
+        return data.get_profile_image()
+
+    @staticmethod
+    def get_full_name(data):
+        return data.get_full_name()
+
+    @staticmethod
+    def get_id(data):
+        return data.pk_as_str

@@ -7,6 +7,7 @@ from django.core.cache import cache
 from django.db.models import Q
 from scuba.home.models import Jumbotron
 from scuba.home.serializers import JumbotronSerializer
+from scuba.home.serializers import BuddySerializer as SearchBuddySerializer
 from scuba.accounts.serializers.buddies import BuddySerializer, BuddyRecentActivity
 from scuba.accounts.models import User
 from scuba.divesites.models import Divesite
@@ -45,11 +46,7 @@ class SearchApi(generics.GenericAPIView):
             Q(last_name__icontains=q_param) |
             Q(first_name__icontains=q_param))
 
-        retval = []
-        if q_param:
-            for user in users:
-                retval.append({'id': user.pk_as_str, 'title': user.get_full_name()})
-
+        retval = {'buddies': SearchBuddySerializer(users, many=True).data}
         return Response({'search': retval})
 
 
