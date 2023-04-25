@@ -22,7 +22,7 @@ def can_view_profile(view_func):
             return view_func(request, *args, **kwargs)
 
         # check if this is a valid profile
-        profile_user = get_object_or_404(User, username=username)
+        profile_user = get_object_or_404(User, id=id)
 
         if user.is_blocked(profile_user):
             raise Http404
