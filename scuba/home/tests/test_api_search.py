@@ -26,3 +26,9 @@ class TestSearchAPI(TestCase):
         self.assertIsNotNone(results.get('search'), 'results contains search element')
         self.assertIsNotNone(results['search'].get('buddies'), 'Search key contains a buddies list')
         self.assertEqual(len(results['search']['buddies']), 4, 'Returning four buddies')
+
+        # test case insensitivity
+        response = client.get('/api/search?q=TEST', format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(results['search']['buddies']), 4, 'Returning four buddies')
+
