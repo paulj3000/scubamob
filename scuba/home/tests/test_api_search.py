@@ -13,7 +13,7 @@ from scuba.accounts.models import User
 
 class TestSearchAPI(TestCase):
     fixtures = ["test_divesites.json", "test_users.json", "test_sitesettings.json"]
-    def test_buddies_search(self):
+    def test_users_search(self):
         user = User.objects.get(email='foo@nowhere.com')
 
         client = APIClient()
@@ -24,11 +24,31 @@ class TestSearchAPI(TestCase):
 
         results = response.json()
         self.assertIsNotNone(results.get('search'), 'results contains search element')
-        self.assertIsNotNone(results['search'].get('buddies'), 'Search key contains a buddies list')
-        self.assertEqual(len(results['search']['buddies']), 4, 'Returning four buddies')
+        self.assertIsNotNone(results['search'].get('users'), 'Search key contains a users list')
+        self.assertEqual(len(results['search']['users']), 4, 'Returning four users')
 
         # test case insensitivity
         response = client.get('/api/search?q=TEST', format='json')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(results['search']['buddies']), 4, 'Returning four buddies')
+        self.assertEqual(len(results['search']['users']), 4, 'Returning four users')
 
+    def test_self_user_search(self):
+        user = User.objects.get(email='foo@nowhere.com')
+
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        response = client.get('/api/search?q=First', format='json')
+        self.assertEqual(response.status_code, 200)
+        results = response.json()
+
+        # make sure
+        self.assertEqual(
+            len(results['search']['users']), 2,
+            'The user himself should not be returned')
+
+        for search_user in results['search']['users']:
+            self.assertNotEqual(
+                user.id,
+                search_user['id'],
+                f"{search_user['id']} doesn't match")
