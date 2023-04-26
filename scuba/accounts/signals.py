@@ -45,8 +45,7 @@ def post_login(sender, user, request, **kwargs):
 
     if ip_address:
         data = MaxMind.get_city_data(ip_address)
-        pprint(data)
-        #data = geolite2.lookup(ip_address)
+        # data = geolite2.lookup(ip_address)
         tz = data[1].time_zone
     else:
         tz = 'America/Los_Angeles'

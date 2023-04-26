@@ -6,7 +6,7 @@ from scuba.accounts.models import User, UserEmail, UserSetting
 
 class UserEmailSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()
-    #is_primary = serializers.BooleanField()
+    # is_primary = serializers.BooleanField()
 
     @staticmethod
     def validate_email(email):
@@ -100,14 +100,4 @@ class UserSettingSerializer(serializers.ModelSerializer):
         """
         # get the original representation
         ret = super().to_representation(instance)
-
-        from collections import OrderedDict
-
-        from pprint import pprint
-        pprint(ret)
-
-
-        # change the date
-        #ret['date_joined'] = instance.date_joined.strftime("%m/%d/%Y")
-        # return the modified representation
         return ret

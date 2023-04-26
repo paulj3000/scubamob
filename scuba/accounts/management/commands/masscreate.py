@@ -21,7 +21,6 @@ class Command(BaseCommand):
                 new_user.last_name = f'user {i}'
                 new_user.date_of_birth = '1970-04-01'
 
-                #new_user.username = username
                 new_user.email = email
                 new_user.set_password(f'tester{i}')
                 new_user.save()
