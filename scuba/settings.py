@@ -245,14 +245,14 @@ IMAGE_TYPES = ['png', 'jpg', 'gif', 'jpeg']
 VALID_CONTENT_TYPES = ['image/png', 'image/jpg', 'image/jpeg', 'video/mp4']
 
 
-COMPRESS_FILTERS = {
+xCOMPRESS_FILTERS = {
     'css': ['compressor.filters.css_default.CssAbsoluteFilter',
             'compressor.filters.yuglify.YUglifyCSSFilter'],
     'js': ['compressor.filters.jsmin.JSMinFilter',
            'compressor.filters.yuglify.YUglifyJSFilter'],
 }
 
-COMPRESS_YUGLIFY_BINARY = f"{BASE_DIR}/node_modules/yuglify/bin/yuglify"
+xCOMPRESS_YUGLIFY_BINARY = f"{BASE_DIR}/node_modules/yuglify/bin/yuglify"
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_ALL_ORIGINS = True
