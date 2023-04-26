@@ -101,9 +101,8 @@ TEMPLATES = [
     },
 ]
 
-AUTHENTICATION_BACKENDS = [
+AUTHENTICATION_BACKENDS = DEFAULT_SETTINGS.AUTHENTICATION_BACKENDS + [
     'rest_framework.authentication.TokenAuthentication',
-    'scuba.libs.authentication.emailauthentication.DefaultBackend',
     'scuba.libs.authentication.adminoverride.AdminOverride',
 ]
 
