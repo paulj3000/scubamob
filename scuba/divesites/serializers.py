@@ -64,6 +64,7 @@ class DivesiteSerializer(serializers.ModelSerializer):
         # retval['condition'] = weather['current'].pop('condition')
         retval['weather'] = weather['current']
         retval['location'] = weather['location']
+        retval['location']['id'] = data.region.pk_as_str
         retval['reviews'] = [data.get_divesite_stats(date.today())]
         return retval
 

@@ -74,8 +74,13 @@ class GetHomescreenApi(generics.GenericAPIView):
         '''
         weather = Weather.get_current_by_q_param(q_param)
         obj = Region.store_weather_region(weather)
+
         key = f'weather_{obj.pk_as_str}'
         cache.set(key, weather, 3600)
+
+        location = weather.pop('location')
+        location['id'] = obj.pk_as_str
+
 
         return Response({
             'buddies': {
@@ -85,7 +90,7 @@ class GetHomescreenApi(generics.GenericAPIView):
             },
             # 'weather': WeatherSerializer(weather, many=True).data,
             'weather': weather,
-            'location': weather.pop('location'),
+            'location': location,
             'divesites': {
                 'favorites': user.get_divesite_favorites(),
                 'list': DivesiteSerializer(Divesite.get_all_active_divesites(), many=True).data
