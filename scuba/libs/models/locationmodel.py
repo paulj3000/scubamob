@@ -42,11 +42,13 @@ class LocationModel(UUIDModel):
         lat1 = math.radians(lat)  # lat in radians
         lngg1 = math.radians(lng)  # lngg in radians
 
-        lat2 = math.asin(math.sin(lat1) * math.cos(distance/R) +
-                         math.cos(lat1) * math.sin(distance/R) * math.cos(bearing))
+        lat2 = math.asin(math.sin(lat1) * math.cos(distance / R)
+                         + math.cos(lat1) * math.sin(distance / R)
+                         * math.cos(bearing))
 
-        lngg2 = lngg1 + math.atan2(math.sin(bearing) * math.sin(distance/R) * math.cos(lat1),
-                                   math.cos(distance/R) - math.sin(lat1) * math.sin(lat2))
+        lngg2 = lngg1 + math.atan2(
+            math.sin(bearing) * math.sin(distance/R) * math.cos(lat1),
+            math.cos(distance / R) - math.sin(lat1) * math.sin(lat2))
 
         lat2 = math.degrees(lat2)
         lngg2 = math.degrees(lngg2)
