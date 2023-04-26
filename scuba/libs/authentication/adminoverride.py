@@ -1,4 +1,3 @@
-#from django.contrib.auth.models import User
 from scuba.accounts.models import User
 import scuba.settings
 

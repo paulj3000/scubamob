@@ -31,7 +31,6 @@ class UserDivesiteFavoriteSerializer(serializers.Serializer):
 
         return divesite_id
 
-
     class Meta:
         model = UserDivesiteFavorite
         fields = ('divesite',)

@@ -1,4 +1,4 @@
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # utils/middleware/authentication.py
 #
 # This file adds an extra layer of login for the user.  This will check the

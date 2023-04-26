@@ -43,8 +43,7 @@ class SearchApi(generics.GenericAPIView):
 
         q_param = request.query_params.get('q')
         users = User.objects.filter(
-            Q(last_name__icontains=q_param) |
-            Q(first_name__icontains=q_param))
+            Q(last_name__icontains=q_param) | Q(first_name__icontains=q_param))
 
         retval = {'buddies': SearchBuddySerializer(users, many=True).data}
         return Response({'search': retval})
