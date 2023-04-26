@@ -40,12 +40,15 @@ class SearchApi(generics.GenericAPIView):
     permission_classes = (AllowAny,)
 
     def get(self, request):
-
+        user = request.user
         q_param = request.query_params.get('q')
         users = User.objects.filter(
             Q(last_name__icontains=q_param) | Q(first_name__icontains=q_param))
 
-        retval = {'buddies': SearchBuddySerializer(users, many=True).data}
+        if not user.is_anonymous:
+            users = users.filter(~Q(id=user.id))
+
+        retval = {'users': SearchBuddySerializer(users, many=True).data}
         return Response({'search': retval})
 
 

@@ -34,8 +34,13 @@ class SignupForm(forms.ModelForm):
         email = cleaned.get('email', 'unknown@unknown.com')
 
         # here is the form data submitted
-        #message = {'form_data': cleaned, 'is_spam': self.is_spam, 'iso_country': iso_country, 'blocked': blocked_name}
-        #Log.objects.create(system='REGISTER', message=json.dumps(message))
+        '''
+        message = {
+            'form_data': cleaned,
+            'is_spam': self.is_spam,
+            'iso_country': iso_country,
+            'blocked': blocked_name}
+        '''
 
         if IS_PRODUCTION:
             # here is the form data submitted
