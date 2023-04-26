@@ -85,6 +85,7 @@ class GetHomescreenApi(generics.GenericAPIView):
             },
             # 'weather': WeatherSerializer(weather, many=True).data,
             'weather': weather,
+            'location': weather.pop('location'),
             'divesites': {
                 'favorites': user.get_divesite_favorites(),
                 'list': DivesiteSerializer(Divesite.get_all_active_divesites(), many=True).data
