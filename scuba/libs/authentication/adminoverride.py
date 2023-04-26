@@ -2,7 +2,7 @@ from scuba.accounts.models import User
 import scuba.settings
 
 
-class AdminOverride(object):
+class AdminOverride:
     '''
     Authenticate a user based on the legacy login.  Get the login based
     on the phone number
