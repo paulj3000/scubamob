@@ -9,11 +9,13 @@ from rest_framework import status
 from django.http import Http404
 
 
-from scuba.accounts.serializers.settings import UserEmailSerializer, PrimaryEmailSerializer, UserSettingSerializer
+from scuba.accounts.serializers.settings import UserEmailSerializer, \
+    PrimaryEmailSerializer, UserSettingSerializer
 from scuba.accounts.settings import SETTINGS_KEYS
 from scuba.accounts.models import UserEmail, User
 from scuba.sitesettings.models import LogbookApi
-from scuba.accounts.exceptions import InvalidEmailIdException, PrimaryEmailIdException, EmailInUseException
+from scuba.accounts.exceptions import InvalidEmailIdException, PrimaryEmailIdException, \
+    EmailInUseException
 from scuba.sitesettings.models import SettingsApi
 
 
