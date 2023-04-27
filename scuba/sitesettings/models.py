@@ -7,7 +7,8 @@ from django.db import models
 from scuba.sitesettings import exceptions
 from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.sitesettings.exceptions import InvalidConfigurationException
-from scuba.sitesettings.settings import (SYSTEM_SETTINGS, SYSTEM_APIS, SOCKET_SERVER_SETTINGS,\
+from scuba.sitesettings.settings import (
+    SYSTEM_SETTINGS, SYSTEM_APIS, SOCKET_SERVER_SETTINGS,
     LOGBOOK_APIS, SETTINGS_APIS, AWS_APIS, BILLING_APIS, APPS)
 from scuba.sitesettings import settings
 from scuba.settings import PROFILE_BLANK_URL, BANNER_BLANK_URL
@@ -22,7 +23,6 @@ class ApiEndpoint(UUIDModel):
     class Meta:
         """ define models, fields, etc """
         db_table = 'api_endpoint'
-        #app_label = 'api endpoints'
         unique_together = [['app', 'key']]
 
     @staticmethod
@@ -241,12 +241,14 @@ class BaseAPI(UUIDModel):
 
 class AlertingApi(BaseAPI):
     choices = settings.ALERTING_APIS
+
     class Meta:
         db_table = 'alerting_api'
 
 
 class AWSApi(BaseAPI):
     choices = AWS_APIS
+
     class Meta:
         db_table = 'aws_api'
 
@@ -265,12 +267,14 @@ class AWSApi(BaseAPI):
 
 class BillingApi(BaseAPI):
     choices = BILLING_APIS
+
     class Meta:
         db_table = 'billing_api'
 
 
 class ChatApi(BaseAPI):
     choices = settings.CHAT_APIS
+
     class Meta:
         db_table = 'chat_api'
 
@@ -291,11 +295,9 @@ class ChatApi(BaseAPI):
 
 class LogbookApi(BaseAPI):
     choices = settings.LOGBOOK_APIS
+
     class Meta:
         db_table = 'logbook_api'
-
-    #def get_domain(self):
-    #    return SystemApi.get_url_by_key('LOGBOOK_SERVER')
 
     @staticmethod
     def get_all_logbooks(userid):
@@ -321,6 +323,7 @@ class LogbookApi(BaseAPI):
 
 class SettingsApi(BaseAPI):
     choices = SETTINGS_APIS
+
     class Meta:
         db_table = 'settings_api'
 
@@ -358,7 +361,8 @@ class SettingsApi(BaseAPI):
 
 
 class APIKey(UUIDModel):
-    key = models.CharField(db_index=True,
+    key = models.CharField(
+        db_index=True,
         unique=True,
         max_length=128,
         choices=settings.API_KEYS)
