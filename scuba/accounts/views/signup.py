@@ -76,34 +76,6 @@ class ValidateEmail(View):
     """ Email validation coming through. This will be used to verify if the
     email address has already been registered
     """
-    def post(self, request):
-        """ Do the actual post """
-        if request.session.get('duplicate_email_ok'):
-            return JsonResponse(True, safe=False)
-
-        email = request.POST.get('email')
-
-        retval = 'true'
-
-        if email:
-            user = request.user
-            if user.is_authenticated:
-                ex_user = User.objects.filter(email=email).first()
-                if ex_user:
-                    if str(ex_user.id) != str(user.id):
-                        retval = 'false'
-                    else:
-                        retval = 'true'
-                else:
-                    retval = 'true'
-            else:
-                if User.objects.filter(email=email).count():
-                    retval = 'false'
-        else:
-            retval = 'false'
-
-        return JsonResponse(retval, safe=False)
-
     def post(self, request, *args, **kwargs):
         """
         Handle POST requests: instantiate a form instance with the passed
