@@ -13,6 +13,7 @@ from scuba.accounts.models import User
 from scuba.divesites.models import Divesite
 from scuba.divesites.serializers import DivesiteSerializer
 from scuba.libs.weather import Weather
+from scuba.libs.exceptions import InvalidWeatherDataException
 from scuba.maps.models import Region
 
 
@@ -72,7 +73,14 @@ class GetHomescreenApi(generics.GenericAPIView):
         else:
             weather = Weather.get_current_by_postal_code('92107')
         '''
-        weather = Weather.get_current_by_q_param(q_param)
+
+        # check for the weather. If it doesn't return, give the
+        # default location of 92107
+        try:
+            weather = Weather.get_current_by_q_param(q_param)
+        except InvalidWeatherDataException:
+            weather = Weather.get_current_by_q_param('92107')
+
         obj = Region.store_weather_region(weather)
 
         key = f'weather_{obj.pk_as_str}'
@@ -80,7 +88,6 @@ class GetHomescreenApi(generics.GenericAPIView):
 
         location = weather.pop('location')
         location['id'] = obj.pk_as_str
-
 
         return Response({
             'buddies': {
