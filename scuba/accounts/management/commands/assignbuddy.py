@@ -5,6 +5,7 @@ from scuba.accounts.models import User
 
 from scuba.accounts.models import UserBuddyRequest, UserBuddy
 
+
 class Command(BaseCommand):
     def handle(self, *args, **options):
         ''' update all account guids '''

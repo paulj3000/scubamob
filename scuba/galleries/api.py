@@ -32,6 +32,7 @@ class ListAlbumsApi(generics.ListAPIView):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = AlbumSerializer
+
     def get_queryset(self):
         """ get_queryset
 
@@ -67,18 +68,15 @@ def json_createalbum(us_request):
 
     retval = []
 
-    try:
-        # convert the response to JSON
-        album = Album.objects.create(
-                    user=us_request.user, title=params['title'],
-                    description=params.get('description'), )
+    # convert the response to JSON
+    album = Album.objects.create(
+        user=us_request.user, title=params['title'],
+        description=params.get('description'), )
 
-        json = album.to_json()
-        json['url'] = reverse('show_album', kwargs={'album_id': album.guid})
+    json = album.to_json()
+    json['url'] = reverse('show_album', kwargs={'album_id': album.guid})
 
-        return JsonResponse(json)
-    except:
-        pass
+    return JsonResponse(json)
 
 
 @login_required
@@ -89,10 +87,7 @@ def getalbums(us_request):
         json = album.to_json()
         json['url'] = reverse('show_album', kwargs={'album_id': album.guid})
 
-        try:
-            json['cover'] = album.album_image.all().first().thumbnail
-        except:
-            pass
+        json['cover'] = album.album_image.all().first().thumbnail
 
         img_count = album.album_image.all().count()
         json['image_count'] = "%i %s" % (img_count, 'photo' if img_count == 1 else 'photos')
@@ -118,7 +113,7 @@ def json_deletealbum(us_request, album_id):
 def json_getalbumimages(us_request, album_id):
     params = us_request.REQUEST
 
-    #PRODUCTION_GALLERY_URL
+    # PRODUCTION_GALLERY_URL
     retval = []
     # convert the response to JSON
     print(f"album id:  {album_id}")

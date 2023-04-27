@@ -7,6 +7,8 @@ Author: Pauljames "The Juggernaut" Dimitriu
 
 Create exceptions for the system processes.
 """
+
+
 class InvalidConfigrationException(Exception):
     """ InvalidConfigrationException
 

@@ -19,28 +19,20 @@ import django.conf.global_settings as DEFAULT_SETTINGS
 BASE_DIR = Path(__file__).resolve().parent.parent
 BASE_URL = 'scubamob.com'
 SITE_URL = 'scubamob.com'
-PROJECT_DIR = f"{BASE_DIR}/scuba"
+TEMPLATE_ROOT = os.path.join(BASE_DIR, './templates')
+PROJECT_DIR = os.path.join(BASE_DIR, './scuba')
 STATIC_ROOT = os.path.join(BASE_DIR, './static')
 LOG_DIRECTORY = '/tmp'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = int(os.environ.get("DEBUG", default=True))
+DEBUG = True
 
-TEMPLATE_ROOT = ''
-if DEBUG:
-    TEMPLATE_ROOT = os.path.join(f"{BASE_DIR}/templates")
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-2f=t9#vtv*_lwn-%)x@a8q==3c4j-@*es^(gfk1afab^5i*(kr'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost:8002', 'localhost']
 
 
 # Application definition
@@ -109,9 +101,8 @@ TEMPLATES = [
     },
 ]
 
-AUTHENTICATION_BACKENDS = [
+AUTHENTICATION_BACKENDS = DEFAULT_SETTINGS.AUTHENTICATION_BACKENDS + [
     'rest_framework.authentication.TokenAuthentication',
-    'scuba.libs.authentication.emailauthentication.DefaultBackend',
     'scuba.libs.authentication.adminoverride.AdminOverride',
 ]
 
@@ -174,8 +165,8 @@ LANGUAGE_CODE = 'en-us'
 
 USE_I18N = True
 
-USE_TZ = True
-# TIME_ZONE = 'UTC'
+USE_TZ = False
+TIME_ZONE = 'UTC'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
@@ -203,18 +194,6 @@ FACEBOOK_APP = ''
 FACEBOOK_APP_ID = ''
 FACEBOOK_API_SECRET = ''
 
-EXTERNAL_INTERFACES = {
-    FACEBOOK: {
-        'app': '178799865530799',
-        'secret': '502a5c37f483495170f0559afa4ad1ca',
-        'url': 'https://graph.facebook.com/oauth/authorize'
-    },
-
-    GOOGLE_ADDRESS: {
-        'url': 'http://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false'
-    }
-}
-
 # Here is the bucket file pattern.  It goes in the following manner:
 # account guid / album id / file name
 GALLERY_BUCKET = 'scubamob.gallery.dev'
@@ -223,21 +202,12 @@ EMAIL_BACKEND = 'django_ses.SESBackend'
 DEFAULT_FROM_EMAIL = 'no-reply@scubamob.com'
 GOOGLE_API_KEY = 'AIzaSyD8CDOojSGLURvXDISrXKHZss1BkOA-Lss'
 
-# the following settings are for the mobile apps
-MOBILE_HEADER_APP = 'scubaapp'
-MOBILE_HEADER_DEVICES = {'smandroid': 'am', 'smios': 'io'}
-
 # maxmind settings
 MAXMIND_URL = 'https://geoip.maxmind.com/geoip/v2.0/city/%s'
 MAXMIND_LICENSE = 'hVeqTCTxxU5H'
 MAXMIND_USER = '75205'
 MAXMIND_CITY_DB = f"{BASE_DIR}/GeoLite2-City.mmdb"
 MAXMIND_USE_DB = True
-
-# define the mongo collections
-MONGO_DIVELOGS = 'divelogs'
-
-DEBUG_IP = '68.101.214.253'
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"

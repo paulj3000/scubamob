@@ -67,7 +67,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
     is_admin = models.BooleanField(default=False)
 
     aws_id = models.CharField(max_length=10, blank=True)
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(default='1970-04-01')
     last_login_date = models.DateTimeField(null=True)
     can_add_divesites = models.BooleanField(default=False)
     reputation = models.PositiveSmallIntegerField(default=0)

@@ -1,14 +1,18 @@
 class InvalidUserIdException(Exception):
-    pass
+    """ Invalid user id exception """
+
 
 class InvalidEmailIdException(Exception):
-    pass
+    """ Invalid email id exception """
+
 
 class PrimaryEmailIdException(Exception):
-    pass
+    """ Primary email exception """
+
 
 class EmailInUseException(Exception):
-    pass
+    """ Email in use exception """
+
 
 class InvalidConfirmationCodeException(Exception):
-    pass
+    """ Invalid confirmation code exception """

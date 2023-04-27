@@ -15,6 +15,7 @@ from scuba.sitesettings.models import SystemApi, ChatApi
 
 class UserListApi(generics.GenericAPIView):
     permission_classes = [AllowAny]
+
     def get(self, request):
         """ get
 
@@ -39,6 +40,7 @@ class ChatWUserApi(APIView):
     Get the user's data, something we can use for the api
     """
     permission_classes = [IsAuthenticated]
+
     def get(self, request):
         """ get
 
@@ -53,7 +55,9 @@ class ChatWUserApi(APIView):
         }
 
         try:
-            chat = requests.get(f"{SystemApi.get_chat_server()}/api/chats/lookup", params=params);
+            chat = requests.get(
+                f"{SystemApi.get_chat_server()}/api/chats/lookup",
+                params=params)
             retval = chat.json()
 
             if retval and retval['chat']:
@@ -76,7 +80,10 @@ class ChatWUserApi(APIView):
         }
 
         try:
-            chat = requests.post(f"{SystemApi.get_chat_server()}api/chats/", json=data);
+            chat = requests.post(
+                f"{SystemApi.get_chat_server()}api/chats/",
+                json=data)
+
             retval = chat.json()
             retval['chat']['me'] = user.pk_as_str
             return Response(retval)
@@ -115,6 +122,7 @@ class GetAllChatsApi(APIView):
     Get the user's data, something we can use for the api
     """
     permission_classes = [IsAuthenticated]
+
     def get(self, request):
         """ get
 
@@ -132,6 +140,7 @@ class GetAllChatsApi(APIView):
 
 class GetChatsApi(APIView):
     permission_classes = [IsAuthenticated]
+
     def get(self, request):
         """ get
 
@@ -154,6 +163,7 @@ class GetChatsApi(APIView):
 
 class GetChatMessagesApi(APIView):
     permission_classes = [IsAuthenticated]
+
     def get(self, request):
         """ get
 

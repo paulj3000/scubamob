@@ -42,16 +42,12 @@ def logbookfolders(request):
         form_data = None
         folder = None
         if request.method == 'POST':
-            try:
-                form_data = json.loads(request.body)
-            except:
-                error = 'Invalid Data'
+            form_data = json.loads(request.body)
 
             if form_data:
-                try:
-                    folder = LogbookFolder.objects.create(user=user, name=form_data.get('foldername'))
-                except:
-                    error = 'Duplicate Folder Name'
+                folder = LogbookFolder.objects.get_or_create(
+                    user=user,
+                    name=form_data.get('foldername'))
 
     folders = user.logbook_folders.values('id', 'name').order_by('name').all()
 

@@ -32,14 +32,6 @@ class SignupView(FormView):
         request = self.request
         user = form.save()
 
-        # add mailchimp free user
-        #user.add_free_mailchimp()
-
-        # send the welcome email
-        #user.send_welcome_free_email()
-        #user.add_login(request.META.get('HTTP_X_REAL_IP'),
-        #               request.META.get('HTTP_USER_AGENT'))
-
         user = authenticate(
             self.request,
             email=request.POST['email'],
@@ -65,15 +57,6 @@ class SignupView(FormView):
         form = self.get_form()
 
         request = self.request
-        #tosend = {
-        #    'secret': GOOGLE_RECAPTA_SECRET,
-        #    'response': request.POST.get('g-recaptcha-response')
-        #}
-        #captcha = requests.post('https://www.google.com/recaptcha/api/siteverify', tosend)
-        #resp = captcha.json()
-
-        #form.set_is_spam(not resp['success'])
-        print(type(request.META.get('HTTP_X_REAL_IP')))
 
         if IS_PRODUCTION:
             form.set_ip_address(request.META.get('HTTP_X_REAL_IP'))
@@ -83,8 +66,8 @@ class SignupView(FormView):
         else:
             if request.POST.get('email'):
                 InvalidEmail.objects.create(
-                        email=request.POST['email'],
-                        ip_address=request.META.get("HTTP_X_REAL_IP", '0.0.0.0'))
+                    email=request.POST['email'],
+                    ip_address=request.META.get("HTTP_X_REAL_IP", '0.0.0.0'))
             return self.form_invalid(form)
 
 
@@ -93,34 +76,6 @@ class ValidateEmail(View):
     """ Email validation coming through. This will be used to verify if the
     email address has already been registered
     """
-    def post(self, request):
-        """ Do the actual post """
-        if request.session.get('duplicate_email_ok'):
-            return JsonResponse(True, safe=False)
-
-        email = request.POST.get('email')
-
-        retval = 'true'
-
-        if email:
-            user = request.user
-            if user.is_authenticated:
-                ex_user = User.objects.filter(email=email).first()
-                if ex_user:
-                    if str(ex_user.id) != str(user.id):
-                        retval = 'false'
-                    else:
-                        retval = 'true'
-                else:
-                    retval = 'true'
-            else:
-                if User.objects.filter(email=email).count():
-                    retval = 'false'
-        else:
-            retval = 'false'
-
-        return JsonResponse(retval, safe=False)
-
     def post(self, request, *args, **kwargs):
         """
         Handle POST requests: instantiate a form instance with the passed
@@ -129,14 +84,6 @@ class ValidateEmail(View):
         form = self.get_form()
 
         request = self.request
-        #tosend = {
-        #    'secret': GOOGLE_RECAPTA_SECRET,
-        #    'response': request.POST.get('g-recaptcha-response')
-        #}
-        #captcha = requests.post('https://www.google.com/recaptcha/api/siteverify', tosend)
-        #resp = captcha.json()
-
-        #form.set_is_spam(not resp['success'])
         form.set_ip_address(request.META.get('HTTP_X_REAL_IP'))
 
         if form.is_valid():
@@ -144,6 +91,7 @@ class ValidateEmail(View):
         else:
             if request.POST.get('email'):
                 InvalidEmail.objects.create(
-                        email=request.POST['email'],
-                        ip_address=request.META.get("HTTP_X_REAL_IP"))
+                    email=request.POST['email'],
+                    ip_address=request.META.get("HTTP_X_REAL_IP"))
+
             return self.form_invalid(form)
