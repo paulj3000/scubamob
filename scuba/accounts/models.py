@@ -578,7 +578,7 @@ class UserBuddyRemove(UUIDModel):
 
 class UserBlocked(models.Model):
     user = models.ForeignKey(User, null=True, related_name='blocked', on_delete=models.CASCADE)
-    buddy = models.ForeignKey(User, related_name='blocked_friend', on_delete=models.CASCADE)
+    buddy = models.ForeignKey(User, related_name='blocked_buddy', on_delete=models.CASCADE)
     blocked_by = models.ForeignKey(User, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
 
