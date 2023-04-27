@@ -15,10 +15,10 @@ from scuba.galleries.models import Album, AlbumImage
 
 
 IMAGE_TYPE_EXTENSIONS = {
-        'image/gif': 'gif',
-        'image/jpeg': 'jpg',
-        'image/png': 'png',
-        'image/tiff': 'tiff'
+    'image/gif': 'gif',
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/tiff': 'tiff'
 }
 
 
@@ -40,7 +40,13 @@ def upload(us_request):
     galleries_file = album.add_image(uploaded_image)
     galleries_file_thumbnail = album.add_image_thumbnail(uploaded_image)
 
-    retval['data']['items'] = [{'thumbnail': galleries_file_thumbnail, 'full': galleries_file}]
-    AlbumImage.objects.create(album=album, image=galleries_file, thumbnail=galleries_file_thumbnail)
+    retval['data']['items'] = [
+        {'thumbnail': galleries_file_thumbnail,
+         'full': galleries_file}]
+
+    AlbumImage.objects.create(
+        album=album,
+        image=galleries_file,
+        thumbnail=galleries_file_thumbnail)
 
     return JsonResponse(api_response(**retval))
