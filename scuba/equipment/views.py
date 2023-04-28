@@ -47,7 +47,7 @@ def edit(request, equipment_id=None):
     else:
         form = EquipmentForm()
 
-    return render(request, 'equipment/edit.html',  {'form': form, 'equipment_id': equipment_id})
+    return render(request, 'equipment/edit.html', {'form': form, 'equipment_id': equipment_id})
 
 
 def delete_equipment(request, equipment_id):

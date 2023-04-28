@@ -45,7 +45,6 @@ class TestUserBuddiesAPI(TestCase):
         response = client.post('/api/buddies/add/', payload, format='json')
         self.assertEqual(response.status_code, 404, 'Cannot add a private account')
 
-
     def test_remove_buddy_request(self):
         """
         Test the making of a buddy request

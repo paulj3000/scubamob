@@ -82,7 +82,6 @@ class NewsArticleView(TemplateView):
     """ For page templates needed for Angular.js, handle the templates """
     template_name = "content/news/article.html"
 
-
     def get_context_data(self, **kwargs):
         """ get_context_data
 

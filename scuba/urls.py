@@ -105,5 +105,5 @@ urlpatterns = [
 
     # enable the admin section
     path('admin/', admin.site.urls),
-    re_path(r'^p/(?P<id>[\w]+)/',  include('scuba.accounts.urls_profile')),
+    re_path(r'^p/(?P<id>[\w]+)/', include('scuba.accounts.urls_profile')),
 ]

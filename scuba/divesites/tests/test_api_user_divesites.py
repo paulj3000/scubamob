@@ -119,7 +119,6 @@ class TestUserDivesitesApi(TestCase):
         self.assertIsNotNone(checkin['id'])
         self.assertIsNotNone(checkin['checkin_date'])
 
-
         # try again, make sure we cannot add another checkin for today
         response = client.post(url, {'note': note}, format='json')
         self.assertEqual(response.status_code, 400)
