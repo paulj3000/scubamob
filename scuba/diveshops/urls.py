@@ -15,10 +15,10 @@ import scuba.diveshops.views as diveshops_shopadmin
 
 urlpatterns = [
     path('', diveshops_views.index, name="diveshops_home"),
-    '''
-    path('create_site/', diveshops_shopadmin.packages, name="diveshops_packages"),
-    path('new/', diveshops_shopadmin.editshop, name="diveshops_new"),
-    '''
-
     path('json/getlocaldiveshops/', diveshops_views.getlocaldiveshops),
 ]
+
+'''
+path('create_site/', diveshops_shopadmin.packages, name="diveshops_packages"),
+path('new/', diveshops_shopadmin.editshop, name="diveshops_new"),
+'''
