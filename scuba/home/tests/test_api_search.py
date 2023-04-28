@@ -52,3 +52,15 @@ class TestSearchAPI(TestCase):
                 user.id,
                 search_user['id'],
                 f"{search_user['id']} doesn't match")
+
+    def test_self_not_user_search(self):
+        user = User.objects.get(email='foo@nowhere.com')
+
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        response = client.get('/api/search?q=First&c=c', format='json')
+        self.assertEqual(response.status_code, 200)
+        results = response.json()
+
+        self.assertIsNone(results['search'].get('users'))

@@ -43,13 +43,16 @@ class SearchApi(generics.GenericAPIView):
     def get(self, request):
         user = request.user
         q_param = request.query_params.get('q')
-        users = User.objects.filter(
-            Q(last_name__icontains=q_param) | Q(first_name__icontains=q_param))
+        c_param = request.query_params.get('c')
 
+        retval = {}
         if not user.is_anonymous:
-            users = users.filter(~Q(id=user.id))
+            if c_param == 'b' or not c_param:
+                users = User.objects.filter(
+                    Q(last_name__icontains=q_param) | Q(first_name__icontains=q_param)
+                ).filter(~Q(id=user.id))
+                retval['users'] = SearchBuddySerializer(users, many=True).data
 
-        retval = {'users': SearchBuddySerializer(users, many=True).data}
         return Response({'search': retval})
 
 
