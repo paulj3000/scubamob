@@ -1,3 +1,5 @@
+import requests
+
 from datetime import datetime, timedelta
 from urllib.parse import urljoin
 from mimetypes import guess_extension
@@ -79,3 +81,44 @@ class UploadFileSerializer(serializers.Serializer):
     def many_init(cls, *args, **kwargs):
         kwargs['child'] = cls()
         return UploadFileListSerializer(*args, **kwargs)
+
+
+class ChatSerializer(serializers.Serializer):
+    users = serializers.ListSerializer(child=serializers.CharField())
+    userid = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        userid = data['userid']
+        try:
+            user = User.objects.get(id=userid)
+        except User.DoesNotExist:
+            raise serializers.ValidationError(f"invalid userid {userid}")
+
+        for userid in data['users']:
+            if not User.objects.filter(id=userid):
+                raise serializers.ValidationError(f"{userid} is not a valid user")
+
+            if user.blocked_buddy.filter(user_id=userid):
+                raise serializers.ValidationError(f"{userid} is not a valid user")
+
+        return data
+
+    def save(self, **kwargs):
+        validated_data = {**self.validated_data, **kwargs}
+
+        userid = validated_data['userid']
+        users = validated_data['users']
+
+        if userid not in users:
+            users.append(userid)
+
+        params = {
+            'userId': userid,
+            'users': users,
+        }
+
+        try:
+            chat = requests.post(f"{SystemApi.get_chat_server()}/api/chats/", json=params)
+            return chat.json()
+        except requests.exceptions.ConnectionError:
+            raise serializers.ValidationError(f"could not connect to chat server")

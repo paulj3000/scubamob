@@ -9,7 +9,9 @@ from rest_framework import status
 from rest_framework import generics
 
 from scuba.accounts.models import User
-from scuba.accounts.serializers.chat import UserListSerializer, UploadFileSerializer
+from scuba.accounts.serializers.chat import UserListSerializer, \
+    UploadFileSerializer, ChatSerializer
+
 from scuba.sitesettings.models import SystemApi, ChatApi
 
 
@@ -40,6 +42,7 @@ class ChatWUserApi(APIView):
     Get the user's data, something we can use for the api
     """
     permission_classes = [IsAuthenticated]
+    serializer_class = ChatSerializer
 
     def get(self, request):
         """ get
@@ -69,6 +72,10 @@ class ChatWUserApi(APIView):
             return Response({'error': 'cannot reach chat server'}, 500)
 
     def post(self, request):
+        '''
+
+
+
         uids = request.data.get('uid')
         user = request.user
         if not isinstance(uids, list):
@@ -89,6 +96,10 @@ class ChatWUserApi(APIView):
             return Response(retval)
         except requests.exceptions.ConnectionError:
             return Response({'error': 'cannot reach chat server'}, 500)
+        '''
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.save(), status=status.HTTP_201_CREATED)
 
 
 class UploadFileApi(APIView):
@@ -163,6 +174,7 @@ class GetChatsApi(APIView):
 
 class GetChatMessagesApi(APIView):
     permission_classes = [IsAuthenticated]
+    serializer = ChatSerializer
 
     def get(self, request):
         """ get
@@ -185,3 +197,17 @@ class GetChatMessagesApi(APIView):
             return Response(retval)
         except requests.exceptions.ConnectionError:
             return Response({'error': 'cannot reach chat server'}, 500)
+
+    def post(self, request):
+        """ get
+
+        Do the actual get
+        """
+        query = request.query_params
+        user = request.user
+        user_list = request.data.get('users')
+
+        print(" IN HERE ... ")
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.save(), status=status.HTTP_201_CREATED)
