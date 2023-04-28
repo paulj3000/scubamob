@@ -23,14 +23,13 @@ class TestSearchAPI(TestCase):
         self.assertEqual(response.status_code, 200)
 
         results = response.json()
-        self.assertIsNotNone(results.get('search'), 'results contains search element')
-        self.assertIsNotNone(results['search'].get('users'), 'Search key contains a users list')
-        self.assertEqual(len(results['search']['users']), 4, 'Returning four users')
+        self.assertIsNotNone(results.get('users'), 'Search key contains a users list')
+        self.assertEqual(len(results['users']), 4, 'Returning four users')
 
         # test case insensitivity
         response = client.get('/api/search?q=TEST', format='json')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(results['search']['users']), 4, 'Returning four users')
+        self.assertEqual(len(results['users']), 4, 'Returning four users')
 
     def test_self_user_search(self):
         user = User.objects.get(email='foo@nowhere.com')
@@ -44,10 +43,10 @@ class TestSearchAPI(TestCase):
 
         # make sure
         self.assertEqual(
-            len(results['search']['users']), 2,
+            len(results['users']), 2,
             'The user himself should not be returned')
 
-        for search_user in results['search']['users']:
+        for search_user in results.get('users'):
             self.assertNotEqual(
                 user.id,
                 search_user['id'],
@@ -63,7 +62,7 @@ class TestSearchAPI(TestCase):
         self.assertEqual(response.status_code, 200)
         results = response.json()
 
-        self.assertIsNone(results['search'].get('users'))
+        self.assertIsNone(results.get('users'))
 
     def test_self_not_user_logged_in_search(self):
         user = User.objects.get(email='foo@nowhere.com')
@@ -73,9 +72,9 @@ class TestSearchAPI(TestCase):
         response = client.get('/api/search?q=First&c=b', format='json')
         self.assertEqual(response.status_code, 200)
         results = response.json()
-        self.assertIsNone(results['search'].get('users'))
+        self.assertIsNone(results.get('users'))
 
         response = client.get('/api/search?q=First', format='json')
         self.assertEqual(response.status_code, 200)
         results = response.json()
-        self.assertIsNone(results['search'].get('users'))
+        self.assertIsNone(results.get('users'))

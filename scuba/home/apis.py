@@ -53,7 +53,7 @@ class SearchApi(generics.GenericAPIView):
                 ).filter(~Q(id=user.id))
                 retval['users'] = SearchBuddySerializer(users, many=True).data
 
-        return Response({'search': retval})
+        return Response(retval)
 
 
 class GetHomescreenApi(generics.GenericAPIView):
