@@ -234,7 +234,7 @@ class TestUserDivesitesApi(TestCase):
         Verify if a divesite is a favorite
         """
         user = User.objects.get(email='foo@nowhere.com')
-        user2= User.objects.get(email='test2@tester.com')
+        user2 = User.objects.get(email='test2@tester.com')
         divesite = Divesite.objects.get(name='White Point')
 
         checkin = divesite.checkins.create(user=user)

@@ -22,7 +22,7 @@ class ImageUploader:
     """ Simple class to upload images to S3 """
 
     # size 250 / 250
-    #quality = 80
+    # quality = 80
 
     @staticmethod
     def compress_upload_image(image_file, path, img_format='png'):
@@ -70,30 +70,3 @@ class ImageUploader:
         S3.upload_raw_data(AWS_S3_BUCKET, filename, image_file, **header)
 
         return filename
-
-
-    '''
-    @staticmethod
-    def compress_image(image_file):
-        """ add_years_to_today
-
-        add a set number of years to today. Note, this will NOT account for leap years,
-        it just updates the date
-        """
-        img = Image.open(image_file)
-        imagefile = BytesIO()
-        new_image.save(imagefile, format=img.format, optimize=True, quality=ImageUploader)
-
-        #imagedata = imagefile.getvalue()
-        return imagefile
-
-    @staticmethod
-    def upload_image(raw_image, resized_image, filename):
-        img = Image.open(image_file)
-        imagefile = BytesIO()
-        new_image = img.resize((width, height), Image.ANTIALIAS)
-        new_image.save(imagefile, format=img.format, optimize=True, quality=80)
-
-        #imagedata = imagefile.getvalue()
-        return imagefile
-    '''

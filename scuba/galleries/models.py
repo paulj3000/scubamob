@@ -127,7 +127,7 @@ class Album(UUIDModel):
         W, H = bg.size
         w, h = im.size
 
-        xo, yo = (W - w)/2, (H - h)/2
+        xo, yo = (W - w) / 2, (H - h) / 2
         bg.paste(im, (xo, yo, xo + w, yo + h))
 
         conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
