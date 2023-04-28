@@ -666,6 +666,18 @@ class UserLocation(UUIDModel):
         db_table = 'user_location'
 
 
+class UserIsPrime(UUIDModel):
+    """ UserLocation
+
+    Keep a representation of the user's profile image
+    """
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    class Meta:
+        """ define database tables, etc """
+        db_table = 'user_is_prime'
+
+
 class UserProfileImage(UUIDModel):
     """ UserProfileImage
 
