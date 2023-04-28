@@ -93,6 +93,10 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
     def is_staff(self):
         return self.is_admin
 
+    @property
+    def is_premier(self):
+        return hasattr(self, 'userispremier')
+
     def get_full_name(self):
         """ get_full_name
 
@@ -321,6 +325,13 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
 
     def get_all_logins(self):
         return self.logins.all().order_by('login_date')
+
+    def set_is_premier(self, is_premier):
+        if is_premier:
+            if not hasattr(self, 'userispremier'):
+                UserIsPremier.objects.create(user=self)
+        else:
+            UserIsPremier.objects.filter(user=self).delete()
 
     # -----------------------------------------------------------------------------
     # start profile image stuff
@@ -666,7 +677,7 @@ class UserLocation(UUIDModel):
         db_table = 'user_location'
 
 
-class UserIsPrime(UUIDModel):
+class UserIsPremier(UUIDModel):
     """ UserLocation
 
     Keep a representation of the user's profile image
@@ -675,7 +686,7 @@ class UserIsPrime(UUIDModel):
 
     class Meta:
         """ define database tables, etc """
-        db_table = 'user_is_prime'
+        db_table = 'user_is_premier'
 
 
 class UserProfileImage(UUIDModel):

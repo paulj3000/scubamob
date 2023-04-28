@@ -37,6 +37,24 @@ class TestUserMethods(TestCase):
         self.assertFalse(user.is_admin)
         self.assertFalse(user.is_staff)
 
+    def test_user_is_premier(self):
+        """
+        Test simple user get name
+        """
+        user = User.objects.get(email='test@tester.com')
+        self.assertEqual(hasattr(user, 'userispremier'), False)
+        self.assertEqual(user.is_premier, False)
+
+        user.set_is_premier(True)
+        user = User.objects.get(email='test@tester.com')
+        self.assertEqual(hasattr(user, 'userispremier'), True)
+        self.assertEqual(user.is_premier, True)
+
+        user.set_is_premier(False)
+        user = User.objects.get(email='test@tester.com')
+        self.assertEqual(hasattr(user, 'userispremier'), False)
+        self.assertEqual(user.is_premier, False)
+
     def test_user_add_divesite_recently_viewed(self):
         """
         Test adding a divesite to a user's recently viewed
