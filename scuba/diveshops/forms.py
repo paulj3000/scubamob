@@ -12,7 +12,6 @@
 from django import forms
 
 from utils.external.google_address import GoogleAddress
-from bson.objectid import ObjectId
 
 
 class DiveShopForm(forms.Form):
@@ -26,24 +25,8 @@ class DiveShopForm(forms.Form):
         self.site_id = kwargs.pop('site_id') if kwargs.keys().count('site_id') else None
         super().__init__(*args, **kwargs)
 
-        self.Meta.id = self.site_id
-        if self.site_id:
-            data = self.Object.collection.find_one({'_id': ObjectId(self.site_id), 'user_id': self.user_id})
-            if data:
-                for field in self.fields.iterkeys():
-                    self.fields[field].initial = data.get(field, "")
-
     class Meta:
         model = 'divesite'
-
-    def findsite(self, id):
-        site = self.collection.find_one({'_id': ObjectId(id)})
-
-        site['id'] = str(site['_id'])
-        del(site['_id'])
-
-        # let's return our item
-        return site
 
 
 class DiveShopAddressForm(forms.ModelForm):

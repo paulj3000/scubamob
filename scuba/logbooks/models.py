@@ -23,7 +23,8 @@ class Logbook(UUIDModel):
 
 
 class LogbookFolder(UUIDModel):
-    user = models.ForeignKey('accounts.User', related_name='logbook_folders', on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        'accounts.User', related_name='logbook_folders', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
 
     def get_logs(self):

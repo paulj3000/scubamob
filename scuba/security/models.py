@@ -27,7 +27,9 @@ class BlockedCountry(UUIDModel):
         Log.objects.create(system='GEOIP', message=json.dumps(match))
 
         if match and 'country' in match:
-            return BlockedCountry.objects.filter(iso=match['country']['iso_code']).first(), match['country']['iso_code']
+            return BlockedCountry.objects.filter(
+                iso=match['country']['iso_code']
+            ).first(), match['country']['iso_code']
 
         return None, 'XX'
 
