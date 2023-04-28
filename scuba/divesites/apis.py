@@ -4,10 +4,10 @@ from rest_framework import generics
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
-from scuba.divesites.models import Divesite
+from scuba.divesites.models import Divesite, DivesiteCheckinThank, DivesiteCheckin
 from scuba.divesites.serializers import DivesiteSerializer, \
     DivesiteReviewSerializer, DivesiteFavoriteSerializer, \
-    DivesiteCheckinSerializer
+    DivesiteCheckinSerializer, DivesiteCheckinThankSerializer
 
 
 class GetDivesiteApi(generics.GenericAPIView):
@@ -131,6 +131,22 @@ class FavoriteApi(generics.GenericAPIView):
         divesite = get_object_or_404(Divesite, id=id)
 
         serializer = self.get_serializer(divesite=divesite, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_202_ACCEPTED)
+
+
+class CheckinThankApi(generics.GenericAPIView):
+    """ Thank the divesite
+
+    Indicate if a divesite is a favorite Divesite
+    """
+    serializer_class = DivesiteCheckinThankSerializer
+
+    def post(self, request, id, *args, **kwargs):
+        checkin = get_object_or_404(DivesiteCheckin, id=id)
+
+        serializer = self.get_serializer(divesite_checkin=checkin, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=status.HTTP_202_ACCEPTED)

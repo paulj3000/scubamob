@@ -201,6 +201,16 @@ class DivesiteCheckin(UUIDModel):
         unique_together = (('user', 'divesite', 'checkin_date'), )
 
 
+class DivesiteCheckinThank(UUIDModel):
+    divesite_checkin = models.ForeignKey(DivesiteCheckin, related_name='thanks', on_delete=models.CASCADE)
+    user = models.ForeignKey('accounts.User', related_name='thanks', on_delete=models.CASCADE)
+    is_thanked = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'divesite_checkin_thank'
+        unique_together = (('user', 'divesite_checkin',), )
+
+
 class DivesiteDailyStats(UUIDModel):
     divesite = models.ForeignKey(Divesite, related_name='stats', on_delete=models.CASCADE)
     user = models.ForeignKey('accounts.User', related_name='stats', on_delete=models.CASCADE)

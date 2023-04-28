@@ -11,7 +11,7 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 
 from scuba.accounts.models import User
-from scuba.divesites.models import Divesite
+from scuba.divesites.models import Divesite, DivesiteCheckin, DivesiteCheckinThank
 
 
 class TestUserDivesitesApi(TestCase):
@@ -229,3 +229,44 @@ class TestUserDivesitesApi(TestCase):
         self.assertEqual(divesite['name'], divesite['name'])
         self.assertEqual(divesite['description'], divesite['description'])
         self.assertEqual(divesite['banner'], divesite['banner'])
+
+    def test_thank_checkin_divesite(self):
+        """
+        Verify if a divesite is a favorite
+        """
+        user = User.objects.get(email='foo@nowhere.com')
+        user2= User.objects.get(email='test2@tester.com')
+        divesite = Divesite.objects.get(name='White Point')
+
+        #checkin = DivesiteCheckin.objects.create(divesite=divesite, user=user)
+        checkin = divesite.checkins.create(user=user)
+
+        client = APIClient()
+        client.force_authenticate(user=user2)
+
+        url = f'/api/divesites/checkins/{checkin.pk_as_str}/thank/'
+        response = client.post(url, {}, format='json')
+        self.assertEqual(response.status_code, 202)
+
+        thanks = DivesiteCheckinThank.objects.all().first()
+        self.assertTrue(thanks.is_thanked)
+
+        payload = {
+            'thank': False
+        }
+
+        response = client.post(url, payload, format='json')
+        self.assertEqual(response.status_code, 202)
+
+        thanks = DivesiteCheckinThank.objects.all().first()
+        self.assertFalse(thanks.is_thanked)
+
+        payload = {
+            'thank': True
+        }
+
+        response = client.post(url, payload, format='json')
+        self.assertEqual(response.status_code, 202)
+
+        thanks = DivesiteCheckinThank.objects.all().first()
+        self.assertTrue(thanks.is_thanked)

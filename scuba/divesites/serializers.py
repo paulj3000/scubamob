@@ -6,7 +6,7 @@ from django.core.cache import cache
 from django.templatetags.static import static
 
 from scuba.divesites.models import Divesite, DivesiteReview, \
-    DivesiteFavorite, DivesiteDailyStats, DivesiteCheckin
+    DivesiteFavorite, DivesiteDailyStats, DivesiteCheckin, DivesiteCheckinThank
 
 from scuba.libs.exceptions import InvalidWeatherDataException
 from scuba.maps.models import Region
@@ -204,6 +204,25 @@ class DivesiteFavoriteSerializer(serializers.Serializer):
             divesite=getattr(self, 'divesite'),
             user=self.context['request'].user,
             defaults={'is_favorite': validated_data['favorite']})
+
+
+class DivesiteCheckinThankSerializer(serializers.Serializer):
+    def __init__(self, *args, **kwargs):
+        divesite_checkin = kwargs.pop('divesite_checkin', None)
+        setattr(self, 'divesite_checkin', divesite_checkin)
+        super().__init__(*args, **kwargs)
+
+    thank = serializers.BooleanField(default=True)
+
+    def save(self, **kwargs):
+        validated_data = {**self.validated_data, **kwargs}
+
+        from pprint import pprint
+        pprint(validated_data)
+        return DivesiteCheckinThank.objects.update_or_create(
+            divesite_checkin=getattr(self, 'divesite_checkin'),
+            user=self.context['request'].user,
+            defaults={'is_thanked': validated_data['thank']})
 
 
 class DivesiteCheckinSerializer(serializers.ModelSerializer):
