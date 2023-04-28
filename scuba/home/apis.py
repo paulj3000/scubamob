@@ -46,7 +46,7 @@ class SearchApi(generics.GenericAPIView):
         c_param = request.query_params.get('c')
 
         retval = {}
-        if not user.is_anonymous:
+        if user.is_authenticated:
             if c_param == 'b' or not c_param:
                 users = User.objects.filter(
                     Q(last_name__icontains=q_param) | Q(first_name__icontains=q_param)

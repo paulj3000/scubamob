@@ -64,3 +64,18 @@ class TestSearchAPI(TestCase):
         results = response.json()
 
         self.assertIsNone(results['search'].get('users'))
+
+    def test_self_not_user_logged_in_search(self):
+        user = User.objects.get(email='foo@nowhere.com')
+
+        client = APIClient()
+
+        response = client.get('/api/search?q=First&c=b', format='json')
+        self.assertEqual(response.status_code, 200)
+        results = response.json()
+        self.assertIsNone(results['search'].get('users'))
+
+        response = client.get('/api/search?q=First', format='json')
+        self.assertEqual(response.status_code, 200)
+        results = response.json()
+        self.assertIsNone(results['search'].get('users'))
