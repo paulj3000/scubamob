@@ -90,7 +90,6 @@ class Jumbotron(UUIDModel):
             raise InvalidContentTypeException(content_type)
 
         extra = 1
-        #_, ext = os.path.splitext(name)
 
         prefix = None
         jtron_type = None

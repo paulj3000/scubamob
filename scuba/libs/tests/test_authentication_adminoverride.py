@@ -7,7 +7,6 @@ Replace this with more appropriate tests for your application.
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.client import Client
-#from rest_framework.request import Request
 
 from scuba.libs.authentication.adminoverride import AdminOverride
 from scuba.accounts.models import User

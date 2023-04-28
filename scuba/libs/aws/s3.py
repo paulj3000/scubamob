@@ -22,9 +22,7 @@ class S3:
     """
     def __init__(self, bucket_name):
         print(bucket_name)
-        #session = boto3.Session(profile_name='default')
         session = boto3.Session(profile_name=AWS_PROFILE)
-        #self.conn = boto3.resource('s3')
         self.conn = session.resource('s3')
 
         # now assign the bucket

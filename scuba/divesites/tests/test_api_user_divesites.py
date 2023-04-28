@@ -238,7 +238,6 @@ class TestUserDivesitesApi(TestCase):
         user2= User.objects.get(email='test2@tester.com')
         divesite = Divesite.objects.get(name='White Point')
 
-        #checkin = DivesiteCheckin.objects.create(divesite=divesite, user=user)
         checkin = divesite.checkins.create(user=user)
 
         client = APIClient()

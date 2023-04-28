@@ -1,7 +1,6 @@
-import geoip2.database
-
 import json
-from pprint import pprint
+
+import geoip2.database
 
 from scuba.settings import MAXMIND_CITY_DB
 
@@ -16,24 +15,3 @@ class MaxMind:
             print(response.location)
 
             return response.city, response.location
-
-    @staticmethod
-    def lookup(ip):
-
-        # Attempt to decode the json data.  If we don't get valid data
-        # send an alert to OPS
-        try:
-            ret = self.do_request(ip)
-            decoded_json = json.loads(ret['response'])
-        except:
-            # JSON error, the return data was not JSON
-            # for some reason, we cannot communicate w/ Quova.  Log the message, email OPS and return
-            logmsg = ''
-            #logmsg = "Error communicating w/ maxmind.  Response received:  %s\n" % ret['response']
-            logmsg += "IP Address queried:  %s\n" % ip;
-
-            #print(logmsg)
-
-            return None     # something bad happened communicating w/ quova
-
-        return decoded_json

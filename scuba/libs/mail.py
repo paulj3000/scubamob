@@ -58,7 +58,7 @@ def store_email(user, email, title):
 
     # generate the key name
     file = s3.upload_data(upload_file, email, **{'ContentType': 'text/html'})
-    #file.make_public()
+    # file.make_public()
 
     # now return the uploaded file
     return upload_file

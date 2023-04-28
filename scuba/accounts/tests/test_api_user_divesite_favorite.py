@@ -119,4 +119,3 @@ class TestUserDivesiteFavoriteAPI(TestCase):
         self.assertEqual(response.status_code, 204)
 
         response = client.get(f'/api/user/divesites/favorite/{obj.pk_as_str}/', format='json')
-        #self.assertEqual(response.status_code, 404)
