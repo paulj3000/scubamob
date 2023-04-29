@@ -173,7 +173,7 @@ class BuddySerializer(serializers.Serializer):
 
     @staticmethod
     def get_id(data):
-        return data.pk_as_str
+        return data.buddy.pk_as_str
 
     def create(self, validated_data):
         """ create
