@@ -85,15 +85,14 @@ class UploadFileSerializer(serializers.Serializer):
 
 class ChatSerializer(serializers.Serializer):
     users = serializers.ListSerializer(child=serializers.CharField())
-    userid = serializers.CharField(write_only=True)
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        setattr(self, 'user', user)
+        super().__init__(*args, **kwargs)
 
     def validate(self, data):
-        userid = data['userid']
-        try:
-            user = User.objects.get(id=userid)
-        except User.DoesNotExist:
-            raise serializers.ValidationError(f"invalid userid {userid}")
-
+        user = getattr(self, 'user')
         for userid in data['users']:
             if not User.objects.filter(id=userid):
                 raise serializers.ValidationError(f"{userid} is not a valid user")
@@ -104,9 +103,10 @@ class ChatSerializer(serializers.Serializer):
         return data
 
     def save(self, **kwargs):
+        user = getattr(self, 'user')
         validated_data = {**self.validated_data, **kwargs}
 
-        userid = validated_data['userid']
+        userid = user.pk_as_str
         users = validated_data['users']
 
         if userid not in users:

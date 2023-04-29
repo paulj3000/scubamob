@@ -97,7 +97,7 @@ class ChatWUserApi(APIView):
         except requests.exceptions.ConnectionError:
             return Response({'error': 'cannot reach chat server'}, 500)
         '''
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data, user=request.user)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.save(), status=status.HTTP_201_CREATED)
 
