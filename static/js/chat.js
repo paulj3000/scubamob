@@ -132,6 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const uid = document.getElementById('uid').value;
 
         btnSend = document.getElementById('send');
+        console.log(btnSend);
         boxChat = document.getElementById('chatbox');
         const boxChatWindow = document.getElementById('chatwindow');
 
@@ -141,6 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         btnSend.addEventListener("click", () => {
+            alert(" THIS WAS CALLED ... ");
             if (! chatId) {
                 fetch('/api/accounts/chats/', {
                     headers: headers,
@@ -171,6 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 btnSend.disabled = true;
         });
 
+        alert("STARTING HERE ... ");
         fetch(`/api/accounts/chats?uid=${uid}`, {
             headers: headers, method: 'GET',
         })

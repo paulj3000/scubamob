@@ -292,6 +292,23 @@ class ChatApi(BaseAPI):
         except (requests.ConnectionError, requests.exceptions.JSONDecodeError):
             raise exceptions.ChatServerDownException
 
+    @classmethod
+    def get_all_chat_messages(cls, userid, chatid, limit=100, page=0):
+        url = cls.get_url('GET_ALL_CHAT_MESSAGES')
+
+        params = {
+            'userId': userid,
+            'chatId': chatid,
+            'limit': limit,
+            'page': page
+        }
+
+        try:
+            req = requests.get(url, params=params)
+            return req.json()
+        except (requests.ConnectionError, requests.exceptions.JSONDecodeError):
+            raise exceptions.ChatServerDownException
+
 
 class LogbookApi(BaseAPI):
     choices = settings.LOGBOOK_APIS
