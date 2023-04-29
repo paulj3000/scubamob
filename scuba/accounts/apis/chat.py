@@ -191,9 +191,7 @@ class GetChatMessagesApi(APIView):
         }
 
         try:
-            chat = requests.get(f"{SystemApi.get_chat_server()}api/messages/last", params=params)
-            retval = chat.json()
-            retval['me'] = user.pk_as_str
+            retval = ChatApi.get_all_chat_messages(user.pk_as_str, query.get('chatId'))
             return Response(retval)
         except requests.exceptions.ConnectionError:
             return Response({'error': 'cannot reach chat server'}, 500)
