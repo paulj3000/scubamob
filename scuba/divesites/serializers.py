@@ -25,11 +25,8 @@ class DivesiteSerializer(serializers.ModelSerializer):
     lat = serializers.SerializerMethodField(read_only=True)
     long = serializers.SerializerMethodField(read_only=True)
     stats = serializers.SerializerMethodField(read_only=True)
+    checkins = serializers.SerializerMethodField(read_only=True)
     # weather = serializers.SerializerMethodField(read_only=True)
-
-    @staticmethod
-    def get_id(data):
-        return data.pk_as_str
 
     @staticmethod
     def get_stats(data):
@@ -68,21 +65,14 @@ class DivesiteSerializer(serializers.ModelSerializer):
         retval['reviews'] = [data.get_divesite_stats(date.today())]
         return retval
 
-    '''
     @staticmethod
-    def get_weather(data):
-        if data.region:
-            key = f'weather_{data.region.pk_as_str}'
-            if cache.get(key):
-                return cache.get(key)
+    def get_id(data):
+        return data.pk_as_str
 
-        weather, region = Region.get_weather_by_lat_long(data.lat, data.long)
-        data.region = region
-        cache.set(key, weather, 3600)
-        data.save()
+    @staticmethod
+    def get_checkins(data):
+        return data.checkins.filter(checkin_date=date.today()).count()
 
-        return weather
-    '''
 
     @staticmethod
     def get_banner(data):
@@ -105,7 +95,7 @@ class DivesiteSerializer(serializers.ModelSerializer):
         model = Divesite
         fields = (
             'id', 'name', 'description', 'lat', 'long', 'difficulty',
-            'difficulty_display', 'banner', 'stats',
+            'difficulty_display', 'banner', 'stats', 'checkins',
         )
 
     def create(self, validated_data):

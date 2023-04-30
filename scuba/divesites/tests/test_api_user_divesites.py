@@ -102,6 +102,12 @@ class TestUserDivesitesApi(TestCase):
         client = APIClient()
         client.force_authenticate(user=user)
 
+        url = f'/api/divesites/{divesite.pk_as_str}'
+        response = client.get(url, format='json')
+        divesiteData = response.json().get('divesite')
+        self.assertIsNotNone(divesiteData)
+        self.assertEqual(divesiteData['checkins'], 0, 'no checkins yet')
+
         # get the checkin url
         url = f'/api/divesites/{divesite.pk_as_str}/checkin/'
         client.force_authenticate(user=user)
@@ -122,6 +128,12 @@ class TestUserDivesitesApi(TestCase):
         # try again, make sure we cannot add another checkin for today
         response = client.post(url, {'note': note}, format='json')
         self.assertEqual(response.status_code, 400)
+
+        url = f'/api/divesites/{divesite.pk_as_str}'
+        response = client.get(url, format='json')
+        divesite = response.json().get('divesite')
+        self.assertIsNotNone(divesite)
+        self.assertEqual(divesite['checkins'], 1, 'we now have a checkin')
 
     def test_invalid_checkin(self):
         payload = {
