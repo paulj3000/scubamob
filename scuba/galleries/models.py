@@ -72,7 +72,8 @@ class Media(UUIDModel):
         FileUtils.upload_file_to_s3(aws_filename, content_type, data)
 
         # and now, create the file
-        return Media.objects.create(filename=name, content_type=content_type, aws_filename=aws_filename)
+        return Media.objects.create(
+            filename=name, content_type=content_type, aws_filename=aws_filename)
 
 
 class Album(UUIDModel):
@@ -110,7 +111,8 @@ class Album(UUIDModel):
             IMAGE_TYPE_EXTENSIONS[uploaded_image.content_type])
 
         account = self.user.get_account()
-        gallery_file_thumbnail = AlbumImage.generate_image_thumbnail_name(account.guid, self.guid, filename)
+        gallery_file_thumbnail = AlbumImage.generate_image_thumbnail_name(
+            account.guid, self.guid, filename)
         header = {'Content-Type': uploaded_image.content_type}
 
         conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
@@ -158,7 +160,9 @@ class Album(UUIDModel):
         db_table = 'gallery_album'
 
     def to_json(self):
-        return {'title': self.title, 'description': self.description, 'id': self.id, 'guid': self.guid}
+        return {
+            'title': self.title, 'description': self.description,
+            'id': self.id, 'guid': self.guid}
 
 
 class AlbumImage(UUIDModel):

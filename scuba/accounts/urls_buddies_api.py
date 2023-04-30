@@ -12,6 +12,8 @@ urlpatterns = [
     re_path(r'(?P<buddy_id>[0-9a-fA-F]{32})/block/', buddies_api.BlockUserApi.as_view()),
     re_path(r'(?P<buddy_id>[0-9a-fA-F]{32})/follow/', buddies_api.FollowBuddyApi.as_view()),
     path('requests/', buddies_api.BuddyRequestListApi.as_view()),
-    re_path(r'requests/(?P<id>[0-9a-fA-F]{32})/accept', buddies_api.AcceptBuddyRequestApi.as_view()),
+    re_path(
+        r'requests/(?P<id>[0-9a-fA-F]{32})/accept',
+        buddies_api.AcceptBuddyRequestApi.as_view()),
     re_path(r'requests/(?P<id>[0-9a-fA-F]{32})/', buddies_api.BuddyRequestApi.as_view()),
 ]

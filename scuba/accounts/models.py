@@ -23,7 +23,9 @@ from scuba.accounts.settings import SETTINGS_KEYS, SETTINGS_VALUES
 from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.libs.alerting import Alerting
 from scuba.settings import PROFILE_BLANK_URL, AWS_CLOUDFRONT
-from scuba.accounts.exceptions import InvalidEmailIdException, PrimaryEmailIdException, EmailInUseException, InvalidUserIdException, InvalidConfirmationCodeException
+from scuba.accounts.exceptions import (
+    InvalidEmailIdException, InvalidUserIdException,
+    PrimaryEmailIdException, EmailInUseException, InvalidConfirmationCodeException)
 from scuba.accounts.settings import SETTINGS
 from scuba.sitesettings.models import SystemSetting
 from scuba.divesites.models import Divesite
@@ -149,8 +151,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
 
     def get_buddy(self, buddy):
         return UserBuddy.objects.filter(
-            Q(buddy=buddy) |
-            Q(user=buddy)).first()
+            Q(buddy=buddy) | Q(user=buddy)).first()
 
     def get_my_buddy(self, buddy_id):
         return self.buddies.filter(buddy__id=buddy_id)
@@ -197,7 +198,8 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
             if data:
                 return {'state': 2, 'type': 'Buddies', 'id': data.pk_as_str}
 
-            data = self.buddy_requested.filter(buddy=self, is_active=True, is_deleted=False).first()
+            data = self.buddy_requested.filter(
+                buddy=self, is_active=True, is_deleted=False).first()
             if data:
                 return {'state': 3, 'type': 'Was Requested', 'id': data.pk_as_str}
 
@@ -232,8 +234,8 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         self.remove_buddy(buddy)
 
         # remove all buddy requests
-        UserBuddyRequest.objects.filter(Q(user=buddy, buddy=self) |
-                                        Q(user=self, buddy=buddy)).delete()
+        UserBuddyRequest.objects.filter(
+            Q(user=buddy, buddy=self) | Q(user=self, buddy=buddy)).delete()
 
         # get all of the current buddies
         return UserBlocked.objects.create(user=self, buddy=buddy, blocked_by=self)
@@ -248,8 +250,8 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
 
     def is_blocked(self, buddy):
         # check if the user is blocking for the friend.
-        return UserBlocked.objects.filter(Q(user=buddy, buddy=self) |
-                                          Q(user=self, buddy=buddy)).count()
+        return UserBlocked.objects.filter(
+            Q(user=buddy, buddy=self) | Q(user=self, buddy=buddy)).count()
 
     # -----------------------------------------------------------------------------
     # start confirmation code stuff
@@ -319,7 +321,8 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         # if str(self.id).replace('-', '') in USER_IGNORE_TRACKING:
         #    return
 
-        UserLogin.objects.create(user=self, ip_address=ip_address, device=device, iso_country=country)
+        UserLogin.objects.create(
+            user=self, ip_address=ip_address, device=device, iso_country=country)
         self.last_login_date = datetime.datetime.now()
         self.save()
 
@@ -760,7 +763,8 @@ class UserDivesiteRecentlyViewed(UUIDModel):
 
     The user's favorite divesites
     """
-    user = models.ForeignKey(User, related_name='divesites_recently_viewed', on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User, related_name='divesites_recently_viewed', on_delete=models.CASCADE)
     divesite = models.ForeignKey('divesites.Divesite', on_delete=models.CASCADE)
     viewed_date = models.DateTimeField(auto_now=True)
 

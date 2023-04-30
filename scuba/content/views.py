@@ -12,6 +12,7 @@ class FAQView(TemplateView):
     display the frequently asked quesitons page
     """
     template_name = 'content/faq.html'
+
     def get_context_data(self, **kwargs):
         """ get_context_data
 
@@ -28,6 +29,7 @@ class ContentView(TemplateView):
     display the frequently asked quesitons page
     """
     template_name = 'content/content.html'
+
     def get_context_data(self, **kwargs):
         """ get_context_data
 
@@ -52,6 +54,7 @@ class PageTemplate(TemplateView):
     """ For page templates needed for Angular.js, handle the templates """
 
     path = None
+
     def get_context_data(self, **kwargs):
         """ get_context_data
 
