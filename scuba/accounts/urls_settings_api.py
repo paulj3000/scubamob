@@ -16,5 +16,5 @@ urlpatterns = [
         settings_api.UserGeneralSettingListApi.as_view()),
     re_path('list/options', settings_api.UserSettingApi.as_view()),
     re_path('list', settings_api.UserSettingListApi.as_view()),
-    re_path('(?P<setting>[\w-]+)', settings_api.UserSettingApi.as_view()),
+    re_path(r'(?P<setting>[\w-]+)', settings_api.UserSettingApi.as_view()),
 ]
