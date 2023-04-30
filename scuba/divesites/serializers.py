@@ -27,6 +27,18 @@ class DivesiteSerializer(serializers.ModelSerializer):
     stats = serializers.SerializerMethodField(read_only=True)
     checkin_count = serializers.SerializerMethodField(read_only=True)
     # weather = serializers.SerializerMethodField(read_only=True)
+    checkins = serializers.SerializerMethodField(read_only=True)
+
+    def __init__(self, *args, **kwargs):
+        """ Override the initialization. We're going to remove all fields
+        and keep the base fields
+        """
+        # get the response type
+        response_type = kwargs.pop('type', '')
+
+        super().__init__(*args, **kwargs)
+        if response_type == 'simple':
+            self.fields.pop("checkins", None)
 
     @staticmethod
     def get_stats(data):
@@ -73,6 +85,10 @@ class DivesiteSerializer(serializers.ModelSerializer):
     def get_checkin_count(data):
         return data.checkins.filter(checkin_date=date.today()).count()
 
+    @staticmethod
+    def get_checkins(data):
+        return DivesiteCheckinSerializer(
+            data.checkins.filter(checkin_date=date.today()), many=True).data
 
     @staticmethod
     def get_banner(data):
@@ -96,6 +112,7 @@ class DivesiteSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'name', 'description', 'lat', 'long', 'difficulty',
             'difficulty_display', 'banner', 'stats', 'checkin_count',
+            'checkins',
         )
 
     def create(self, validated_data):
@@ -206,9 +223,6 @@ class DivesiteCheckinThankSerializer(serializers.Serializer):
 
     def save(self, **kwargs):
         validated_data = {**self.validated_data, **kwargs}
-
-        from pprint import pprint
-        pprint(validated_data)
         return DivesiteCheckinThank.objects.update_or_create(
             divesite_checkin=getattr(self, 'divesite_checkin'),
             user=self.context['request'].user,
