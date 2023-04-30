@@ -99,7 +99,7 @@ class GetHomescreenApi(generics.GenericAPIView):
                 'recent_activity': BuddyRecentActivity(buddy_recent_activity, many=True).data,
             },
             # 'weather': WeatherSerializer(weather, many=True).data,
-            'weather': weather,
+            'weather': weather.pop('current'),
             'location': location,
             'divesites': {
                 'favorites': user.get_divesite_favorites(),
