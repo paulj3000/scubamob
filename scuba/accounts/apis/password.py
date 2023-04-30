@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 class PasswordResetApi(generics.GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = PasswordResetSerializer
+
     def post(self, request):
         """ post
 
