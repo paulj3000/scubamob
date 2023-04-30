@@ -25,7 +25,7 @@ class DivesiteSerializer(serializers.ModelSerializer):
     lat = serializers.SerializerMethodField(read_only=True)
     long = serializers.SerializerMethodField(read_only=True)
     stats = serializers.SerializerMethodField(read_only=True)
-    checkins = serializers.SerializerMethodField(read_only=True)
+    checkin_count = serializers.SerializerMethodField(read_only=True)
     # weather = serializers.SerializerMethodField(read_only=True)
 
     @staticmethod
@@ -70,7 +70,7 @@ class DivesiteSerializer(serializers.ModelSerializer):
         return data.pk_as_str
 
     @staticmethod
-    def get_checkins(data):
+    def get_checkin_count(data):
         return data.checkins.filter(checkin_date=date.today()).count()
 
 
@@ -95,7 +95,7 @@ class DivesiteSerializer(serializers.ModelSerializer):
         model = Divesite
         fields = (
             'id', 'name', 'description', 'lat', 'long', 'difficulty',
-            'difficulty_display', 'banner', 'stats', 'checkins',
+            'difficulty_display', 'banner', 'stats', 'checkin_count',
         )
 
     def create(self, validated_data):

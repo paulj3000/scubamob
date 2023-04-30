@@ -106,7 +106,7 @@ class TestUserDivesitesApi(TestCase):
         response = client.get(url, format='json')
         divesiteData = response.json().get('divesite')
         self.assertIsNotNone(divesiteData)
-        self.assertEqual(divesiteData['checkins'], 0, 'no checkins yet')
+        self.assertEqual(divesiteData['checkin_count'], 0, 'no checkins yet')
 
         # get the checkin url
         url = f'/api/divesites/{divesite.pk_as_str}/checkin/'
@@ -133,7 +133,7 @@ class TestUserDivesitesApi(TestCase):
         response = client.get(url, format='json')
         divesite = response.json().get('divesite')
         self.assertIsNotNone(divesite)
-        self.assertEqual(divesite['checkins'], 1, 'we now have a checkin')
+        self.assertEqual(divesite['checkin_count'], 1, 'we now have a checkin')
 
     def test_invalid_checkin(self):
         payload = {
