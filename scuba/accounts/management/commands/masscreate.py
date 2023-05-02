@@ -31,5 +31,6 @@ class Command(BaseCommand):
                         UserBuddyRequest.objects.create(user=new_user, buddy=me_user)
                     else:
                         UserBuddy.objects.create(buddy=new_user, user=me_user)
+                        UserBuddy.objects.create(buddy=me_user, user=new_user)
             except IntegrityError:
                 print(f"User {username} with email {email} already exists")

@@ -8,10 +8,29 @@ from scuba.settings import PROFILE_BLANK_URL
 
 
 class ProfileSerializer(serializers.Serializer):
+    def __init__(self, *args, **kwargs):
+        if kwargs.pop('is_private', False):
+            self.fields.pop("media", None)
+            self.fields.pop("buddies_count", None)
+        else:
+            self.fields.pop("is_private", None)
+
+        super().__init__(*args, **kwargs)
+
     id = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
     buddies_count = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
+    media = serializers.SerializerMethodField()
+    is_private = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_is_private(data):
+        return True
+
+    @staticmethod
+    def get_media(data):
+        return data.media.all().order_by('-created')[:12]
 
     @staticmethod
     def get_buddies_count(data):

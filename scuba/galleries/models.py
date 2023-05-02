@@ -20,14 +20,13 @@ IMAGE_TYPE_EXTENSIONS = {
         'image/tiff': 'tiff'
 }
 
-
 class Media(UUIDModel):
     user = models.ForeignKey(User, related_name='media', on_delete=models.CASCADE)
-    image = models.CharField(max_length=255)
+    filename = models.CharField(max_length=255)
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=255)
     thumbnail = models.CharField(max_length=255)
-    guid = models.CharField(max_length=125, db_index=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     # define a couple of static functions which will define an image name
     @staticmethod
