@@ -12,8 +12,7 @@ class StringUtils:
     def generate_random_string(string_length):
         return ''.join(
             random.choices(
-                string.ascii_uppercase +
-                string.digits, k=string_length))
+                string.ascii_uppercase + string.digits, k=string_length))
 
     @staticmethod
     def generate_random_string_case_insensitive(string_length):

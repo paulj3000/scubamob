@@ -15,6 +15,5 @@ from skm.content import views as news_views
 urlpatterns = [
     path('', news_views.NewsIndexView.as_view(), name="news_index"),
     re_path(r'^(?P<url>[\w-]{1,255})$',
-        news_views.NewsArticleView.as_view(),
-        name='news_article'),
+            news_views.NewsArticleView.as_view(), name='news_article'),
 ]
