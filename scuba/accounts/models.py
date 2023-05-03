@@ -399,9 +399,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
                 if default:
                     break
 
-            return self.settings.create(
-                    setting=SETTINGS_KEYS[settings_key],
-                    value=default)
+            return self.settings.create(setting=SETTINGS_KEYS[settings_key], value=default)
 
         return item
 
