@@ -7,7 +7,6 @@ Replace this with more appropriate tests for your application.
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
-import pytest
 from django.test import TestCase
 from rest_framework.test import APIClient
 
@@ -98,7 +97,6 @@ class TestUserProfilesAPI(TestCase):
         self.assertIsNone(profile.get('is_private'), 'user is private but still friends')
         self.assertIsNotNone(profile.get('media'), 'user has media')
 
-    @pytest.mark.skip(reason="no way of currently testing this")
     def test_get_basic_profile_is_blocked(self):
         """
         Test the making of a buddy request
@@ -106,25 +104,13 @@ class TestUserProfilesAPI(TestCase):
         user = User.objects.get(email='foo@nowhere.com')
         user2 = User.objects.get(email='test4@tester.com')
 
-        user2.is_private = True
-        user2.save()
-
-        UserBlocked.objects.create(user=user2, buddy=user, blocked_by=user2)
+        user2.block_buddy(user)
+        #UserBlocked.objects.create(user=user2, buddy=user, blocked_by=user2)
 
         client = APIClient()
         client.force_authenticate(user=user)
-        url = f'/api/profile/{user2.pk_as_str}/'
+        url = f'/api/profile/{user.pk_as_str}/'
         response = client.get(url, format='json')
         profile = response.json()
-
-        import  pprint
-        pprint.pprint(profile)
-
-        pprint.pprint(UserBlocked.objects.filter(buddy=user))
-
-
-        f = open("/tmp/demofile2.txt", "a")
-        f.write(pprint.pformat(profile, indent=4))
-        f.close()
 
         self.assertEqual(response.status_code, 404, 'blocked user not found')

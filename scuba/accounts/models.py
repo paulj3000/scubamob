@@ -238,7 +238,10 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
             Q(user=buddy, buddy=self) | Q(user=self, buddy=buddy)).delete()
 
         # get all of the current buddies
-        return UserBlocked.objects.create(user=self, buddy=buddy, blocked_by=self)
+        blocked, _ = UserBlocked.objects.get_or_create(
+            user=self, buddy=buddy, blocked_by=self)
+
+        return blocked
 
     def follow_buddy(self, buddy, follow):
         # set the user buddy flag to follow
