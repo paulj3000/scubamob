@@ -5,6 +5,7 @@ from scuba.accounts.models import User
 
 from scuba.accounts.models import UserBuddyRequest, UserBuddy
 
+
 class Command(BaseCommand):
     def handle(self, *args, **options):
         ''' update all account guids '''
@@ -16,7 +17,7 @@ class Command(BaseCommand):
             username = f'xuser_{i}'
             email = f'xuser{i}@em{i}.com'
             try:
-                new_user = User();
+                new_user = User()
                 new_user.first_name = f'test {i}'
                 new_user.last_name = f'user {i}'
                 new_user.date_of_birth = '1970-04-01'

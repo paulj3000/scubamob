@@ -16,14 +16,8 @@ class SignupForm(forms.ModelForm):
 
     Sign up a new user
     """
-    is_spam = forms.BooleanField(
-            required=False,
-            widget=forms.HiddenInput(),
-            initial=False)
-
-    ip_address = forms.CharField(
-            widget=forms.HiddenInput(),
-            initial='0.0.0.0')
+    is_spam = forms.BooleanField(required=False, widget=forms.HiddenInput(), initial=False)
+    ip_address = forms.CharField(widget=forms.HiddenInput(), initial='0.0.0.0')
 
     class Meta:
         model = User
