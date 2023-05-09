@@ -5,12 +5,12 @@ from scuba import settings
 from scuba.sitesettings.models import APIKey
 from scuba.libs.exceptions import InvalidWeatherDataException
 
-
 # weatherapi.com settings
 WEATHER_API = {
     'current': 'http://api.weatherapi.com/v1/current.json',
     'forecast': 'http://api.weatherapi.com/v1/forecast.json',
 }
+
 
 class Weather:
 

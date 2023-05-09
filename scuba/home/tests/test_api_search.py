@@ -13,6 +13,7 @@ from scuba.accounts.models import User
 
 class TestSearchAPI(TestCase):
     fixtures = ["test_divesites.json", "test_users.json", "test_sitesettings.json"]
+
     def test_users_search(self):
         user = User.objects.get(email='foo@nowhere.com')
 

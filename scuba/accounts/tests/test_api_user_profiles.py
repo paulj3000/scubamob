@@ -105,7 +105,6 @@ class TestUserProfilesAPI(TestCase):
         user2 = User.objects.get(email='test4@tester.com')
 
         user2.block_buddy(user)
-        #UserBlocked.objects.create(user=user2, buddy=user, blocked_by=user2)
 
         client = APIClient()
         client.force_authenticate(user=user)

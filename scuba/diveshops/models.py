@@ -6,6 +6,7 @@ from scuba.libs.models.uuidmodel import UUIDModel
 
 class Diveshop(UUIDModel):
     name = models.CharField(max_length=100)
+
 '''
     description = models.TextField()
     url = models.URLField(max_length=255, db_index=True, blank=True)
