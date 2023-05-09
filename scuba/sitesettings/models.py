@@ -309,6 +309,17 @@ class ChatApi(BaseAPI):
         except (requests.ConnectionError, requests.exceptions.JSONDecodeError):
             raise exceptions.ChatServerDownException
 
+    @classmethod
+    def admin_get_all_chats(cls):
+        url = cls.get_url('ADMIN_GET_ALL_CHATS')
+
+        try:
+            req = requests.get(url)
+            return req.json()
+        except (requests.ConnectionError, requests.exceptions.JSONDecodeError):
+            raise exceptions.ChatServerDownException
+from django.core.exceptions import ValidationError
+
 
 class LogbookApi(BaseAPI):
     choices = settings.LOGBOOK_APIS

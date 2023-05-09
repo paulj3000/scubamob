@@ -47,7 +47,9 @@ BILLING_APIS = (
 
 CHAT_APIS = (
     ('GET_ALL_USER_CHATS', 'Get All User Chats'),
-    ('GET_ALL_CHAT_MESSAGES', 'Get All CHAT Messages'),
+    ('GET_ALL_CHAT_MESSAGES', 'Get All Chat Messages'),
+
+    ('ADMIN_GET_ALL_CHATS', 'Admin Get All Chats'),
 )
 
 
