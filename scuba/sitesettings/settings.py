@@ -57,8 +57,8 @@ LOGBOOK_APIS = (
     ('GET_LOGBOOKS', 'Get All Logbooks'),
     ('GET_LOG', 'Get Log'),
     ('ADD_LOG', 'Add Logbook'),
+    ('GET_TAGS', 'Get All TAGS'),
 )
-
 
 SETTINGS_APIS = (
     ('ADD_USER_SETTING', 'Add User Setting'),

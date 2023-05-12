@@ -316,22 +316,33 @@ class LogbookApi(BaseAPI):
     def get_all_logbooks(userid):
         domain = SystemApi.get_logbook_server()
         endpoint = LogbookApi.objects.get(key='GET_LOGBOOKS').value
+        endpoint = LogbookApi.get_all_logbooks_url(userid)
 
-        url = LogbookApi.get_all_logbooks_url(userid)
+        return LogbookApi.query_logbook_server(endpoint)
 
+    @staticmethod
+    def get_all_logbooks_url(userid):
+        domain = SystemApi.get_logbook_server()
+
+        endpoint = LogbookApi.objects.get(key='GET_LOGBOOKS').value
+        endpoint = LogbookApi.sub_url_userid(endpoint, userid)
+        return LogbookApi.query_logbook_server(endpoint)
+
+    @staticmethod
+    def get_all_tags(userid):
+        domain = SystemApi.get_logbook_server()
+
+        endpoint = LogbookApi.objects.get(key='GET_TAGS').value
+        endpoint = LogbookApi.sub_url_userid(endpoint, userid)
+        return LogbookApi.query_logbook_server(endpoint)
+
+    @staticmethod
+    def query_logbook_server(url):
         try:
             req = requests.get(url)
             return req.json()
         except requests.ConnectionError:
             raise exceptions.LogbookServerDownException
-
-    @staticmethod
-    def get_all_logbooks_url(userid):
-        domain = SystemApi.get_logbook_server()
-        endpoint = LogbookApi.objects.get(key='GET_LOGBOOKS').value
-
-        endpoint = LogbookApi.sub_url_userid(endpoint, userid)
-        return urljoin(domain, endpoint)
 
 
 class SettingsApi(BaseAPI):
