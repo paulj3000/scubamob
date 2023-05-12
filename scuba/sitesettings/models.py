@@ -178,6 +178,13 @@ class SystemSetting(UUIDModel):
 
 
 class BaseAPI(UUIDModel):
+    VERBS = (
+        ('POST', 'POST'),
+        ('GET', 'GET'),
+        ('PUT', 'PUT'),
+        ('DELETE', 'DELETE'),
+    )
+
     def __init__(self, *args, **kwargs):
 
         if not hasattr(self, 'choices'):
@@ -188,6 +195,7 @@ class BaseAPI(UUIDModel):
 
     key = models.CharField(max_length=128, db_index=True, unique=True)
     value = models.CharField(max_length=128)
+    verb = models.CharField(max_length=128, choices=VERBS)
 
     def __str__(self):
         """ return a string representation of the page """
@@ -340,6 +348,14 @@ class LogbookApi(BaseAPI):
     def query_logbook_server(url):
         try:
             req = requests.get(url)
+            return req.json()
+        except requests.ConnectionError:
+            raise exceptions.LogbookServerDownException
+
+    @staticmethod
+    def post_to_logbook_server(url, json):
+        try:
+            req = requests.post(url, json=json)
             return req.json()
         except requests.ConnectionError:
             raise exceptions.LogbookServerDownException
