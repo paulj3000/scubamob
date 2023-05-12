@@ -88,6 +88,7 @@ class Image(AWSModel):
     This is for all images updated to the website for content purposes
     """
     title = models.CharField(max_length=64)
+
     class Meta:
         """ define models, fields, etc """
         verbose_name_plural = 'images'

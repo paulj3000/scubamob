@@ -44,7 +44,6 @@ class Weather:
         except:
             raise ValueError("Error")
 
-
     @classmethod
     def get_current_by_q_param(cls, q_param):
         # call the API and return the data

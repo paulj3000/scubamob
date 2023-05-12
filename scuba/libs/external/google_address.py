@@ -8,6 +8,7 @@ from scuba.sitesettings.models import APIKey
 
 logger = logging.getLogger(__name__)
 
+
 class GoogleAddress:
     @staticmethod
     def get_geocode_from_postal_code(postal_code):

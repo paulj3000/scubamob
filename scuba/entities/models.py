@@ -10,8 +10,8 @@ class CertificationOrganizationType(models.Model):
 
 class CertificationOrganization(models.Model):
     certification_organtization_type = models.ForeignKey(
-            CertificationOrganizationType,
-            on_delete=models.CASCADE)
+        CertificationOrganizationType,
+        on_delete=models.CASCADE)
     abbreviation = models.CharField(max_length=10)
     name = models.CharField(max_length=100)
     url = models.URLField(max_length=255)

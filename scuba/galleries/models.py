@@ -20,6 +20,7 @@ IMAGE_TYPE_EXTENSIONS = {
         'image/tiff': 'tiff'
 }
 
+
 class Media(UUIDModel):
     user = models.ForeignKey(User, related_name='media', on_delete=models.CASCADE)
     filename = models.CharField(max_length=255)
