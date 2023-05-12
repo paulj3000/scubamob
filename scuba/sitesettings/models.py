@@ -33,27 +33,12 @@ class ApiEndpoint(UUIDModel):
 class SystemApi(UUIDModel):
     key = models.CharField(max_length=128, db_index=True, choices=SYSTEM_APIS, unique=True)
     value = models.CharField(max_length=128)
-    share_with_chat = models.BooleanField(default=True)
 
     class Meta:
         """ define models, fields, etc """
         db_table = 'system_api'
         app_label = 'sitesettings'
         ordering = ['key']
-
-    def sync_settings(self):
-        if self.share_with_chat:
-            chat_server = SystemApi.get_chat_server()
-            try:
-                data = {
-                    'key': self.key,
-                    'value': self.value,
-                }
-
-                update_url = urljoin(chat_server, 'api/system/setting/update')
-                req = requests.post(update_url, json=data)
-            except requests.ConnectionError:
-                raise exceptions.ChatServerDownException
 
     @staticmethod
     def get_aws_url_by_key(key, default=None):
