@@ -33,6 +33,7 @@ class SystemApiAdmin(admin.ModelAdmin):
 
 class GenericKeyValueApiAdmin(admin.ModelAdmin):
     change_form_template = 'admin/change_endpoint_form.html'
+    list_display = ('key', 'value',)
 
 
 class SystemSettingAdmin(admin.ModelAdmin):
