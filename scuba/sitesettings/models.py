@@ -311,7 +311,6 @@ class ChatApi(BaseAPI):
             return req.json()
         except (requests.ConnectionError, requests.exceptions.JSONDecodeError):
             raise exceptions.ChatServerDownException
-from django.core.exceptions import ValidationError
 
 
 class LogbookApi(BaseAPI):
