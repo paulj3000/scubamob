@@ -331,6 +331,7 @@ class ChatApi(BaseAPI):
         except requests.ConnectionError:
             raise exceptions.ChatServerDownException
 
+
 class LogbookApi(BaseAPI):
     choices = settings.LOGBOOK_APIS
 
