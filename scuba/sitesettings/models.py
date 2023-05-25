@@ -312,6 +312,24 @@ class ChatApi(BaseAPI):
         except (requests.ConnectionError, requests.exceptions.JSONDecodeError):
             raise exceptions.ChatServerDownException
 
+    @classmethod
+    def chat_lookup(cls, json):
+        url = cls.get_url('CHAT_LOOKUP')
+
+        try:
+            req = requests.post(url, json=json)
+            return req.json()
+        except (requests.ConnectionError, requests.exceptions.JSONDecodeError):
+            raise exceptions.ChatServerDownException
+
+    @classmethod
+    def create_chat(cls, json):
+        url = cls.get_url('CREATE_CHAT')
+        try:
+            req = requests.post(url, json=json)
+            return req.json()
+        except requests.ConnectionError:
+            raise exceptions.ChatServerDownException
 
 class LogbookApi(BaseAPI):
     choices = settings.LOGBOOK_APIS
