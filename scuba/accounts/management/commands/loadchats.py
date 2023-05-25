@@ -52,15 +52,14 @@ class Command(BaseCommand):
             }
 
             try:
-                chat = requests.get(f"{SystemApi.get_chat_server()}/api/chats/lookup", params=params)
+                chat = ChatApi.chat_lookup(params)
                 retval = chat.json()
 
                 if retval['chat']:
                     chat_id = retval['chat']['id']
                 else:
                     try:
-                        chat = requests.post(f"{SystemApi.get_chat_server()}/api/chats/", json=params)
-                        retval = chat.json()
+                        retval = ChatApi.create_chat(params)
                         chat_id = retval['chat']['id']
                     except requests.exceptions.ConnectionError:
                         print("Chat server is not accessible")
