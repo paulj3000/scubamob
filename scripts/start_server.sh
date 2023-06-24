@@ -1,5 +1,4 @@
 #!/bin/bash
-source env/bin/activate
-pip install -r requirements.txt
-python manage.py migrate
+source /scuba/apps/env/bin/activate && pip install -r requirements.txt
+source /scuba/apps/env/bin/activate && cd /scuba/apps/scubamob && python manage.py migrate
 service nginx start
