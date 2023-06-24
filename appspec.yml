@@ -4,7 +4,7 @@ files:
   - source: /scuba
     destination: /scuba/apps/scubamob/scuba
   - source: /manage.py
-    destination: /scuba/apps/scubamob/manage.py
+    destination: /scuba/apps/scubamob
   - source: /static
     destination: /scuba/apps/scubamob/static
   - source: /templates
@@ -12,7 +12,7 @@ files:
   - source: /node_modules
     destination: /scuba/apps/scubamob/node_modules
   - source: /requirements.txt
-    destination: /scuba/apps/scubamob/requirements.txt
+    destination: /scuba/apps/scubamob
 file_exists_behavior: OVERWRITE
 hooks:
   BeforeInstall:
