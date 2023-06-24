@@ -1,8 +1,13 @@
 version: 0.0
 os: linux
 files:
-  - source: /
-    destination: /scuba/apps/scubamob
+  - source: /scuba
+    destination: /scuba/apps/scubamob/scuba
+  - source: /static
+    destination: /scuba/apps/scubamob/static
+  - source: /templates
+    destination: /scuba/apps/scubamob/templates
+file_exists_behavior: OVERWRITE
 hooks:
   BeforeInstall:
     - location: scripts/install_dependencies.sh
