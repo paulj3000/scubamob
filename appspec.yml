@@ -2,11 +2,15 @@ version: 0.0
 os: linux
 files:
   - source: /scuba
-    destination: /scuba/apps/scubamob/scuba
+    destination: /scuba/apps/scubamob/
+  - source: /manage.py
+    destination: /scuba/apps/scubamob/
   - source: /static
-    destination: /scuba/apps/scubamob/static
+    destination: /scuba/apps/scubamob/
   - source: /templates
-    destination: /scuba/apps/scubamob/templates
+    destination: /scuba/apps/scubamob/
+  - source: /node_modules
+    destination: /scuba/apps/scubamob/
 file_exists_behavior: OVERWRITE
 hooks:
   BeforeInstall:
