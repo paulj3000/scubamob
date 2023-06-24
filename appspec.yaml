@@ -5,8 +5,18 @@ files:
     destination: /scuba/apps/scubamob
 hooks:
     ApplicationStart:
-      -location: scripts/deploy/install_dependencies.sh
       -location: scripts/deploy/install_db_updates.sh
       -location: scripts/deploy/install_static.sh
        timeout:300
-       runas: jello
+       #runas: jello
+  BeforeInstall:
+    - location: scripts/install_dependencies.sh
+      timeout: 300
+      runas: root
+    - location: scripts/start_server.sh
+      timeout: 300
+      runas: root
+  ApplicationStop:
+    - location: scripts/stop_server.sh
+      timeout: 300
+      runas: root
