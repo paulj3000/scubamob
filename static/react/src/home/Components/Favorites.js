@@ -24,6 +24,11 @@ function Favorites(props) {
                                     <h6>{site.stats.weather.condition.text}</h6>
                                 </div>
                             </div>
+                            <div className="row">
+                                <div className="col">
+                                    <h6>Number of checkins: {site.checkin_count}</h6>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="card-footer"><a className="btn btn-primary btn-sm" href="#!">More Info</a></div>
