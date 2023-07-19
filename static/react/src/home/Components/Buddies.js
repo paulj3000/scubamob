@@ -10,11 +10,9 @@ function Buddies(props) {
 
             {props.buddies.list.map(buddy => (
                 <div className="col-md-4 mb-5" key={buddy.id}>
-                    <div className="card h-100">
-                        <img className="card-img-top" src={buddy.profile_image} alt="Card image cap" />
-                        <div className="card-body">
-                            <h2 className="card-title">{buddy.full_name}</h2>
-                        </div>
+                    <div className="bg-white rounded shadow-sm py-5 px-4">
+                        <img className="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm" src={buddy.profile_image} alt="Card image cap" width="100" />
+                        <h5 className="mb-0">{buddy.full_name}</h5>
                     </div>
                     <div className="card-footer"><a className="btn btn-primary btn-sm" href="#!">More Info</a></div>
                 </div>

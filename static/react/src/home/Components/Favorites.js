@@ -15,6 +15,15 @@ function Favorites(props) {
                         <div className="card-body">
                             <h2 className="card-title">{site.name}</h2>
                             <p className="card-text">{site.description}</p>
+                            <i className="bi bi-geo"></i>
+                            <div className="row">
+                                <div className="col">
+                                    <img src={site.stats.weather.condition.icon} style={{height:64, width:64}} />
+                                </div>
+                                <div className="col">
+                                    <h6>{site.stats.weather.condition.text}</h6>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="card-footer"><a className="btn btn-primary btn-sm" href="#!">More Info</a></div>
