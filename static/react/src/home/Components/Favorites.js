@@ -1,0 +1,27 @@
+import { Outlet, Link } from "react-router-dom";
+import {Routes, Route, useNavigate} from 'react-router-dom';
+
+import React from 'react';
+
+
+function Favorites(props) {
+    return (
+        <div className="row">
+
+            {props.divesites.list.map(site => (
+                <div className="col-md-4 mb-5" key={site.id}>
+                    <div className="card h-100">
+                        <img className="card-img-top" src={site.banner} alt="Card image cap" />
+                        <div className="card-body">
+                            <h2 className="card-title">{site.name}</h2>
+                            <p className="card-text">{site.description}</p>
+                        </div>
+                    </div>
+                    <div className="card-footer"><a className="btn btn-primary btn-sm" href="#!">More Info</a></div>
+                </div>
+            ))}
+        </div>
+    )
+}
+
+export default Favorites;
