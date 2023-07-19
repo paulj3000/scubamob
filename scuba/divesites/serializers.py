@@ -4,6 +4,7 @@ from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 from django.core.cache import cache
 from django.templatetags.static import static
+from django.urls import reverse
 
 from scuba.divesites.models import Divesite, DivesiteReview, \
     DivesiteFavorite, DivesiteDailyStats, DivesiteCheckin, DivesiteCheckinThank
@@ -24,6 +25,7 @@ class DivesiteSerializer(serializers.ModelSerializer):
     banner = serializers.SerializerMethodField(read_only=True)
     lat = serializers.SerializerMethodField(read_only=True)
     long = serializers.SerializerMethodField(read_only=True)
+    url = serializers.SerializerMethodField(read_only=True)
     stats = serializers.SerializerMethodField(read_only=True)
     checkin_count = serializers.SerializerMethodField(read_only=True)
     # weather = serializers.SerializerMethodField(read_only=True)
@@ -82,6 +84,10 @@ class DivesiteSerializer(serializers.ModelSerializer):
         return data.pk_as_str
 
     @staticmethod
+    def get_url(data):
+        return reverse('site', kwargs={'url': data.url})
+
+    @staticmethod
     def get_checkin_count(data):
         return data.checkins.filter(checkin_date=date.today()).count()
 
@@ -112,7 +118,7 @@ class DivesiteSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'name', 'description', 'lat', 'long', 'difficulty',
             'difficulty_display', 'banner', 'stats', 'checkin_count',
-            'checkins',
+            'checkins', 'url',
         )
 
     def create(self, validated_data):
