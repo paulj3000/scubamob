@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.conf.urls.static import static
 from django.http import Http404
+from django.urls import reverse
 
 from rest_framework import serializers
 
@@ -164,10 +165,15 @@ class BuddySerializer(serializers.Serializer):
     first_name = serializers.SerializerMethodField()
     last_name = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
+    url = serializers.SerializerMethodField()
 
     @staticmethod
     def get_profile_image(data):
         return data.buddy.get_profile_image()
+
+    @staticmethod
+    def get_url(data):
+        return reverse('profile', kwargs={'id': data.buddy.pk_as_str})
 
     @staticmethod
     def get_full_name(data):
