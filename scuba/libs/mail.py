@@ -55,7 +55,7 @@ def store_email(user, email, title):
     s3 = S3(AWS_S3_BUCKET_PRIVATE)
 
     tstamp = int(time.time())
-    upload_file = f"{AWS_EMAIL_STORAGE_ROOT}/accounts/{user.id}/{title}_{int(time.time())}.html'
+    upload_file = f"{AWS_EMAIL_STORAGE_ROOT}/accounts/{user.id}/{title}_{int(time.time())}.html"
 
     # generate the key name
     file = s3.upload_data(upload_file, email, **{'ContentType': 'text/html'})
