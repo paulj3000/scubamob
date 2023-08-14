@@ -4,6 +4,8 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
+import uuid
+
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.client import Client
@@ -76,3 +78,17 @@ class TestAdminOverride(TestCase):
         request = response.wsgi_request
         result = admin.get_user(user.id)
         self.assertIsNotNone(result)
+
+    def test_get_user_dne(self):
+        """
+        Validating the login from a superuser works
+        """
+        client = Client()
+        response = client.get("/api/signup/createuser/")
+        admin = AdminOverride()
+
+        user = User.objects.get(email='foo@nowhere.com')
+
+        request = response.wsgi_request
+        result = admin.get_user(uuid.uuid4())
+        self.assertIsNone(result)
