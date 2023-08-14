@@ -39,6 +39,15 @@ class TestAdminOverride(TestCase):
         self.assertIsNone(result)
         self.assertIsNone(request.session.get('adminoverride'))
 
+    def test_admin_password_2(self):
+        """
+        Test admin password 2
+        """
+        client = Client()
+        admin = AdminOverride()
+        response = client.get("/api/signup/createuser/")
+        request = response.wsgi_request
+
         kwargs = {
             'email': 'foo@nowhere.com',
             'password': 'test@admin.com%tester1234'
