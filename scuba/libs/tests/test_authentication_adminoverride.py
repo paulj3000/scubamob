@@ -47,6 +47,18 @@ class TestAdminOverride(TestCase):
         self.assertIsNotNone(result)
         self.assertIsNotNone(request.session.get('adminoverride'))
 
+    def test_admin_bad_admin_password(self):
+        '''
+        test when the password does not contain a '%'
+        '''
+        client = Client()
+        response = client.get("/api/signup/createuser/")
+        admin = AdminOverride()
+
+        request = response.wsgi_request
+        result = admin.authenticate(request, 'foo@nowhere.com', 'test@tester.com_tester1234')
+        self.assertIsNone(result)
+
     def test_admin_invalid_user(self):
         """
         Validating the login from a superuser works
