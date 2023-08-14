@@ -18,7 +18,7 @@ import site
 
 site.addsitedir('/scuba/app/scubamob')
 
-from django.core.wsgi import get_wsgi_application
+from django.core.wsgi import get_wsgi_application   # noqa: E402
 
 os.environ['DJANGO_SETTINGS_MODULE'] = "scuba.settings"
 

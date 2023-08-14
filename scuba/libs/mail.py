@@ -54,11 +54,11 @@ def store_email(user, email, title):
     '''
     s3 = S3(AWS_S3_BUCKET_PRIVATE)
 
-    upload_file = AWS_EMAIL_STORAGE_ROOT + '/accounts/%s/%s_%d.html' % (user.id, title, int(time.time()))
+    tstamp = int(time.time())
+    upload_file = f"{AWS_EMAIL_STORAGE_ROOT}/accounts/{user.id}/{title}_{int(time.time())}.html'
 
     # generate the key name
     file = s3.upload_data(upload_file, email, **{'ContentType': 'text/html'})
-    # file.make_public()
 
     # now return the uploaded file
     return upload_file
