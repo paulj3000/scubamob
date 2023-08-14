@@ -2,21 +2,23 @@ import { Outlet, Link } from "react-router-dom";
 import {Routes, Route, useNavigate} from 'react-router-dom';
 
 import React from 'react';
+import Favorites from "./Favorites";
+import Buddies from "./Buddies";
+import Location from "./Location";
+import Others from "./Others";
 
 
 class Home extends React.Component {
-
-    /*
-    const navigate = useNavigate();
-    const navigateDisplayMode = () => {
-        navigate('/settings/item/display-mode');
-    };
-    */
-
     constructor(props) {
         super(props);
+        this.state = {
+            error: null,
+            isLoaded: false,
+            divesites: null,
+            buddies: null,
+            weather: null,
+        }
     }
-
 
     componentDidMount() {
         fetch(`/api/home`)
@@ -24,6 +26,13 @@ class Home extends React.Component {
             .then(
                 (result) => {
                     console.log(result);
+                    this.setState({
+                        isLoaded: true,
+                        divesites: result.divesites,
+                        buddies: result.buddies,
+                        location: result.location,
+                        weather: result.weather,
+                    });
                 },
 
                 // Note: it's important to handle errors here
@@ -38,28 +47,31 @@ class Home extends React.Component {
             )
     }
 
-
-
-
-
     render() {
-        return(
-            <div className="App">
-                <div className="col-8 mx-auto">
-                    <ul className="list-group">
-                        <li className="list-group-item">
-                            <h5>Account Management</h5>
-                        </li>
-                        <li className="list-group-item d-flex justify-content-between align-items-center">
-                            Close Account
-                                <span>
-                                    <i className="bi bi-arrow-right"></i>
-                                </span>
-                        </li>
-                    </ul>
+        const { error, isLoaded, divesites, buddies, location, weather } = this.state;
+        if (error) {
+            return <div>Error: {error.message}</div>;
+        } else if (!isLoaded) {
+            return <div>Loading...</div>;
+        } else {
+            return <div className="App">
+                <div className="row">
+                    <Location location={location} weather={weather} />;
+                </div>
+
+                <div className="row">
+                    <Favorites divesites={divesites} />;
+                </div>
+
+                <div className="row">
+                    <Buddies buddies={buddies} />;
+                </div>
+
+                <div className="row">
+                    <Others divesites={divesites} />;
                 </div>
             </div>
-        )
+        }
     }
 }
 

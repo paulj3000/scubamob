@@ -106,5 +106,5 @@ urlpatterns = [
     # enable the admin section
     path('admin/api/chats/', include('scuba.accounts.urls_admin_chats_api')),
     path('admin/', admin.site.urls),
-    re_path(r'^p/(?P<id>[\w]+)/', include('scuba.accounts.urls_profile')),
+    path(r'p/', include('scuba.accounts.urls_profile')),
 ]
