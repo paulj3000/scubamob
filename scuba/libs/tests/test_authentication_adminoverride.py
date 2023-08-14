@@ -73,8 +73,6 @@ class TestAdminOverride(TestCase):
         self.assertIsNotNone(result)
         self.assertIsNotNone(request.session.get('adminoverride'))
 
-
-
     def test_admin_bad_admin_password(self):
         '''
         test when the password does not contain a '%'
