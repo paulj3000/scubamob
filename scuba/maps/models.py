@@ -29,22 +29,6 @@ class Region(UUIDModel):
         return obj
 
     @staticmethod
-    def xget_weather_by_lat_long(lat, long):
-        from pprint import pprint
-        pprint(weather_json)
-
-        location = weather_json['location']
-        key = f'weather_{obj.pk_as_str}'
-        weather = cache.get(key, 3600)
-
-        obj, _ = Region.objects.get_or_create(
-            name=location['name'].upper(),
-            region=location['region'].upper(),
-            country=location['country'].upper())
-
-        return obj
-
-    @staticmethod
     def get_weather_by_lat_long(lat, long):
         weather_json = Weather.get_current_by_lat_lng(lat, long)
         region = Region.store_weather_region(weather_json)
