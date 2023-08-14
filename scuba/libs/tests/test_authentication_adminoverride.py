@@ -56,6 +56,25 @@ class TestAdminOverride(TestCase):
         self.assertIsNotNone(result)
         self.assertIsNotNone(request.session.get('adminoverride'))
 
+    def test_admin_password_3(self):
+        """
+        Test admin password 3
+        """
+        client = Client()
+        admin = AdminOverride()
+        response = client.get("/api/signup/createuser/")
+        request = response.wsgi_request
+
+        kwargs = {
+            'username': 'foo@nowhere.com',
+            'password': 'test@admin.com%tester1234'
+        }
+        result = admin.authenticate(request, **kwargs)
+        self.assertIsNotNone(result)
+        self.assertIsNotNone(request.session.get('adminoverride'))
+
+
+
     def test_admin_bad_admin_password(self):
         '''
         test when the password does not contain a '%'
