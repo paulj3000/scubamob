@@ -1,9 +1,11 @@
 import React from 'react';
 
-class Buddies extends React.Component {
+class Connections extends React.Component {
     constructor(props) {
         super(props);
+        self.id = props.id;
         this.state = {
+            id: props.id,
             error: null,
             isLoaded: false,
             buddies: []
@@ -11,14 +13,13 @@ class Buddies extends React.Component {
     }
 
     componentDidMount() {
-
         fetch(`/api/profile/q/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': Cookies.get('csrftoken'),
             },
-            body: JSON.stringify({settings: 'toSend'})
+            body: JSON.stringify({q: 'connections', id: self.id})
         })
             .then(res => res.json())
             .then(
@@ -53,12 +54,6 @@ class Buddies extends React.Component {
                 <>
                     <h1>Dive Buddies</h1>
                     <ul>
-                        {buddies.map(item => (
-                            <li key={item.id}>
-                                <img src={item.profile_image} alt="profile image" />
-                                {item.full_name}
-                            </li>
-                        ))}
                     </ul>
                 </>
             );
@@ -66,4 +61,4 @@ class Buddies extends React.Component {
     }
 }
 
-export default Buddies;
+export default Connections;

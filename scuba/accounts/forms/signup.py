@@ -21,21 +21,13 @@ class SignupForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'date_of_birth', 'email', 'password',)
+        fields = ('username', 'first_name', 'last_name', 'date_of_birth', 'email', 'password',)
 
     def clean(self):
         cleaned = super().clean()
         email = cleaned.get('email', 'unknown@unknown.com')
 
-        # here is the form data submitted
-        '''
-        message = {
-            'form_data': cleaned,
-            'is_spam': self.is_spam,
-            'iso_country': iso_country,
-            'blocked': blocked_name}
-        '''
-
+        # check if the ip address is from Russia. If it is, return an error
         if IS_PRODUCTION:
             # here is the form data submitted
             blocked, iso_country = BlockedCountry.is_ip_available(getattr(self, 'ip_address'))
@@ -79,6 +71,18 @@ class SignupForm(forms.ModelForm):
             raise forms.ValidationError(f"{email} is already registered")
 
         return email
+
+    def clean_username(self):
+        cleaned = super().clean()
+        username = cleaned.get('username')
+
+        if len(username) < 5 or len(username) > 40:
+            raise forms.ValidationError(f"{username} is a bad length")
+
+        if User.objects.filter(username=username).first():
+            raise forms.ValidationError(f"{username} is already registered")
+
+        return username
 
     def save(self, commit=True):
         user = super().save(commit=False)

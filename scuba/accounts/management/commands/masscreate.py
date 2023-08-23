@@ -20,6 +20,7 @@ class Command(BaseCommand):
                 new_user = User()
                 new_user.first_name = f'test {i}'
                 new_user.last_name = f'user {i}'
+                new_user.username = f'testuser{i}'
                 new_user.date_of_birth = '1970-04-01'
 
                 new_user.email = email

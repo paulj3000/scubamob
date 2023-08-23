@@ -5,11 +5,11 @@ from rest_framework import generics
 
 from scuba.accounts.models import User
 from scuba.accounts.models import UserBlocked, UserBuddy
-from scuba.accounts.serializers.profile import ProfileSerializer
+from scuba.accounts.serializers import profile as serializers
 
 
 class GetProfileApi(generics.RetrieveAPIView):
-    serializer_class = ProfileSerializer
+    serializer_class = serializers.ProfileSerializer
     lookup_field = 'id'
 
     def get_serializer(self, *args, **kwargs):
@@ -43,7 +43,7 @@ class GetProfileApi(generics.RetrieveAPIView):
 
 class GetMeProfileApi(generics.GenericAPIView):
     lookup_field = 'username'
-    serializer_class = ProfileSerializer
+    serializer_class = serializers.ProfileSerializer
 
     def get(self, request):
         """ post
@@ -53,3 +53,18 @@ class GetMeProfileApi(generics.GenericAPIView):
         user = request.user
         user = self.serializer_class(request.user)
         return Response({'profile': user.data})
+
+
+class QueryApi(generics.GenericAPIView):
+    serializer_class = serializers.QuerySerializer
+
+    def post(self, request):
+        """ post
+
+        Do the actual posting of the password reset
+        """
+        user = request.user
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return Response({'profile': serializer.data})

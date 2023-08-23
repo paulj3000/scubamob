@@ -162,3 +162,27 @@ class ConfirmBuddyRequestSerializer(serializers.Serializer):
         user.confirm_buddy_request(self.buddy_user)
 
         return True
+
+
+class QuerySerializer(serializers.Serializer):
+    q = serializers.SerializerMethodField(read_only=True)
+
+    @staticmethod
+    def get_q(data):
+        print(data)
+        return True
+
+    def validate_userid(self, userid):
+        """ validate_plan
+
+        Validate the plan id coming in
+        """
+        user = self.context['user']
+
+        if user.id == userid:
+            raise serializers.ValidationError("You cannot block yourself")
+
+        buddy_user = get_object_or_404(User, pk=userid)
+
+        setattr(self, 'buddy_user', buddy_user)
+        return userid

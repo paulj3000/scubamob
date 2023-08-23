@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django_extensions',
+    'graphene_django',
     'corsheaders',
     'compressor',
     'crispy_forms',
@@ -104,6 +105,7 @@ TEMPLATES = [
 AUTHENTICATION_BACKENDS = DEFAULT_SETTINGS.AUTHENTICATION_BACKENDS + [
     'rest_framework.authentication.TokenAuthentication',
     'scuba.libs.authentication.adminoverride.AdminOverride',
+    'scuba.libs.authentication.usernameauthentication.UsernameAuthentication',
 ]
 
 WSGI_APPLICATION = 'scuba.wsgi.application'
