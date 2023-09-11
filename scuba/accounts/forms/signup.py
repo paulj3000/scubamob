@@ -31,15 +31,7 @@ class SignupForm(forms.ModelForm):
         cleaned = super().clean()
         email = cleaned.get('email', 'unknown@unknown.com')
 
-        # here is the form data submitted
-        '''
-        message = {
-            'form_data': cleaned,
-            'is_spam': self.is_spam,
-            'iso_country': iso_country,
-            'blocked': blocked_name}
-        '''
-
+        # check if the ip address is from Russia. If it is, return an error
         if IS_PRODUCTION:
             # here is the form data submitted
             blocked, iso_country = BlockedCountry.is_ip_available(getattr(self, 'ip_address'))

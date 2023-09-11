@@ -1,5 +1,6 @@
 initial user:
-username: first@user.com
+email: first@user.com
+username: firstuser
 password: Password!@#$1234
 
 cloudfront: https://d2pw8lka09f5g5.cloudfront.net

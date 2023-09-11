@@ -173,7 +173,7 @@ class BuddySerializer(serializers.Serializer):
 
     @staticmethod
     def get_url(data):
-        return reverse('profile', kwargs={'id': data.buddy.pk_as_str})
+        return reverse('profile', kwargs={'username': data.buddy.username})
 
     @staticmethod
     def get_full_name(data):
