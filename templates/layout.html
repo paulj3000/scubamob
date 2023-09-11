@@ -624,7 +624,7 @@ i.wide {
 
                     <div class="card mb-4">
                         <div class="card-body text-center">
-                            <a href="{% url 'profile' id=user.pk_as_str %}">
+                            <a href="{% url 'profile' username=user.username %}">
                                 <img src="{{user.profile_image}}" alt="profile image for {{user.get_full_name}}"
                                 class="rounded-circle img-fluid" style="width: 150px;" />
                             </a>
