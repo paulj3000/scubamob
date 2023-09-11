@@ -62,7 +62,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
     email = models.EmailField(max_length=255, unique=True, db_index=True)
-    #username = models.CharField(max_length=40, unique=True, db_index=True)
+    # username = models.CharField(max_length=40, unique=True, db_index=True)
     username = models.CharField(null=True, max_length=40)
     first_name = models.CharField(max_length=40)
     last_name = models.CharField(max_length=40)

@@ -103,6 +103,7 @@ class GetHomescreenApi(generics.GenericAPIView):
             'location': location,
             'divesites': {
                 'favorites': user.get_divesite_favorites(),
-                'list': DivesiteSerializer(Divesite.get_all_active_divesites(), many=True, type='simple').data
+                'list': DivesiteSerializer(Divesite.get_all_active_divesites(),
+                                           many=True, type='simple').data
             }
         })

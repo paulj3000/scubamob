@@ -202,7 +202,9 @@ class DivesiteCheckin(UUIDModel):
 
 
 class DivesiteCheckinThank(UUIDModel):
-    divesite_checkin = models.ForeignKey(DivesiteCheckin, related_name='thanks', on_delete=models.CASCADE)
+    divesite_checkin = models.ForeignKey(DivesiteCheckin,
+                                         related_name='thanks',
+                                         on_delete=models.CASCADE)
     user = models.ForeignKey('accounts.User', related_name='thanks', on_delete=models.CASCADE)
     is_thanked = models.BooleanField(default=True)
 
