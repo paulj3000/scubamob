@@ -9,9 +9,10 @@ from scuba.accounts.models import User
 from scuba.settings import PROFILE_BLANK_URL
 
 
-class RegisterUserSerializer(serializers.Serializer):
+class RegisterSerializer(serializers.Serializer):
     id = serializers.SerializerMethodField(read_only=True)
     email = serializers.EmailField()
+    username = serializers.CharField()
     first_name = serializers.CharField()
     last_name = serializers.CharField()
     password = serializers.CharField(write_only=True)
@@ -40,8 +41,22 @@ class RegisterUserSerializer(serializers.Serializer):
 
         return email
 
+    def validate_username(self, username):
+        """ validate_username
+
+        Validate the username coming in
+        """
+        if len(username) < 5 or len(username) > 40:
+            raise serializers.ValidationError(f"Username {username} is an invalid length")
+
+        if User.objects.filter(username=username).count():
+            raise serializers.ValidationError(f"Username {username} is already registered")
+
+        return username
+
     def create(self, validated_data):
         user = User.objects.create(
+            username=validated_data['username'],
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
             email=validated_data['email'])

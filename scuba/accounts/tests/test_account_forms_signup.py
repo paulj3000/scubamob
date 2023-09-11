@@ -76,3 +76,25 @@ class TestAccountFormSignup(TestCase):
         self.assertEqual(
             form.errors["email"], [f"{email} is already registered"],
         )
+
+    def test_duplicate_username(self):
+        """
+        Test if the email address is a duplicate
+        """
+        username = 'testtester'
+        data = {
+            'first_name': 'Test',
+            'last_name': 'User',
+            'username': username,
+            'date_of_birth': '1970-04-01',
+            'email': 'xxx@duplicateusername.com',
+            'password': 'testpassword',
+            'ip_address': '0.0.0.0',
+            'is_spam': False,
+        }
+
+        form = SignupForm(data=data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors["username"], [f"{username} is already registered"],
+        )

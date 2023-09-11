@@ -84,6 +84,15 @@ class SignupForm(forms.ModelForm):
 
         return email
 
+    def clean_username(self):
+        cleaned = super().clean()
+        username = cleaned.get('username')
+
+        if User.objects.filter(username=username).first():
+            raise forms.ValidationError(f"{username} is already registered")
+
+        return username
+
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data['password'])

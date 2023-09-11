@@ -11,7 +11,7 @@ from rest_framework.permissions import AllowAny
 
 from scuba.accounts.models import User
 from scuba.accounts.exceptions import InvalidUserIdException
-from scuba.accounts.serializers.account import RegisterUserSerializer, LoginSerializer
+from scuba.accounts.serializers.account import RegisterSerializer, LoginSerializer
 from scuba.divesites.serializers import DivesiteReviewSerializer
 
 
@@ -21,7 +21,7 @@ class RegisterUserApi(generics.CreateAPIView):
     This class handles the API calls of the password reset functionality
     of the site
     """
-    serializer_class = LoginSerializer
+    serializer_class = RegisterSerializer
     permission_classes = (AllowAny,)
 
 
