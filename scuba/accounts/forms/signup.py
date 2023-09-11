@@ -88,6 +88,9 @@ class SignupForm(forms.ModelForm):
         cleaned = super().clean()
         username = cleaned.get('username')
 
+        if len(username) < 5 or len(username) > 40:
+            raise forms.ValidationError(f"{username} is a bad length")
+
         if User.objects.filter(username=username).first():
             raise forms.ValidationError(f"{username} is already registered")
 
