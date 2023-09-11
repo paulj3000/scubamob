@@ -6,6 +6,4 @@ urlpatterns = [
     re_path(r'(?P<username>[\w]+)$', profile_view.ProfileView.as_view(), name='profile'),
     re_path(r'(?P<username>[\w]+)/buddies$', profile_view.ProfileView.as_view(), name='buddies'),
     re_path(r'(?P<username>[\w]+)/about$', profile_view.ProfileView.as_view(), name='about'),
-    #path('buddies', profile_view.ProfileView.as_view(), name='buddies'),
-    #path('about', profile_view.ProfileView.as_view(), name='about'),
 ]
