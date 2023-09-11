@@ -56,7 +56,8 @@ class TestUserRegisterAPI(TestCase):
         response = client.post('/api/register/', payload, format='json')
         self.assertEqual(response.status_code, 400)
         self.assertIsNotNone(response.json().get('email'))
-        self.assertEqual(response.json().get('email')[0], 'Email address foo@nowhere.com is already registered')
+        self.assertEqual(response.json().get('email')[0],
+                         'Email address foo@nowhere.com is already registered')
 
     def test_user_register_duplicate_username(self):
         """
@@ -74,7 +75,8 @@ class TestUserRegisterAPI(TestCase):
         response = client.post('/api/register/', payload, format='json')
         self.assertEqual(response.status_code, 400)
         self.assertIsNotNone(response.json().get('username'))
-        self.assertEqual(response.json().get('username')[0], 'Username testuser3 is already registered')
+        self.assertEqual(response.json().get('username')[0],
+                         'Username testuser3 is already registered')
 
     def test_user_register_short_username(self):
         """
@@ -95,7 +97,8 @@ class TestUserRegisterAPI(TestCase):
             response = client.post('/api/register/', payload, format='json')
             self.assertEqual(response.status_code, 400)
             self.assertIsNotNone(response.json().get('username'))
-            self.assertEqual(response.json().get('username')[0], f'Username {username} is an invalid length')
+            self.assertEqual(response.json().get('username')[0],
+                             f'Username {username} is an invalid length')
 
     def test_user_register_long_username(self):
         """
@@ -115,4 +118,5 @@ class TestUserRegisterAPI(TestCase):
         response = client.post('/api/register/', payload, format='json')
         self.assertEqual(response.status_code, 400)
         self.assertIsNotNone(response.json().get('username'))
-        self.assertEqual(response.json().get('username')[0], f'Username {username} is an invalid length')
+        self.assertEqual(response.json().get('username')[0],
+                         f'Username {username} is an invalid length')
