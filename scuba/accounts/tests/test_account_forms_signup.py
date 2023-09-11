@@ -99,7 +99,7 @@ class TestAccountFormSignup(TestCase):
             form.errors["username"], [f"{username} is already registered"],
         )
 
-    def test_bad_password_too_short(self):
+    def test_bad_password_length(self):
         """
         Test a bad password, it has to be at least 4 characters
         """
@@ -132,4 +132,37 @@ class TestAccountFormSignup(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form.errors["password"], ['Your password must be between 4 and 20 characters'],
+        )
+
+    def test_bad_username_length(self):
+        """
+        Test a bad password, it has to be at least 4 characters
+        """
+
+
+        data = {
+            'first_name': 'Test',
+            'last_name': 'User',
+            'date_of_birth': '1970-04-01',
+            'email': 'test@newuser.com',
+            'password': 'xxxxxxxx',
+            'ip_address': '0.0.0.0',
+            'is_spam': False,
+        }
+
+        for x in range(1, 5):
+            username = 'x' * x
+            data['username'] = username
+
+            form = SignupForm(data=data)
+            self.assertFalse(form.is_valid())
+            self.assertEqual(
+                form.errors['username'], [f'{username} is a bad length']
+            )
+
+        data['username'] = 'x' * 41
+        form = SignupForm(data=data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors['username'], ['Ensure this value has at most 40 characters (it has 41).']
         )
