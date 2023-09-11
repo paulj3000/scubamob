@@ -103,8 +103,6 @@ class TestAccountFormSignup(TestCase):
         """
         Test a bad password, it has to be at least 4 characters
         """
-
-
         data = {
             'first_name': 'Test',
             'last_name': 'User',
@@ -115,7 +113,6 @@ class TestAccountFormSignup(TestCase):
             'ip_address': '0.0.0.0',
             'is_spam': False,
         }
-
 
         for x in range(1, 4):
             passwd = 'x' * x
@@ -138,8 +135,6 @@ class TestAccountFormSignup(TestCase):
         """
         Test a bad password, it has to be at least 4 characters
         """
-
-
         data = {
             'first_name': 'Test',
             'last_name': 'User',
