@@ -30,6 +30,7 @@
 
                 <form method="post" action="{% url 'login' %}" id="f_login">
                     {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ next }}">
 
                     {% if form.errors %}
                     <div class="errors alert alert-danger" role="alert">
