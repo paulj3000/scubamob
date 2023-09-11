@@ -20,6 +20,7 @@ class TestAccountFormSignup(TestCase):
         data = {
             'first_name': 'Test',
             'last_name': 'User',
+            'username': 'newtestuser',
             'date_of_birth': '1970-04-01',
             'email': 'test@newuser.com',
             'password': 'testpassword',
@@ -40,6 +41,7 @@ class TestAccountFormSignup(TestCase):
         data = {
             'first_name': 'Test',
             'last_name': 'User',
+            'username': 'russia',
             'date_of_birth': '1970-04-01',
             'email': 'test@newuser.ru',
             'password': 'testpassword',
@@ -61,6 +63,7 @@ class TestAccountFormSignup(TestCase):
         data = {
             'first_name': 'Test',
             'last_name': 'User',
+            'username': 'duplicateuser',
             'date_of_birth': '1970-04-01',
             'email': email,
             'password': 'testpassword',

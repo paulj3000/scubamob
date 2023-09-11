@@ -26,7 +26,7 @@ class RegisterUserApi(generics.CreateAPIView):
 
 
 class LoginUserApi(generics.GenericAPIView):
-    """ Block User
+    """ Login User
 
     This class handles the API calls of the password reset functionality
     of the site

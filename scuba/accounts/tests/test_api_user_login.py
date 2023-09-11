@@ -18,7 +18,7 @@ class TestUserLoginAPI(TestCase):
 
     def test_login_user_1(self):
         """
-        Test simple create user
+        Test simple login by way of email address and password
         """
         user = User.objects.get(email='foo@nowhere.com')
         client = APIClient()
@@ -48,12 +48,36 @@ class TestUserLoginAPI(TestCase):
 
     def test_login_user_2(self):
         """
-        Test simple create user
+        Test simple login by way of email address and password 2
         """
         user = User.objects.get(email='foo@nowhere.com')
         client = APIClient()
         payload = {
             'email': 'foo@nowhere.com',
+            'password': 'password',
+            'ip_address': '192.168.0.1',
+            'device': 'some_mobile_device',
+        }
+
+        response = client.post('/api/login/', payload, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        # check the login stuff, make sure there is one login
+        self.assertEqual(len(user.get_all_logins()), 1)
+
+        # make sure the login stuff is logged
+        user_login = user.get_all_logins()[0]
+        self.assertEqual(user_login.device, 'some_mobile_device')
+        self.assertEqual(user_login.ip_address, '192.168.0.1')
+
+    def test_login_username(self):
+        """
+        Test login user by way of username
+        """
+        user = User.objects.get(email='foo@nowhere.com')
+        client = APIClient()
+        payload = {
+            'username': 'testusernamefoo',
             'password': 'password',
             'ip_address': '192.168.0.1',
             'device': 'some_mobile_device',

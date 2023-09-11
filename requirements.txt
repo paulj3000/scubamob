@@ -32,3 +32,7 @@ django-bootstrap5==22.2
 pycodestyle==2.8.0
 googlemaps==4.10.0
 django-storages==1.13.2
+graphene==3.3
+graphene-django==3.1.5
+graphql-core==3.2.3
+graphql-relay==3.2.0

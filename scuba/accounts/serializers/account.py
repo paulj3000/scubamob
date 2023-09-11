@@ -63,7 +63,8 @@ class LoginSerializer(serializers.ModelSerializer):
     )
 
     confirmed = serializers.SerializerMethodField(read_only=True)
-    email = serializers.CharField(label=_("Email"))
+    email = serializers.CharField(label=_("Email"), required=False)
+    username = serializers.CharField(label=_("Username"), required=False)
     device = serializers.CharField(default='mobile', write_only=True)
     ip_address = serializers.CharField(default='0.0.0.0', write_only=True)
 
@@ -75,6 +76,7 @@ class LoginSerializer(serializers.ModelSerializer):
         Raises: validation exception if the user has cannot authenticate
         """
         email = attrs.get('email')
+        username = attrs.get('username')
         password = attrs.get('password')
         device = attrs.get('device')
         ip_address = attrs.get('ip_address')
@@ -90,8 +92,27 @@ class LoginSerializer(serializers.ModelSerializer):
                 msg = _('Unable to log in with provided credentials.')
                 raise serializers.ValidationError(msg, code='authorization')
 
+        elif username and password:
+            user = authenticate(request=self.context.get('request'),
+                                username=username, password=password)
+
+            print(f"USERNAME {username}")
+            print(f"USERNAME {username}")
+            print(f"USERNAME {username}")
+            print(f"USERNAME {username}")
+
+            print(user)
+            print(user)
+            print(user)
+
+            # The authenticate call simply returns None for is_active=False
+            # users. (Assuming the default ModelBackend authentication
+            # backend.)
+            if not user:
+                msg = _('Unable to log in with provided credentials.')
+                raise serializers.ValidationError(msg, code='authorization')
         else:
-            msg = _('Must include "email" and "password".')
+            msg = _('Must include "email or username" and "password".')
             raise serializers.ValidationError(msg, code='authorization')
 
         # now add the user's login info
@@ -142,6 +163,7 @@ class LoginSerializer(serializers.ModelSerializer):
             'date_joined': {'read_only': True},
             'profile_image': {'read_only': True},
             'email': {'read_only': True},
+            'email': {'username': True},
             'first_name': {'read_only': True},
             'last_name': {'read_only': True},
             'device': {'write_only': True},
@@ -149,7 +171,7 @@ class LoginSerializer(serializers.ModelSerializer):
             'token': {'read_only': True}}
 
         fields = ('id', 'first_name', 'last_name', 'email', 'token', 'device',
-                  'confirmed',
+                  'confirmed', 'username',
                   'date_joined', 'password', 'profile_image', 'ip_address',)
 
     def create(self, validated_data):
