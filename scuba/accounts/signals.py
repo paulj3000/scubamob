@@ -8,7 +8,7 @@ Author: Pauljames "The Juggernaut" Dimitriu
 Add some signal stuff for account creation stuff
 """
 import pytz
-from pprint import pprint
+from pytz import UnknownTimeZoneError
 import logging
 
 from django.utils import timezone
@@ -50,10 +50,13 @@ def post_login(sender, user, request, **kwargs):
     else:
         tz = 'America/Los_Angeles'
 
-    timezone.activate(pytz.timezone(tz))
-    request.session['timezone'] = tz
-    request.session['zipcode'] = 92107
-
+    try:
+        timezone.activate(pytz.timezone(tz))
+        request.session['timezone'] = tz
+        request.session['zipcode'] = 92107
+    except UnknownTimeZoneError:
+        request.session['timezone'] = 'America/Los_Angeles'
+        request.session['zipcode'] = 92107
 
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):
