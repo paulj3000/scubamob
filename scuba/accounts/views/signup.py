@@ -22,6 +22,9 @@ class SignupView(FormView):
     template_name = 'accounts/signup.html'
     success_url = reverse_lazy('home')
     form_class = SignupForm
+    extra_context = {
+        'hide_nav_account': True,
+    }
 
     def form_valid(self, form):
         """ form_valid
@@ -39,15 +42,6 @@ class SignupView(FormView):
 
         login(self.request, user, backend='django.contrib.auth.backends.ModelBackend')
         return super().form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context.update({
-            'hidelogin': True,
-            'facebook_id': FACEBOOK_APP,
-        })
-        return context
 
     def post(self, request, *args, **kwargs):
         """

@@ -2,20 +2,32 @@
 {% load crispy_forms_tags static %}
 
 {% block content %}
-<div class="sales">
-    <h1>Sign up for ScubaMob</h1>
-</div>
-<div class="inputform">
 
-    <form method="post" action="{% url 'signup' %}">
-        {% csrf_token %}
-        {{ form|crispy }}
-        <div class="loginoption">
-            <button class="btn btn-primary" type="submit">Login</button>
+    <style>
+    @media (min-width: 1025px) {
+        .h-custom {
+            height: 100vh !important;
+        }
+    }
+    </style>
+
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-lg-8 col-xl-6">
+        <div class="card rounded-3">
+          <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/img3.webp"
+            class="w-100" style="border-top-left-radius: .3rem; border-top-right-radius: .3rem;"
+            alt="Sample photo">
+          <div class="card-body p-4 p-md-5">
+            <form method="post" action="{% url 'signup' %}" class="px-md-2">
+                {% csrf_token %}
+                {{ form|crispy }}
+
+                <button type="submit" class="btn btn-primary btn-lg mb-1">Submit</button>
+                <input type="hidden" name="next" value="{{ next }}" />
+            </form>
+
+          </div>
         </div>
-
-        <input type="hidden" name="next" value="{{ next }}" />
-    </form>
-</div>
-
+      </div>
+    </div>
 {% endblock %}

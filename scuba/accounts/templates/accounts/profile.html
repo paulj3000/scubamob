@@ -15,6 +15,171 @@
 {% endblock %}
 
 {% block content %}
+<style>
+.profile {
+  margin: 20px 0;
+}
+
+/* Profile sidebar */
+.profile-sidebar {
+  padding: 20px 0 10px 0;
+  background: #fff;
+}
+
+.profile-sidebar > .header {
+    border-radius: 8px 8px 0px 0px;
+    position:absolute;
+    width:100%;
+    background-color:rgba(45,46,47,1);
+    box-sizing:border-box;
+    z-index:-1;
+    min-height:80px;
+}
+
+.profile-userpic img {
+  margin: 0 auto;
+  width: 50%;
+  height: 50%;
+  -webkit-border-radius: 50% !important;
+  -moz-border-radius: 50% !important;
+  display:block;
+}
+
+.profile-usertitle {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.profile-usertitle-name {
+  color: #5a7391;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 7px;
+}
+
+.profile-usertitle-job {
+  text-transform: uppercase;
+  color: #5b9bd1;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.profile-userbuttons {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.profile-userbuttons .btn {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 15px;
+  margin-right: 5px;
+}
+
+.profile-userbuttons .btn:last-child {
+  margin-right: 0px;
+}
+
+.profile-usermenu {
+  margin-top: 30px;
+}
+
+.profile-usermenu ul li {
+  border-bottom: 1px solid #f0f4f7;
+}
+
+.profile-usermenu ul li:last-child {
+  border-bottom: none;
+}
+
+.profile-usermenu ul li a {
+  color: #93a3b5;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.profile-usermenu ul li a i {
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+.profile-usermenu ul li a:hover {
+  background-color: #fafcfd;
+  color: #5b9bd1;
+}
+
+.profile-usermenu ul li.active {
+  border-bottom: none;
+}
+
+.profile-usermenu ul li.active a {
+  color: #5b9bd1;
+  background-color: #f6f9fb;
+  border-left: 2px solid #5b9bd1;
+  margin-left: -2px;
+}
+
+/* Profile Content */
+.profile-content {
+  padding: 20px;
+  background: #fff;
+  min-height: 460px;
+}
+
+
+</style>
+
+
+<div class="row profile">
+    <div class="col-sm-3">
+        <div class="card profile-sidebar">
+            <div class="header"></div>
+            <!-- SIDEBAR USERPIC -->
+            <div class="profile-userpic">
+                <img src="{{user.profile_image}}" class="img-fluid img-thumbnail rounded-circle" alt="">
+            </div>
+            <!-- END SIDEBAR USERPIC -->
+            <!-- SIDEBAR USER TITLE -->
+            <div class="profile-usertitle">
+                <div class="profile-usertitle-name">
+                    {{profile.get_full_name}}
+                </div>
+                <div class="profile-usertitle-job">
+                    San Diego, CA
+                </div>
+                <div class="profile-usertitle-job">
+                    x x x
+                </div>
+            </div>
+            <!-- END SIDEBAR USER TITLE -->
+            <!-- SIDEBAR BUTTONS -->
+            <div class="profile-userbuttons">
+                <button type="button" class="btn btn-success btn-sm">Follow</button>
+                <button type="button" class="btn btn-danger btn-sm">Message</button>
+            </div>
+            <!-- END SIDEBAR BUTTONS -->
+        </div>
+
+        <div class="pt-3">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <i class="bi bi-stars"></i> Reviews
+                </li>
+                <li class="list-group-item">
+                    <i class="bi bi-image"></i> Photos and Videos
+                </li>
+                <li class="list-group-item">
+                    <i class="bi bi-person-square"></i> Buddies
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-sm-9">
+    </div>
+</div>
+
 <script src="{% static 'js/chat.js' %}"></script>
 <style>
 
@@ -60,109 +225,6 @@ input[type=number]:focus,
 }
 </style>
 
-<section>
-    <div class="row d-flex justify-content-center align-items-center h-100">
-      <div class="col">
-        <div class="card">
-          <div class="rounded-top text-white d-flex flex-row" style="background-color: #000; height:200px;">
-            <div class="ms-4 mt-5 d-flex flex-column" style="width: 150px;">
-              <img src="{{user.profile_image}}"
-                alt="Generic placeholder image" class="img-fluid img-thumbnail rounded-circle"
-                style="width: 150px; z-index: 1">
-            </div>
-          </div>
-
-          <div class="p-4 pb-1 text-black" style="background-color: #f8f9fa;">
-            <div class="d-flex float-start text-left py-1">
-                <div>
-                    <h5>{{profile.get_full_name}}</h5>
-                    <h6>San Diego, CA</h6>
-
-                    <script>
-                        const profileId = "{{profile.pk_as_str}}";
-                    </script>
-                    <div id="profile"></div>
-                    {% if profile.get_friend_count %}
-                    <a href="#">{{profile.get_friend_count}} Budd{{profile.get_friend_count|pluralize:"y,ies"}}</a>
-                    {% endif %}
-                </div>
-            </div>
-          </div>
-
-        <div class="p-4 pt-1 text-black" style="background-color: #f8f9fa;">
-            <div class="d-flex float-start text-center py-1">
-                {% if request.is_user %}
-                {% else %}
-                <div>
-                    <div id="confirmbuddy" class="d-none d-inline-block">
-                        <span class="pe-3">{{profile.first_name}} wants to be a buddy</span>
-                        <button class="btn btn-primary" onclick="confirmRequest()">Connect</button>
-                        <button class="btn btn-primary" onclick="cancelBuddyRequest()">Delete Buddy Request</button>
-                    </div>
-                    <button class="btn btn-primary d-none" onclick="addBuddy()" id="addbuddy">Connect</button>
-                    <button class="btn btn-primary d-none" onclick="cancelBuddyRequest()" id="cancelrequest">Cancel Buddy Request</button>
-
-                    <div class="btn-group">
-                        <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                            More
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                            <li><a class="dropdown-item" href="#">Action</a></li>
-                            <li><a class="dropdown-item" href="#">Another action</a></li>
-                            <li><a class="dropdown-item d-none" href="#" onclick="removeLink()" id="removeLink" >Unlink</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="doBlock()">Block</a></li>
-                        </ul>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-          </div>
-
-
-          <div class="card-body p-4 text-black">
-            <div class="mb-5">
-              <p class="lead fw-normal mb-1">About</p>
-              <div class="p-4" style="background-color: #f8f9fa;">
-                <p class="font-italic mb-1">Web Developer</p>
-                <p class="font-italic mb-1">Lives in New York</p>
-                <p class="font-italic mb-0">Photographer</p>
-              </div>
-            </div>
-            {% block profile %}
-            <div id="root"></div>
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div id="profile_container"></div>
-              <p class="lead fw-normal mb-0">Recent photos</p>
-              <p class="mb-0"><a href="#!" class="text-muted">Show all</a></p>
-            </div>
-            <div class="row g-2">
-              <div class="col mb-2">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(112).webp"
-                  alt="image 1" class="w-100 rounded-3">
-              </div>
-              <div class="col mb-2">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(107).webp"
-                  alt="image 1" class="w-100 rounded-3">
-              </div>
-            </div>
-            <div class="row g-2">
-              <div class="col">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(108).webp"
-                  alt="image 1" class="w-100 rounded-3">
-              </div>
-              <div class="col">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(114).webp"
-                  alt="image 1" class="w-100 rounded-3">
-              </div>
-            </div>
-            {% endblock %}
-          </div>
-        </div>
-      </div>
-    </div>
-</section>
-
-
 {% if request.is_user %}
 this is me!!!!!!
 {% else %}
@@ -191,11 +253,6 @@ this is me!!!!!!
         </div>
     </div>
     {% endif %}
-{% endif %}
-
-{% if friends %}
-here are my friends
-{{ friends }}
 {% endif %}
 
 <script type="text/template" id="friendrequested">
@@ -360,3 +417,6 @@ var friendId=null;
 {% include "messenger/message.html" %}
 
 {% endblock %}
+
+<!--https://bootsnipp.com/snippets/MRgWB -->
+<!--https://bootsnipp.com/snippets/M48pA -->

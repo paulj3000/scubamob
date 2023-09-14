@@ -561,6 +561,20 @@ class Account(models.Model):
         send_mail(subject, message, from_email, [self.email])
 
 
+class UserFollower(UUIDModel):
+    """ UserFollower
+
+    Who is following who
+    """
+    user = models.ForeignKey(User, related_name='followers', on_delete=models.CASCADE)
+    follower = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name_plural = 'user followers'
+        db_table = 'user_follower'
+        unique_together = (('user', 'follower'), )
+
+
 class UserBuddy(UUIDModel):
     user = models.ForeignKey(User, related_name='buddies', on_delete=models.CASCADE)
     buddy = models.ForeignKey(User, on_delete=models.CASCADE)

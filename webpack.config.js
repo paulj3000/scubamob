@@ -10,6 +10,7 @@ module.exports = {
     settings: { import: `${staticPath}/settings/index.js` },
     home: { import: `${staticPath}/home/index.js` },
     messenger: { import: `${staticPath}/messenger/index.js` },
+    chatbox: { import: `${staticPath}/chatbox/index.js` },
   },
 
   module: {
