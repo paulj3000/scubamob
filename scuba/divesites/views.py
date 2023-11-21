@@ -2,9 +2,10 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.generic import TemplateView
+from django.views.generic.edit import FormView
 from django.shortcuts import get_object_or_404
 
-from scuba.divesites.models import Divesite
+from .models import Divesite, DivesiteReview
 
 
 class IndexView(TemplateView):
@@ -40,8 +41,10 @@ class SiteView(TemplateView):
         add more parameters to the context data
         """
         context = super().get_context_data(**kwargs)
+        site = kwargs.get('site')
         context.update({
-            'site': Divesite.get_all_active_divesites(),
+            'site': kwargs.get('site'),
+            'title': site.name,
         })
 
         return context
@@ -54,5 +57,4 @@ class SiteView(TemplateView):
             request.user.add_divesite_recently_viewed(site)
 
         kwargs['site'] = site
-
         return super().dispatch(request, *args, **kwargs)

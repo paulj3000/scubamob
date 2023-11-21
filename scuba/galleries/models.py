@@ -79,8 +79,7 @@ class Media(UUIDModel):
 class Album(UUIDModel):
     user = models.ForeignKey(User, related_name='albums', on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
-    description = models.CharField(max_length=255)
-    guid = models.CharField(max_length=125, db_index=True)
+    description = models.TextField(blank=True, default="")
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -147,14 +146,6 @@ class Album(UUIDModel):
         k.set_contents_from_string(temp_handle.read(), header)
 
         return gallery_file_thumbnail
-
-    def save(self, *args, **kwargs):
-        # save the album
-
-        if not self.guid:
-            self.guid = str(uuid.uuid1()).replace('-', '')
-
-        super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'gallery_album'

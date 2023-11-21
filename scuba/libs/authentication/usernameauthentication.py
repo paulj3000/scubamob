@@ -12,9 +12,6 @@ class UsernameAuthentication:
         if username is None:
             username = kwargs.get('username')
 
-            if username is None:
-                username = kwargs.get('username')
-
         if password is None:
             password = kwargs.get('password')
 

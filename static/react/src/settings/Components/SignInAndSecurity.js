@@ -16,11 +16,11 @@ export default function SignInAndSecurity() {
     return(
         <div className="App">
             <div className="col-8 mx-auto">
-                <ul class="list-group mb-4">
-                    <li class="list-group-item">
+                <ul className="list-group mb-4">
+                    <li className="list-group-item">
                         <h5>Account access</h5>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center"
+                    <li className="list-group-item d-flex justify-content-between align-items-center"
                         onClick={navigateEmailAddresses}>
                         Email Addresses
                             <span>

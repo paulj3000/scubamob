@@ -14,7 +14,7 @@ class AlbumSerializer(serializers.ModelSerializer):
     class Meta:
         """ define models, fields, etc """
         model = Album
-        fields = '__all__'
+        exclude = ('user', 'created', 'modified',)
 
     @staticmethod
     def get_url(data):

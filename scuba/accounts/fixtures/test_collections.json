@@ -1,0 +1,1 @@
+[{"model": "accounts.usercollection", "pk": "d432f4fc-4a34-49aa-a193-f8a6bd04ca37", "fields": {"user": "02263a44-50f9-4503-ae92-8a49fc28964a", "name": "New Collection!", "is_public": true}}]

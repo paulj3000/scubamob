@@ -4,7 +4,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
-from scuba.divesites.models import Divesite, DivesiteCheckinThank, DivesiteCheckin
+from scuba.divesites.models import Divesite, DivesiteCheckinThank, DivesiteCheckin, DivesiteReview
 from scuba.divesites.serializers import DivesiteSerializer, \
     DivesiteReviewSerializer, DivesiteFavoriteSerializer, \
     DivesiteCheckinSerializer, DivesiteCheckinThankSerializer
@@ -108,8 +108,37 @@ class AddReviewApi(generics.GenericAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class CheckinApi(generics.GenericAPIView):
+class CheckinApi(generics.ListCreateAPIView):
     serializer_class = DivesiteCheckinSerializer
+
+    def get_queryset(self):
+        id = self.kwargs['id']
+        return DivesiteCheckin.objects.filter(divesite_id=id)
+
+    def post(self, request, id, *args, **kwargs):
+        data = request.data
+        data['divesite_id'] = id
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def list(self, request, **kwargs):
+        queryset = self.get_queryset()
+        retval = {
+            'checkins': self.serializer_class(queryset, many=True).data
+        }
+
+        return Response(retval)
+
+
+class ReviewsApi(generics.ListCreateAPIView):
+    serializer_class = DivesiteReviewSerializer
+
+    def get_queryset(self):
+        id = self.kwargs['id']
+        return DivesiteReview.objects.filter(divesite_id=id)
 
     def post(self, request, id, *args, **kwargs):
         divesite = get_object_or_404(Divesite, id=id)
@@ -118,6 +147,14 @@ class CheckinApi(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def list(self, request, **kwargs):
+        queryset = self.get_queryset()
+        retval = {
+            'reviews': self.serializer_class(queryset, many=True).data
+        }
+
+        return Response(retval)
 
 
 class FavoriteApi(generics.GenericAPIView):

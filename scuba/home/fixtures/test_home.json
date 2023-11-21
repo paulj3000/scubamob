@@ -1,0 +1,1 @@
+[{"model": "home.jumbotron", "pk": "37f88a73-b7da-4fd6-a47c-e11161239a0a", "fields": {"name": "Image Test", "filename": "jtrons/img_1653367464.png", "jumbotron_type": 1, "is_active": false}}, {"model": "home.jumbotron", "pk": "4d870447-dba6-4be0-a712-88ca280d4a5c", "fields": {"name": "Movie Test", "filename": "jtrons/vid_1653367478.mp4", "jumbotron_type": 0, "is_active": false}}]

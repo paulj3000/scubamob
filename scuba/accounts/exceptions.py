@@ -16,3 +16,7 @@ class EmailInUseException(Exception):
 
 class InvalidConfirmationCodeException(Exception):
     """ Invalid confirmation code exception """
+
+
+class IsBlockedException(Exception):
+    """ User is blocked """

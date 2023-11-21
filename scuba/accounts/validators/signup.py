@@ -1,10 +1,9 @@
 def validate_password(password):
     """ validate_password
 
-    A generic class to validate the password for a user. The
-    password needs to fulfil the password requirements stuff.
+    A generic class to validate the password for a user.
 
-    returns a boolean: True if password fulfils the params else
+    returns a boolean: True if password fulfils the size requirements else
         return false
     """
     if password and len(password) < 4 or len(password) > 20:
@@ -19,10 +18,10 @@ def validate_username(username):
 
     A generic class to validate the username.
 
-    returns a boolean: True if password fulfils the params else
+    returns a boolean: True if username fulfils the size requirements
         return false
     """
-    if len(password) < 5:
+    if len(username) < 5 or len(username) > 20:
         return False
 
     # the passord is good. We will return True

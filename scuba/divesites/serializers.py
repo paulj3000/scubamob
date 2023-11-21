@@ -8,9 +8,31 @@ from django.urls import reverse
 
 from scuba.divesites.models import Divesite, DivesiteReview, \
     DivesiteFavorite, DivesiteDailyStats, DivesiteCheckin, DivesiteCheckinThank
+import scuba.divesites.models as divesites_models
 
 from scuba.libs.exceptions import InvalidWeatherDataException
 from scuba.maps.models import Region
+
+
+class DivesiteTagOptionSerializer(serializers.Serializer):
+    id = serializers.SerializerMethodField(read_only=True)
+    name = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_id(data):
+        return data.pk_as_str
+
+    @staticmethod
+    def get_name(data):
+        return data.tag.tag
+
+    class Meta:
+        """ define models, fields, etc """
+        model = divesites_models.DivesiteTagOption
+        fields = (
+            'id',
+            'name',
+        )
 
 
 class DivesiteSerializer(serializers.ModelSerializer):
@@ -21,15 +43,18 @@ class DivesiteSerializer(serializers.ModelSerializer):
     json objects
     """
     id = serializers.SerializerMethodField()
+    tags = serializers.ListSerializer(child=DivesiteTagOptionSerializer())
     difficulty_display = serializers.SerializerMethodField(read_only=True)
     banner = serializers.SerializerMethodField(read_only=True)
     lat = serializers.SerializerMethodField(read_only=True)
     long = serializers.SerializerMethodField(read_only=True)
+    coords = serializers.SerializerMethodField(read_only=True)
+    location = serializers.CharField(read_only=True)
     url = serializers.SerializerMethodField(read_only=True)
     stats = serializers.SerializerMethodField(read_only=True)
     checkin_count = serializers.SerializerMethodField(read_only=True)
     # weather = serializers.SerializerMethodField(read_only=True)
-    checkins = serializers.SerializerMethodField(read_only=True)
+    # checkins = serializers.SerializerMethodField(read_only=True)
 
     def __init__(self, *args, **kwargs):
         """ Override the initialization. We're going to remove all fields
@@ -41,6 +66,13 @@ class DivesiteSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
         if response_type == 'simple':
             self.fields.pop("checkins", None)
+
+    @staticmethod
+    def get_coords(data):
+        return {
+            'long': float(data.long),
+            'lat': float(data.lat),
+        }
 
     @staticmethod
     def get_stats(data):
@@ -92,11 +124,6 @@ class DivesiteSerializer(serializers.ModelSerializer):
         return data.checkins.filter(checkin_date=date.today()).count()
 
     @staticmethod
-    def get_checkins(data):
-        return DivesiteCheckinSerializer(
-            data.checkins.filter(checkin_date=date.today()), many=True).data
-
-    @staticmethod
     def get_banner(data):
         return static(data.banner)
 
@@ -118,7 +145,7 @@ class DivesiteSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'name', 'description', 'lat', 'long', 'difficulty',
             'difficulty_display', 'banner', 'stats', 'checkin_count',
-            'checkins', 'url',
+            'url', 'tags', 'location', 'coords',
         )
 
     def create(self, validated_data):
@@ -134,30 +161,55 @@ class DivesiteReviewSerializer(serializers.ModelSerializer):
     """
     def __init__(self, *args, **kwargs):
         divesite = kwargs.pop('divesite', None)
-        setattr(self, 'divesite', divesite)
         super().__init__(*args, **kwargs)
+
+        if divesite:
+            setattr(self, 'divesite', divesite)
+        else:
+            self.fields.pop('divesite')
 
     id = serializers.SerializerMethodField(read_only=True)
     review_date = serializers.SerializerMethodField(read_only=True)
+    divesite = serializers.SerializerMethodField(read_only=True)
+    user = serializers.SerializerMethodField(read_only=True)
 
     @staticmethod
     def get_id(data):
         return data.pk_as_str
 
     @staticmethod
+    def get_user(obj):
+        user = obj.user
+        return {
+            'id': user.pk_as_str,
+            'username': user.username,
+            'profile_image': user.profile_image,
+        }
+
+    @staticmethod
     def get_review_date(data):
         return int(data.review_date.strftime('%s'))
+
+    def get_divesite(self, _):
+        divesite = self.divesite
+
+        return {
+            'url': reverse('site', kwargs={'url': divesite.url}),
+            'name': divesite.name,
+        }
 
     class Meta:
         """ define models, fields, etc """
         model = DivesiteReview
         fields = (
             'id',
+            'divesite',
             'review',
             'rating',
             'temp_c',
             'visibility',
             'review_date',
+            'user',
         )
 
     @staticmethod
@@ -192,14 +244,19 @@ class DivesiteReviewSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
+        user = self.context['request'].user
         data = {
             'divesite': getattr(self, 'divesite'),
-            'user': self.context['request'].user,
+            'user': user,
             'rating': validated_data['rating'],
             'review': validated_data['review'],
         }
 
-        return DivesiteReview.objects.create(**data)
+        review = DivesiteReview.objects.create(**data)
+
+        # add the review to the user's feed
+        user.add_review_to_feed(review.id)
+        return review
 
 
 class DivesiteFavoriteSerializer(serializers.Serializer):
@@ -236,23 +293,49 @@ class DivesiteCheckinThankSerializer(serializers.Serializer):
 
 
 class DivesiteCheckinSerializer(serializers.ModelSerializer):
+    """ DivesiteCheckinSerializer
+
+    The serializer for a divesite review
+    """
     id = serializers.SerializerMethodField(read_only=True)
-    checkin_date = serializers.SerializerMethodField(read_only=True)
+    checkin_date = serializers.DateField(read_only=True)
+    user = serializers.SerializerMethodField(read_only=True)
+    divesite_id = serializers.UUIDField()
+    rating = serializers.IntegerField()
 
     @staticmethod
     def get_id(data):
         return data.pk_as_str
 
     @staticmethod
+    def get_user(obj):
+        user = obj.user
+        return {
+            'id': user.pk_as_str,
+            'username': user.username,
+            'profile_image': user.profile_image,
+        }
+
+    @staticmethod
     def get_checkin_date(data):
         return int(data.checkin_date.strftime('%s'))
 
-    def validate(self, attrs):
+    def get_divesite(self, data):
+        # get the divesite from attribute
         divesite = getattr(self, 'divesite')
+
+        return {
+            'url': reverse('site', kwargs={'url': divesite.url}),
+            'name': divesite.name,
+        }
+
+    def validate(self, attrs):
         user = self.context['request'].user
         today = date.today()
 
-        if DivesiteCheckin.objects.filter(user=user, divesite=divesite, checkin_date=today).count():
+        if DivesiteCheckin.objects.filter(user=user,
+                                          divesite=attrs['divesite_id'],
+                                          checkin_date=today).count():
             raise serializers.ValidationError("You already checked in today")
 
         # everything is good, return
@@ -265,6 +348,14 @@ class DivesiteCheckinSerializer(serializers.ModelSerializer):
 
         return temp_c
 
+    def validate_divesite_id(self, divesite_id):
+        try:
+            divesite = Divesite.objects.get(id=divesite_id)
+        except Divesite.DoesNotExist:
+            raise serializers.ValidationError(f"{divesite_id} is invalid")
+
+        return divesite_id
+
     @staticmethod
     def validate_visibility(visibility):
         if visibility < 0 or visibility > 1000:
@@ -272,27 +363,39 @@ class DivesiteCheckinSerializer(serializers.ModelSerializer):
 
         return visibility
 
-    def __init__(self, *args, **kwargs):
-        divesite = kwargs.pop('divesite', None)
-        setattr(self, 'divesite', divesite)
-        super().__init__(*args, **kwargs)
-
     class Meta:
         """ define models, fields, etc """
         model = DivesiteCheckin
         fields = (
             'id',
-            'note',
+            'review',
             'visibility',
             'temp_c',
+            'rating',
             'checkin_date',
+            'user',
+            'divesite_id',
+            'is_anonymous',
         )
 
     def create(self, validated_data):
-        data = {
-            'divesite': getattr(self, 'divesite'),
-            'user': self.context['request'].user,
-            'note': validated_data['note'],
+        validated_data['user'] = self.context['request'].user
+        anonymous = validated_data.get('is_anonymous')
+        checkin = DivesiteCheckin.objects.create(**validated_data)
+
+        if not anonymous:
+            checkin.user.add_checkin_to_feed(checkin.id)
+
+        return checkin
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+
+        divesite = Divesite.objects.get(id=ret.pop('divesite_id'))
+
+        ret['divesite'] = {
+            'url': reverse('site', kwargs={'url': divesite.url}),
+            'name': divesite.name,
         }
 
-        return DivesiteCheckin.objects.create(**data)
+        return ret

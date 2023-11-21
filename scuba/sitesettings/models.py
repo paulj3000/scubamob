@@ -446,3 +446,16 @@ class APIKey(UUIDModel):
             return APIKey.objects.get(key='GOOGLE_MAPS').value
         except APIKey.DoesNotExist:
             raise exceptions.InvalidAPIKeyException
+
+
+class FlagOption(UUIDModel):
+    FLAG_TYPES = {
+        (0, 'Review'),
+        (1, 'Checkin'),
+    }
+
+    flag = models.CharField(max_length=128)
+    instance_type = models.PositiveSmallIntegerField(choices=FLAG_TYPES)
+
+    class Meta:
+        db_table = 'flag_option'

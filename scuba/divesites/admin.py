@@ -8,6 +8,11 @@ from django.shortcuts import get_object_or_404
 import scuba.divesites.models as divesites_models
 from scuba.divesites.models import Divesite
 from scuba.divesites.serializers import DivesiteSerializer
+from scuba.divesites.forms.admin import DivesiteReviewForm, DivesiteCheckinForm
+
+
+class DivesiteTagAdminInline(admin.StackedInline):
+    model = divesites_models.DivesiteTag
 
 
 class DivesiteAdmin(admin.ModelAdmin):
@@ -15,6 +20,10 @@ class DivesiteAdmin(admin.ModelAdmin):
     change_list_template = 'admin/divesites/change_divesite_list.html'
     change_form_template = 'admin/divesites/change_divesite_form.html'
     readonly_fields = ['url']
+
+    inlines = (
+        DivesiteTagAdminInline,
+    )
 
     def get_urls(self):
         """ get_urls
@@ -73,7 +82,17 @@ class DivesiteDailyStatsAdmin(admin.ModelAdmin):
     list_display = ('divesite', 'temp_c', 'visibility', 'stats_date')
 
 
+class DivesiteReviewAdmin(admin.ModelAdmin):
+    form = DivesiteReviewForm
+
+
+class DivesiteCheckinAdmin(admin.ModelAdmin):
+    form = DivesiteCheckinForm
+    list_display = ('user', 'temp_c', 'visibility', 'checkin_date')
+
+
+admin.site.register(divesites_models.DivesiteTagOption)
 admin.site.register(divesites_models.Divesite, DivesiteAdmin)
-admin.site.register(divesites_models.DivesiteReview)
-admin.site.register(divesites_models.DivesiteCheckin)
+admin.site.register(divesites_models.DivesiteReview, DivesiteReviewAdmin)
+admin.site.register(divesites_models.DivesiteCheckin, DivesiteCheckinAdmin)
 admin.site.register(divesites_models.DivesiteDailyStats, DivesiteDailyStatsAdmin)

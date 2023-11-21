@@ -7,6 +7,7 @@ from django.views.generic import TemplateView
 # define the user data for this account
 from scuba.divesites.models import Divesite
 from scuba.home.models import Jumbotron
+from scuba.settings import SITE_NAME
 
 
 class IndexView(TemplateView):

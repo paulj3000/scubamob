@@ -16,6 +16,41 @@
 
 {% block content %}
 <style>
+
+.ratings{
+    margin-right:10px;
+}
+
+.ratings i{
+    
+    color:#cecece;
+    font-size:32px;
+}
+
+.rating-color{
+    color:#fbc634 !important;
+}
+
+.review-count{
+    font-weight:400;
+    margin-bottom:2px;
+    font-size:24px !important;
+}
+
+.small-ratings i{
+  color:#cecece;   
+}
+
+.review-stat{
+    font-weight:300;
+    font-size:18px;
+    margin-bottom:2px;
+}
+
+
+
+
+
 .profile {
   margin: 20px 0;
 }
@@ -130,55 +165,9 @@
 
 
 </style>
+<script id="profileData" type="application/json">{{profile_json|safe}}</script>
 
-
-<div class="row profile">
-    <div class="col-sm-3">
-        <div class="card profile-sidebar">
-            <div class="header"></div>
-            <!-- SIDEBAR USERPIC -->
-            <div class="profile-userpic">
-                <img src="{{user.profile_image}}" class="img-fluid img-thumbnail rounded-circle" alt="">
-            </div>
-            <!-- END SIDEBAR USERPIC -->
-            <!-- SIDEBAR USER TITLE -->
-            <div class="profile-usertitle">
-                <div class="profile-usertitle-name">
-                    {{profile.get_full_name}}
-                </div>
-                <div class="profile-usertitle-job">
-                    San Diego, CA
-                </div>
-                <div class="profile-usertitle-job">
-                    x x x
-                </div>
-            </div>
-            <!-- END SIDEBAR USER TITLE -->
-            <!-- SIDEBAR BUTTONS -->
-            <div class="profile-userbuttons">
-                <button type="button" class="btn btn-success btn-sm">Follow</button>
-                <button type="button" class="btn btn-danger btn-sm">Message</button>
-            </div>
-            <!-- END SIDEBAR BUTTONS -->
-        </div>
-
-        <div class="pt-3">
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item">
-                    <i class="bi bi-stars"></i> Reviews
-                </li>
-                <li class="list-group-item">
-                    <i class="bi bi-image"></i> Photos and Videos
-                </li>
-                <li class="list-group-item">
-                    <i class="bi bi-person-square"></i> Buddies
-                </li>
-            </ul>
-        </div>
-    </div>
-    <div class="col-sm-9">
-    </div>
-</div>
+<div id="profile"></div>
 
 <script src="{% static 'js/chat.js' %}"></script>
 <style>

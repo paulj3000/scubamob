@@ -56,19 +56,19 @@ class Home extends React.Component {
         } else {
             return <div className="App">
                 <div className="row">
-                    <Location location={location} weather={weather} />;
+                    <Location location={location} weather={weather} />
                 </div>
 
                 <div className="row">
-                    <Favorites divesites={divesites} />;
+                    <Favorites divesites={divesites} />
                 </div>
 
                 <div className="row">
-                    <Buddies buddies={buddies} />;
+                    <Buddies buddies={buddies} />
                 </div>
 
                 <div className="row">
-                    <Others divesites={divesites} />;
+                    <Others divesites={divesites} />
                 </div>
             </div>
         }

@@ -6,8 +6,8 @@ from scuba.accounts.forms import SettingsForm, PasswordForm
 
 
 urlpatterns = [
-    path('', settings_views.settings,
-         {'formname': SettingsForm, 'mode': 'settings'},
+    path('',
+         TemplateView.as_view(template_name="settings/index.html"),
          name='settings_home'),
     path('account', settings_views.settings,
          {'formname': SettingsForm, 'mode': 'settings'},

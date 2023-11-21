@@ -67,3 +67,32 @@ class TestDivesiteMethods(TestCase):
         self.assertEqual(stats['avg_temp_f'], 81)
         self.assertEqual(stats['avg_visibility'], 48)
         self.assertEqual(stats['avg_temp_c'], 27)
+
+    def test_divesite_string(self):
+        """
+        test the name of the divesite
+        """
+        divesite = Divesite.objects.filter(name='White Point').first()
+        self.assertEqual(divesite.__str__(), 'White Point')
+
+    def test_get_active_divesites(self):
+        """
+        test getting active divesites
+        """
+        active_divesites = Divesite.get_all_active_divesites()
+        self.assertEqual(len(active_divesites), 1)
+
+    def test_generate_aws_id(self):
+        """
+        test generation of an aws_id
+        """
+        id = Divesite.generate_aws_id()
+        self.assertTrue(id.startswith('dx'))
+        self.assertEqual(id[4], '/')
+
+    def test_divesite_has_aws_id(self):
+        """
+        verify the divesite has a valid id
+        """
+        divesite = Divesite.objects.all().first()
+        self.assertIsNotNone(divesite.aws_id)

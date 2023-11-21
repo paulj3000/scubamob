@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% load static compress %}
+
+
+{% block reactscript %}
+{% compress js file collections %}
+<script type="module" src="{% static 'react/dist/collections.js' %}"></script>
+{% endcompress %}
+{% endblock %}
+
+
+{% block content %}
+<div id="collections"></div>
+{% endblock %}

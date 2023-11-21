@@ -31,7 +31,6 @@ from scuba.sitesettings.models import SystemSetting
 from scuba.divesites.models import Divesite
 
 from scuba.libs.mail import generate_email, send_mail
-from scuba.content.models import EmailTemplate
 
 
 class UserManager(BaseUserManager):
@@ -109,16 +108,6 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
 
     def __str__(self):
         return self.get_full_name()
-
-    @staticmethod
-    def create_user(first_name, last_name, email, password, date_of_birth):
-        return User.objects.create(
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
-            password=password,
-            date_of_birth=date_of_birth,
-            confirmed=False)
 
     # -----------------------------------------------------------------------------
     # start API stuff (token based)
@@ -311,6 +300,50 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
             {'content': content, 'short_code': email_template.short_code})
 
         return (html, email_txt)
+
+    # -----------------------------------------------------------------------------
+    # start feed stuff
+    # -----------------------------------------------------------------------------
+    def get_feed(self):
+        '''
+        return all of the user's activity, (as a feed)
+        '''
+        return self.feed.all()
+
+    def add_review_to_feed(self, id):
+        return self.add_to_feed(id, 0)
+
+    def get_feed_review(self, id):
+        return self.get_from_feed(id, 0)
+
+    def add_checkin_to_feed(self, id):
+        return self.add_to_feed(id, 1)
+
+    def get_feed_checkin(self, id):
+        return self.get_from_feed(id, 1)
+
+    def add_to_feed(self, id, instance_type):
+        '''
+        return all of the user's activity, (as a feed)
+        '''
+        return self.feed.create(instance_id=id, instance_type=instance_type)
+
+    def get_from_feed(self, id, instance_type):
+        '''
+        return all of the user's activity, (as a feed)
+        '''
+        return self.feed.filter(instance_id=id, instance_type=instance_type).first()
+
+    # -----------------------------------------------------------------------------
+    # start location tracking
+    # -----------------------------------------------------------------------------
+    def get_active_location(self):
+        """ get_default_location
+
+        What is the default location
+        ignore it
+        """
+        return self.locations.filter(is_active=True).first()
 
     # -----------------------------------------------------------------------------
     # start login tracking
@@ -511,6 +544,66 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         # return the divesites
         return retval
 
+    # -----------------------------------------------------------------------------
+    # start photos and albums stuff
+    # -----------------------------------------------------------------------------
+    def get_photos(self):
+        ''' return a profile image. make sure they have a user profile object
+        first. Later, if no profile image exists, return a default avatar '''
+
+        return self.media.all()
+
+    # -----------------------------------------------------------------------------
+    # start following stuff
+    def set_follow_user(self, user, is_following):
+        ''' return a profile image. make sure they have a user profile object
+        first. Later, if no profile image exists, return a default avatar '''
+        obj, _ = UserFollower.objects.update_or_create(user=self,
+                                                       follower=user,
+                                                       defaults={'is_following': is_following})
+
+        # return the object
+        return obj
+
+    def create_collection(self, name, is_public):
+        ''' return a profile image. make sure they have a user profile object
+        first. Later, if no profile image exists, return a default avatar '''
+        return self.collections.create(name=name, is_public=is_public)
+
+    def get_collections(self):
+        ''' return all of the collections for this user. order them by name '''
+        return self.collections.all().order_by('name')
+
+
+class UserFeed(UUIDModel):
+    FEED_VALUES = {
+        (0, 'Review'),
+        (1, 'Checkin'),
+    }
+
+    user = models.ForeignKey(User, related_name='feed', on_delete=models.CASCADE)
+    instance_type = models.PositiveSmallIntegerField(choices=FEED_VALUES)
+    instance_id = models.UUIDField()
+    is_private = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'user_feed'
+        unique_together = (('instance_id', 'instance_type', 'user'), )
+
+
+class UserFeedFlagged(UUIDModel):
+    user = models.ForeignKey(User, related_name='flags', on_delete=models.CASCADE)
+    user_feed = models.ForeignKey(UserFeed, related_name='flags', on_delete=models.CASCADE)
+    flag = models.ForeignKey('sitesettings.FlagOption', on_delete=models.CASCADE)
+    reason = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = 'user feed flagged'
+        db_table = 'user_feed_flagged'
+        unique_together = (('user_feed', 'user'), )
+
 
 class UserConfirmationCode(UUIDModel):
     user = models.ForeignKey(User, related_name='confirmation_codes', on_delete=models.CASCADE)
@@ -568,6 +661,7 @@ class UserFollower(UUIDModel):
     """
     user = models.ForeignKey(User, related_name='followers', on_delete=models.CASCADE)
     follower = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_following = models.BooleanField(default=True)
 
     class Meta:
         verbose_name_plural = 'user followers'
@@ -582,6 +676,8 @@ class UserBuddy(UUIDModel):
     # kind of like a "don't see my stories" thing
     hide = models.BooleanField(default=False)
 
+    # is following: This is different from the UserFollower flag. This
+    # version of "is_following" means they're still buddies, but the buddy is muted
     is_following = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -687,9 +783,10 @@ class UserLocation(UUIDModel):
 
     Keep a representation of the user's profile image
     """
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='locations', on_delete=models.CASCADE)
     postal_code = models.CharField(max_length=16)
     city = models.CharField(max_length=128)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         """ define database tables, etc """
@@ -706,6 +803,18 @@ class UserIsPremier(UUIDModel):
     class Meta:
         """ define database tables, etc """
         db_table = 'user_is_premier'
+
+
+class UserHidden(UUIDModel):
+    """ UserHidden
+
+    Is the user hidden?
+    """
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    class Meta:
+        """ define database tables, etc """
+        db_table = 'user_hidden'
 
 
 class UserProfileImage(UUIDModel):
@@ -789,6 +898,39 @@ class UserDivesiteRecentlyViewed(UUIDModel):
         db_table = 'user_divesites_recently_viewed'
 
 
+class UserCollection(UUIDModel):
+    """ UserDivesiteCollection
+
+    The user's favorite divesites
+    """
+    user = models.ForeignKey(User, related_name='collections', on_delete=models.CASCADE)
+    name = models.CharField(max_length=40)
+    is_public = models.BooleanField(default=False)
+
+    class Meta:
+        """ define database tables, etc """
+        db_table = 'user_collection'
+
+    def add_to_collection(self, instance_type, instance_id):
+        return self.items.create(instance_type=instance_type, instance_id=instance_id)
+
+
+class UserCollectionItem(UUIDModel):
+    COLLECTION_VALUES = {
+        (0, 'Divesite'),
+        (1, 'Dive Shop'),
+    }
+
+    collection = models.ForeignKey(UserCollection, related_name='items', on_delete=models.CASCADE)
+    instance_type = models.PositiveSmallIntegerField(choices=COLLECTION_VALUES)
+    instance_id = models.UUIDField()
+
+    class Meta:
+        """ define database tables, etc """
+        db_table = 'user_collection_item'
+        unique_together = (('instance_id', 'instance_type', 'collection'), )
+
+
 class UserRecentActivity(UUIDModel):
     """ UserRecentActivity
 
@@ -801,3 +943,55 @@ class UserRecentActivity(UUIDModel):
     class Meta:
         """ define database tables, etc """
         db_table = 'user_recent_activity'
+
+
+class ViewProfile(UUIDModel):
+    """ ViewProfile
+
+    The profile of the user
+    """
+    username = models.CharField(max_length=40, unique=True, db_index=True)
+    first_name = models.CharField(max_length=40)
+    last_name = models.CharField(max_length=40)
+    location = models.CharField(max_length=512)
+    profile_image = models.CharField(max_length=128)
+    followers_count = models.PositiveSmallIntegerField(default=0)
+    buddy_count = models.PositiveSmallIntegerField(default=0)
+    reviews_count = models.PositiveSmallIntegerField(default=0)
+    is_private = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+
+    class Meta:
+        """ define database tables, etc """
+        db_table = 'view_profile'
+        managed = False
+
+    def get_full_name(self):
+        """ get_full_name
+
+        get the user's full name
+        """
+        return f"{self.first_name.strip()} {self.last_name.strip()}"
+
+    def get_is_following(self, user):
+        """ get_full_name
+
+        get the user's full name
+        """
+        return True if UserFollower.objects.filter(id=self.id, user=user).count() else False
+
+    def get_profile_image(self):
+        ''' return a profile image. make sure they have a user profile object
+        first. Later, if no profile image exists, return a default avatar '''
+
+        if self.profile_image:
+            return f"{CLOUDFRONT}{self.profile_image}"
+
+        return static(SystemSetting.get_default_profile_image())
+
+    @property
+    def is_hidden(self):
+        ''' return a profile image. make sure they have a user profile object
+        first. Later, if no profile image exists, return a default avatar '''
+
+        return True if UserHidden.objects.filter(id=self.id).count() else False

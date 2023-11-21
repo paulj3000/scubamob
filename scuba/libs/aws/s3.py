@@ -7,9 +7,13 @@ Author: Pauljames "The Juggernaut" Dimitriu
 
 Some utility methods to upload stuff and download stuff from / to AWS
 """
+import os
 import boto3
 import botocore
+from botocore.exceptions import ClientError
+
 from scuba.settings import AWS_PROFILE, AWS_S3_BUCKET
+from scuba.libs.exceptions import InvalidAWSKey
 
 
 class S3:
@@ -36,17 +40,16 @@ class S3:
         This will create a session which will connect to S3 by
         way of our profile id
         """
-        session = boto3.Session(profile_name=AWS_PROFILE)
+        session = None
+        if os.getenv('AWS_SECRET_ACCESS_KEY') and os.getenv('AWS_ACCESS_KEY_ID'):
+            session = boto3.Session(
+                aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+                aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+            )
+        else:
+            session = boto3.Session(profile_name=AWS_PROFILE)
+
         return session.resource('s3')
-
-    @staticmethod
-    def print_all_files(bucket=AWS_S3_BUCKET):
-        """ print_all_files
-
-        Get the list of files from S3 and do a simple "print"
-        """
-        for my_bucket_object in S3.list_all_files(bucket):
-            print(my_bucket_object)
 
     @staticmethod
     def list_all_files(bucket=AWS_S3_BUCKET):
@@ -62,23 +65,7 @@ class S3:
         return bucket_obj.objects.all()
 
     @staticmethod
-    def verify_file(key, bucket=AWS_S3_BUCKET):
-        """ verify_file
-
-        Verify a file exists.
-        """
-        # get the bucket
-        session = S3.get_session()
-
-        try:
-            return session.Object(bucket, key)
-        except botocore.exceptions.ClientError:
-            return None
-
-        return None
-
-    @staticmethod
-    def upload_raw_data(bucket, name, fileobj, **headers):
+    def upload_raw_data(name, fileobj, bucket=AWS_S3_BUCKET, **headers):
         """ Upload raw data to Amazon S3. Pass in the name, the actual
         object, and optionally extra data metadata"""
         to_send = {
@@ -102,6 +89,24 @@ class S3:
         s3_obj = S3.get_session()
         obj = s3_obj.Object(bucket, filename)
         obj.delete()
+
+    @staticmethod
+    def get_object(key, bucket=AWS_S3_BUCKET):
+        """ get_file
+
+        Get the file from S3
+        """
+        to_send = {
+            'Key': key,
+        }
+
+        session = S3.get_session()
+
+        try:
+            obj = session.Object(bucket, key).get()
+            return obj['Body']
+        except ClientError:
+            raise InvalidAWSKey
 
     def upload_data(self, name, data, **kwargs):
         """ upload_data

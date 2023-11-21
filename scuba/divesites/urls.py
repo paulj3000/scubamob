@@ -15,4 +15,6 @@ import scuba.divesites.views as divesites_views
 urlpatterns = [
     path('', divesites_views.IndexView.as_view(), name='divesites_home'),
     re_path(r'(?P<url>[\w-]*)$', divesites_views.SiteView.as_view(), name="site"),
+    re_path(r'(?P<url>[\w-]*)/checkins$', divesites_views.SiteView.as_view()),
+    re_path(r'(?P<url>[\w-]*)/writeareview$', divesites_views.SiteView.as_view()),
 ]

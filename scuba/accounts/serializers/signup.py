@@ -57,6 +57,7 @@ class CreateUserSerializer(serializers.Serializer):
     id = serializers.SerializerMethodField(read_only=True)
     first_name = serializers.CharField()
     last_name = serializers.CharField()
+    username = serializers.CharField()
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
     date_of_birth = serializers.DateField(write_only=True)
@@ -72,6 +73,16 @@ class CreateUserSerializer(serializers.Serializer):
         return email
 
     @staticmethod
+    def validate_username(username):
+        '''
+        validate_username
+        make sure the username is unique
+        '''
+        if User.objects.filter(username=username).count():
+            raise serializers.ValidationError(f"'{username}' has already registered")
+        return username
+
+    @staticmethod
     def validate_password(password):
         # for now, validate the password is at least eight chars
         if len(password) < 8:
@@ -81,7 +92,9 @@ class CreateUserSerializer(serializers.Serializer):
 
     @staticmethod
     def validate_date_of_birth(date_of_birth):
-        ''' make sure the user is at least 13 years old.
+        '''
+        validate_date_of_birth
+        make sure the user is at least 13 years old.
         COPPA laws will get us
         '''
         THIRTEEN_YEARS = 13
@@ -116,5 +129,13 @@ class CreateUserSerializer(serializers.Serializer):
         last_name = validated_data['last_name']
         password = validated_data['password']
         email = validated_data['email']
+        username = validated_data['username']
 
-        return User.create_user(first_name, last_name, email, password, date_of_birth)
+        kwargs = {
+            'first_name': first_name,
+            'last_name': last_name,
+            'date_of_birth': date_of_birth,
+            'username': username,
+        }
+
+        return User.objects.create_user(email, password, **kwargs)

@@ -7,55 +7,12 @@ from django.db.models import Q
 
 from scuba.accounts.models import User
 from scuba.content.models import (
-    FAQEntry, FAQSection, FAQEntry, Image, Page, EmailTemplate, NewsArticle)
+    FAQEntry, FAQSection, FAQEntry, Image, Page, Article, ArticleVersion)
 from scuba.content.forms.admin import ImageForm
 
 
 class PageAdmin(admin.ModelAdmin):
     change_form_template = 'admin/content/change_page_form.html'
-
-
-class EmailTemplateAdmin(admin.ModelAdmin):
-    change_form_template = 'admin/content/change_email_template_form.html'
-
-    def get_urls(self):
-        """ get_urls
-
-        adding some extra urls to the user model
-        """
-        urls = super().get_urls()
-
-        my_urls = [
-            re_path(
-                r'^send_test_email/(?P<id>[0-9A-Fa-f-]{1,36})/send_test',
-                self.send_test_email, name='send_test_email'),
-        ]
-
-        return my_urls + urls
-
-    def send_test_email(modeladmin, request, id):
-        """ send_test_email
-
-        send test emails to the staff
-        """
-        email_template = get_object_or_404(EmailTemplate, pk=id)
-        to_send_email = {
-            2: 'send_confirmation_code_email'
-        }
-
-        for user in User.objects.filter(Q(is_superuser=True) | Q(is_admin=True)):
-
-            func = getattr(user, to_send_email[email_template.template_type])
-            func('123456')
-
-        messages.add_message(
-            request,
-            messages.INFO,
-            'Test message successfully sent'
-        )
-
-        # change appropriately
-        return redirect('admin:content_emailtemplate_change', object_id=email_template.id)
 
 
 class ImageAdmin(admin.ModelAdmin):
@@ -127,13 +84,24 @@ class FAQSectionAdmin(admin.ModelAdmin):
     inlines = (FAQEntryAdminInline,)
 
 
-class NewsArticleAdmin(admin.ModelAdmin):
-    change_form_template = 'admin/content/change_news_admin_form.html'
+class ArticleVersionInline(admin.StackedInline):
+    """ HomeCategoryInline
+
+    Class representation of the home category inline pages necessary for
+    the category admin
+    """
+    model = ArticleVersion
+    extra = 0
 
 
+class ArticleAdmin(admin.ModelAdmin):
+    inlines = (ArticleVersionInline,)
+    list_display = ('title', 'user', 'url',)
+    exclude = ('url',)
+
+
+admin.site.register(Article, ArticleAdmin)
 admin.site.register(Page, PageAdmin)
 admin.site.register(Image, ImageAdmin)
 admin.site.register(FAQSection)
-admin.site.register(EmailTemplate, EmailTemplateAdmin)
-admin.site.register(NewsArticle, NewsArticleAdmin)
 admin.site.register(FAQEntry, FAQEntryAdmin)

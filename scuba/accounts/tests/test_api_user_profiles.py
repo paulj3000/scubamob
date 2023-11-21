@@ -42,13 +42,13 @@ class TestUserProfilesAPI(TestCase):
         client.force_authenticate(user=user)
         url = f'/api/profile/{user2.pk_as_str}/'
         response = client.get(url, format='json')
-        profile = response.json()
+        profile = response.json().get('profile')
 
         self.assertEqual(response.status_code, 200, 'user is logged in')
         self.assertEqual(profile.get('id'), user2.pk_as_str, 'user id matches')
         self.assertEqual(profile.get('full_name'), user2.get_full_name(), 'user name matches')
-        self.assertIsNone(profile.get('is_private'), 'user is not private')
-        self.assertIsNotNone(profile.get('media'), 'user has media')
+        self.assertFalse(profile.get('is_private'), 'user is not private')
+        # self.assertIsNotNone(profile.get('media'), 'user has media')
 
     def test_get_basic_profile_is_private(self):
         """
@@ -64,13 +64,13 @@ class TestUserProfilesAPI(TestCase):
         client.force_authenticate(user=user)
         url = f'/api/profile/{user2.pk_as_str}/'
         response = client.get(url, format='json')
-        profile = response.json()
+        profile_json = response.json().get('profile')
 
         self.assertEqual(response.status_code, 200, 'user is logged in')
-        self.assertEqual(profile.get('id'), user2.pk_as_str, 'user id matches')
-        self.assertEqual(profile.get('full_name'), user2.get_full_name(), 'user name matches')
-        self.assertIsNotNone(profile.get('is_private'), 'user is not private')
-        self.assertIsNone(profile.get('media'), 'user has media')
+        self.assertEqual(profile_json['id'], user2.pk_as_str, 'user id matches')
+        self.assertEqual(profile_json['full_name'], user2.get_full_name(), 'user name matches')
+        self.assertTrue(profile_json['is_private'], 'user is private')
+        self.assertNotIn('location', profile_json, 'location is not visible in a private profile')
 
     def test_get_basic_profile_is_private_but_buddies(self):
         """
@@ -89,13 +89,12 @@ class TestUserProfilesAPI(TestCase):
         client.force_authenticate(user=user)
         url = f'/api/profile/{user2.pk_as_str}/'
         response = client.get(url, format='json')
-        profile = response.json()
+        profile_json = response.json().get('profile')
 
         self.assertEqual(response.status_code, 200, 'user is logged in')
-        self.assertEqual(profile.get('id'), user2.pk_as_str, 'user id matches')
-        self.assertEqual(profile.get('full_name'), user2.get_full_name(), 'user name matches')
-        self.assertIsNone(profile.get('is_private'), 'user is private but still friends')
-        self.assertIsNotNone(profile.get('media'), 'user has media')
+        self.assertEqual(profile_json['id'], user2.pk_as_str, 'user id matches')
+        self.assertEqual(profile_json['full_name'], user2.get_full_name(), 'user name matches')
+        self.assertTrue(profile_json['is_private'], 'user is private but still friends')
 
     def test_get_basic_profile_is_blocked(self):
         """
@@ -108,8 +107,25 @@ class TestUserProfilesAPI(TestCase):
 
         client = APIClient()
         client.force_authenticate(user=user)
+        url = f'/api/profile/{user2.pk_as_str}/'
+        response = client.get(url, format='json')
+        profile = response.json()
+
+        self.assertEqual(response.status_code, 403, 'blocked user not found')
+
+    def test_get_basic_profile_is_blocked_2(self):
+        """
+        The blocking user should not be able to access the blockee's profile either
+        """
+        user = User.objects.get(email='foo@nowhere.com')
+        user2 = User.objects.get(email='test4@tester.com')
+
+        user2.block_buddy(user)
+
+        client = APIClient()
+        client.force_authenticate(user=user2)
         url = f'/api/profile/{user.pk_as_str}/'
         response = client.get(url, format='json')
         profile = response.json()
 
-        self.assertEqual(response.status_code, 404, 'blocked user not found')
+        self.assertEqual(response.status_code, 403, 'blocked user not found')

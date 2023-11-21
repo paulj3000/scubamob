@@ -38,20 +38,6 @@ RUN chown -R scuba:scuba static \
 USER scuba
 WORKDIR "/scuba/app/scubamob"
 
-# install the nodejs and python dependencies
-RUN python3 -m venv /scuba/app/scubamob/./env \
-    && source /scuba/app/scubamob/./env/bin/activate \
-    && pip install --upgrade pip \
-    && pip install -r requirements.txt \
-    && pip install mysqlclient==2.1.0 \
-    && npm install \
-    && npm run build \
-
-    # install the static stuff
-    && python manage.py compress --force \
-    && python manage.py collectstatic --noinput
-
-
 ENTRYPOINT ["/scuba/app/scubamob/entrypoint.sh"]
 
 CMD ["/scuba/app/scubamob/env/bin/gunicorn", "--bind", "0.0.0.0:8002", "--workers", "4", "scuba.wsgi:application", "--error-logfile", "/scuba/log/error.log", "--access-logfile", "/scuba/log/access.log"]

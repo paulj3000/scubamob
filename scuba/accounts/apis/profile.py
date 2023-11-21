@@ -1,48 +1,48 @@
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
 
-from scuba.accounts.models import User
-from scuba.accounts.models import UserBlocked, UserBuddy
+from scuba.accounts.models import UserBlocked, UserBuddy, User
 from scuba.accounts.serializers import profile as serializers
+from scuba.accounts.serializers import buddies as buddies_serializers
+from scuba.galleries import serializers as galleries_serializers
+from scuba.accounts.models import ViewProfile, User
+from scuba.accounts.exceptions import IsBlockedException
+from scuba.accounts.permissions import CanViewProfile
+from scuba.divesites.models import DivesiteCheckin
+from scuba.divesites.serializers import DivesiteCheckinSerializer
+
+
+def get_profile(user, profile_id):
+    profile = get_object_or_404(User, id=profile_id)
+    blocked = UserBlocked.objects.filter(Q(buddy_id=profile_id, user=user) |
+                                         Q(user=user, buddy_id=profile_id))
+
+    if blocked:
+        raise IsBlockedException
+
+    return profile
 
 
 class GetProfileApi(generics.RetrieveAPIView):
     serializer_class = serializers.ProfileSerializer
     lookup_field = 'id'
-
-    def get_serializer(self, *args, **kwargs):
-        """
-        Return the serializer instance that should be used for validating and
-        deserializing input, and for serializing output.
-        """
-        serializer_class = self.get_serializer_class()
-        kwargs.setdefault('context', self.get_serializer_context())
-
-        instance = args[0]
-        user = self.request.user
-
-        if instance != user and not UserBuddy.objects.filter(user=instance, buddy=user).count():
-            if instance.is_private:
-                kwargs['is_private'] = True
-
-        return serializer_class(*args, **kwargs)
+    permission_classes = [IsAuthenticated & CanViewProfile]
 
     def get_queryset(self):
         id = self.kwargs.get(self.lookup_field)
-        inner_qs = UserBlocked.objects.filter(buddy=self.request.user)
-        user = User.objects.filter(id=id) \
-            .exclude(blocked_buddy__in=inner_qs)
+        return ViewProfile.objects.filter(id=id)
 
-        if self.request.user == user:
-            return user
-
-        return user
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response({'profile': serializer.data})
 
 
 class GetMeProfileApi(generics.GenericAPIView):
-    lookup_field = 'username'
     serializer_class = serializers.ProfileSerializer
 
     def get(self, request):
@@ -51,8 +51,78 @@ class GetMeProfileApi(generics.GenericAPIView):
         Do the actual posting of the password reset
         """
         user = request.user
-        user = self.serializer_class(request.user)
+        profile = ViewProfile.objects.get(id=user.id)
+        user = self.serializer_class(profile, context=self.get_serializer_context())
         return Response({'profile': user.data})
+
+
+class GetGalleryApi(generics.ListAPIView):
+    serializer_class = galleries_serializers.MediaSerializer
+    permission_classes = [IsAuthenticated & CanViewProfile]
+    lookup_field = 'id'
+
+    def get_serializer(self, *args, **kwargs):
+        """
+        Return the serializer instance that should be used for validating and
+        deserializing input, and for serializing output.
+        """
+        serializer_class = self.get_serializer_class()
+        return serializer_class(*args, **kwargs)
+
+    def get_queryset(self):
+        return User.objects.get(id=self.request.id).media
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return Response({
+            'media': response.data
+        })
+
+
+class GetCheckinsApi(generics.ListAPIView):
+    serializer_class = DivesiteCheckinSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'id'
+
+    def get_serializer(self, *args, **kwargs):
+        """
+        Return the serializer instance that should be used for validating and
+        deserializing input, and for serializing output.
+        """
+        serializer_class = self.get_serializer_class()
+        return serializer_class(*args, **kwargs)
+
+    def get_queryset(self):
+        return DivesiteCheckin.objects.filter(user=self.request.user)
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return Response({
+            'checkins': response.data
+        })
+
+
+class GetAlbumsApi(generics.ListAPIView):
+    serializer_class = galleries_serializers.AlbumSerializer
+    permission_classes = [IsAuthenticated & CanViewProfile]
+    lookup_field = 'id'
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return Response({
+            'albums': response.data
+        })
+
+    def get_queryset(self):
+        return User.objects.get(id=self.request.id).albums
+
+
+class GetPhotosApi(generics.ListAPIView):
+    serializer_class = galleries_serializers.MediaSerializer
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        self.request.user.get_photos()
 
 
 class QueryApi(generics.GenericAPIView):
@@ -68,3 +138,63 @@ class QueryApi(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         return Response({'profile': serializer.data})
+
+
+class GetBuddiesListApi(generics.ListAPIView):
+    """ Get Buddies List
+
+    Return all of the buddies for this particular user
+    """
+    serializer_class = buddies_serializers.BuddySerializer
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        id = self.kwargs.get(self.lookup_field)
+        user = get_object_or_404(User, id=id)
+        return user.get_all_buddies()
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return Response({
+            'buddies': response.data
+        })
+
+
+class GetFeedApi(generics.ListAPIView):
+    """ Get Feed List
+
+    Return the feed of the user
+    """
+    serializer_class = serializers.FeedSerializer
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        id = self.kwargs.get(self.lookup_field)
+        user = get_object_or_404(User, id=id)
+        return user.get_feed()
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return Response({
+            'feed': response.data
+        })
+
+
+class FollowProfileApi(generics.GenericAPIView):
+    """ FollowProfileApi
+
+    Return the feed of the user
+    """
+    serializer_class = serializers.FollowProfileSerializer
+    permission_classes = [IsAuthenticated & CanViewProfile]
+
+    def post(self, request, id):
+
+        profile = get_profile(request.user, id)
+
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user, profile=profile)
+
+        # response
+        return Response(serializer.data)

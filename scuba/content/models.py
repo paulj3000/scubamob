@@ -7,6 +7,8 @@ Author: Pauljames "The Juggernaut" Dimitriu
 
 The models for the legal pages stuff
 """
+from datetime import date
+
 from django.db import models
 from django.db.models import Max
 
@@ -20,6 +22,7 @@ class Page(UUIDModel):
     name = models.CharField(max_length=128)
     url = models.CharField(max_length=32)
     content = models.TextField()
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, editable=False)
 
     class Meta:
         """ define models, fields, etc """
@@ -30,56 +33,43 @@ class Page(UUIDModel):
         return self.name
 
 
-class EmailTemplate(UUIDModel):
-    """
-    EmailTemplate
-
-    Allow dickhead to define the welcome emails
-    """
-    EMAIL_WELCOME_FREE = 0
-    EMAIL_WELCOME_PREMIUM = 1
-    EMAIL_CONFIRMATION_CODE = 2
-    EMAIL_TEMPLATES = (
-        (EMAIL_WELCOME_FREE, 'Welcome Free Account'),
-        (EMAIL_WELCOME_PREMIUM, 'Welcome Premium Account'),
-        (EMAIL_CONFIRMATION_CODE, 'Confirmation Code'),
-    )
-
-    template_type = models.PositiveSmallIntegerField(choices=EMAIL_TEMPLATES, unique=True)
-    subject = models.CharField(max_length=128)
-    short_code = models.CharField(max_length=128)
+class Article(UUIDModel):
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    url = models.CharField(max_length=32)
     content = models.TextField()
-    is_active = models.BooleanField(default=True)
+    is_published = models.BooleanField(default=False)
+    published_date = models.DateField(editable=False, null=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         """ define models, fields, etc """
-        db_table = 'email_template'
+        db_table = 'article'
+        indexes = [
+            models.Index(fields=['url', ]),
+        ]
 
     def __str__(self):
         """ return a string representation of the page """
-        return self.get_template_type_display()
+        return self.title
 
-    @classmethod
-    def get_welcome_email(cls):
-        email = cls.objects.filter(template_type=cls.EMAIL_WELCOME_FREE).first()
+    def publish(self):
+        self.published_date = date.today()
+        self.is_published = True
+        self.save()
 
-        # do we have a valid email
-        if email:
-            return email
 
-        # we don't have a valid configuration. Throw an exception
-        raise InvalidConfigrationException("Missing free email template")
+class ArticleVersion(UUIDModel):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    content = models.TextField()
+    version = models.PositiveSmallIntegerField()
+    is_active = models.BooleanField(default=False)
+    published_date = models.DateField(editable=False, null=True)
+    created = models.DateTimeField(auto_now_add=True)
 
-    @classmethod
-    def get_confirmation_code_email(cls):
-        email = cls.objects.filter(template_type=cls.EMAIL_CONFIRMATION_CODE).first()
-
-        # do we have a valid email
-        if email:
-            return email
-
-        # we don't have a valid configuration. Throw an exception
-        raise InvalidConfigrationException("Missing confirmation code email template")
+    class Meta:
+        """ define models, fields, etc """
+        db_table = 'article_version'
 
 
 class Image(AWSModel):
@@ -100,7 +90,7 @@ class Image(AWSModel):
         return f"{AWS_CLOUDFRONT}{filename}"
 
 
-class FAQSection(models.Model):
+class FAQSection(UUIDModel):
     title = models.CharField(max_length=255)
     position = models.PositiveSmallIntegerField()
 
@@ -117,14 +107,14 @@ class FAQSection(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.position:
-            tst = FAQEntry.objects.filter(faq_section=self).aggregate(Max('position'))
+            tst = FAQSection.objects.all().aggregate(Max('position'))
             pos = tst.get('position__max') or -1
-            self.position = pos
+            self.position = pos + 1
 
         super().save(*args, **kwargs)
 
 
-class FAQEntry(models.Model):
+class FAQEntry(UUIDModel):
     faq_section = models.ForeignKey(FAQSection,
                                     related_name='faq_entries',
                                     on_delete=models.CASCADE)
@@ -147,9 +137,12 @@ class FAQEntry(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-
         if not self.position:
-            pos = FAQEntry.objects.filter(faq_section=self.faq_section).aggregate(Max('position'))
+            tst = FAQEntry.objects.filter(faq_section=self.faq_section).aggregate(Max('position'))
+            pos = tst.get('position__max') or -1
+            self.position = pos + 1
+
+        super().save(*args, **kwargs)
 
 
 class NewsArticle(UUIDModel):

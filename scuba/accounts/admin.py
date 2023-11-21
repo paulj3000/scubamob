@@ -148,7 +148,7 @@ class UserAdmin(admin.ModelAdmin):
     fieldsets = (
         (None,
             {'fields':
-                ('username', 'first_name', 'last_name', 'email', 'date_of_birth',
+                ('username', 'first_name', 'last_name', 'email', 'date_of_birth', 'is_private',
                  'confirmed', 'last_login_date', 'get_token')}),
         ('Permissions', {'fields': ('groups', )}),
     )
@@ -178,11 +178,33 @@ class UserBuddyAdmin(admin.ModelAdmin):
     list_display = ('user', 'buddy',)
 
 
+class UserCollectionItemInlineAdmin(admin.StackedInline):
+    """ UserConfirmationCodeAdminInline
+
+    Class representation of the confirmation codes assigned to this user
+    """
+    model = account_models.UserCollectionItem
+    extra = 0
+
+
+class UserCollectionAdmin(admin.ModelAdmin):
+    inlines = (UserCollectionItemInlineAdmin,)
+    list_display = ('user', 'name',)
+
+
+class UserFollowerAdmin(admin.ModelAdmin):
+    list_display = ('user', 'follower', 'is_following',)
+
+
 admin.site.register(User, UserAdmin)
 admin.site.register(UserBuddyRequest, UserBuddyRequestAdmin)
 admin.site.register(UserBlocked, UserBlockedAdmin)
 admin.site.register(UserBuddy, UserBuddyAdmin)
+admin.site.register(account_models.UserCollection, UserCollectionAdmin)
 admin.site.register(account_models.UserEmail)
-admin.site.register(account_models.UserFollower)
+admin.site.register(account_models.UserFollower, UserFollowerAdmin)
 admin.site.register(account_models.UserSetting)
 admin.site.register(account_models.UserIsPremier)
+admin.site.register(account_models.UserLocation)
+admin.site.register(account_models.UserFeed)
+admin.site.register(account_models.UserFeedFlagged)

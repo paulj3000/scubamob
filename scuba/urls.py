@@ -6,6 +6,7 @@ from django.contrib.auth.views import LogoutView
 
 import scuba.settings
 import scuba.home.views as home_views
+import scuba.search.views as search_views
 import scuba.home.apis as home_apis
 import scuba.accounts.views.profiles as account_profiles
 import scuba.accounts.views.login as login_views
@@ -33,6 +34,9 @@ urlpatterns = [
     path('home/', home_views.HomeView.as_view(), name='home'),
     path('signup/', signup_views.SignupView.as_view(), name='signup'),
 
+    path('collections/', include('scuba.accounts.urls_collections')),
+    path('search', search_views.SearchView.as_view(), name='search'),
+    path('articles/', include('scuba.content.urls_articles')),
     path('account/', include('scuba.accounts.urls')),
     path('settings/', include('scuba.accounts.urls_settings')),
     path('groups/', include('scuba.divegroups.urls')),
@@ -54,15 +58,18 @@ urlpatterns = [
 
     path('api/accounts/', include('scuba.accounts.urls_accounts_api')),
     path('api/buddies/', include('scuba.accounts.urls_buddies_api')),
+    path('api/collections/', include('scuba.accounts.urls_collections_api')),
     path('api/user/divesites/', include('scuba.accounts.urls_divesites_api')),
     path('api/password/', include('scuba.accounts.urls_password_api')),
     path('api/signup/', include('scuba.accounts.urls_signup_api')),
-    path('api/profile/', profile_api.GetMeProfileApi.as_view()),
+    path('api/profile/me', profile_api.GetMeProfileApi.as_view()),
+    path('api/profile/me/', include('scuba.accounts.urls_profile_me_api')),
     path('api/profile/q/', profile_api.QueryApi.as_view()),
-    re_path('api/profile/(?P<id>[a-fA-F0-9]+)/', include('scuba.accounts.urls_profile_api')),
+    re_path('api/profile/(?P<id>[a-fA-F0-9]{32})/', include('scuba.accounts.urls_profile_api')),
     path('api/logbooks/', include('scuba.logbooks.urls_logbooks_api')),
     path('api/ui/', include('scuba.accounts.urls_ui_api')),
     path('api/chats/', include('scuba.accounts.urls_chats_api')),
+    path('api/feed/', include('scuba.accounts.urls_feed_api')),
     path('api/messenger/', include('scuba.accounts.urls_messenger_api')),
     path('api/home/', include('scuba.home.urls_home_api')),
     path('api/galleries/', include('scuba.galleries.urls_api')),

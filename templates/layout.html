@@ -45,7 +45,7 @@
         {% block includes %}
         {% endblock %}
 
-        <title>{% block title %}ScubaMob{% endblock %}</title>
+	<title>{% if title %}{{title}}{% else %}ScubaMob{% endif %}</title>
     </head>
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -56,8 +56,9 @@
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     {% if not hide_nav_account %}
-                    <form class="d-flex input-group w-25">
-                        <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+		    <form class="d-flex input-group w-50" method="get" action="{% url 'search' %}">
+                        <input class="form-control" type="search" name="search" placeholder="Search" aria-label="Search">
+                        <input class="form-control" name="location" type="text" placeholder="San Diego, CA" aria-label="Search">
                         <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i></button>
                     </form>
 
@@ -101,6 +102,7 @@
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="{% url 'profile' username=user.username %}">Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'collections_index' %}">Collections</a></li>
                                 <li><a class="dropdown-item" href="{% url 'settings_home' %}">Settings</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'logout' %}">Log Out</a></li>
@@ -127,8 +129,8 @@
             </div>
         </nav>
 
-        {% block jumbotron %}{% endblock %}
-        <section class="py-5 border-bottom">
+        {% block fullscreen %}{% endblock %}
+        <section class="py-5">
             <div id="fb-root"></div>
 
             <div class="{% block container %}container mt-3{% endblock %}">
@@ -148,7 +150,7 @@
 <div class="b-example-divider"></div>
 
 
-        <section class="border-bottom">
+	<section>
             <div id="chatbox"></div>
             <div class="container">
 
@@ -201,7 +203,7 @@
     </div>
 
                     <div class="d-flex justify-content-between py-4 my-4 border-top">
-                        <p>© 2021 {{html_name | safe}}, Inc. All rights reserved.</p>
+                        <p>&copy; {% now 'Y' %} {{html_name | safe}}, Inc. All rights reserved.</p>
                         <ul class="list-unstyled d-flex">
                             <li class="ms-3"><a class="link-dark" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#twitter"></use></svg></a></li>
                             <li class="ms-3"><a class="link-dark" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#instagram"></use></svg></a></li>

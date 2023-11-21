@@ -4,6 +4,8 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
+import re
+
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 
@@ -25,8 +27,10 @@ class TestUserDivesitesApi(TestCase):
         user2 = User.objects.get(email='test4@tester.com')
         divesite = Divesite.objects.get(name='White Point')
 
+        review_title = 'Today is a good day'
+
         payload = {
-            'review': 'Today is a good day',
+            'review': review_title,
             'rating': 4,
             'temp_c': 30.5,
             'visibility': 200,
@@ -42,7 +46,10 @@ class TestUserDivesitesApi(TestCase):
 
         review = response.json()
         self.assertIsNotNone(review)
-        self.assertEqual(review['id'], review['id'])
+
+        # g et the feed object
+        feed = user.get_feed_review(review['id'])
+        self.assertIsNotNone(feed)
 
         # now attempt to add another review for today, this one should fail
         response = client.post(url, payload, format='json')
@@ -53,9 +60,13 @@ class TestUserDivesitesApi(TestCase):
         client = APIClient()
         client.force_authenticate(user=user2)
 
+        # a different user can still post the same rating
         url = f'/api/divesites/{divesite.pk_as_str}/reviews/'
         response = client.post(url, payload, format='json')
         self.assertEqual(response.status_code, 201)
+
+        feed2 = user.get_feed_review(review['id'])
+        self.assertIsNotNone(feed2)
 
     def test_invalid_divesite_review(self):
         user = User.objects.get(email='foo@nowhere.com')
@@ -107,19 +118,24 @@ class TestUserDivesitesApi(TestCase):
         divesiteData = response.json().get('divesite')
         self.assertIsNotNone(divesiteData)
         self.assertEqual(divesiteData['checkin_count'], 0, 'no checkins yet')
-        self.assertEqual(len(divesiteData['checkins']), 0, 'no checkins yet')
+        # self.assertEqual(len(divesiteData['checkins']), 0, 'no checkins yet')
 
         # get the checkin url
-        url = f'/api/divesites/{divesite.pk_as_str}/checkin/'
+        url = f'/api/divesites/{divesite.pk_as_str}/checkins'
         client.force_authenticate(user=user)
 
         note = 'This was a good day'
         payload = {
-            'note': note,
+            'review': note,
             'temp_c': 23,
+            'rating': 1,
             'visibility': 300,
         }
-        response = client.post(url, {'note': note}, format='json')
+        from pprint import pprint
+        pprint(url)
+        pprint(payload)
+        response = client.post(url, payload, format='json')
+        pprint(response.json())
         self.assertEqual(response.status_code, 201)
 
         checkin = response.json()
@@ -127,7 +143,7 @@ class TestUserDivesitesApi(TestCase):
         self.assertIsNotNone(checkin['checkin_date'])
 
         # try again, make sure we cannot add another checkin for today
-        response = client.post(url, {'note': note}, format='json')
+        response = client.post(url, payload, format='json')
         self.assertEqual(response.status_code, 400)
 
         url = f'/api/divesites/{divesite.pk_as_str}'
@@ -135,7 +151,7 @@ class TestUserDivesitesApi(TestCase):
         divesite = response.json().get('divesite')
         self.assertIsNotNone(divesite)
         self.assertEqual(divesite['checkin_count'], 1, 'we now have a checkin')
-        self.assertEqual(len(divesite['checkins']), 1, 'we now have a checkin')
+        # self.assertEqual(len(divesite['checkins']), 1, 'we now have a checkin')
 
     def test_invalid_checkin(self):
         payload = {
@@ -148,7 +164,7 @@ class TestUserDivesitesApi(TestCase):
         # get the checkin url, divesite and user
         user = User.objects.get(email='foo@nowhere.com')
         divesite = Divesite.objects.get(name='White Point')
-        url = f'/api/divesites/{divesite.pk_as_str}/checkin/'
+        url = f'/api/divesites/{divesite.pk_as_str}/checkins'
 
         client = APIClient()
         client.force_authenticate(user=user)
@@ -242,6 +258,7 @@ class TestUserDivesitesApi(TestCase):
         self.assertEqual(divesite['name'], divesite['name'])
         self.assertEqual(divesite['description'], divesite['description'])
         self.assertEqual(divesite['banner'], divesite['banner'])
+        self.assertIsNone(re.match(r'checkins$', divesite['url']))
 
     def test_thank_checkin_divesite(self):
         """

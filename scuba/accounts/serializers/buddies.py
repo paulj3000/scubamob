@@ -165,11 +165,16 @@ class BuddySerializer(serializers.Serializer):
     first_name = serializers.SerializerMethodField()
     last_name = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
 
     @staticmethod
     def get_profile_image(data):
         return data.buddy.get_profile_image()
+
+    @staticmethod
+    def get_username(data):
+        return data.buddy.username
 
     @staticmethod
     def get_url(data):

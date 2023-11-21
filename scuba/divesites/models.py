@@ -18,6 +18,8 @@ class Divesite(UUIDModel):
     description = models.TextField()
     url = models.URLField(max_length=255, db_index=True, blank=True)
     lat = models.DecimalField(max_digits=15, decimal_places=9)
+    location = models.CharField(max_length=128)
+    long = models.DecimalField(max_digits=15, decimal_places=9)
     long = models.DecimalField(max_digits=15, decimal_places=9)
     aws_id = models.CharField(max_length=10, blank=True)
     is_active = models.BooleanField(default=True)
@@ -54,13 +56,14 @@ class Divesite(UUIDModel):
         him then return it
         """
         if self.aws_id is None or self.aws_id == '':
-            self.aws_id = self.generate_aws_id()
+            self.aws_id = Divesite.generate_aws_id()
             self.save()
 
         # return the aws id
         return self.aws_id
 
-    def generate_aws_id(self):
+    @staticmethod
+    def generate_aws_id():
         ''' generate a unique aws id for a program '''
         letters_and_digits = string.ascii_letters + string.digits
         key_length = 7
@@ -152,7 +155,7 @@ class DivesiteReview(UUIDModel):
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'divesite_reviews'
+        db_table = 'divesite_review'
         unique_together = (('user', 'divesite', 'review_date'), )
 
     def __str__(self):
@@ -192,8 +195,10 @@ class DivesiteCheckin(UUIDModel):
     divesite = models.ForeignKey(Divesite, related_name='checkins', on_delete=models.CASCADE)
     user = models.ForeignKey('accounts.User', related_name='checkins', on_delete=models.CASCADE)
     visibility = models.PositiveSmallIntegerField(default=0)
+    rating = models.PositiveSmallIntegerField(choices=RATING_CHOICES, default=1)
     temp_c = models.FloatField(default=0.0)
-    note = models.TextField(default="")
+    review = models.TextField(default="")
+    is_anonymous = models.BooleanField(default=False)
     checkin_date = models.DateField(auto_now_add=True)
 
     class Meta:
@@ -223,3 +228,23 @@ class DivesiteDailyStats(UUIDModel):
     class Meta:
         db_table = 'divesite_daily_stats'
         unique_together = (('user', 'divesite', 'stats_date'), )
+
+
+class DivesiteTagOption(UUIDModel):
+    tag = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        db_table = 'divesite_tag_option'
+
+    def __str__(self):
+        return self.tag
+
+
+class DivesiteTag(UUIDModel):
+    divesite = models.ForeignKey(Divesite, related_name='tags', on_delete=models.CASCADE)
+    tag = models.ForeignKey(DivesiteTagOption, on_delete=models.CASCADE)
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'divesite_tag'
+        unique_together = (('divesite', 'tag'), )
