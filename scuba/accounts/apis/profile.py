@@ -22,8 +22,8 @@ class GetProfileApi(generics.RetrieveAPIView):
 
         instance = args[0]
         user = self.request.user
-        if instance != user and not UserBuddy.objects.filter(
-            user=instance, buddy=user).count():
+
+        if instance != user and not UserBuddy.objects.filter(user=instance, buddy=user).count():
             if instance.is_private:
                 kwargs['is_private'] = True
 

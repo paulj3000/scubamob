@@ -58,6 +58,7 @@ def post_login(sender, user, request, **kwargs):
         request.session['timezone'] = 'America/Los_Angeles'
         request.session['zipcode'] = 92107
 
+
 @receiver(post_save, sender=User)
 def create_profile(sender, instance, created, **kwargs):
     """Create a matching profile whenever a user object is created."""

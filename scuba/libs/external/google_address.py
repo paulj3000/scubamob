@@ -15,6 +15,7 @@ class GoogleAddress:
         gmaps = googlemaps.Client(key=APIKey.get_google_maps_key())
         return gmaps.geocode(postal_code)
 
+    '''
     def get_data_city_state(self, address, city, state):
         city = city.replace(' ', '_').lower()
         settings = self.settings
@@ -50,3 +51,4 @@ class GoogleAddress:
         retval['longitude'] = geometry['lng']
 
         return retval
+    '''

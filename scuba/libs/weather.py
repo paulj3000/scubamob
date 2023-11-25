@@ -26,6 +26,7 @@ class Weather:
     def gen_param_postal(lat, lng):
         return f'q={lat},{lng}'
 
+    '''
     @staticmethod
     def get_data_city_state(city, state):
         city = city.replace(' ', '_').lower()
@@ -43,6 +44,7 @@ class Weather:
                 raise ValueError("Invalid Response")
         except:
             raise ValueError("Error")
+    '''
 
     @classmethod
     def get_current_by_q_param(cls, q_param):
