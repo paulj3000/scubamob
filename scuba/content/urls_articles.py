@@ -8,7 +8,7 @@ Author: Pauljames "The Juggernaut" Dimitriu
 These are the links for news section of the site
     * webhooks
 """
-from django.urls import path, re_path
+from django.urls import re_path
 
 from scuba.content.views import articles as articles_views
 

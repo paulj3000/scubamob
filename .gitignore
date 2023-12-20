@@ -33,5 +33,6 @@ test.xml
 test*.xml
 coverage
 .coverage
+pep8.log
 
 #https://stackoverflow.com/questions/44568184/gitignore-everything-except-a-subfolder-with-every-content

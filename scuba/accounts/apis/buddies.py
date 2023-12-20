@@ -1,7 +1,3 @@
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
-from django.db.models import Q
-from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 
 from rest_framework.response import Response
@@ -62,7 +58,7 @@ class FollowBuddyApi(generics.UpdateAPIView):
         return user.get_my_buddy(self.kwargs['buddy_id'])
 
     def put(self, request, *args, **kwargs):
-        response = super().put(request, *args, **kwargs)
+        super().put(request, *args, **kwargs)
         return Response(status=status.HTTP_202_ACCEPTED)
 
 
@@ -104,7 +100,7 @@ class AddBuddyApi(generics.CreateAPIView):
     serializer_class = AddBuddySerializer
 
     def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
+        super().create(request, *args, **kwargs)
         return Response(
             {'message': 'Buddy Request Sent'},
             status=status.HTTP_201_CREATED)
@@ -147,7 +143,6 @@ class AcceptBuddyRequestApi(generics.CreateAPIView):
         serializer = self.get_serializer(data=kwargs)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
 
         return Response({
             'accept': serializer.data
@@ -162,5 +157,5 @@ class RemoveBuddyApi(generics.CreateAPIView):
     serializer_class = RemoveBuddySerializer
 
     def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
+        super().create(request, *args, **kwargs)
         return Response(status=status.HTTP_202_ACCEPTED)

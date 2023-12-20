@@ -15,7 +15,6 @@ from django.db.models import Max
 from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.libs.models.awsmodel import AWSModel
 from scuba.settings import AWS_CLOUDFRONT
-from scuba.content.exceptions import InvalidConfigrationException
 
 
 class Page(UUIDModel):

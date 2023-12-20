@@ -24,8 +24,6 @@ class BlockedCountry(UUIDModel):
         reader = geolite2.reader()
 
         match = reader.get(ip_address)
-        Log.objects.create(system='GEOIP', message=json.dumps(match))
-
         if match and 'country' in match:
             return BlockedCountry.objects.filter(
                 iso=match['country']['iso_code']
@@ -47,3 +45,17 @@ class InvalidEmail(UUIDModel):
     def __str__(self):
         """ return a string friendly representation of this model """
         return self.email
+
+
+class BouncedEmail(UUIDModel):
+    ''' this user tried signing up w/ a bad email address. Flag it '''
+    user = models.OneToOneField('accounts.User', on_delete=models.CASCADE)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        """ define database tables, etc """
+        db_table = 'bounced_email'
+
+    def __str__(self):
+        """ return a string friendly representation of this model """
+        return self.user.email

@@ -1,11 +1,11 @@
 import json
 
-from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 from django.views import View
 from django.http import JsonResponse
+from django.contrib import messages
 
 from scuba.accounts.decorators import can_view_profile
 from scuba.accounts.serializers.profile import ProfileSerializer

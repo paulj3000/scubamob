@@ -1,6 +1,9 @@
+import math
+
 from django.db import models
 
 from scuba.libs.models.uuidmodel import UUIDModel
+from scuba.libs.stringutils import StringUtils
 
 
 class LocationModel(UUIDModel):

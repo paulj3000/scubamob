@@ -9,7 +9,7 @@ from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.sitesettings.exceptions import InvalidConfigurationException
 from scuba.sitesettings.settings import (
     SYSTEM_SETTINGS, SYSTEM_APIS, SOCKET_SERVER_SETTINGS,
-    LOGBOOK_APIS, SETTINGS_APIS, AWS_APIS, BILLING_APIS, APPS)
+    SETTINGS_APIS, AWS_APIS, BILLING_APIS, APPS)
 from scuba.sitesettings import settings
 from scuba.settings import PROFILE_BLANK_URL, BANNER_BLANK_URL
 
@@ -340,7 +340,6 @@ class LogbookApi(BaseAPI):
 
     @staticmethod
     def get_all_logbooks(userid):
-        domain = SystemApi.get_logbook_server()
         endpoint = LogbookApi.objects.get(key='GET_LOGBOOKS').value
         endpoint = LogbookApi.get_all_logbooks_url(userid)
 
@@ -348,16 +347,12 @@ class LogbookApi(BaseAPI):
 
     @staticmethod
     def get_all_logbooks_url(userid):
-        domain = SystemApi.get_logbook_server()
-
         endpoint = LogbookApi.objects.get(key='GET_LOGBOOKS').value
         endpoint = LogbookApi.sub_url_userid(endpoint, userid)
         return LogbookApi.query_logbook_server(endpoint)
 
     @staticmethod
     def get_all_tags(userid):
-        domain = SystemApi.get_logbook_server()
-
         endpoint = LogbookApi.objects.get(key='GET_TAGS').value
         endpoint = LogbookApi.sub_url_userid(endpoint, userid)
         return LogbookApi.query_logbook_server(endpoint)
@@ -459,3 +454,19 @@ class FlagOption(UUIDModel):
 
     class Meta:
         db_table = 'flag_option'
+
+
+class SNSSubscriptionRequest(UUIDModel):
+    message_id = models.CharField(max_length=40, unique=True)
+    token = models.CharField(max_length=40)
+    topic_arn = models.CharField(max_length=64)
+    message = models.CharField(max_length=128)
+    subscribe_url = models.CharField(max_length=256, unique=True)
+    timestamp = models.DateTimeField()
+    signature_version = models.PositiveSmallIntegerField()
+    signature = models.CharField(max_length=128, unique=True)
+    signing_cert_url = models.CharField(max_length=256, unique=True)
+    is_confirmed = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'sns_subscription_requests'

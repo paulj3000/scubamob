@@ -1,13 +1,9 @@
 from django.contrib import admin
 from django.http import JsonResponse
-from django.urls import path, re_path
-from django.shortcuts import redirect, get_object_or_404
-from django.contrib import messages
-from django.db.models import Q
+from django.urls import path
 
-from scuba.accounts.models import User
 from scuba.content.models import (
-    FAQEntry, FAQSection, FAQEntry, Image, Page, Article, ArticleVersion)
+    FAQEntry, FAQSection, Image, Page, Article, ArticleVersion)
 from scuba.content.forms.admin import ImageForm
 
 

@@ -12,8 +12,7 @@ import pytz
 from django import forms
 from django.forms import ModelForm
 
-from scuba.accounts.models import User, UserSetting
-from scuba.accounts.forms.admin import ChangeAccountForm
+from scuba.accounts.models import User
 
 
 class ChangeAccountForm(ModelForm):

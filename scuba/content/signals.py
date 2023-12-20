@@ -8,7 +8,6 @@ Author: Pauljames "The Juggernaut" Dimitriu
 Add some signal stuff for account creation stuff
 """
 from datetime import datetime
-import re
 
 from django.dispatch import receiver
 from django.db.models.signals import pre_save
@@ -24,7 +23,7 @@ def verify_news_article(sender, instance, **kwargs):
     when saving an article, make sure we have a valid url in the
     title and verify a published date
     """
-    instance.url = generate_url_from_string(instance.title)
+    instance.url = StringUtils.generate_url_from_string(instance.title)
 
     # do we need to update the published date
     if not instance.published_date and instance.is_published:

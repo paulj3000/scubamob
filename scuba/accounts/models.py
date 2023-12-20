@@ -1,8 +1,8 @@
+import re
 import datetime
 import time
 import random
-import uuid
-import string
+import base64
 
 from django.db import models
 from django.contrib.auth.models import (
@@ -19,10 +19,9 @@ from bs4 import BeautifulSoup
 
 from rest_framework.authtoken.models import Token
 
+from scuba.libs.stringutils import StringUtils
 from scuba.accounts.settings import SETTINGS_KEYS, SETTINGS_VALUES
 from scuba.libs.models.uuidmodel import UUIDModel
-from scuba.libs.alerting import Alerting
-from scuba.settings import PROFILE_BLANK_URL, AWS_CLOUDFRONT
 from scuba.accounts.exceptions import (
     InvalidEmailIdException, InvalidUserIdException,
     PrimaryEmailIdException, EmailInUseException, InvalidConfirmationCodeException)
@@ -619,41 +618,6 @@ class UserConfirmationCode(UUIDModel):
         self.save()
 
 
-class Account(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-
-    can_add_divesites = models.BooleanField(default=False)
-    reputation = models.PositiveSmallIntegerField(default=0)
-    is_private = models.BooleanField(default=False)
-
-    secret = models.CharField(max_length=16)
-
-    class Meta:
-        db_table = 'account'
-
-    def get_short_name(self):
-        "Returns the short name for the user."
-        return self.first_name
-
-    def get_abbreviated_name(self):
-        return "%s %s." % (self.first_name, self.last_name[0])
-
-    def __str__(self):
-        return self.get_full_name()
-
-    def has_perm(self, perm, obj=None):
-        return True
-
-    def has_module_perms(self, app_label):
-        return True
-
-    def email_user(self, subject, message, from_email=None):
-        """
-        Sends an email to this User.
-        """
-        send_mail(subject, message, from_email, [self.email])
-
-
 class UserFollower(UUIDModel):
     """ UserFollower
 
@@ -843,7 +807,7 @@ class UserProfileImage(UUIDModel):
         sanitize the profile image. This will return the full url path
         of the profile image, sans the 'profiles/' prefix
         """
-        return f"{CLOUDFRONT}{self.image_cleaned}"
+        return static(self.image_cleaned)
 
 
 class UserLogin(UUIDModel):
@@ -985,7 +949,7 @@ class ViewProfile(UUIDModel):
         first. Later, if no profile image exists, return a default avatar '''
 
         if self.profile_image:
-            return f"{CLOUDFRONT}{self.profile_image}"
+            return static(self.profile_image)
 
         return static(SystemSetting.get_default_profile_image())
 

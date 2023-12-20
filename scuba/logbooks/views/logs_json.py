@@ -1,10 +1,7 @@
 import json
-from django.http import HttpResponse
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login
-from django.core import serializers
 
-from scuba.logbooks.forms import DiveForm
 from scuba.logbooks.models import LogbookFolder
 
 
@@ -29,7 +26,7 @@ def logbookfolderlogs(us_request):
     except LogbookFolder.DoesNotExist:
         raise
 
-    return JSONResponse(response)
+    return JsonResponse(response)
 
 
 @login_required
@@ -62,4 +59,4 @@ def logbookfolders(request):
     for x in divelog_mongo.collection.find(to_search):
         logs.append({'id': x['_id']['id'], 'title': x['title'], 'date': x['date']})
 
-    return JSONResponse({'folders': list(folders), 'logs': logs})
+    return JsonResponse({'folders': list(folders), 'logs': logs})

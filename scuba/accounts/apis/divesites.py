@@ -1,19 +1,9 @@
-import requests
 import logging
 
 from rest_framework.response import Response
 from rest_framework import generics
-from rest_framework import mixins
-from rest_framework.permissions import AllowAny
-from rest_framework import status
-
-from django.shortcuts import get_object_or_404
 
 from scuba.accounts.serializers.divesites import UserDivesiteFavoriteSerializer
-from scuba.accounts.models import UserEmail, User, UserDivesiteFavorite
-from scuba.accounts.exceptions import InvalidEmailIdException, PrimaryEmailIdException
-from scuba.sitesettings.models import SettingsApi
-from scuba.divesites.models import Divesite
 
 
 logger = logging.getLogger(__name__)
