@@ -1,6 +1,4 @@
-import re
 import uuid
-import datetime
 from PIL import Image
 from io import StringIO
 

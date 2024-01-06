@@ -7,8 +7,7 @@
 #
 # Author: Pauljames "The Juggernaut" Dimitriu
 # -----------------------------------------------------------------------------
-from django.conf.urls import include
-from django.urls import path, re_path
+from django.urls import path
 
 import scuba.divegroups.views as friends_views
 

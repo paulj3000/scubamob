@@ -1,4 +1,3 @@
-import os
 import time
 from urllib.parse import urljoin
 
@@ -10,7 +9,7 @@ from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.libs.exceptions import InvalidContentTypeException
 from scuba.libs.fileutils import FileUtils
 from scuba.settings import (
-    VIDEO_TYPES, IMAGE_TYPES, VALID_CONTENT_TYPES, AWS_CLOUDFRONT
+    VIDEO_TYPES, VALID_CONTENT_TYPES, AWS_CLOUDFRONT
 )
 
 

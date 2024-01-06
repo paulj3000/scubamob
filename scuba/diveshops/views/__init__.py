@@ -1,9 +1,5 @@
-from pprint import pprint
-
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.contrib import messages
+from django.shortcuts import render
+from django.http import JsonResponse
 
 from django.contrib.auth.decorators import login_required
 
@@ -29,4 +25,4 @@ def getlocaldiveshops(us_request):
     for ds in Diveshop.get_local_diveshops(lon, lat, radius):
         retval.append(ds)
 
-    return JSONResponse(api_response(data={'items': retval}))
+    return JsonResponse({'items': retval})

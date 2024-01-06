@@ -152,7 +152,21 @@ class SystemSetting(UUIDModel):
 
     @staticmethod
     def get_chat_server_active():
-        return SystemSetting.get_url_by_key('CHAT_SERVER_ACTIVE', False)
+        value = SystemSetting.get_url_by_key('CHAT_SERVER_ACTIVE', False)
+        if value:
+            if value in ('1', 'True', 'true'):
+                return True
+            return False
+        return False
+
+    @staticmethod
+    def get_alert_server_active():
+        value = SystemSetting.get_url_by_key('ALERT_SERVER_ACTIVE', False)
+        if value:
+            if value in ('1', 'True', 'true'):
+                return True
+            return False
+        return False
 
     @staticmethod
     def get_default_profile_image():

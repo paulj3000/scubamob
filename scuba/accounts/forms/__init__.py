@@ -1,7 +1,3 @@
-from pprint import pprint
-from datetime import datetime
-import uuid
-
 from django.core.exceptions import ValidationError
 from django import forms
 from django.utils.translation import gettext_lazy as _

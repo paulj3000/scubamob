@@ -1,7 +1,5 @@
-from pprint import pprint
-
 from rest_framework import serializers
-from scuba.accounts.models import User, UserEmail, UserSetting
+from scuba.accounts.models import UserEmail, UserSetting
 
 
 class UserEmailSerializer(serializers.ModelSerializer):

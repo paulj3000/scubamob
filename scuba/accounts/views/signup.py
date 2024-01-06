@@ -1,14 +1,13 @@
 from django.views.generic.edit import FormView
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate, login
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 
 from scuba.accounts.forms.signup import SignupForm
 from scuba.security.models import InvalidEmail
-from scuba.settings import FACEBOOK_APP, IS_PRODUCTION
+from scuba.settings import IS_PRODUCTION
 
 
 # -----------------------------------------------------------------------------

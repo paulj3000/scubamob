@@ -1,11 +1,7 @@
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.core.context_processors import csrf
-from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from pprint import pprint
 
-from utils.jsonresponse import JSONResponse
 from django.contrib.auth.decorators import login_required
 from diveshops.forms import DiveShopAddressForm
 

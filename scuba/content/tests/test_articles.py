@@ -62,7 +62,7 @@ class TestAccountsAPI(TestCase):
         """
         test an article that may not exist
         """
-        url = f'/articles/this-is-a-nonexistant-article'
+        url = '/articles/this-is-a-nonexistant-article'
 
         client = APIClient()
         response = client.get(url)

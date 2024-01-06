@@ -4,9 +4,6 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-
 from django.test import TestCase
 from rest_framework.test import APIClient
 
@@ -66,7 +63,7 @@ class TestUserDivesiteFavoriteAPI(TestCase):
         divesite = Divesite.objects.all().first()
 
         # add the divesite into the database
-        obj = user.set_divesite_favorite(divesite)
+        user.set_divesite_favorite(divesite)
 
         # and query for the divesites
         client = APIClient()

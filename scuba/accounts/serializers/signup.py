@@ -1,15 +1,9 @@
 import datetime
 from dateutil.relativedelta import relativedelta
 
-from django.shortcuts import get_object_or_404
-from django.conf.urls.static import static
-from django.utils.translation import gettext_lazy as _
-from django.contrib.auth import authenticate
-
 from rest_framework import serializers
 
 from scuba.accounts.models import User
-from scuba.settings import PROFILE_BLANK_URL
 
 
 class SetUsernameSerializer(serializers.Serializer):

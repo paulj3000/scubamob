@@ -4,9 +4,6 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
-from datetime import date
-from dateutil.relativedelta import relativedelta
-
 from django.test import TestCase
 from rest_framework.test import APIClient
 
@@ -31,7 +28,7 @@ class TestUserCollectionsAPI(TestCase):
             'is_public': True
         }
 
-        url = f'/api/collections/'
+        url = '/api/collections/'
         response = client.post(url, payload, format='json')
         self.assertEqual(response.status_code, 201)
 
@@ -55,7 +52,7 @@ class TestUserCollectionsAPI(TestCase):
             'is_public': False
         }
 
-        url = f'/api/collections/'
+        url = '/api/collections/'
         response = client.post(url, payload, format='json')
         self.assertEqual(response.status_code, 201)
 
@@ -100,7 +97,7 @@ class TestUserCollectionsAPI(TestCase):
         """
         # get the user and create a collection
         user = User.objects.get(email='foo@nowhere.com')
-        collection = user.create_collection('test', True)
+        user.create_collection('test', True)
 
         # get the divesite
         divesite = Divesite.objects.all().first()
@@ -125,14 +122,14 @@ class TestUserCollectionsAPI(TestCase):
         """
         # get the user and create a collection
         user = User.objects.get(email='foo@nowhere.com')
-        collection = user.create_collection('test', True)
+        user.create_collection('test', True)
 
         client = APIClient()
         client.force_authenticate(user=user)
 
         # sending in divesite.pk_as_str on purpose. No collection
         # will exists so this should throw a 404
-        url = f'/api/collections/'
+        url = '/api/collections/'
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
 

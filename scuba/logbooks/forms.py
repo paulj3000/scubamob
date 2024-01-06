@@ -9,8 +9,6 @@
 #
 # Author: Pauljames "The Juggernaut" Dimitriu
 # -----------------------------------------------------------------------------
-from pprint import pprint
-
 from django import forms
 
 
@@ -46,7 +44,7 @@ class DiveForm(forms.Form):
         divelog = self.collection.find_one({'_id': id})
 
         divelog['id'] = divelog['_id']['guid']
-        del(divelog['_id'])
+        del (divelog['_id'])
 
         # let's return our item
         return divelog

@@ -9,7 +9,6 @@ Some utility methods to upload stuff and download stuff from / to AWS
 """
 import os
 import boto3
-import botocore
 from botocore.exceptions import ClientError
 
 from scuba.settings import AWS_PROFILE, AWS_S3_BUCKET

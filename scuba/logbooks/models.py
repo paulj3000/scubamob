@@ -1,8 +1,3 @@
-import datetime
-import time
-import random
-import uuid
-
 from django.db import models
 
 from scuba.libs.models.uuidmodel import UUIDModel

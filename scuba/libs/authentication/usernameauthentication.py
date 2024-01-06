@@ -1,5 +1,4 @@
 from scuba.accounts.models import User
-import scuba.settings
 
 
 class UsernameAuthentication:

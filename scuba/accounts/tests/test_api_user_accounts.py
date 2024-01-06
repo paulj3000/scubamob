@@ -5,7 +5,6 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 from datetime import date
-from dateutil.relativedelta import relativedelta
 
 from django.test import TestCase
 from rest_framework.test import APIClient
@@ -48,7 +47,7 @@ class TestUserAccountsAPI(TestCase):
 
         client = APIClient()
         client.force_authenticate(user=user)
-        url = f'/api/accounts/reviews'
+        url = '/api/accounts/reviews'
         response = client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
 

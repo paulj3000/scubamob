@@ -1,4 +1,4 @@
-from django.urls import path, re_path
+from django.urls import path
 import scuba.accounts.apis.password as password_api
 
 

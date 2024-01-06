@@ -1,13 +1,8 @@
-from django.http import HttpResponse
-from django.shortcuts import redirect, render
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login
+from django.shortcuts import redirect
 from django.views.generic import TemplateView
 
 # define the user data for this account
-from scuba.divesites.models import Divesite
 from scuba.home.models import Jumbotron
-from scuba.settings import SITE_NAME
 
 
 class IndexView(TemplateView):

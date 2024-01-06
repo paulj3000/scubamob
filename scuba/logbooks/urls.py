@@ -7,7 +7,6 @@
 #
 # Author: Pauljames "The Juggernaut" Dimitriu
 # -----------------------------------------------------------------------------
-from django.conf.urls import include
 from django.urls import path, re_path
 
 import scuba.logbooks.views.dives as dives_views

@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.views.generic import TemplateView
 
 from scuba.search.models import SearchLocation
@@ -41,7 +40,7 @@ class SearchView(TemplateView):
         search = get.get('search', '')
 
         context.update({
-            'title': f"Top {get['search']} in {location} - {SITE_NAME}"
+            'title': f"Top {search} in {location} - {SITE_NAME}"
         })
 
         return context

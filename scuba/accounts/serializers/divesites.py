@@ -1,9 +1,6 @@
-from django.shortcuts import get_object_or_404
-from django.conf.urls.static import static
-
 from rest_framework import serializers
 
-from scuba.accounts.models import User, UserDivesiteFavorite
+from scuba.accounts.models import UserDivesiteFavorite
 from scuba.divesites.models import Divesite
 from scuba.divesites.serializers import DivesiteSerializer
 

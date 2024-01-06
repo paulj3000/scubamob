@@ -5,15 +5,12 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 import os
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
 
 from django.test import TestCase
 from rest_framework.test import APIClient
 
-from scuba.accounts.models import User
+from scuba.accounts.models import User, UserConfirmationCode
 from scuba.accounts.exceptions import InvalidConfirmationCodeException
-from scuba.content.exceptions import InvalidConfigrationException
 
 
 class TestConfirmationCode(TestCase):
@@ -33,7 +30,7 @@ class TestConfirmationCode(TestCase):
         code = user.generate_confirmation_code()
         to_test = code.code + 10
 
-        with self.assertRaises(InvalidConfirmationCodeException) as context:
+        with self.assertRaises(InvalidConfirmationCodeException) as _:
             user.verify_confirmation_code(to_test)
 
     def test_generate_multiple_confirmation_code(self):
@@ -55,9 +52,7 @@ class TestConfirmationCode(TestCase):
         Test the redeeming of cnfirmation codes
         """
         user = User.objects.get(email='foo@nowhere.com')
-        code1 = user.generate_confirmation_code()
         code2 = user.generate_confirmation_code()
-        code3 = user.generate_confirmation_code()
 
         try:
             user.verify_confirmation_code(code2.code)

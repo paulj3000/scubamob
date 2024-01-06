@@ -65,14 +65,19 @@
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item"><a class="nav-link active" aria-current="page" href="#!">Home</a></li>
                         <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#!">Contact</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#!">Services</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#!">xContact</a></li>
                     </ul>
 
                     {% block rightmenu %}
-                    <ul class="navbar-nav flex-row mb-2 mb-lg-0">
+                    <ul class="navbar-nav d-flex me-1">
                         {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="#!">
+                                <i data-count="3" class="bi bi-journal" style="font-size:1.5em" id="journal"></i>
+                            </a>
+                        </li>
 
+                        {% if chat_server_active %}
                         <li class="nav-item dropdown" id="messagebell">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i data-count="3" class="bi bi-messenger" style="font-size:1.5em" id="messagecount"></i>
@@ -84,7 +89,15 @@
                                 <li><a class="dropdown-item" href="{% url 'messenger' %}">See all in Messenger</a></li>
                             </ul>
                         </li>
+                        {% else %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i data-count="3" class="bi bi-messenger" style="font-size:1.5em" id="messagecount"></i>
+                            </a>
+                        </li>
+                        {% endif %}
 
+                        {% if alert_server_active %}
                         <li class="nav-item dropdown" id="alertbell">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-bell" style="font-size:1.5em" id="alertcount"></i>
@@ -96,6 +109,14 @@
                                 <li><a class="dropdown-item" href="#">Something else here</a></li>
                             </ul>
                         </li>
+                        {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="bi bi-bell" style="font-size:1.5em" id="alertcount"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <img src="{{user.get_profile_image}}" class="rounded-circle" height="25" alt="user.get_full_name" loading="lazy">

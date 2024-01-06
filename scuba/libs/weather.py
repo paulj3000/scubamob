@@ -1,7 +1,5 @@
-import logging
 import requests
 
-from scuba import settings
 from scuba.sitesettings.models import APIKey
 from scuba.libs.exceptions import InvalidWeatherDataException
 

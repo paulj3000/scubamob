@@ -1,18 +1,11 @@
-from pprint import pprint
+import os
 import requests
 
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login
-from django.http import JsonResponse
-
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
 from rest_framework import generics
 
+from scuba.sitesettings.exceptions import InvalidConfigurationException
 from scuba.sitesettings.models import SystemApi
 
 
@@ -65,8 +58,14 @@ class AlertsApi(generics.GenericAPIView):
         }
 
         try:
-            url = SystemApi.get_alerting_alerts()
-            alerts = requests.get(url, params=params)
-            return Response(alerts.json())
+            url = SystemApi.get_alerting_url()
+            if os.environ.get('IS_TEST'):
+                return Response({'alerts': []})
+            else:
+                alerts = requests.get(url, params=params)
+                return Response(alerts.json())
+
         except requests.exceptions.ConnectionError:
             return Response({'error': 'cannot reach chat server'}, 500)
+        except InvalidConfigurationException:
+            return Response({'error': 'alert server is offline'}, 400)

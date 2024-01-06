@@ -4,7 +4,6 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
-from django.urls import reverse
 from django.test import TestCase
 
 from scuba.content.models import Article

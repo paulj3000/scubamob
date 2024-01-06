@@ -1,6 +1,4 @@
 from django.shortcuts import get_object_or_404
-from django.conf.urls.static import static
-
 from rest_framework import serializers
 
 from scuba.accounts.models import User

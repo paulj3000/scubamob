@@ -7,10 +7,9 @@
 #
 # Author: Pauljames "The Juggernaut" Dimitriu
 # -----------------------------------------------------------------------------
-from django.urls import path, re_path
+from django.urls import path
 
 import scuba.diveshops.views as diveshops_views
-import scuba.diveshops.views as diveshops_shopadmin
 
 
 urlpatterns = [

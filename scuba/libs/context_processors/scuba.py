@@ -9,6 +9,7 @@ Our context preprocessor. Add some extra stuff to the context
 before we print out our page
 """
 from django.conf import settings
+from scuba.sitesettings.models import SystemSetting
 
 
 def Scuba(request):
@@ -21,6 +22,8 @@ def Scuba(request):
         'site_title': settings.SITE_TITLE,
         'html_name': settings.TITLE_HTML,
         'is_production': settings.IS_PRODUCTION,
+        'chat_server_active': SystemSetting.get_chat_server_active(),
+        'alert_server_active': SystemSetting.get_alert_server_active()
     }
 
     # if the user is logged in, get his profile image

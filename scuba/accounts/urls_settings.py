@@ -1,4 +1,4 @@
-from django.urls import path, re_path
+from django.urls import path
 from django.views.generic import TemplateView
 
 import scuba.accounts.views.settings as settings_views

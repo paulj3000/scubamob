@@ -4,7 +4,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
-from scuba.divesites.models import Divesite, DivesiteCheckinThank, DivesiteCheckin, DivesiteReview
+from scuba.divesites.models import Divesite, DivesiteCheckin, DivesiteReview
 from scuba.divesites.serializers import DivesiteSerializer, \
     DivesiteReviewSerializer, DivesiteFavoriteSerializer, \
     DivesiteCheckinSerializer, DivesiteCheckinThankSerializer

@@ -1,10 +1,8 @@
-from pprint import pprint
-
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template import loader, Context
-from django.http import HttpResponse, HttpResponseNotFound, Http404
+from django.http import HttpResponse, Http404
 
 from scuba.equipment.models import EquipmentMaintenance, Equipment
 from scuba.equipment.forms import EquipmentForm

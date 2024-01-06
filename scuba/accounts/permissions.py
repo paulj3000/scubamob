@@ -1,7 +1,6 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import permissions
 
-from scuba.accounts.models import User, UserBlocked
+from scuba.accounts.models import User
 
 
 class IsUserBlocked(permissions.BasePermission):

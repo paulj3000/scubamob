@@ -1,5 +1,4 @@
 from django.db import models
-from django.core.cache import cache
 
 from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.libs.weather import Weather

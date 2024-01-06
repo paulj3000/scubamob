@@ -10,12 +10,8 @@ import uuid
 
 from django.utils.safestring import mark_safe
 from django.core.mail import EmailMultiAlternatives
-from django.template import loader, Context
-from scuba.settings import (
-    EMAIL_FROM, EMAIL_BCC, AWS_S3_BUCKET_PRIVATE, BASE_URL,
-    AWS_S3_BUCKET_PRIVATE_REGION, SITE_URL,
-    TITLE_HTML
-)
+from django.template import loader
+from scuba.settings import EMAIL_FROM, EMAIL_BCC, BASE_URL, SITE_URL, TITLE_HTML
 
 from scuba.libs.aws.s3 import S3
 from scuba.settings import AWS_EMAIL_STORAGE_ROOT
@@ -55,10 +51,10 @@ def store_email(user, email, title):
     s3 = S3(AWS_S3_BUCKET_PRIVATE)
 
     tstamp = int(time.time())
-    upload_file = f"{AWS_EMAIL_STORAGE_ROOT}/accounts/{user.id}/{title}_{int(time.time())}.html"
+    upload_file = f"{AWS_EMAIL_STORAGE_ROOT}/accounts/{user.id}/{title}_{tstamp}.html"
 
     # generate the key name
-    file = s3.upload_data(upload_file, email, **{'ContentType': 'text/html'})
+    _ = s3.upload_data(upload_file, email, **{'ContentType': 'text/html'})
 
     # now return the uploaded file
     return upload_file

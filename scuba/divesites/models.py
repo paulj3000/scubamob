@@ -2,8 +2,8 @@ import string
 from random import choice
 
 from django.db import models
-from django.db.models import Avg, DateTimeField, ExpressionWrapper, F
-from django.db.models.functions import Cast, Coalesce
+from django.db.models import Avg, ExpressionWrapper, F
+from django.db.models.functions import Coalesce
 
 from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.divesites.settings import RATING_CHOICES, DIFFICULTY_CHOICES

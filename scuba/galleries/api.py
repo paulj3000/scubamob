@@ -1,11 +1,5 @@
-from django.http import JsonResponse
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
-from django.db.models import Count
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 from django.urls import reverse
 
 from rest_framework import generics

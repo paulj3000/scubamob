@@ -7,8 +7,6 @@ Author: Pauljames "The Juggernaut" Dimitriu
 
 This form is for entering program tracks into the program's form.
 """
-from mimetypes import guess_extension
-
 from django import forms
 from django.forms import ModelForm
 from django.core.validators import FileExtensionValidator

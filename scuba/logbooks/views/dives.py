@@ -23,11 +23,9 @@ def edit(us_request, logid=None):
             return redirect('/logbook/')
     elif logid:
         dive_form = DiveForm(user_id=us_request.user.id, log_id=logid)
-        divelog = dive_form.findlog(logid)
+        # divelog = dive_form.findlog(logid)
     else:
         dive_form = DiveForm(user_id=us_request.user.id)
 
     context = {'dive_form': dive_form}
-    context.update(csrf(us_request))
-
     return render(us_request, 'logbook/edit.html', context)

@@ -5,11 +5,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
 
-from scuba.accounts.models import UserBlocked, UserBuddy, User
+from scuba.accounts.models import User
 from scuba.accounts.serializers import profile as serializers
 from scuba.accounts.serializers import buddies as buddies_serializers
 from scuba.galleries import serializers as galleries_serializers
-from scuba.accounts.models import ViewProfile, User
+from scuba.accounts.models import ViewProfile, UserBlocked
 from scuba.accounts.exceptions import IsBlockedException
 from scuba.accounts.permissions import CanViewProfile
 from scuba.divesites.models import DivesiteCheckin
@@ -133,7 +133,6 @@ class QueryApi(generics.GenericAPIView):
 
         Do the actual posting of the password reset
         """
-        user = request.user
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 

@@ -1,9 +1,7 @@
-import requests
 import logging
 
 import googlemaps
 
-from scuba import settings
 from scuba.sitesettings.models import APIKey
 
 logger = logging.getLogger(__name__)

@@ -1,11 +1,7 @@
 import requests
 
-from datetime import datetime, timedelta
 from urllib.parse import urljoin
 from mimetypes import guess_extension
-
-from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 

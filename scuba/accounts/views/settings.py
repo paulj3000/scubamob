@@ -1,19 +1,13 @@
-# Create your views here.
-from pprint import pprint
-
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
-from django.template import RequestContext
 
 
 @login_required
 def settings(us_request, mode, formname):
     account = us_request.user
-    context_mode = 'edit%s'
 
     # render the appropriate template
     if us_request.method == 'POST':

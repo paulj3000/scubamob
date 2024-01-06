@@ -4,13 +4,10 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
-from datetime import date
-from dateutil.relativedelta import relativedelta
-
 from django.test import TestCase
 from rest_framework.test import APIClient
 
-from scuba.accounts.models import User, UserBuddy, UserBlocked
+from scuba.accounts.models import User, UserBuddy
 
 
 class TestUserProfilesAPI(TestCase):
@@ -20,7 +17,6 @@ class TestUserProfilesAPI(TestCase):
         """
         Test the making of a buddy request
         """
-        user = User.objects.get(email='foo@nowhere.com')
         user2 = User.objects.get(email='test4@tester.com')
 
         client = APIClient()
@@ -109,8 +105,6 @@ class TestUserProfilesAPI(TestCase):
         client.force_authenticate(user=user)
         url = f'/api/profile/{user2.pk_as_str}/'
         response = client.get(url, format='json')
-        profile = response.json()
-
         self.assertEqual(response.status_code, 403, 'blocked user not found')
 
     def test_get_basic_profile_is_blocked_2(self):
@@ -126,6 +120,4 @@ class TestUserProfilesAPI(TestCase):
         client.force_authenticate(user=user2)
         url = f'/api/profile/{user.pk_as_str}/'
         response = client.get(url, format='json')
-        profile = response.json()
-
         self.assertEqual(response.status_code, 403, 'blocked user not found')

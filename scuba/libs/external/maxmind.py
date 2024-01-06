@@ -1,5 +1,3 @@
-import json
-
 import geoip2.database
 
 from scuba.settings import MAXMIND_CITY_DB

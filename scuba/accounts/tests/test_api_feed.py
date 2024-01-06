@@ -25,16 +25,16 @@ class TestFeedAPI(TestCase):
         client = APIClient()
         client.force_authenticate(user=user)
 
-        response = client.get(f'/api/feed/1', format='json')
+        response = client.get('/api/feed/1', format='json')
         self.assertEqual(response.status_code, 404)
 
-        response = client.get(f'/api/feed/1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', format='json')
+        response = client.get('/api/feed/1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', format='json')
         self.assertEqual(response.status_code, 404)
 
-        response = client.get(f'/api/feed/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', format='json')
+        response = client.get('/api/feed/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', format='json')
         self.assertEqual(response.status_code, 404)
 
-        response = client.get(f'/api/feed/70d200e9f10f4d56adc3dafd44afea2f', format='json')
+        response = client.get('/api/feed/70d200e9f10f4d56adc3dafd44afea2f', format='json')
         self.assertEqual(response.status_code, 404)
 
     def test_flag_feed_empty(self):
@@ -59,7 +59,6 @@ class TestFeedAPI(TestCase):
         Test flag_feed true
         """
         user = User.objects.get(email='foo@nowhere.com')
-        user_2 = User.objects.get(email='addbuddy@tester.com')
         divesite = Divesite.objects.all().first()
 
         feed = user.add_to_feed(divesite.id, 0)
@@ -81,7 +80,6 @@ class TestFeedAPI(TestCase):
         Test flag_feed false
         """
         user = User.objects.get(email='foo@nowhere.com')
-        user_2 = User.objects.get(email='addbuddy@tester.com')
         divesite = Divesite.objects.all().first()
 
         feed = user.add_to_feed(divesite.id, 0)
@@ -103,7 +101,6 @@ class TestFeedAPI(TestCase):
         Test flag_feed keep id
         """
         user = User.objects.get(email='foo@nowhere.com')
-        user_2 = User.objects.get(email='addbuddy@tester.com')
         divesite = Divesite.objects.all().first()
 
         feed = user.add_to_feed(divesite.id, 0)

@@ -4,7 +4,6 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
-import time
 import pytest
 from django.test import TestCase
 
@@ -50,7 +49,6 @@ class TestS3(TestCase):
         """
         Rename a file
         """
-        file_list = {}
         test_dir = f'testing_{StringUtils.generate_time_string()}'
 
         key = f'{test_dir}/old_file.txt'

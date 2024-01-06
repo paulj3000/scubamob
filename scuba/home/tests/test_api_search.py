@@ -66,8 +66,6 @@ class TestSearchAPI(TestCase):
         self.assertIsNone(results.get('users'))
 
     def test_self_not_user_logged_in_search(self):
-        user = User.objects.get(email='foo@nowhere.com')
-
         client = APIClient()
 
         response = client.get('/api/search?q=First&c=b', format='json')

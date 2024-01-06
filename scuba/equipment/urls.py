@@ -1,9 +1,6 @@
 from django.urls import path, re_path
 
 from scuba.equipment import views
-from scuba.equipment.models import Equipment
-
-# Uncomment the next two lines to enable the admin:
 
 
 urlpatterns = [

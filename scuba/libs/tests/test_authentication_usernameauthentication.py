@@ -4,10 +4,7 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
-import uuid
-
 from django.test import TestCase
-from django.test.client import RequestFactory
 from django.test.client import Client
 
 from scuba.libs.authentication.usernameauthentication import UsernameAuthentication
@@ -74,7 +71,6 @@ class TestUsernameAuthentication(TestCase):
         """
         Testing the "get_user" function
         """
-        client = Client()
         auth = UsernameAuthentication()
 
         user = User.objects.get(username='testusernamefoo')
@@ -84,6 +80,5 @@ class TestUsernameAuthentication(TestCase):
         """
         Testing the "get_user" function
         """
-        client = Client()
         auth = UsernameAuthentication()
         self.assertIsNone(auth.get_user('861bf455a6234ea69da8814493d9faaa'))

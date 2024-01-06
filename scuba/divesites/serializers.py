@@ -1,13 +1,12 @@
 from datetime import date
 
 from rest_framework import serializers
-from django.shortcuts import get_object_or_404
 from django.core.cache import cache
 from django.templatetags.static import static
 from django.urls import reverse
 
 from scuba.divesites.models import Divesite, DivesiteReview, \
-    DivesiteFavorite, DivesiteDailyStats, DivesiteCheckin, DivesiteCheckinThank
+    DivesiteFavorite, DivesiteCheckin, DivesiteCheckinThank
 import scuba.divesites.models as divesites_models
 
 from scuba.libs.exceptions import InvalidWeatherDataException

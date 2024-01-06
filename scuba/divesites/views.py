@@ -1,11 +1,7 @@
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 from django.views.generic import TemplateView
-from django.views.generic.edit import FormView
 from django.shortcuts import get_object_or_404
 
-from .models import Divesite, DivesiteReview
+from .models import Divesite
 
 
 class IndexView(TemplateView):

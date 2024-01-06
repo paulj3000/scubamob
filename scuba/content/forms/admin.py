@@ -11,7 +11,6 @@ from mimetypes import guess_extension
 
 from django import forms
 from django.forms import ModelForm
-from django.db.models import Max
 from django.core.validators import FileExtensionValidator
 
 from scuba.content.models import Image

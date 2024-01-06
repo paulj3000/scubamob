@@ -1,17 +1,8 @@
-import uuid
-
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
-from django.conf import settings
 
-from scuba.logbooks.forms import DiveForm
-from scuba.galleries.models import Album, AlbumImage
+from scuba.galleries.models import AlbumImage
 
 
 IMAGE_TYPE_EXTENSIONS = {

@@ -1,5 +1,4 @@
 from django.db import models
-from django.templatetags.static import static
 
 from scuba.libs.models.uuidmodel import UUIDModel
 

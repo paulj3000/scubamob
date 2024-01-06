@@ -147,8 +147,6 @@ class TestCreateUserAPI(TestCase):
         """
         Test changing username with an already taken username
         """
-        user = User.objects.get(email='foo@nowhere.com')
-
         client = APIClient()
         payload = {
             'username': "testuser3"

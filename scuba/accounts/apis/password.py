@@ -27,7 +27,8 @@ class PasswordResetApi(generics.GenericAPIView):
         form = PasswordResetForm(request.data)
 
         # send this off to our logger
-        logger = logging.info(f"Password reset for: {request.data['email']}")
+        logging.info(f"Password reset for: {request.data['email']}")
+
         if form.is_valid():
             form.save()
             return Response(status=status.HTTP_200_OK)

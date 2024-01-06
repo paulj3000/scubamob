@@ -83,6 +83,7 @@ SETTINGS_APIS = (
 
 SYSTEM_SETTINGS = [
     ('CHAT_SERVER_ACTIVE', 'Chat Server Active'),
+    ('ALERT_SERVER_ACTIVE', 'Alert Server Active'),
     ('DEFAULT_PROFILE_IMAGE', 'Default Profile Image'),
     ('DEFAULT_BANNER_IMAGE', 'Default Banner Image'),
 ]

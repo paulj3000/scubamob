@@ -1,5 +1,4 @@
 from django.urls import path, re_path
-from django.views.generic import TemplateView
 
 import scuba.accounts.apis.settings as settings_api
 

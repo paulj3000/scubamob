@@ -183,12 +183,6 @@ class GetChatMessagesApi(APIView):
         """
         query = request.query_params
         user = request.user
-        params = {
-            'userId': user.pk_as_str,
-            'chatId': query.get('chatId'),
-            'limit': 100,
-            'page': query.get('page'),
-        }
 
         try:
             retval = ChatApi.get_all_chat_messages(user.pk_as_str, query.get('chatId'))
@@ -201,11 +195,6 @@ class GetChatMessagesApi(APIView):
 
         Do the actual get
         """
-        query = request.query_params
-        user = request.user
-        user_list = request.data.get('users')
-
-        print(" IN HERE ... ")
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.save(), status=status.HTTP_201_CREATED)

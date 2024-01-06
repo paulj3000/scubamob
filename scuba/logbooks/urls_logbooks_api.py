@@ -1,5 +1,4 @@
-from django.urls import path, re_path
-from django.views.generic import TemplateView
+from django.urls import path
 
 import scuba.logbooks.apis.logbook as logbook_api
 

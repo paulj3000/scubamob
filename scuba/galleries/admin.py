@@ -9,7 +9,6 @@ The admin page for the galleries app
 """
 from __future__ import unicode_literals
 
-from django.contrib import messages
 from django.contrib import admin
 
 import scuba.galleries.models as galleries_models

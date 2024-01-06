@@ -6,14 +6,13 @@ Replace this with more appropriate tests for your application.
 """
 import re
 
-from datetime import datetime, date
-from dateutil.relativedelta import relativedelta
+from datetime import date
 
 from django.test import TestCase
 from rest_framework.test import APIClient
 
 from scuba.accounts.models import User
-from scuba.divesites.models import Divesite, DivesiteCheckin, DivesiteCheckinThank
+from scuba.divesites.models import Divesite, DivesiteCheckinThank
 
 
 class TestUserDivesitesApi(TestCase):
@@ -233,7 +232,7 @@ class TestUserDivesitesApi(TestCase):
         client = APIClient()
         client.force_authenticate(user=user)
 
-        url = f'/api/divesites/favorites'
+        url = '/api/divesites/favorites'
         response = client.get(url, format='json')
         self.assertEqual(response.status_code, 200)
 

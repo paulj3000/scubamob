@@ -6,7 +6,6 @@ Replace this with more appropriate tests for your application.
 """
 from django.test import TestCase
 
-from scuba.accounts.models import User
 from scuba.accounts.forms.signup import SignupForm
 
 

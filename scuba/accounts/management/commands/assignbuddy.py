@@ -1,9 +1,6 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.db.utils import IntegrityError
+from django.core.management.base import BaseCommand
 
 from scuba.accounts.models import User
-
-from scuba.accounts.models import UserBuddyRequest, UserBuddy
 
 
 class Command(BaseCommand):

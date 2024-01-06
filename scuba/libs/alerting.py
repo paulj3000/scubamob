@@ -1,5 +1,3 @@
-from pprint import pprint
-
 import requests
 
 from scuba.sitesettings.models import SystemApi
@@ -15,4 +13,4 @@ class Alerting:
             'buddyUserId': buddyUserId,
         }
 
-        r = requests.post(url, json=to_send)
+        requests.post(url, json=to_send)

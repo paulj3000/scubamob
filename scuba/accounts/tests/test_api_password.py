@@ -7,8 +7,6 @@ Replace this with more appropriate tests for your application.
 from django.test import TestCase
 from rest_framework.test import APIClient
 
-from scuba.accounts.models import User
-
 
 class TestPasswordApi(TestCase):
     fixtures = ["test_users.json"]
