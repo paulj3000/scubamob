@@ -7,7 +7,6 @@ from django.views.generic import View
 
 from scuba.accounts.forms.signup import SignupForm
 from scuba.security.models import InvalidEmail
-from scuba.settings import IS_PRODUCTION
 
 
 # -----------------------------------------------------------------------------
@@ -25,6 +24,11 @@ class SignupView(FormView):
         'hide_nav_account': True,
     }
 
+    def get_form_kwargs(self):
+        form_data = super().get_form_kwargs()
+        form_data['ip_address'] = self.request.META.get("HTTP_X_REAL_IP")
+        return form_data
+
     def form_valid(self, form):
         """ form_valid
 
@@ -41,27 +45,6 @@ class SignupView(FormView):
 
         login(self.request, user, backend='django.contrib.auth.backends.ModelBackend')
         return super().form_valid(form)
-
-    def post(self, request, *args, **kwargs):
-        """
-        Handle POST requests: instantiate a form instance with the passed
-        POST variables and then check if it's valid.
-        """
-        form = self.get_form()
-
-        request = self.request
-
-        if IS_PRODUCTION:
-            form.set_ip_address(request.META.get('HTTP_X_REAL_IP'))
-
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            if request.POST.get('email'):
-                InvalidEmail.objects.create(
-                    email=request.POST['email'],
-                    ip_address=request.META.get("HTTP_X_REAL_IP", '0.0.0.0'))
-            return self.form_invalid(form)
 
 
 @method_decorator(csrf_exempt, name='dispatch')

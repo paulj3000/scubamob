@@ -573,6 +573,9 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         ''' return all of the collections for this user. order them by name '''
         return self.collections.all().order_by('name')
 
+    def add_signup_country(self, iso_country):
+        UserSignupCountry.objects.create(user=self, iso_country=iso_country)
+
 
 class UserFeed(UUIDModel):
     FEED_VALUES = {
@@ -767,6 +770,17 @@ class UserIsPremier(UUIDModel):
     class Meta:
         """ define database tables, etc """
         db_table = 'user_is_premier'
+
+
+class UserSignupCountry(UUIDModel):
+    """ UserSignUpCountry
+    """
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    iso_country = models.CharField(max_length=5)
+
+    class Meta:
+        """ define database tables, etc """
+        db_table = 'user_signup_country'
 
 
 class UserHidden(UUIDModel):

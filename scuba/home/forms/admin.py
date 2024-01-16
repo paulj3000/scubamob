@@ -45,7 +45,6 @@ class JumbotronForm(ModelForm):
 
         if cleaned_data.get('upload'):
             upload = cleaned_data['upload']
-            name = cleaned_data['name']
             try:
                 upload, jtype = Jumbotron.upload_jumbotron(
                     upload.name, upload.content_type, upload.read()

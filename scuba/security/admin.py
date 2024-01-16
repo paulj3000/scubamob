@@ -1,7 +1,8 @@
 from django.contrib import admin
 
 # Register your models here.
-from scuba.security.models import BlockedCountry
+from scuba.security import models
 
 
-admin.site.register(BlockedCountry)
+admin.site.register(models.BlockedCountry)
+admin.site.register(models.InvalidCountry)

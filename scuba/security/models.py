@@ -59,3 +59,28 @@ class BouncedEmail(UUIDModel):
     def __str__(self):
         """ return a string friendly representation of this model """
         return self.user.email
+
+
+class InvalidCountry(UUIDModel):
+
+    VIEW_SIGNUP = 0
+    VIEW_LOGIN = 1
+    VIEW_CONTACT_US = 2
+
+    VIEW_CHOICES = (
+        (VIEW_SIGNUP, 'Signup'),
+        (VIEW_LOGIN, 'Login'),
+        (VIEW_CONTACT_US, 'Contact Us'),
+    )
+
+    email = models.CharField(max_length=128,)
+    ip_address = models.CharField(max_length=128, default='0.0.0.0')
+    view = models.PositiveSmallIntegerField(choices=VIEW_CHOICES)
+    blocked_country = models.ForeignKey('security.BlockedCountry', on_delete=models.CASCADE)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        """ define database tables, etc """
+        db_table = 'invalid_country'
+        verbose_name_plural = 'invalid countries'
+        ordering = ['-created_date']

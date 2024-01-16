@@ -3,40 +3,46 @@ import logging
 from django import forms
 
 from scuba.accounts.models import User
-from scuba.security.models import BlockedCountry
+from scuba.security.models import BlockedCountry, InvalidCountry
 from scuba.accounts.validators.signup import validate_password
-from scuba.settings import IS_PRODUCTION
 
 
 logger = logging.getLogger(__name__)
 
 
 class SignupForm(forms.ModelForm):
-    """ AccountForm
+    """ SignupForm
 
     Sign up a new user
     """
     is_spam = forms.BooleanField(required=False, widget=forms.HiddenInput(), initial=False)
-    ip_address = forms.CharField(widget=forms.HiddenInput(), initial='0.0.0.0')
 
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'date_of_birth', 'email', 'password',)
 
+    def __init__(self, ip_address, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        setattr(self, 'ip_address', ip_address)
+
+    def set_ip_address(self, ip_address):
+        # set the ip address of the user coming in
+        self.ip_address = ip_address
+
     def clean(self):
         cleaned = super().clean()
         email = cleaned.get('email', 'unknown@unknown.com')
 
-        # check if the ip address is from Russia. If it is, return an error
-        if IS_PRODUCTION:
-            # here is the form data submitted
-            blocked, iso_country = BlockedCountry.is_ip_available(getattr(self, 'ip_address'))
-            blocked_name = blocked.name if blocked else 'Unknown'
+        # check if the ip address is from an invalid country. If it is, return an error
+        ip_address = getattr(self, 'ip_address', None)
 
+        if ip_address:
+            blocked, iso_country = BlockedCountry.is_ip_available(getattr(self, 'ip_address'))
             if blocked:
+                blocked_name = blocked.name if blocked else 'Unknown'
                 InvalidCountry.objects.create(
                     email=email, view=InvalidCountry.VIEW_SIGNUP,
-                    ip_address=self.ip_address, iso_country=blocked)
+                    ip_address=self.ip_address, blocked_country=blocked)
 
                 raise forms.ValidationError("This request cannot be processed")
 
@@ -90,5 +96,10 @@ class SignupForm(forms.ModelForm):
 
         if commit:
             user.save()
+
+        # add the user's signup country
+
+        if hasattr(self, 'iso_country'):
+            user.add_signup_country(getattr(self, 'iso_country'))
 
         return user
