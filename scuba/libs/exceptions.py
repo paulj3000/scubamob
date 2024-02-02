@@ -22,6 +22,13 @@ class InvalidWeatherDataException(Exception):
     """
 
 
+class InvalidIPAddress(Exception):
+    """ InvalidIPAddress
+
+    Thrown when an invalid IP address is attempted to be added
+    """
+
+
 class InvalidAWSKey(Exception):
     """ InvalidAWSKey
 

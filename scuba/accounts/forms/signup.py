@@ -5,6 +5,7 @@ from django import forms
 from scuba.accounts.models import User
 from scuba.security.models import BlockedCountry, InvalidCountry
 from scuba.accounts.validators.signup import validate_password
+from scuba.libs.exceptions import InvalidIPAddress
 
 
 logger = logging.getLogger(__name__)
@@ -37,16 +38,22 @@ class SignupForm(forms.ModelForm):
         ip_address = getattr(self, 'ip_address', None)
 
         if ip_address:
-            blocked, iso_country = BlockedCountry.is_ip_available(getattr(self, 'ip_address'))
-            if blocked:
-                blocked_name = blocked.name if blocked else 'Unknown'
-                InvalidCountry.objects.create(
-                    email=email, view=InvalidCountry.VIEW_SIGNUP,
-                    ip_address=self.ip_address, blocked_country=blocked)
+            try:
+                blocked_data = BlockedCountry.is_ip_from_blocked_country(ip_address)
+                if blocked_data[0]:
+                    InvalidCountry.objects.create(
+                        email=email, view=InvalidCountry.VIEW_SIGNUP,
+                        ip_address=self.ip_address, blocked_country=blocked_data[0])
 
+                    logger.info(f"{ip_address}: Request came from country {blocked_data[1]}")
+                    raise forms.ValidationError("This request cannot be processed")
+
+                setattr(self, 'iso_country', blocked_data[1])
+
+            except InvalidIPAddress:
+                # the IP address is not valid
+                logger.info(f"{ip_address}: No data was returned")
                 raise forms.ValidationError("This request cannot be processed")
-
-            setattr(self, 'iso_country', iso_country)
 
         # return the cleaned data
         return cleaned
