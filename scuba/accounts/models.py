@@ -781,6 +781,7 @@ class UserSignupCountry(UUIDModel):
     class Meta:
         """ define database tables, etc """
         db_table = 'user_signup_country'
+        verbose_name_plural = 'user signup countries'
 
 
 class UserHidden(UUIDModel):
