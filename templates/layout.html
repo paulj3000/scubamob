@@ -126,7 +126,12 @@
                                 <li><a class="dropdown-item" href="{% url 'collections_index' %}">Collections</a></li>
                                 <li><a class="dropdown-item" href="{% url 'settings_home' %}">Settings</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'logout' %}">Log Out</a></li>
+                                <li>
+                                    <form id="frm_logout" method="post" action="{% url 'logout' %}">
+                                        {% csrf_token %}
+                                        <a class="dropdown-item" href="javascript:$('#frm_logout').submit();">Log Out</a>
+                                    </form>
+                                </li>
                             </ul>
                         </li>
                         {% else %}
