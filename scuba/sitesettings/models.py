@@ -479,7 +479,7 @@ class SNSSubscriptionRequest(UUIDModel):
     timestamp = models.DateTimeField()
     signature_version = models.PositiveSmallIntegerField()
     signature = models.CharField(max_length=128, unique=True)
-    signing_cert_url = models.CharField(max_length=256, unique=True)
+    signing_cert_url = models.CharField(max_length=256)
     is_confirmed = models.BooleanField(default=False)
 
     class Meta:
