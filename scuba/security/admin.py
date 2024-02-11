@@ -5,4 +5,4 @@ from scuba.security import models
 
 
 admin.site.register(models.BlockedCountry)
-admin.site.register(models.InvalidCountry)
+admin.site.register(models.InvalidSignup)
