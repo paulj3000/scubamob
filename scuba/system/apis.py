@@ -6,11 +6,13 @@ from rest_framework.response import Response
 import rest_framework.status as status
 
 from scuba.sitesettings.serializers import SNSSubscriptionRequestSerializer
+from scuba.libs.rest_framework.parsers import AWSJSONParser
 
 
 class BuildAPI(generics.GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = SNSSubscriptionRequestSerializer
+    parser_classes = [AWSJSONParser]
 
     def post(self, request):
         """ post
