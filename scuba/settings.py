@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'scuba.search',
     'scuba.security',
     'scuba.sitesettings',
+    'scuba.system',
     'django.contrib.admindocs',
 ]
 
