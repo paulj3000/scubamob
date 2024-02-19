@@ -1,0 +1,62 @@
+version: 0.2
+
+env:
+  shell: bash
+  variables:
+    SETTINGS_PATH: "/dev/null"
+phases:
+  install:
+    commands:
+      - apt update -y
+      - apt install -y python3-venv
+      - mkdir -p env
+
+  #install:
+    #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
+    #If you specify runtime-versions and use an image other than Ubuntu standard image 2.0, the build fails.
+    #runtime-versions:
+      # name: version
+      # name: version
+    #commands:
+      # - command
+      # - command
+  #pre_build:
+    #commands:
+      # - command
+      # - command
+  build:
+    commands:
+      - python3 -m venv env
+      - source env/bin/activate
+      - pip install --upgrade pip
+      - pip install -r requirements.txt
+      - npm install
+      - npm run build
+  post_build:
+    commands:
+      - source env/bin/activate
+      - pytest
+      - pycodestyle --exclude=migrations --max-line-length=100 scuba/ > pep8.log || true
+reports:
+  unittests:
+    files:
+      - 'test_*.xml'
+  pep8:
+    files:
+      - 'pep8.log'
+  codecoverage:
+    files:
+      - 'coverage.xml'
+    file-format: 'COBERTURAXML'
+
+cache:
+  paths:
+     - './node_modules/**/*'
+     - './env/lib/**/*'
+
+artifacts:
+  files:
+    - manage.py
+    - scuba/**/*
+    - static/**/*
+    - templates/**/*
