@@ -19,6 +19,7 @@ class CodebuildJob(models.Model):
     build_status = models.PositiveSmallIntegerField(choices=BUILD_STATUS_VALUES, default=0)
     project = models.CharField(max_length=128)
     logs = models.CharField(max_length=256)
+    branch = models.CharField(max_length=256)
     start_time = models.DateTimeField(null=True, blank=True)
     end_time = models.DateTimeField(null=True, blank=True)
 
