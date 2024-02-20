@@ -12,6 +12,7 @@ class CodebuildJob(models.Model):
         (0, 'IN_PROGRESS'),
         (1, 'SUCCEEDED'),
         (2, 'FAILED'),
+        (3, 'STOPPED'),
     }
 
     id = models.CharField(max_length=128, primary_key=True, editable=False)
