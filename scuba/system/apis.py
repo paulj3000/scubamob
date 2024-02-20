@@ -7,6 +7,7 @@ import rest_framework.status as status
 from rest_framework.parsers import JSONParser
 
 from scuba.sitesettings.serializers import SNSSubscriptionRequestSerializer
+from scuba.system.serializers import CodebuildJobSerializer
 from scuba.libs.rest_framework.parsers import AWSJSONParser
 
 
@@ -29,5 +30,20 @@ class BuildAPI(generics.GenericAPIView):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(status=status.HTTP_201_CREATED)
+
+        else:
+            detail = request.data['detail']
+            detail['build_status'] = detail['build-status']
+            detail['project'] = detail['project-name']
+            detail['build_id'] = detail['build-id']
+            detail['time'] = request.data['time']
+
+            additional_information = detail['additional-information']
+            detail['logs'] = additional_information['logs']['deep-link']
+
+            serializer = CodebuildJobSerializer(data=request.data['detail'])
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(status=status.HTTP_200_OK)
 
         return Response(status=200)
