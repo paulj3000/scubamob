@@ -63,7 +63,7 @@ class BouncedEmail(UUIDModel):
         return self.user.email
 
 
-class InvalidCountry(UUIDModel):
+class InvalidSignup(UUIDModel):
 
     VIEW_SIGNUP = 0
     VIEW_LOGIN = 1
@@ -83,6 +83,6 @@ class InvalidCountry(UUIDModel):
 
     class Meta:
         """ define database tables, etc """
-        db_table = 'invalid_country'
-        verbose_name_plural = 'invalid countries'
+        db_table = 'invalid_signup'
+        verbose_name_plural = 'invalid signups'
         ordering = ['-created_date']

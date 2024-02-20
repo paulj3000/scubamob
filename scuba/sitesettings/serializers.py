@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 from django.utils.translation import gettext_lazy as _
@@ -69,6 +70,8 @@ class SNSSubscriptionRequestSerializer(serializers.ModelSerializer):
         validated_data['timestamp'] = datetime.strptime(validated_data['timestamp'],
                                                         '%Y-%m-%dT%H:%M:%S.%fZ')
 
+        token = re.findall(r"Token=(.*)", validated_data['subscribe_url'])[0]
+        validated_data['token'] = token
         return SNSSubscriptionRequest.objects.create(**validated_data)
 
     def update(self, obj, validated_data):

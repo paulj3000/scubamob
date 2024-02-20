@@ -43,9 +43,9 @@ class AuthenticationForm(forms.Form):
 
         if blocked:
             blocked_name = blocked.name
-            InvalidCountry.objects.create(
+            InvalidSignup.objects.create(
                 email=email,
-                view=InvalidCountry.VIEW_LOGIN,
+                view=InvalidSignup.VIEW_LOGIN,
                 ip_address=self.ip_address, blocked_country=blocked)
 
             raise forms.ValidationError("This request cannot be processed", code='cannot_process')

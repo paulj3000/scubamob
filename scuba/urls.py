@@ -31,6 +31,7 @@ urlpatterns = [
     path('home/', home_views.HomeView.as_view(), name='home'),
     path('signup/', signup_views.SignupView.as_view(), name='signup'),
     path('security/', include('scuba.security.urls')),
+    path('system/', include('scuba.system.urls')),
 
     path('collections/', include('scuba.accounts.urls_collections')),
     path('search', search_views.SearchView.as_view(), name='search'),

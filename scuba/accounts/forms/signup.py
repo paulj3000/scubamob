@@ -3,7 +3,7 @@ import logging
 from django import forms
 
 from scuba.accounts.models import User
-from scuba.security.models import BlockedCountry, InvalidCountry
+from scuba.security.models import BlockedCountry, InvalidSignup
 from scuba.accounts.validators.signup import validate_password
 from scuba.libs.exceptions import InvalidIPAddress
 
@@ -41,8 +41,8 @@ class SignupForm(forms.ModelForm):
             try:
                 blocked_data = BlockedCountry.is_ip_from_blocked_country(ip_address)
                 if blocked_data[0]:
-                    InvalidCountry.objects.create(
-                        email=email, view=InvalidCountry.VIEW_SIGNUP,
+                    InvalidSignup.objects.create(
+                        email=email, view=InvalidSignup.VIEW_SIGNUP,
                         ip_address=self.ip_address, blocked_country=blocked_data[0])
 
                     logger.info(f"{ip_address}: Request came from country {blocked_data[1]}")
