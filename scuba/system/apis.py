@@ -37,6 +37,7 @@ class BuildAPI(generics.GenericAPIView):
         detail['project'] = detail['project-name']
         detail['build_id'] = detail['build-id']
         detail['time'] = message['time']
+        detail['branch'] = detail['additional-information']['source-version']
 
         additional_information = detail['additional-information']
         detail['logs'] = additional_information['logs']['deep-link']
