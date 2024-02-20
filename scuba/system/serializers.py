@@ -19,6 +19,7 @@ class CodebuildJobSerializer(serializers.ModelSerializer):
             'project',
             'logs',
             'time',
+            'branch',
         )
 
     @staticmethod
@@ -37,6 +38,7 @@ class CodebuildJobSerializer(serializers.ModelSerializer):
                 id=validated_data['build_id'],
                 logs=validated_data['logs'],
                 project=validated_data['project'],
+                branch=validated_data['branch'],
                 start_time=validated_data['time'])
 
         else:
