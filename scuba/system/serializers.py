@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from scuba.system.models import CodebuildJob, InvalidCodebuildException
+from scuba.system.models import CodebuildJob, CodebuildProject, InvalidCodebuildException
 
 
 class CodebuildJobSerializer(serializers.ModelSerializer):
@@ -32,17 +32,22 @@ class CodebuildJobSerializer(serializers.ModelSerializer):
 
     def save(self, **kwargs):
         validated_data = {**self.validated_data, **kwargs}
+        project, _ = CodebuildProject.objects.get_or_create(project=validated_data['project'])
 
         if validated_data['build_status'] == 0:
+
             return CodebuildJob.objects.create(
                 id=validated_data['build_id'],
                 logs=validated_data['logs'],
-                project=validated_data['project'],
+                project=project,
                 branch=validated_data['branch'],
                 start_time=validated_data['time'])
 
         else:
-            return CodebuildJob.objects \
-                       .filter(id=validated_data['build_id']) \
-                       .update(build_status=validated_data['build_status'],
-                               end_time=validated_data['time'])
+            if validated_data['build_status'] == 1:
+                project.last_successful_build = validated_data['time']
+                project.save()
+
+            return CodebuildJob.objects.filter(id=validated_data['build_id']) \
+                               .update(build_status=validated_data['build_status'],
+                                       end_time=validated_data['time'])
