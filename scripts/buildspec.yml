@@ -57,6 +57,10 @@ cache:
 artifacts:
   files:
     - manage.py
+    - appspec.yml
     - scuba/**/*
     - static/**/*
+    - scripts/**/*
+    - env/**/*
+    - node_modules/**/*
     - templates/**/*

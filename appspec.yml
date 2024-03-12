@@ -3,26 +3,32 @@ os: linux
 files:
   - source: /scuba
     destination: /scuba/apps/scubamob/scuba
+  - source: /scripts
+    destination: /scuba/apps/scubamob/scripts
+  - source: /env
+    destination: /scuba/apps/scubamob/env
   - source: /manage.py
-    destination: /scuba/apps/scubamob
+    destination: /scuba/apps/scubamob/manage.py
   - source: /static
     destination: /scuba/apps/scubamob/static
   - source: /templates
     destination: /scuba/apps/scubamob/templates
   - source: /node_modules
     destination: /scuba/apps/scubamob/node_modules
-  - source: /requirements.txt
-    destination: /scuba/apps/scubamob
 file_exists_behavior: OVERWRITE
 hooks:
   BeforeInstall:
-    - location: scripts/install_dependencies.sh
-      timeout: 300
-      runas: root
-    - location: scripts/start_server.sh
+    - location: scripts/install_server.sh
       timeout: 300
       runas: root
   ApplicationStop:
     - location: scripts/stop_server.sh
+      timeout: 300
+      runas: root
+  ApplicationStart:
+    - location: scripts/install_db_updates.sh
+      timeout: 300
+      runas: ubuntu
+    - location: scripts/start_server.sh
       timeout: 300
       runas: root
