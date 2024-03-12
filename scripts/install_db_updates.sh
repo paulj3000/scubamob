@@ -1,4 +1,3 @@
 #!/bin/bash
-cd ../ &&
-    source env/bin/activate &&
-    python manage.py migrate
+source env/bin/activate &&
+python manage.py migrate
