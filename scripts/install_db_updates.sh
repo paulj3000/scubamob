@@ -1,4 +1,4 @@
 #!/bin/bash
-cd ../../ &&
+cd ../ &&
     source env/bin/activate &&
     python manage.py migrate
