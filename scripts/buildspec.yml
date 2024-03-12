@@ -61,5 +61,6 @@ artifacts:
     - scuba/**/*
     - static/**/*
     - scripts/**/*
+    - env/**/*
     - node_modules/**/*
     - templates/**/*
