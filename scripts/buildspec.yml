@@ -9,8 +9,14 @@ phases:
     commands:
       - apt update -y
       - apt install -y python3-venv
-      - mkdir -p /scuba/apps
-      #- mkdir -p env
+      - pip install --upgrade pip
+      - pip install --upgrade awscli
+
+  pre_build:
+    commands:
+      - python3 -m venv env
+      - source env/bin/activate
+      - pip install -r requirements.txt
 
   #install:
     #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
@@ -21,26 +27,17 @@ phases:
     #commands:
       # - command
       # - command
-  #pre_build:
-    #commands:
-      # - command
-      # - command
   build:
     commands:
-      - pwd
-      - ls
-      - cd /scuba/apps
-      - python3 -m venv env
       - source env/bin/activate
-      - pip install --upgrade pip
-      - pip install -r requirements.txt
       - npm install
       - npm run build
   post_build:
     commands:
       - source env/bin/activate
       - pytest
-      - pycodestyle --exclude=migrations --max-line-length=100 scuba/ > pep8.log || true
+      - flake8 --exit-zero --exclude=migrations --max-line-length=100 scuba/ > pep8.log
+
 reports:
   unittests:
     files:
