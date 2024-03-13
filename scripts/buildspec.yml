@@ -9,7 +9,7 @@ phases:
     commands:
       - apt update -y
       - apt install -y python3-venv
-      - mkdir /scuba/apps
+      - mkdir -p /scuba/apps
       #- mkdir -p env
 
   #install:
