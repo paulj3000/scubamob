@@ -9,7 +9,8 @@ phases:
     commands:
       - apt update -y
       - apt install -y python3-venv
-      - mkdir -p env
+      - mkdir /scuba/apps
+      #- mkdir -p env
 
   #install:
     #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
@@ -26,6 +27,7 @@ phases:
       # - command
   build:
     commands:
+      - cd /scuba/apps
       - python3 -m venv env
       - source env/bin/activate
       - pip install --upgrade pip
