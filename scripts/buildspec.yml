@@ -27,6 +27,8 @@ phases:
       # - command
   build:
     commands:
+      - pwd
+      - ls
       - cd /scuba/apps
       - python3 -m venv env
       - source env/bin/activate
