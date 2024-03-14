@@ -17,6 +17,9 @@ hooks:
       timeout: 300
       runas: root
   ApplicationStart:
+    - location: scripts/change_permissions.sh
+      timeout: 300
+      runas: root
     - location: scripts/install_db_updates.sh
       timeout: 300
       runas: ubuntu
