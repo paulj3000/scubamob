@@ -37,4 +37,3 @@ graphql-core==3.2.3
 graphql-relay==3.2.0
 flake8==6.1.0
 black==24.1.1
-awscli==1.32.63
