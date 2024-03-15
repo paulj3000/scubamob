@@ -29,12 +29,12 @@ phases:
       # - command
   build:
     commands:
-      - source env/bin/activate
+      - source /tmp/env/bin/activate
       - npm install
       - npm run build
   post_build:
     commands:
-      - source env/bin/activate
+      - source /tmp/env/bin/activate
       - pytest
       - flake8 --exit-zero --exclude=migrations --max-line-length=100 scuba/ > pep8.log
 
