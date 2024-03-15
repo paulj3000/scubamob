@@ -53,6 +53,7 @@ reports:
 cache:
   paths:
      - './node_modules/**/*'
+     - '/tmp/env/**/*'
 
 artifacts:
   files:
