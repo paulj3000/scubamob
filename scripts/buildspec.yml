@@ -17,6 +17,9 @@ phases:
       - pip install --upgrade pip
       - pip install -r requirements.txt
       - pip install --upgrade awscli
+      - mkdir xxx
+      - touch xxx/yyyy
+      - aws s3 sync ./xxx s3://scubamob-reports-pipeline/${CODEBUILD_BUILD_ARN}/xxx/
 
   #install:
     #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
