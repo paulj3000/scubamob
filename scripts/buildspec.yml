@@ -17,9 +17,6 @@ phases:
       - pip install --upgrade pip
       - pip install -r requirements.txt
       - pip install --upgrade awscli
-      - mkdir xxx
-      - touch xxx/yyyy
-      - aws s3 sync ./xxx s3://scubamob-reports-pipeline/${CODEBUILD_BUILD_ARN}/xxx/
 
   #install:
     #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
@@ -40,8 +37,8 @@ phases:
       - source /tmp/env/bin/activate
       - pytest
       - flake8 --exit-zero --exclude=migrations --max-line-length=100 --format=html --htmldir=flake-report scuba/ > pep8.log
-      - aws s3 sync ./coverage s3://scubamob-reports-pipeline/${CODEBUILD_BUILD_ARN}/coverage/
-      - aws s3 sync ./coverage s3://scubamob-reports-pipeline/${CODEBUILD_BUILD_ARN}/flake-report/
+      - aws s3 sync ./coverage s3://scubamob-deploy/${CODEBUILD_BUILD_ARN}/coverage/
+      - aws s3 sync ./coverage s3://scubamob-deploy/${CODEBUILD_BUILD_ARN}/flake-report/
 
 reports:
   unittests:
