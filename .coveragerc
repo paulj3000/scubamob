@@ -10,3 +10,6 @@ omit =
     env/*
     xml/*
     scuba/**/migrations/*
+
+[html]
+directory = coverage
