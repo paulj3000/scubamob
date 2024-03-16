@@ -37,8 +37,8 @@ phases:
       - source /tmp/env/bin/activate
       - pytest
       - flake8 --exit-zero --exclude=migrations --max-line-length=100 --format=html --htmldir=flake-report scuba/ > pep8.log
-      - aws s3 sync ./coverage s3://scubamob-deploy/pipeline/${CODEBUILD_BUILD_ARN}/coverage/
-      - aws s3 sync ./coverage s3://scubamob-deploy/pipeline/${CODEBUILD_BUILD_ARN}/flake-report/
+      - aws s3 sync ./coverage s3://scubamob-pipeline-reports/${CODEBUILD_BUILD_ARN}/coverage/
+      - aws s3 sync ./coverage s3://scubamob-pipeline-reports/${CODEBUILD_BUILD_ARN}/flake-report/
 
 reports:
   unittests:

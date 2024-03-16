@@ -16,7 +16,7 @@ class CodeBuildJobAdminInline(admin.TabularInline):
     max_num = 0
 
     def reports(self, obj):
-        url = f'<a target="_blank" href="{STATIC_URL}{obj.id}/coverage/">Coverage</a>' + \
+        url = f'<a target="_blank" href="{STATIC_URL}{obj.id}/coverage/">Coverage</a> | ' + \
               f'<a target="_blank" href="{STATIC_URL}{obj.id}/flake-report/">Flake8</a>'
 
         return mark_safe(url)
