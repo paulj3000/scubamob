@@ -18,6 +18,7 @@ class CodebuildJobSerializer(serializers.ModelSerializer):
             'build_id',
             'build_status',
             'project',
+            'project_arn',
             'logs',
             'time',
             'branch',
