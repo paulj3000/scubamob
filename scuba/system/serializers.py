@@ -5,6 +5,7 @@ from scuba.system.models import CodebuildJob, CodebuildProject, InvalidCodebuild
 
 class CodebuildJobSerializer(serializers.ModelSerializer):
     project = serializers.CharField()
+    project_arn = serializers.CharField()
     build_status = serializers.CharField()
     build_id = serializers.CharField()
     time = serializers.DateTimeField()
@@ -32,7 +33,9 @@ class CodebuildJobSerializer(serializers.ModelSerializer):
 
     def save(self, **kwargs):
         validated_data = {**self.validated_data, **kwargs}
-        project, _ = CodebuildProject.objects.get_or_create(project=validated_data['project'])
+        project_name = validated_data['project']
+        project, _ = CodebuildProject.objects.get_or_create(id=validated_data['project_arn'],
+                                                            defaults={'project': project_name})
 
         if validated_data['build_status'] == 0:
 

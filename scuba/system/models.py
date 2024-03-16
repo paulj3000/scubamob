@@ -7,8 +7,9 @@ class InvalidCodebuildException(Exception):
     pass
 
 
-class CodebuildProject(UUIDModel):
+class CodebuildProject(models.Model):
     ''' replace the primary key with a uuid field '''
+    id = models.CharField(max_length=128, primary_key=True, editable=False)
     project = models.CharField(max_length=128)
     last_successful_build = models.DateTimeField(null=True, blank=True)
 
@@ -32,7 +33,6 @@ class CodebuildJob(models.Model):
 
     id = models.CharField(max_length=128, primary_key=True, editable=False)
     build_status = models.PositiveSmallIntegerField(choices=BUILD_STATUS_VALUES, default=0)
-    project = models.CharField(max_length=128)
     project = models.ForeignKey(CodebuildProject, related_name='jobs', on_delete=models.CASCADE)
     logs = models.CharField(max_length=256)
     branch = models.CharField(max_length=256)

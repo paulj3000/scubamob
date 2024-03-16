@@ -35,6 +35,7 @@ class BuildAPI(generics.GenericAPIView):
         detail = message['detail']
         detail['build_status'] = detail['build-status']
         detail['project'] = detail['project-name']
+        detail['project_arn'] = detail['build-id'].split('/')[0]
         detail['build_id'] = detail['build-id']
         detail['time'] = message['time']
         detail['branch'] = detail['additional-information']['source-version']
