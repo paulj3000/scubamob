@@ -12,11 +12,11 @@ phases:
 
   pre_build:
     commands:
-      - pip install --upgrade pip
-      - pip install --upgrade awscli
       - python3 -m venv /tmp/env
       - source /tmp/env/bin/activate
+      - pip install --upgrade pip
       - pip install -r requirements.txt
+      - pip install --upgrade awscli
 
   #install:
     #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
