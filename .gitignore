@@ -32,6 +32,7 @@ coverage.xml
 test.xml
 test*.xml
 coverage
+flake-report
 .coverage
 pep8.log
 
