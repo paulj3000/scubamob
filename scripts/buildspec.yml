@@ -18,15 +18,6 @@ phases:
       - pip install -r requirements.txt
       - pip install --upgrade awscli
 
-  #install:
-    #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
-    #If you specify runtime-versions and use an image other than Ubuntu standard image 2.0, the build fails.
-    #runtime-versions:
-      # name: version
-      # name: version
-    #commands:
-      # - command
-      # - command
   build:
     commands:
       - source /tmp/env/bin/activate
