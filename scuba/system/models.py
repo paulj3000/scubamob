@@ -40,5 +40,6 @@ class CodebuildJob(models.Model):
     end_time = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        get_latest_by = "-end_time"
+        get_latest_by = "-start_time"
         db_table = 'codebuild_job'
+        ordering = ("-start_time",)
