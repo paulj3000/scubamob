@@ -16,6 +16,9 @@ class CodeBuildJobAdminInline(admin.TabularInline):
     max_num = 0
 
     def reports(self, obj):
+        if not obj.is_completed:
+            return 'Not available yet'
+
         base_url = f"{AWS_CLOUDFRONT_DEPLOY}/builds/"
         url = f'<a target="_blank" href="{base_url}{obj.id}/coverage/">Coverage</a> | ' + \
               f'<a target="_blank" href="{base_url}{obj.id}/flake-report/">Flake8</a>'
