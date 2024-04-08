@@ -13,7 +13,7 @@ class UserEmailSerializer(serializers.ModelSerializer):
         make sure the email coming in hasn't been used yet
         """
         if UserEmail.objects.filter(email=email):
-            raise serializers.ValidationError(f"This email has already been used")
+            raise serializers.ValidationError("This email has already been used")
 
         return email
 
@@ -45,7 +45,7 @@ class PrimaryEmailSerializer(serializers.ModelSerializer):
         make sure the email coming in hasn't been used yet
         """
         if is_primary:
-            raise serializers.ValidationError(f"This email is already the primary email")
+            raise serializers.ValidationError("This email is already the primary email")
 
         return is_primary
 
@@ -72,7 +72,7 @@ class UserSettingSerializer(serializers.ModelSerializer):
         make sure the email coming in hasn't been used yet
         """
         if is_primary:
-            raise serializers.ValidationError(f"This email is already the primary email")
+            raise serializers.ValidationError("This email is already the primary email")
 
         return is_primary
 
