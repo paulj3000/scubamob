@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 
 import scuba.system.models as system_models
-from scuba.settings import STATIC_URL
+from scuba.settings import AWS_CLOUDFRONT_DEPLOY
 
 
 class CodeBuildJobAdminInline(admin.TabularInline):
@@ -16,11 +16,14 @@ class CodeBuildJobAdminInline(admin.TabularInline):
     max_num = 0
 
     def reports(self, obj):
-        url = f'<a target="_blank" href="{STATIC_URL}{obj.id}/coverage/">Coverage</a> | ' + \
-              f'<a target="_blank" href="{STATIC_URL}{obj.id}/flake-report/">Flake8</a>'
+        if not obj.is_completed:
+            return 'Not available yet'
+
+        base_url = f"{AWS_CLOUDFRONT_DEPLOY}builds/"
+        url = f'<a target="_blank" href="{base_url}{obj.id}/coverage/">Coverage</a> | ' + \
+              f'<a target="_blank" href="{base_url}{obj.id}/flake-report/">Flake8</a>'
 
         return mark_safe(url)
-
 
 
 class CodeBuildProjectAdmin(admin.ModelAdmin):

@@ -39,6 +39,13 @@ class CodebuildJob(models.Model):
     start_time = models.DateTimeField(null=True, blank=True)
     end_time = models.DateTimeField(null=True, blank=True)
 
+    @property
+    def is_completed(self):
+        if self.build_status == 1:
+            return True
+
+        return False
+
     class Meta:
         get_latest_by = "-start_time"
         db_table = 'codebuild_job'

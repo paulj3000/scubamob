@@ -228,6 +228,8 @@ AWS_S3_BUCKET_PRIVATE_REGION = 'us-east-1'
 AWS_PROFILE = 'default'
 AWS_EMAIL_STORAGE_ROOT = 'emailsent/skmradio'
 AWS_CLOUDFRONT = os.environ.get('AWS_CLOUDFRONT', 'https://d2pw8lka09f5g5.cloudfront.net/')
+AWS_CLOUDFRONT_DEPLOY = os.environ.get('AWS_CLOUDFRONT_DEPLOY',
+                                       'https://d2y2c3a6qt52o9.cloudfront.net/')
 
 FILE_UPLOAD_HANDLERS = ['django.core.files.uploadhandler.TemporaryFileUploadHandler']
 
