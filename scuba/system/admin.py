@@ -23,7 +23,6 @@ class CodeBuildJobAdminInline(admin.TabularInline):
         return mark_safe(url)
 
 
-
 class CodeBuildProjectAdmin(admin.ModelAdmin):
     list_display = ('project', 'last_successful_build',)
 
