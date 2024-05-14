@@ -3,24 +3,6 @@ from rest_framework import permissions
 from scuba.accounts.models import User
 
 
-class IsUserBlocked(permissions.BasePermission):
-    """
-    Global permission check for blocked IPs.
-    """
-
-    def has_object_permission(self, request, view, obj):
-        user = request.user
-        id = self.kwargs.get('id')
-
-        profile = User.objects.filter(id=id).first()
-        if not profile:
-            return False
-
-        ip_addr = request.META['REMOTE_ADDR']
-        blocked = Blocklist.objects.filter(ip_addr=ip_addr).exists()
-        return not blocked
-
-
 class CanViewProfile(permissions.BasePermission):
     """
     Global permission check for blocked IPs.

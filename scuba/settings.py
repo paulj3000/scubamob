@@ -289,6 +289,6 @@ LOGGING = {
 try:
     import sys
     sys.path.append(os.environ.get('SETTINGS_PATH', '/scuba'))
-    from system.settings import *
+    from system.settings import *   # noqa: F401,F403
 except ImportError as exp:
     print('system.settings was not loaded. Continuing with standard settings.\n%s' % exp)

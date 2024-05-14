@@ -31,7 +31,7 @@ class BlockedCountry(UUIDModel):
             raise InvalidIPAddress
 
         blocked_country = BlockedCountry.objects.filter(iso=match['country']['iso_code']).first()
-        return [blocked_country,  match['country']['iso_code']]
+        return [blocked_country, match['country']['iso_code']]
 
 
 class InvalidEmail(UUIDModel):

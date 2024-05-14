@@ -8,6 +8,7 @@ from scuba.system.models import (
     InvalidCodeBuildException
 )
 
+
 class CodeBuildJobSerializer(serializers.ModelSerializer):
     project = serializers.CharField()
     project_arn = serializers.CharField()

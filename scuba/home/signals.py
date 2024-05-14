@@ -7,7 +7,6 @@ Author: Pauljames "The Juggernaut" Dimitriu
 
 Add some signal stuff for account creation stuff
 """
-import logging
 from django.dispatch import receiver
 from django.db.models.signals import pre_delete, pre_save
 
@@ -21,7 +20,6 @@ def delete_obj_from_s3(sender, instance, **kwargs):
 
     Some modifications necessary for the campaign once it's uploaded
     """
-    logger = logging.getLogger('main')
     FileUtils.delete_file_from_s3(instance.filename)
 
 
@@ -31,8 +29,6 @@ def validate_is_active(sender, instance, **kwargs):
 
     Some modifications necessary for the campaign once it's uploaded
     """
-    logger = logging.getLogger('main')
-
     # verify there is an active jumbotron. If there is not, set this one
     # to active
     if not Jumbotron.objects.filter(is_active=True).count():

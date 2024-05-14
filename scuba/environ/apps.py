@@ -6,4 +6,4 @@ class EnvironConfig(AppConfig):
     name = 'scuba.environ'
 
     def ready(self):
-        import scuba.accounts.signals
+        import scuba.accounts.signals   # noqa: F401

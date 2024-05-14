@@ -6,4 +6,4 @@ class ContentConfig(AppConfig):
     name = 'scuba.content'
 
     def ready(self):
-        import scuba.content.signals
+        import scuba.content.signals    # noqa: F401

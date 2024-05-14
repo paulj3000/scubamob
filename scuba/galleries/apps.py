@@ -6,4 +6,4 @@ class GalleriesConfig(AppConfig):
     name = 'scuba.galleries'
 
     def ready(self):
-        import scuba.galleries.signals
+        import scuba.galleries.signals  # noqa: F401

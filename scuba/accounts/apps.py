@@ -6,4 +6,4 @@ class AccountsConfig(AppConfig):
     name = 'scuba.accounts'
 
     def ready(self):
-        import scuba.accounts.signals
+        import scuba.accounts.signals   # noqa: F401

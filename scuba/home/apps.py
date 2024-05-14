@@ -6,4 +6,4 @@ class HomeConfig(AppConfig):
     name = 'scuba.home'
 
     def ready(self):
-        import scuba.home.signals
+        import scuba.home.signals  # noqa: F401

@@ -82,15 +82,6 @@ class Divesite(UUIDModel):
         # return the generated id
         return aws_id
 
-    def get_active_banner(self):
-        banner = self.banners.filter(is_active=True).first()
-
-        if banner:
-            img = banner.image.replace('divesites/', '')
-            return f"{AWS_CLOUDFRONT}{img}"
-
-        return None
-
     # -----------------------------------------------------------------------------
     # start banner image stuff
     # -----------------------------------------------------------------------------
