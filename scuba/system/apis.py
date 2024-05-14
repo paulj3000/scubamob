@@ -9,7 +9,8 @@ from rest_framework.parsers import JSONParser
 from scuba.sitesettings.serializers import SNSSubscriptionRequestSerializer
 from scuba.system.serializers import (
     CodePipelineStateSerializer,
-    CodePipelineStateSerializer
+    CodePipelineStateSerializer,
+    CodeBuildJobSerializer,
 )
 
 from scuba.libs.rest_framework.parsers import AWSJSONParser
@@ -36,23 +37,25 @@ class CodeBuildAPI(generics.GenericAPIView):
             serializer.save()
             return Response(status=status.HTTP_201_CREATED)
 
-        message = json.loads(request.data['Message'])
-        detail = message['detail']
-        detail['build_status'] = detail['build-status']
-        detail['project'] = detail['project-name']
-        detail['project_arn'] = detail['build-id'].split('/')[0]
-        detail['build_id'] = detail['build-id']
-        detail['time'] = message['time']
-        detail['branch'] = detail['additional-information']['source-version']
+        try:
+            message = json.loads(request.data['Message'])
+            detail = message['detail']
+            detail['build_status'] = detail['build-status']
+            detail['project'] = detail['project-name']
+            detail['project_arn'] = detail['build-id'].split('/')[0]
+            detail['build_id'] = detail['build-id']
+            detail['time'] = message['time']
+            detail['branch'] = detail['additional-information']['source-version']
 
-        additional_information = detail['additional-information']
-        detail['logs'] = additional_information['logs']['deep-link']
+            additional_information = detail['additional-information']
+            detail['logs'] = additional_information['logs']['deep-link']
 
-        serializer = CodeBuildJobSerializer(data=detail)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(status=status.HTTP_200_OK)
-
+            serializer = CodeBuildJobSerializer(data=detail)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(status=status.HTTP_200_OK)
+        except KeyError:
+            return Response(status=status.HTTP_400_HTTP_400_BAD_REQUEST)
 
 class CodePipelineAPI(generics.GenericAPIView):
     permission_classes = (AllowAny,)

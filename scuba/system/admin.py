@@ -56,4 +56,4 @@ class CodePipelineStateAdmin(admin.ModelAdmin):
 
 admin.site.register(system_models.CodeBuildProject, CodeBuildProjectAdmin)
 admin.site.register(system_models.CodePipelineProject, CodePipelineProjectAdmin)
-admin.site.register(system_models.CodePipelineState, CodePipelineStateAdmin)
+admin.site.register(system_models.CodePipelineStatePayload)
