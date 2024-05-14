@@ -3,11 +3,11 @@ from django.db import models
 from scuba.libs.models.uuidmodel import UUIDModel
 
 
-class InvalidCodebuildException(Exception):
+class InvalidCodeBuildException(Exception):
     pass
 
 
-class CodebuildProject(models.Model):
+class CodeBuildProject(models.Model):
     ''' replace the primary key with a uuid field '''
     id = models.CharField(max_length=128, primary_key=True, editable=False)
     project = models.CharField(max_length=128)
@@ -21,7 +21,7 @@ class CodebuildProject(models.Model):
         db_table = 'codebuild_project'
 
 
-class CodebuildJob(models.Model):
+class CodeBuildJob(models.Model):
     ''' replace the primary key with a uuid field '''
 
     BUILD_STATUS_VALUES = {
@@ -33,7 +33,7 @@ class CodebuildJob(models.Model):
 
     id = models.CharField(max_length=128, primary_key=True, editable=False)
     build_status = models.PositiveSmallIntegerField(choices=BUILD_STATUS_VALUES, default=0)
-    project = models.ForeignKey(CodebuildProject, related_name='jobs', on_delete=models.CASCADE)
+    project = models.ForeignKey(CodeBuildProject, related_name='jobs', on_delete=models.CASCADE)
     logs = models.CharField(max_length=256)
     branch = models.CharField(max_length=256)
     start_time = models.DateTimeField(null=True, blank=True)
@@ -50,3 +50,31 @@ class CodebuildJob(models.Model):
         get_latest_by = "-start_time"
         db_table = 'codebuild_job'
         ordering = ("-start_time",)
+
+
+class CodePipelineProject(models.Model):
+    ''' replace the primary key with a uuid field '''
+    id = models.CharField(max_length=128, primary_key=True, editable=False)
+    pipeline = models.CharField(max_length=128)
+    topic_arn = models.CharField(max_length=256)
+
+    def __str__(self):
+        """ return a string representation of the model """
+        return self.pipeline
+
+    class Meta:
+        db_table = 'codepipeline_project'
+
+
+class CodePipelineState(models.Model):
+    ''' replace the primary key with a uuid field '''
+    id = models.CharField(max_length=128, primary_key=True, editable=False)
+    pipeline = models.ForeignKey(CodePipelineProject, related_name='states', on_delete=models.CASCADE)
+    notification_rule_arn = models.CharField(max_length=128)
+    state = models.CharField(max_length=64)
+    start_time = models.DateTimeField(null=True, blank=True)
+    pipeline_execution_attempt = models.PositiveSmallIntegerField(default=0)
+    payload = models.CharField(max_length=1024)
+
+    class Meta:
+        db_table = 'codepipeline_state'

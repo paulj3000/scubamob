@@ -1,9 +1,14 @@
 from rest_framework import serializers
 
-from scuba.system.models import CodebuildJob, CodebuildProject, InvalidCodebuildException
+from scuba.system.models import (
+    CodeBuildJob,
+    CodeBuildProject,
+    CodePipelineState,
+    CodePipelineProject,
+    InvalidCodeBuildException
+)
 
-
-class CodebuildJobSerializer(serializers.ModelSerializer):
+class CodeBuildJobSerializer(serializers.ModelSerializer):
     project = serializers.CharField()
     project_arn = serializers.CharField()
     build_status = serializers.CharField()
@@ -12,7 +17,7 @@ class CodebuildJobSerializer(serializers.ModelSerializer):
 
     class Meta:
         """ define models, fields, etc """
-        model = CodebuildJob
+        model = CodeBuildJob
         fields = (
             'id',
             'build_id',
@@ -26,21 +31,21 @@ class CodebuildJobSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def validate_build_status(status):
-        for _, item in enumerate(CodebuildJob.BUILD_STATUS_VALUES):
+        for _, item in enumerate(CodeBuildJob.BUILD_STATUS_VALUES):
             if item[1] == status:
                 return item[0]
 
-        raise InvalidCodebuildException(f"{status} is invalid")
+        raise InvalidCodeBuildException(f"{status} is invalid")
 
     def save(self, **kwargs):
         validated_data = {**self.validated_data, **kwargs}
         project_name = validated_data['project']
-        project, _ = CodebuildProject.objects.get_or_create(id=validated_data['project_arn'],
+        project, _ = CodeBuildProject.objects.get_or_create(id=validated_data['project_arn'],
                                                             defaults={'project': project_name})
 
         if validated_data['build_status'] == 0:
 
-            return CodebuildJob.objects.create(
+            return CodeBuildJob.objects.create(
                 id=validated_data['build_id'],
                 logs=validated_data['logs'],
                 project=project,
@@ -52,6 +57,51 @@ class CodebuildJobSerializer(serializers.ModelSerializer):
                 project.last_successful_build = validated_data['time']
                 project.save()
 
-            return CodebuildJob.objects.filter(id=validated_data['build_id']) \
+            return CodeBuildJob.objects.filter(id=validated_data['build_id']) \
                                .update(build_status=validated_data['build_status'],
                                        end_time=validated_data['time'])
+
+
+class CodePipelineStateSerializer(serializers.ModelSerializer):
+    id = serializers.CharField()
+    project_name = serializers.CharField()
+    pipeline_arn = serializers.CharField()
+    payload = serializers.CharField()
+    pipeline_arn = serializers.CharField()
+    topic_arn = serializers.CharField()
+    notification_rule_arn = serializers.CharField()
+
+    class Meta:
+        """ define models, fields, etc """
+        model = CodePipelineState
+        fields = (
+            'id',
+            'notification_rule_arn',
+            'state',
+            'start_time',
+            'pipeline_execution_attempt',
+            'payload',
+            'pipeline_arn',
+            'project_name',
+            'pipeline_arn',
+            'topic_arn',
+        )
+
+    def save(self, **kwargs):
+        validated_data = {**self.validated_data, **kwargs}
+        project_name = validated_data['project_name']
+        topic_arn = validated_data['topic_arn']
+        pipeline, _ = CodePipelineProject.objects.get_or_create(id=validated_data['id'],
+                                                            defaults={'pipeline': project_name,
+                                                                      'topic_arn': topic_arn})
+
+        return CodePipelineState \
+                .objects \
+                .create(id=validated_data['id'],
+                        pipeline=pipeline,
+                        state=validated_data['state'],
+                        start_time=validated_data['start_time'],
+                        pipeline_execution_attempt=validated_data['pipeline_execution_attempt'],
+                        notification_rule_arn=validated_data['notification_rule_arn'],
+                        payload=validated_data['payload'],
+                       )

@@ -7,11 +7,15 @@ import rest_framework.status as status
 from rest_framework.parsers import JSONParser
 
 from scuba.sitesettings.serializers import SNSSubscriptionRequestSerializer
-from scuba.system.serializers import CodebuildJobSerializer
+from scuba.system.serializers import (
+    CodePipelineStateSerializer,
+    CodePipelineStateSerializer
+)
+
 from scuba.libs.rest_framework.parsers import AWSJSONParser
 
 
-class BuildAPI(generics.GenericAPIView):
+class CodeBuildAPI(generics.GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = SNSSubscriptionRequestSerializer
     parser_classes = [AWSJSONParser, JSONParser]
@@ -23,6 +27,7 @@ class BuildAPI(generics.GenericAPIView):
         """
         fh = open("/tmp/build.txt", "a")
         fh.write(json.dumps(request.data) + "\n")
+        fh.write("\n\n---------\n\n")
         fh.close()
 
         if request.data.get('Type') == 'SubscriptionConfirmation':
@@ -43,7 +48,50 @@ class BuildAPI(generics.GenericAPIView):
         additional_information = detail['additional-information']
         detail['logs'] = additional_information['logs']['deep-link']
 
-        serializer = CodebuildJobSerializer(data=detail)
+        serializer = CodeBuildJobSerializer(data=detail)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        return Response(status=status.HTTP_200_OK)
+
+
+class CodePipelineAPI(generics.GenericAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = SNSSubscriptionRequestSerializer
+    parser_classes = [AWSJSONParser, JSONParser]
+
+    def post(self, request):
+        """ post
+
+        Do the actual posting of the password reset
+        """
+        fh = open("/tmp/pipeline.txt", "a")
+        fh.write(json.dumps(request.data) + "\n")
+        fh.write("\n\n---------\n\n")
+        fh.close()
+
+        if request.data.get('Type') == 'SubscriptionConfirmation':
+            serializer = SNSSubscriptionRequestSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+
+        message = json.loads(request.data['Message'])
+        detail = message['detail']
+        detail['pipeline_execution_attempt'] = detail['pipeline-execution-attempt']
+        detail['project_name'] = detail['pipeline']
+        detail['start_time'] = detail['start-time']
+        detail['execution_id'] = detail['execution-id']
+        detail['id'] = detail['execution-id']
+        detail['notification_rule_arn'] = message.get('notificationRuleArn')
+        detail['topic_arn'] = request.data['TopicArn']
+        detail['payload'] = json.dumps(request.data)
+
+        print('xxx', detail['id'])
+
+        for arn in message.get('resources'):
+            detail['pipeline_arn'] = arn
+            serializer = CodePipelineStateSerializer(data=detail)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
         return Response(status=status.HTTP_200_OK)
