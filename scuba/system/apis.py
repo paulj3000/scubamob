@@ -9,7 +9,6 @@ from rest_framework.parsers import JSONParser
 from scuba.sitesettings.serializers import SNSSubscriptionRequestSerializer
 from scuba.system.serializers import (
     CodePipelineStateSerializer,
-    CodePipelineStateSerializer,
     CodeBuildJobSerializer,
 )
 
@@ -56,6 +55,7 @@ class CodeBuildAPI(generics.GenericAPIView):
             return Response(status=status.HTTP_200_OK)
         except KeyError:
             return Response(status=status.HTTP_400_HTTP_400_BAD_REQUEST)
+
 
 class CodePipelineAPI(generics.GenericAPIView):
     permission_classes = (AllowAny,)

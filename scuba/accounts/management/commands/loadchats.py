@@ -4,7 +4,7 @@ import requests
 from django.core.management.base import BaseCommand
 
 from scuba.accounts.models import User
-from scuba.sitesettings.models import SystemApi
+from scuba.sitesettings.models import SystemApi, ChatApi
 
 
 class Command(BaseCommand):
@@ -48,7 +48,7 @@ class Command(BaseCommand):
 
             params = {
                 'users': users,
-                'userId': users[random.randint(0, len(users)-1)]
+                'userId': users[random.randint(0, len(users) - 1)]
             }
 
             try:
