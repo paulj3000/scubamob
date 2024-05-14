@@ -8,6 +8,7 @@ omit =
 [report]
 omit =
     env/*
+    *test*/*
     xml/*
     scuba/**/migrations/*
 
