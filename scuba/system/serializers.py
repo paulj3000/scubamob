@@ -95,13 +95,17 @@ class CodePipelineStateSerializer(serializers.ModelSerializer):
                                                             defaults={'pipeline': project_name,
                                                                       'topic_arn': topic_arn})
 
-        return CodePipelineState \
+        state, _ = CodePipelineState \
                 .objects \
-                .create(id=validated_data['id'],
-                        pipeline=pipeline,
-                        state=validated_data['state'],
-                        start_time=validated_data['start_time'],
-                        pipeline_execution_attempt=validated_data['pipeline_execution_attempt'],
-                        notification_rule_arn=validated_data['notification_rule_arn'],
-                        payload=validated_data['payload'],
-                       )
+                .update_or_create(id=validated_data['id'],
+                        defaults=({
+                            'pipeline': pipeline,
+                            'state': validated_data['state'],
+                            'start_time': validated_data['start_time'],
+                            'pipeline_execution_attempt': validated_data['pipeline_execution_attempt'],
+                            'notification_rule_arn': validated_data['notification_rule_arn'],
+                        })
+                )
+
+        state.add_payload(validated_data['payload'])
+        return state

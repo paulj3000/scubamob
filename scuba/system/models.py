@@ -78,3 +78,14 @@ class CodePipelineState(models.Model):
 
     class Meta:
         db_table = 'codepipeline_state'
+
+    def add_payload(self, payload):
+        self.payloads.create(payload=payload)
+
+
+class CodePipelineStatePayload(models.Model):
+    state = models.ForeignKey(CodePipelineState, related_name='payloads', on_delete=models.CASCADE)
+    payload = models.CharField(max_length=1024)
+
+    class Meta:
+        db_table = 'codepipeline_state_payload'
