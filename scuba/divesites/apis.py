@@ -33,9 +33,9 @@ class DivesiteListApi(generics.ListAPIView):
         lng = self.request.query_params.get('long', None)
         distance = self.request.query_params.get('distance', None)
 
-        return Divesites.get_local_divesites(lat, lng, distance)
+        return Divesite.get_local_divesites(lat, lng, distance)
 
-    def get_queryset(self):
+    def get_queryset_off(self):
         """ get_queryset
 
         get all of categories associated to the section
@@ -68,9 +68,9 @@ class DivesiteReviewListApi(generics.ListAPIView):
         lng = self.request.query_params.get('long', None)
         distance = self.request.query_params.get('distance', None)
 
-        return Divesites.get_local_diveshops(lat, lng, distance)
+        return Divesite.get_local_diveshops(lat, lng, distance)
 
-    def get_queryset(self):
+    def get_queryset_off(self):
         """ get_queryset
 
         get all of categories associated to the section

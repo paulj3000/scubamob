@@ -21,8 +21,7 @@ class AlbumSerializer(serializers.ModelSerializer):
         return f"{AWS_CLOUDFRONT}/{data.filename}"
 
     def create(self, validated_data):
-        retval = []
-        file = validated_data['file']
+        fileinfo = validated_data['file']
         return Media.upload_new_media(fileinfo.name, fileinfo.content_type, fileinfo.read())
 
 
@@ -42,8 +41,7 @@ class MediaSerializer(serializers.Serializer):
         return f"{AWS_CLOUDFRONT}{data.filename}"
 
     def create(self, validated_data):
-        retval = []
-        file = validated_data['file']
+        fileinfo = validated_data['file']
         return Media.upload_new_media(fileinfo.name, fileinfo.content_type, fileinfo.read())
 
 

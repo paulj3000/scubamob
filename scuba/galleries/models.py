@@ -1,14 +1,17 @@
+import os
 import uuid
 from PIL import Image
 from io import StringIO
 
 from django.db import models
-from django.conf import settings
 
+import scuba.settings as settings
 from scuba.accounts.models import User
 from scuba.libs.fileutils import FileUtils
 from scuba.libs.models.awsmodel import AWSModel
 from scuba.libs.models.uuidmodel import UUIDModel
+from scuba.libs.stringutils import StringUtils
+from scuba.libs.aws.s3 import S3
 
 
 IMAGE_TYPE_EXTENSIONS = {
@@ -64,7 +67,7 @@ class Media(UUIDModel):
                 name = tmp_name
 
         # TODO: validate the extension
-        aws_filename = f"content/{SITE_ID}/{name}"
+        aws_filename = f"content/{settings.SITE_ID}/{name}"
 
         # upload the file to s3
         FileUtils.upload_file_to_s3(aws_filename, content_type, data)
@@ -88,16 +91,11 @@ class Album(UUIDModel):
             IMAGE_TYPE_EXTENSIONS[uploaded_image.content_type])
 
         account = self.user.get_account()
-        gallery_file = AlbumImage.generate_image_name(account.guid, self.guid, filename)
-        header = {'Content-Type': uploaded_image.content_type}
+        name = AlbumImage.generate_image_name(account.guid, self.guid, filename)
+        headers = {'Content-Type': uploaded_image.content_type}
 
-        conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
-        b = conn.get_bucket(settings.GALLERY_BUCKET)
-
-        k = b.new_key(gallery_file)
-        k.set_contents_from_string(uploaded_image.read(), header)
-
-        return gallery_file
+        S3.upload_raw_data(name, uploaded_image.read(), settings.GALLERY_BUCKET, headers)
+        return name
 
     def add_image_thumbnail(self, uploaded_image):
         # this is really bad!  Refactor
@@ -110,15 +108,12 @@ class Album(UUIDModel):
         account = self.user.get_account()
         gallery_file_thumbnail = AlbumImage.generate_image_thumbnail_name(
             account.guid, self.guid, filename)
-        header = {'Content-Type': uploaded_image.content_type}
-
-        conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
-        b = conn.get_bucket(settings.GALLERY_BUCKET)
+        headers = {'Content-Type': uploaded_image.content_type}
 
         WHITE = (255, 255, 255)
 
         size = 150, 150
-        im = Image.open(cStringIO.StringIO(uploaded_image.read()))
+        im = Image.open(StringIO(uploaded_image.read()))
         im.thumbnail(size, Image.ANTIALIAS)
 
         bg = Image.new('RGB', (150, 150), WHITE)
@@ -129,10 +124,6 @@ class Album(UUIDModel):
         xo, yo = (W - w) / 2, (H - h) / 2
         bg.paste(im, (xo, yo, xo + w, yo + h))
 
-        conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
-        b = conn.get_bucket(settings.GALLERY_BUCKET)
-        k = b.new_key(gallery_file_thumbnail)
-
         # convert the image
         img_type = IMAGE_TYPE_EXTENSIONS[uploaded_image.content_type]
         img_type = 'jpeg' if img_type.lower() == 'jpg' else img_type
@@ -141,7 +132,10 @@ class Album(UUIDModel):
         bg.save(temp_handle, img_type)
         temp_handle.seek(0)
 
-        k.set_contents_from_string(temp_handle.read(), header)
+        S3.upload_raw_data(gallery_file_thumbnail,
+                           temp_handle.read(),
+                           settings.GALLERY_BUCKET,
+                           headers)
 
         return gallery_file_thumbnail
 
