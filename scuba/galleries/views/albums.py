@@ -44,4 +44,4 @@ def json_createalbum(us_request):
         json['url'] = reverse('show_album', kwargs={'id': json['id']})
         retval.append(json)
 
-    return render(us_request, 'galleries/image.html', context)
+    return render(us_request, 'galleries/image.html', {})
