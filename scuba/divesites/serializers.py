@@ -148,9 +148,7 @@ class DivesiteSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        retval = []
-        file = validated_data['file']
-        return Media.upload_new_media(fileinfo.name, fileinfo.content_type, fileinfo.read())
+        raise NotImplementedError
 
 
 class DivesiteReviewSerializer(serializers.ModelSerializer):
@@ -238,7 +236,7 @@ class DivesiteReviewSerializer(serializers.ModelSerializer):
 
         today = date.today()
         if DivesiteReview.objects.filter(user=user, review_date=today, divesite=divesite).filter():
-            raise serializers.ValidationError(f"You already submitted a review for today")
+            raise serializers.ValidationError("You already submitted a review for today")
 
         return attrs
 
@@ -348,12 +346,10 @@ class DivesiteCheckinSerializer(serializers.ModelSerializer):
         return temp_c
 
     def validate_divesite_id(self, divesite_id):
-        try:
-            divesite = Divesite.objects.get(id=divesite_id)
-        except Divesite.DoesNotExist:
-            raise serializers.ValidationError(f"{divesite_id} is invalid")
+        if Divesite.objects.filter(id=divesite_id):
+            return divesite_id
 
-        return divesite_id
+        raise serializers.ValidationError(f"{divesite_id} is invalid")
 
     @staticmethod
     def validate_visibility(visibility):

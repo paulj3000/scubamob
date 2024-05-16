@@ -17,21 +17,6 @@ class FileUtils:
 
     @staticmethod
     def upload_file_to_s3(filename, content_type, content, **kwargs):
-        url = SystemApi.get_s3_upload()
-
-        headers = {
-            'ContentType': content_type,
-        }
-
-        headers.update(kwargs.get('headers', {}))
-
-        # generate the data to send over to S3
-        S3.upload_file_content(AWS_S3_BUCKET, filename, content, **headers)
-
-    @staticmethod
-    def generate_post(content_type):
-        url = SystemApi.get_s3_upload()
-
         headers = {
             'ContentType': content_type,
         }

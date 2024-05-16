@@ -1,98 +1,10 @@
 from django.core.exceptions import ValidationError
 from django import forms
-from django.utils.translation import gettext_lazy as _
 from django.forms import ModelForm
 from django.core.validators import validate_email
 from django.contrib.auth.models import User
 
 from scuba.accounts.models import UserBuddyRequest, UserBuddy
-
-
-class AuthenticationForm(forms.Form):
-    email = forms.CharField()
-    password = forms.CharField()
-    remember_me = forms.BooleanField(required=False, widget=forms.CheckboxInput())
-
-    error_messages = {
-        'invalid_login': _(
-            "Please enter a correct %(username)s and password. Note that both "
-            "fields may be case-sensitive."
-        ),
-        'inactive': _("This account is inactive."),
-        'blocked': _("This account is blocked."),
-        'cannot_process': _("This request cannot be processed."),
-    }
-
-    def __init__(self, request=None, *args, **kwargs):
-        self.request = request
-        self.user_cache = None
-        super().__init__(*args, **kwargs)
-
-    def set_ip_address(self, ip_address):
-        self.ip_address = ip_address
-
-    def clean(self):
-        email = self.cleaned_data.get('email')
-        password = self.cleaned_data.get('password')
-
-        message = {'form_data': self.cleaned_data}
-        Log.objects.create(system='LOGIN', message=json.dumps(message))
-
-        blocked, country = BlockedCountry.is_ip_available(getattr(self, 'ip_address'))
-        blocked_name = 'Unknown'
-
-        if blocked:
-            blocked_name = blocked.name
-            InvalidSignup.objects.create(
-                email=email,
-                view=InvalidSignup.VIEW_LOGIN,
-                ip_address=self.ip_address, blocked_country=blocked)
-
-            raise forms.ValidationError("This request cannot be processed", code='cannot_process')
-
-        self.login_country = country
-
-        if email is not None and password:
-            self.user_cache = authenticate(self.request, username=email, password=password)
-            if self.user_cache is None:
-                raise forms.ValidationError(
-                    self.error_messages['invalid_login'],
-                    code='invalid_login',
-                    params={'email': email},
-                )
-
-            self.confirm_login_allowed(self.user_cache)
-
-        if not self.cleaned_data.get('remember_me'):
-            self.request.session.set_expiry(0)
-
-        return self.cleaned_data
-
-    def confirm_login_allowed(self, user):
-        """ confirm_login_allowed
-
-        make sure the user can log in. Is the account active, inactive?
-        let's find out
-        """
-        if not user.is_active:
-            raise forms.ValidationError(
-                self.error_messages['inactive'],
-                code='inactive',
-            )
-
-        if user.is_blocked:
-            raise forms.ValidationError(
-                self.error_messages['blocked'],
-                code='blocked',
-            )
-
-    def get_user_id(self):
-        if self.user_cache:
-            return self.user_cache.id
-        return None
-
-    def get_user(self):
-        return self.user_cache
 
 
 class SettingsForm(ModelForm):
@@ -188,7 +100,6 @@ class EmailInviteForm(forms.Form):
                 continue
 
             # if we got down here, we can add the new user
-            friend_id = friend.id if friend else 0
             self.email_invites.append(email)
             UserBuddyRequest.objects.create(friend=self.user, email=email, user=friend)
 

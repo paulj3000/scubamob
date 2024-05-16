@@ -117,4 +117,4 @@ class ChatSerializer(serializers.Serializer):
             chat = requests.post(f"{SystemApi.get_chat_server()}/api/chats/", json=params)
             return chat.json()
         except requests.exceptions.ConnectionError:
-            raise serializers.ValidationError(f"could not connect to chat server")
+            raise serializers.ValidationError("could not connect to chat server")

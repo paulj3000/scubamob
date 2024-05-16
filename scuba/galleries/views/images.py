@@ -18,8 +18,6 @@ IMAGE_TYPE_EXTENSIONS = {
 def upload(us_request):
     params = us_request.REQUEST
 
-    account = us_request.user.get_account()
-
     retval = {'data': {'items': []}}
 
     # convert the response to JSON
@@ -40,4 +38,4 @@ def upload(us_request):
         image=galleries_file,
         thumbnail=galleries_file_thumbnail)
 
-    return JsonResponse(api_response(**retval))
+    return JsonResponse(retval)

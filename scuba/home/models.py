@@ -88,8 +88,6 @@ class Jumbotron(UUIDModel):
         if content_type not in VALID_CONTENT_TYPES:
             raise InvalidContentTypeException(content_type)
 
-        extra = 1
-
         prefix = None
         jtron_type = None
 

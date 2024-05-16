@@ -9,7 +9,6 @@ from rest_framework.parsers import JSONParser
 from scuba.sitesettings.serializers import SNSSubscriptionRequestSerializer
 from scuba.system.serializers import (
     CodePipelineStateSerializer,
-    CodePipelineStateSerializer,
     CodeBuildJobSerializer,
 )
 
@@ -49,6 +48,13 @@ class CodeBuildAPI(generics.GenericAPIView):
 
             additional_information = detail['additional-information']
             detail['logs'] = additional_information['logs']['deep-link']
+
+            serializer = CodeBuildJobSerializer(data=detail)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(status=status.HTTP_200_OK)
+        except KeyError:
+            return Response(status=status.HTTP_400_HTTP_400_BAD_REQUEST)
 
             serializer = CodeBuildJobSerializer(data=detail)
             serializer.is_valid(raise_exception=True)

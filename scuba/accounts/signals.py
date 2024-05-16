@@ -9,7 +9,6 @@ Add some signal stuff for account creation stuff
 """
 import pytz
 from pytz import UnknownTimeZoneError
-import logging
 
 from django.utils import timezone
 from django.dispatch import receiver
@@ -27,7 +26,6 @@ def pre_save_new_user(sender, instance, **kwargs):
 
     Some modifications necessary for the campaign once it's uploaded
     """
-    logger = logging.getLogger('main')
     key_length = 6
 
     if not instance.aws_id:
@@ -41,7 +39,6 @@ def post_login(sender, user, request, **kwargs):
     # get the IP address
     ip_address = request.META.get('HTTP_X_REAL_IP')
     tz = None
-    city = None
 
     if ip_address:
         data = MaxMind.get_city_data(ip_address)

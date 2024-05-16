@@ -6,4 +6,4 @@ class DivesitesConfig(AppConfig):
     name = 'scuba.divesites'
 
     def ready(self):
-        import scuba.divesites.signals
+        import scuba.divesites.signals  # noqa: F401

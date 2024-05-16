@@ -61,7 +61,6 @@ class FollowBuddySerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         """ set the buddy's follow flag correctly """
-        user = self.context['request'].user
         instance.set_follow(validated_data['follow'])
         return instance
 

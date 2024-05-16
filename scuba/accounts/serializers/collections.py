@@ -73,12 +73,6 @@ class CollectionItemSerializer(serializers.ModelSerializer):
 
         return instance_type
 
-    @staticmethod
-    def off_validate(data):
-        instance_type = data['instance_type']
-        instance_id = data['instance_id']
-        return instance_id
-
     class Meta:
         model = UserCollectionItem
         fields = ('id', 'instance_type', 'instance_id', 'is_active',)
@@ -90,7 +84,6 @@ class CollectionItemSerializer(serializers.ModelSerializer):
         collection = validated_data['collection']
         is_active = validated_data['is_active']
 
-        user = self.context['request'].user
         UserCollectionItem.objects.filter(collection=collection, instance_id=instance_id).delete()
 
         if is_active:
