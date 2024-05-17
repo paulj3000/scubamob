@@ -20,7 +20,6 @@ class CodeBuildJobSerializer(serializers.ModelSerializer):
         """ define models, fields, etc """
         model = CodeBuildJob
         fields = (
-            'id',
             'build_id',
             'build_status',
             'project',
@@ -76,7 +75,6 @@ class CodePipelineStateSerializer(serializers.ModelSerializer):
         """ define models, fields, etc """
         model = CodePipelineState
         fields = (
-            'id',
             'notification_rule_arn',
             'state',
             'start_time',
