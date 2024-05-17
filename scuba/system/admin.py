@@ -43,7 +43,7 @@ class CodePipelineStateAdminInline(admin.TabularInline):
 
 
 class CodePipelineRunAdmin(admin.ModelAdmin):
-    list_display = ('pipeline',)
+    list_display = ('pipeline', 'run_date',)
 
     inlines = [
         CodePipelineStateAdminInline,
