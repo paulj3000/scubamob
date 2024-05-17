@@ -67,6 +67,7 @@ class CodePipelineProject(models.Model):
 class CodePipelineState(models.Model):
     ''' replace the primary key with a uuid field '''
     id = models.CharField(max_length=128, primary_key=True, editable=False)
+    event_id = models.UUIDField(editable=False)
     pipeline = models.ForeignKey(CodePipelineProject, related_name='states', on_delete=models.CASCADE)
     notification_rule_arn = models.CharField(max_length=128)
     state = models.CharField(max_length=64)
@@ -76,14 +77,3 @@ class CodePipelineState(models.Model):
 
     class Meta:
         db_table = 'codepipeline_state'
-
-    def add_payload(self, payload):
-        self.payloads.create(payload=payload)
-
-
-class CodePipelineStatePayload(models.Model):
-    state = models.ForeignKey(CodePipelineState, related_name='payloads', on_delete=models.CASCADE)
-    payload = models.CharField(max_length=1024)
-
-    class Meta:
-        db_table = 'codepipeline_state_payload'
