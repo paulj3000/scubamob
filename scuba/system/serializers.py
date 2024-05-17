@@ -63,6 +63,7 @@ class CodeBuildJobSerializer(serializers.ModelSerializer):
 
 
 class CodePipelineStateSerializer(serializers.ModelSerializer):
+    execution_time = serializers.CharField()
     project_name = serializers.CharField()
     pipeline_arn = serializers.CharField()
     payload = serializers.CharField()
@@ -75,6 +76,7 @@ class CodePipelineStateSerializer(serializers.ModelSerializer):
         model = CodePipelineState
         fields = (
             'notification_rule_arn',
+            'execution_id',
             'state',
             'start_time',
             'pipeline_execution_attempt',
@@ -89,14 +91,14 @@ class CodePipelineStateSerializer(serializers.ModelSerializer):
         validated_data = {**self.validated_data, **kwargs}
         project_name = validated_data['project_name']
         topic_arn = validated_data['topic_arn']
-        pipeline, _ = CodePipelineRun \
-                    .objects \
-                    .get_or_create(id=validated_data['execution_id'],
-                                   defaults={'pipeline': project_name,
-                                             'run_date': validated_data['time'],
-                                             'topic_arn': topic_arn})
+        pipeline = CodePipelineRun \
+                   .objects \
+                   .get_or_create(id=validated_data['execution_id'],
+                                  defaults={'pipeline': project_name,
+                                            'run_date': validated_data['start_time'],
+                                            'topic_arn': topic_arn})
 
-        state, _ = CodePipelineState \
+        state = CodePipelineState \
                 .objects \
                 .create(
                         pipeline=pipeline,

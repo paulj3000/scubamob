@@ -1,5 +1,7 @@
 from django.db import models
 
+from scuba.libs.models.uuidmodel import UUIDModel
+
 
 class InvalidCodeBuildException(Exception):
     pass
@@ -65,9 +67,8 @@ class CodePipelineRun(models.Model):
         db_table = 'codepipeline_project_run'
 
 
-class CodePipelineState(models.Model):
+class CodePipelineState(UUIDModel):
     ''' replace the primary key with a uuid field '''
-    id = models.CharField(max_length=128, primary_key=True, editable=False)
     pipeline = models.ForeignKey(CodePipelineRun,
                                  related_name='states',
                                  on_delete=models.CASCADE)
