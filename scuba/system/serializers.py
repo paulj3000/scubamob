@@ -4,7 +4,7 @@ from scuba.system.models import (
     CodeBuildJob,
     CodeBuildProject,
     CodePipelineState,
-    CodePipelineProject,
+    CodePipelineRun,
     InvalidCodeBuildException
 )
 
@@ -92,15 +92,17 @@ class CodePipelineStateSerializer(serializers.ModelSerializer):
         validated_data = {**self.validated_data, **kwargs}
         project_name = validated_data['project_name']
         topic_arn = validated_data['topic_arn']
-        pipeline, _ = CodePipelineProject.objects.get_or_create(id=validated_data['id'],
-                                                            defaults={'pipeline': project_name,
-                                                                      'topic_arn': topic_arn})
+        pipeline, _ = CodePipelineRun \
+                    .objects \
+                    .get_or_create(id=validated_data['execution_id'],
+                                   defaults={'pipeline': project_name,
+                                             'run_date': validated_data['time'],
+                                             'topic_arn': topic_arn})
 
         state, _ = CodePipelineState \
                 .objects \
                 .create(
                         pipeline=pipeline,
-                        execution_id=validated_data['execution_id'],
                         state=validated_data['state'],
                         start_time=validated_data['start_time'],
                         pipeline_execution_attempt=validated_data['pipeline_execution_attempt'],

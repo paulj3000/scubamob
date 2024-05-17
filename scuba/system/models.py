@@ -50,25 +50,28 @@ class CodeBuildJob(models.Model):
         ordering = ("-start_time",)
 
 
-class CodePipelineProject(models.Model):
+class CodePipelineRun(models.Model):
     ''' replace the primary key with a uuid field '''
     id = models.CharField(max_length=128, primary_key=True, editable=False)
     pipeline = models.CharField(max_length=128)
     topic_arn = models.CharField(max_length=256)
+    run_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         """ return a string representation of the model """
         return self.pipeline
 
     class Meta:
-        db_table = 'codepipeline_project'
+        db_table = 'codepipeline_project_run'
 
 
 class CodePipelineState(models.Model):
     ''' replace the primary key with a uuid field '''
     id = models.CharField(max_length=128, primary_key=True, editable=False)
-    event_id = models.UUIDField(editable=False)
-    pipeline = models.ForeignKey(CodePipelineProject, related_name='states', on_delete=models.CASCADE)
+    pipeline = models.ForeignKey(CodePipelineRun,
+                                 related_name='states',
+                                 on_delete=models.CASCADE)
+
     notification_rule_arn = models.CharField(max_length=128)
     state = models.CharField(max_length=64)
     start_time = models.DateTimeField(null=True, blank=True)

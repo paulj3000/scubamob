@@ -42,7 +42,7 @@ class CodePipelineStateAdminInline(admin.TabularInline):
     max_num = 0
 
 
-class CodePipelineProjectAdmin(admin.ModelAdmin):
+class CodePipelineRunAdmin(admin.ModelAdmin):
     list_display = ('pipeline',)
 
     inlines = [
@@ -55,4 +55,4 @@ class CodePipelineStateAdmin(admin.ModelAdmin):
 
 
 admin.site.register(system_models.CodeBuildProject, CodeBuildProjectAdmin)
-admin.site.register(system_models.CodePipelineProject, CodePipelineProjectAdmin)
+admin.site.register(system_models.CodePipelineRun, CodePipelineRunAdmin)
