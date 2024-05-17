@@ -98,8 +98,9 @@ class CodePipelineStateSerializer(serializers.ModelSerializer):
 
         state, _ = CodePipelineState \
                 .objects \
-                .create(id=validated_data['id'],
+                .create(
                         pipeline=pipeline,
+                        execution_id=validated_data['execution_id'],
                         state=validated_data['state'],
                         start_time=validated_data['start_time'],
                         pipeline_execution_attempt=validated_data['pipeline_execution_attempt'],

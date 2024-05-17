@@ -90,12 +90,9 @@ class CodePipelineAPI(generics.GenericAPIView):
         detail['project_name'] = detail['pipeline']
         detail['start_time'] = detail['start-time']
         detail['execution_id'] = detail['execution-id']
-        detail['id'] = detail['execution-id']
         detail['notification_rule_arn'] = message.get('notificationRuleArn')
         detail['topic_arn'] = request.data['TopicArn']
         detail['payload'] = json.dumps(request.data)
-
-        print('xxx', detail['id'])
 
         for arn in message.get('resources'):
             detail['pipeline_arn'] = arn
