@@ -63,7 +63,6 @@ class CodeBuildJobSerializer(serializers.ModelSerializer):
 
 
 class CodePipelineStateSerializer(serializers.ModelSerializer):
-    id = serializers.CharField()
     project_name = serializers.CharField()
     pipeline_arn = serializers.CharField()
     payload = serializers.CharField()
