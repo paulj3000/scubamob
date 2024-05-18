@@ -59,6 +59,8 @@ LOGBOOK_APIS = (
     ('GET_LOG', 'Get Log'),
     ('ADD_LOG', 'Add Logbook'),
     ('GET_TAGS', 'Get All TAGS'),
+    ('GET_ALL_TEMPLATES', 'Get All Templates'),
+    ('GET_TEMPLATE', 'Get Template'),
 )
 
 SETTINGS_APIS = (

@@ -33,6 +33,7 @@ class ApiEndpoint(UUIDModel):
 class SystemApi(UUIDModel):
     key = models.CharField(max_length=128, db_index=True, choices=SYSTEM_APIS, unique=True)
     value = models.CharField(max_length=128)
+    is_active = models.BooleanField(default=False)
 
     class Meta:
         """ define models, fields, etc """
