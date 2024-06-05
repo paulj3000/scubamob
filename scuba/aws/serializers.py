@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from scuba.system.models import (
+from scuba.aws.models import (
     CodeBuildJob,
     CodeBuildProject,
     CodePipelineState,

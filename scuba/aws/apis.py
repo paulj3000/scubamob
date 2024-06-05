@@ -7,7 +7,7 @@ import rest_framework.status as status
 from rest_framework.parsers import JSONParser
 
 from scuba.sitesettings.serializers import SNSSubscriptionRequestSerializer
-from scuba.system.serializers import (
+from scuba.aws.serializers import (
     CodePipelineStateSerializer,
     CodeBuildJobSerializer,
 )
