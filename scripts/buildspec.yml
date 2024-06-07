@@ -26,10 +26,10 @@ phases:
   post_build:
     commands:
       - source /tmp/env/bin/activate
-      - #pytest
-      - #flake8 --exit-zero --exclude=migrations --max-line-length=100 --format=html --htmldir=flake-report scuba/ > pep8.log
-      - #aws s3 sync ./coverage s3://scubamob-deploy/builds/${CODEBUILD_BUILD_ARN}/coverage/
-      - #aws s3 sync ./flake-report s3://scubamob-deploy/builds/${CODEBUILD_BUILD_ARN}/flake-report/
+      - pytest
+      - flake8 --exit-zero --exclude=migrations --max-line-length=100 --format=html --htmldir=flake-report scuba/ > pep8.log
+      - aws s3 sync ./coverage s3://scubamob-deploy/builds/${CODEBUILD_BUILD_ARN}/coverage/
+      - aws s3 sync ./flake-report s3://scubamob-deploy/builds/${CODEBUILD_BUILD_ARN}/flake-report/
 
 reports:
   unittests:
