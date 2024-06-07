@@ -38,9 +38,10 @@ class SystemApiAdmin(admin.ModelAdmin):
         sync_settings,
     ]
 
-    inlines = (
+    inlines = [
         EndpointAdminInline
-    )
+    ]
+
 
 class GenericKeyValueApiAdmin(admin.ModelAdmin):
     change_form_template = 'admin/change_endpoint_form.html'
@@ -80,7 +81,7 @@ admin.site.register(models.AlertingApi, GenericKeyValueApiAdmin)
 admin.site.register(models.AWSApi, GenericKeyValueApiAdmin)
 admin.site.register(models.BillingApi, GenericKeyValueApiAdmin)
 admin.site.register(models.ChatApi, GenericKeyValueApiAdmin)
-admin.site.register(models.SystemApi, GenericKeyValueApiAdmin)
+admin.site.register(models.SystemApi, SystemApiAdmin)
 admin.site.register(models.LogbookApi, GenericKeyValueApiAdmin)
 admin.site.register(models.SettingsApi, GenericKeyValueApiAdmin)
 admin.site.register(models.FlagOption)
