@@ -14,22 +14,6 @@ from scuba.sitesettings import settings
 from scuba.settings import PROFILE_BLANK_URL, BANNER_BLANK_URL
 
 
-class ApiEndpoint(UUIDModel):
-    app = models.CharField(max_length=128, db_index=True, choices=APPS)
-    key = models.CharField(max_length=128)
-    url = models.CharField(max_length=128)
-    is_active = models.BooleanField(default=True)
-
-    class Meta:
-        """ define models, fields, etc """
-        db_table = 'api_endpoint'
-        unique_together = [['app', 'key']]
-
-    @staticmethod
-    def get_active_endpoints():
-        return ApiEndpoint.objects.filter(is_active=True)
-
-
 class SystemApi(UUIDModel):
     key = models.CharField(max_length=128, db_index=True, choices=SYSTEM_APIS, unique=True)
     value = models.CharField(max_length=128)
@@ -141,6 +125,36 @@ class SystemApi(UUIDModel):
     def __str__(self):
         """ return a string representation of the page """
         return self.key
+
+
+class Endpoint(UUIDModel):
+    VERBS = (
+        ('POST', 'POST'),
+        ('GET', 'GET'),
+        ('PUT', 'PUT'),
+        ('DELETE', 'DELETE'),
+    )
+
+    system = models.ForeignKey(SystemApi, related_name='endpoints', on_delete=models.CASCADE)
+    key = models.CharField(max_length=128)
+    url = models.CharField(max_length=128)
+    verb = models.CharField(max_length=128, choices=VERBS)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        """ define models, fields, etc """
+        db_table = 'endpoint'
+        unique_together = [['system', 'key']]
+
+
+class EndpointParam(UUIDModel):
+    endpoint = models.ForeignKey(SystemApi, related_name='params', on_delete=models.CASCADE)
+    param = models.CharField(max_length=64)
+
+    class Meta:
+        """ define models, fields, etc """
+        db_table = 'endpoint_param'
+        unique_together = [['endpoint', 'param']]
 
 
 class SystemSetting(UUIDModel):

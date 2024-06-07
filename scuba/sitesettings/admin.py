@@ -5,6 +5,15 @@ from scuba.sitesettings import models
 from scuba.libs.exceptions import ChatServerDownException
 
 
+class EndpointAdminInline(admin.StackedInline):
+    """ UserConfirmationCodeAdminInline
+
+    Class representation of the confirmation codes assigned to this user
+    """
+    model = models.Endpoint
+    extra = 0
+
+
 class SystemApiAdmin(admin.ModelAdmin):
     list_display = ('key', 'value',)
 
@@ -29,6 +38,9 @@ class SystemApiAdmin(admin.ModelAdmin):
         sync_settings,
     ]
 
+    inlines = (
+        EndpointAdminInline
+    )
 
 class GenericKeyValueApiAdmin(admin.ModelAdmin):
     change_form_template = 'admin/change_endpoint_form.html'
@@ -43,8 +55,8 @@ class APIKeyAdmin(admin.ModelAdmin):
     list_display = ('key', 'value',)
 
 
-class ApiEndpointAdmin(admin.ModelAdmin):
-    list_display = ('app', 'key', 'url',)
+class EndpointAdmin(admin.ModelAdmin):
+    list_display = ('system', 'key', 'url',)
 
 
 class SNSSubscriptionRequestAdmin(admin.ModelAdmin):
@@ -62,7 +74,7 @@ class SNSSubscriptionRequestAdmin(admin.ModelAdmin):
     list_display = ('topic_arn', 'is_confirmed', 'timestamp',)
 
 
-admin.site.register(models.ApiEndpoint, ApiEndpointAdmin)
+admin.site.register(models.Endpoint, EndpointAdmin)
 admin.site.register(models.APIKey, APIKeyAdmin)
 admin.site.register(models.AlertingApi, GenericKeyValueApiAdmin)
 admin.site.register(models.AWSApi, GenericKeyValueApiAdmin)
