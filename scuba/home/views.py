@@ -1,8 +1,7 @@
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
 
-# define the user data for this account
-from scuba.home.models import Jumbotron
+from scuba.divesites.models import Divesite
 
 
 class IndexView(TemplateView):
@@ -19,7 +18,7 @@ class IndexView(TemplateView):
         """
         context = super().get_context_data(**kwargs)
         context.update({
-            'jumbotron': Jumbotron.get_active_jumbotron(),
+            'divesites': Divesite.get_all_active_divesites(),
         })
 
         return context

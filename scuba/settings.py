@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django_extensions',
-    'graphene_django',
     'corsheaders',
     'compressor',
     'crispy_forms',
