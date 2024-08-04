@@ -54,18 +54,21 @@
 {% endblock %}
 
 {% block fullscreen %}
-    <header class="bg-dark">
-        {% if jumbotron %}
-            {% if jumbotron.is_image %}
-            <img src="{{jumbotron.url}}" alt="{{jumbotron.title}}" />
-            {% endif %}
-
-            {% if jumbotron.is_video %}
-            <video autoplay style="width:100%" muted>
-                <source src="{{jumbotron.url}}" type="video/mp4">
-            </video>
-            {% endif %}
-        {% endif %}
+    <style>
+    .masthead {
+        background: url({{jumbotron.url}});
+    }
+    </style>
+    <header class="bg-dark masthead">
+        <div class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center">
+            <div class="d-flex justify-content-center">
+                <div class="text-center">
+                    <h1 class="mx-auto my-0 text-uppercase">Scubamob</h1>
+                    <h2 class="text-white-50 mx-auto mt-2 mb-5">A Social Divesite</h2>
+                    <a class="btn btn-warning" href="{% url 'signup' %}">Sign Up Now</a>
+                </div>
+            </div>
+        </div>
     </header>
 {% endblock %}
 

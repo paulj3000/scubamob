@@ -17,4 +17,29 @@
   #mainNav.navbar-shrink {
     background-color: rgba(var(--bs-dark-rgb), var(--bs-bg-opacity)) !important;
   }
+
+    .masthead {
+        position: relative;
+        width: 100%;
+        height: auto;
+        min-height: 35rem;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: scroll;
+        background-size: cover;
+    }
+
+    .masthead {
+      height: 85vh;
+      padding: 0;
+  }
+
+
+
+  .masthead h1, .masthead .h1 {
+      font-size: 6.5rem;
+      line-height: 6.5rem;
+      letter-spacing: 0.8rem;
+      color:#fff;
+  }
 }
