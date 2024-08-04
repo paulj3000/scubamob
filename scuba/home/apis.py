@@ -5,8 +5,6 @@ from rest_framework.response import Response
 from django.core.cache import cache
 
 from django.db.models import Q
-from scuba.home.models import Jumbotron
-from scuba.home.serializers import JumbotronSerializer
 from scuba.home.serializers import BuddySerializer as SearchBuddySerializer
 from scuba.accounts.serializers.buddies import BuddySerializer, BuddyRecentActivity
 from scuba.accounts.models import User
@@ -15,26 +13,6 @@ from scuba.divesites.serializers import DivesiteSerializer
 from scuba.libs.weather import Weather
 from scuba.libs.exceptions import InvalidWeatherDataException
 from scuba.maps.models import Region
-
-
-class GetJumbotronApi(generics.GenericAPIView):
-    permission_classes = (AllowAny,)
-    serializer_class = JumbotronSerializer
-
-    def get(self, request):
-        return Response({
-            'jumbotron': self.serializer_class(Jumbotron.get_active_jumbotron()).data
-        })
-
-
-class GetDailyPicApi(generics.GenericAPIView):
-    serializer_class = JumbotronSerializer
-
-    def get(self, request):
-
-        return Response({
-            'jumbotron': self.serializer_class(Jumbotron.get_active_jumbotron()).data
-        })
 
 
 class SearchApi(generics.GenericAPIView):
