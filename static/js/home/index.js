@@ -1,28 +1,31 @@
-$(document).ready(function()
-{
-    /*
-    prefillClass    = '.prefill';
-    prefill = {};
-    $.each($(prefillClass), function(i, e)
-    {
-        field   = $(e);
-        prefill[field.attr('name')]  = field.val();
-    });
+window.addEventListener('DOMContentLoaded', event => {
 
-    $(prefillClass).blur(function()
-    {
-        field   = $(this);
-        name    = field.attr('name');
-        val = (field.val() == "") ? prefill[name] : field.val();
-        field.val(val);
-    });
+    // Navbar shrink function
+    var navbarShrink = function () {
+        const navbarCollapsible = document.body.querySelector('#mainNav');
+        if (!navbarCollapsible) {
+            return;
+        }
+        if (window.scrollY === 0) {
+            navbarCollapsible.classList.remove('navbar-shrink', 'bg-dark')
+        } else {
+            navbarCollapsible.classList.add('navbar-shrink', 'bg-dark')
+        }
 
-    $(prefillClass).focus(function()
-    {
-        field   = $(this);
-        name    = field.attr('name');
-        val = (field.val() == prefill[name]) ? '' : field.val();
-        field.val(val);
-    });
-    */
+    };
+
+    // Shrink the navbar
+    navbarShrink();
+
+    // Shrink the navbar when page is scrolled
+    document.addEventListener('scroll', navbarShrink);
+
+    // Activate Bootstrap scrollspy on the main nav element
+    const mainNav = document.body.querySelector('#mainNav');
+    if (mainNav) {
+        new bootstrap.ScrollSpy(document.body, {
+            target: '#mainNav',
+            rootMargin: '0px 0px -40%',
+        });
+    };
 });

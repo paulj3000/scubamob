@@ -56,4 +56,4 @@ class JumbotronAdmin(admin.ModelAdmin):
     ]
 
 
-admin.site.register(Jumbotron, JumbotronAdmin)
+admin.site.register(Jumbotron)

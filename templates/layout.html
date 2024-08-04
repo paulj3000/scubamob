@@ -12,6 +12,10 @@
 
         {% compress css file style %}
         <link rel="stylesheet" href="{% static 'css/style.css' %}" media="all">
+
+        {% block extracss %}
+        {% endblock %}
+
         {% endcompress %}
 
         {% compress css file vendor %}
@@ -38,6 +42,10 @@
         <script src="{% static 'jquery-autocomplete/jquery.autocomplete.js' %}"></script>
         {% endif %}
 
+        {% block extrajs %}
+        {% endblock %}
+
+
         {% endcompress %}
 
         <link rel="stylesheet" href="{% static 'jquery-autocomplete/jquery.autocomplete.css' %}" media="all" />
@@ -48,7 +56,7 @@
 	<title>{% if title %}{{title}}{% else %}ScubaMob{% endif %}</title>
     </head>
     <body>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <nav class="navbar navbar-expand-lg navbar-dark {% block navbar %}bg-dark{% endblock %}" id="mainNav">
             <div class="container px-5">
                 <a class="navbar-brand" href="{% url 'index' %}">
                   <img class="w-75" src="{% static 'images/logo_small_80.png' %}" alt="Logo">
@@ -56,7 +64,7 @@
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     {% if not hide_nav_account %}
-		    <form class="d-flex input-group w-50" method="get" action="{% url 'search' %}">
+		            <form class="d-flex input-group w-50" method="get" action="{% url 'search' %}">
                         <input class="form-control" type="search" name="search" placeholder="Search" aria-label="Search">
                         <input class="form-control" name="location" type="text" placeholder="San Diego, CA" aria-label="Search">
                         <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i></button>
@@ -169,8 +177,8 @@
                 {% endfor %}
             {% endif %}
 
-                {% block content %}
-                {% endblock %}
+            {% block content %}
+            {% endblock %}
         </section>
 
 <div class="b-example-divider"></div>
@@ -180,62 +188,16 @@
             <div id="chatbox"></div>
             <div class="container">
 
-                <footer class="pt-5">
-    <div class="row">
-      <div class="col-2">
-        <h5>Section</h5>
-        <ul class="nav flex-column">
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Home</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Features</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Pricing</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">FAQs</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">About</a></li>
-        </ul>
-      </div>
-
-      <div class="col-2">
-        <h5>Section</h5>
-        <ul class="nav flex-column">
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Home</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Features</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Pricing</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">FAQs</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">About</a></li>
-        </ul>
-      </div>
-
-      <div class="col-2">
-        <h5>Section</h5>
-        <ul class="nav flex-column">
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Home</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Features</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">Pricing</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">FAQs</a></li>
-          <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-muted">About</a></li>
-        </ul>
-      </div>
-
-      <div class="col-4 offset-1">
-        <form>
-          <h5>Subscribe to our newsletter</h5>
-          <p>Monthly digest of whats new and exciting from us.</p>
-          <div class="d-flex w-100 gap-2">
-            <label for="newsletter1" class="visually-hidden">Email address</label>
-            <input id="newsletter1" type="text" class="form-control" placeholder="Email address">
-            <button class="btn btn-primary" type="button">Subscribe</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-                    <div class="d-flex justify-content-between py-4 my-4 border-top">
-                        <p>&copy; {% now 'Y' %} {{html_name | safe}}, Inc. All rights reserved.</p>
-                        <ul class="list-unstyled d-flex">
-                            <li class="ms-3"><a class="link-dark" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#twitter"></use></svg></a></li>
-                            <li class="ms-3"><a class="link-dark" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#instagram"></use></svg></a></li>
-                            <li class="ms-3"><a class="link-dark" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#facebook"></use></svg></a></li>
-                      </ul>
-                    </div>
+                <footer class="py-3 my-4">
+                    <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+                        <li class="nav-item"><a href="/" class="nav-link px-2 text-muted">Home</a></li>
+                        <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">Features</a></li>
+                        <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">FAQs</a></li>
+                        <li class="nav-item"><a href="{% url 'privacy' %}" class="nav-link px-2 text-muted">Privacy Policy</a></li>
+                        <li class="nav-item"><a href="{% url 'terms' %}" class="nav-link px-2 text-muted">Terms and Conditions</a></li>
+                        <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">About</a></li>
+                    </ul>
+                    <p class="text-center text-muted">© {% now "Y" %} Scubamob, Inc</p>
                 </footer>
             </div>
         </section>
