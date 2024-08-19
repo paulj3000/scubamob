@@ -7,7 +7,6 @@ cloudfront: https://d2pw8lka09f5g5.cloudfront.net
 divesites: http://api.divesites.com/docs/
 https://www.programmableweb.com/news/12-top-marine-apis/brief/2020/08/10#:~:text=FishWatch%20API,taste%2C%20texture%2C%20and%20more.
 
-
 Unit test passwords:
 test@admin.com -> tester1234
 (all for now)
