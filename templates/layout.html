@@ -26,6 +26,7 @@
         {% compress js file vendor %}
         <script src="{% static 'js-cookie/dist/js.cookie.js' %}"></script>
         <script src="{% static 'bootstrap/dist/js/bootstrap.bundle.js' %}"></script>
+        <script src="{% static 'jquery-autocomplete/jquery.autocomplete.js' %}"></script>
         {% endcompress %}
 
         {% compress js file scripts %}
@@ -39,7 +40,6 @@
         <script type="module" src="{% static 'react/dist/chatbox.js' %}"></script>
         -->
 
-        <script src="{% static 'jquery-autocomplete/jquery.autocomplete.js' %}"></script>
         {% endif %}
 
         {% block extrajs %}
