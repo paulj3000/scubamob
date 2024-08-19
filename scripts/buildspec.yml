@@ -59,7 +59,7 @@ artifacts:
     - requirements.txt
     - appspec.yml
     - scuba/**/*
-    - static/**/*
+    #- static/**/*
     - scripts/**/*
-    - node_modules/**/*
+    #- node_modules/**/*
     - templates/**/*
