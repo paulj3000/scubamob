@@ -60,6 +60,7 @@ artifacts:
     - appspec.yml
     - scuba/**/*
     - static/**/*
-    - scripts/**/*
+    #- scripts/**/*
+    - scripts/manifest.json
     - node_modules/**/*
     - templates/**/*
