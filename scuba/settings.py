@@ -250,7 +250,7 @@ VIDEO_TYPES = ['mp4']
 IMAGE_TYPES = ['png', 'jpg', 'gif', 'jpeg']
 VALID_CONTENT_TYPES = ['image/png', 'image/jpg', 'image/jpeg', 'video/mp4']
 
-COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = True
 COMPRESS_CSS_HASHING_METHOD = 'content'
 COMPRESS_CSS_FILTERS = [
     'compressor.filters.css_default.CssAbsoluteFilter',

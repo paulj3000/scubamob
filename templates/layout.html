@@ -203,17 +203,15 @@
         <script src="{% static 'js/sm.common.js' %}"></script>
         {% endcompress %}
 
-        {% compress js file react %}
-
         {% if is_production %}
-        <script src="{% static 'react/umd/react.production.min.js' %}" crossorigin></script>
-        <script src="{% static 'react-dom/umd/react-dom.production.min.js' %}"></script>
+            {% compress js file react %}
+            <script src="{% static 'react/umd/react.production.min.js' %}" crossorigin></script>
+            <script src="{% static 'react-dom/umd/react-dom.production.min.js' %}"></script>
+            {% endcompress %}
         {% else %}
-        <script src="{% static 'react/umd/react.development.js' %}" crossorigin></script>
-        <script src="{% static 'react-dom/umd/react-dom.development.js' %}"></script>
+            <script src="{% static 'react/umd/react.development.js' %}" crossorigin></script>
+            <script src="{% static 'react-dom/umd/react-dom.development.js' %}"></script>
         {% endif %}
-
-        {% endcompress %}
 
         {% endblock %}
         {% block reactscript %}
