@@ -20,7 +20,6 @@ phases:
 
   build:
     commands:
-      - export IS_BUILDING=1
       - source /tmp/env/bin/activate
       - npm install
       - npm run build
