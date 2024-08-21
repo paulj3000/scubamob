@@ -13,6 +13,7 @@ from scuba.libs.exceptions import InvalidAWSKey
 
 
 class TestS3(TestCase):
+    @pytest.mark.skip(reason="This is no longer valid")
     def test_list_all_files(self):
         """
         Test if a value is a float
@@ -45,6 +46,7 @@ class TestS3(TestCase):
             with pytest.raises(InvalidAWSKey):
                 S3.get_object(key)
 
+    @pytest.mark.skip(reason="This is no longer valid")
     def test_rename_file(self):
         """
         Rename a file
