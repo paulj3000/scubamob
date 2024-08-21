@@ -23,6 +23,7 @@ phases:
       - source /tmp/env/bin/activate
       - npm install
       - npm run build
+      - python3 manage.py testenv
       - python3 manage.py compress --force
       - python3 manage.py collectstatic --noinput
   post_build:
