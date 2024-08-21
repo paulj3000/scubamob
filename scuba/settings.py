@@ -294,6 +294,10 @@ LOGGING = {
 
 try:
     import sys
+    print("settings path", os.environ.get('SETTINGS_PATH', '/scuba'))
+    print("settings path", os.environ.get('SETTINGS_PATH', '/scuba'))
+    print("settings path", os.environ.get('SETTINGS_PATH', '/scuba'))
+    print("settings path", os.environ.get('SETTINGS_PATH', '/scuba'))
     sys.path.append(os.environ.get('SETTINGS_PATH', '/scuba'))
     from system.settings import *   # noqa: F401,F403
 except ImportError as exp:

@@ -15,8 +15,7 @@ phases:
       - python3 -m venv /tmp/env
       - mkdir -p /scuba/system
       - aws s3 cp s3://scubamob-prod/system/settings.py /scuba/system/settings.py
-      - ls -l /scuba
-      - ls -la /scuba/system
+      - ls -l /
       - more /scuba/system/settings.py
 
       - source /tmp/env/bin/activate
