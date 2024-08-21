@@ -292,6 +292,8 @@ LOGGING = {
     },
 }
 
+STATIC_URL = 'https://d346oyyai0iy5s.cloudfront.net/'
+
 try:
     import sys
     sys.path.append(os.environ.get('SETTINGS_PATH', '/scuba'))
