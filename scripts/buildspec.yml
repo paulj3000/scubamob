@@ -2,8 +2,6 @@ version: 0.2
 
 env:
   shell: bash
-  variables:
-    SETTINGS_PATH: "/dev/null"
 phases:
   install:
     commands:
