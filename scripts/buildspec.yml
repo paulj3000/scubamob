@@ -17,7 +17,7 @@ phases:
       - aws s3 sync s3://scubamob-prod/system/settings.py /scuba/system/settings.py
       - ls -l /scuba
       - ls -la /scuba/system
-      - ls -la /scuba/system/settings.py
+      - more /scuba/system/settings.py
 
       - source /tmp/env/bin/activate
       - pip install --upgrade pip
