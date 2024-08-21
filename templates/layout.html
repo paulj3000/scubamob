@@ -200,10 +200,8 @@
         {% block reactjs %}
 
         {% if is_production %}
-            {% compress js file react %}
             <script src="{% static 'react/umd/react.production.min.js' %}" crossorigin></script>
             <script src="{% static 'react-dom/umd/react-dom.production.min.js' %}"></script>
-            {% endcompress %}
         {% else %}
             <script src="{% static 'react/umd/react.development.js' %}" crossorigin></script>
             <script src="{% static 'react-dom/umd/react-dom.development.js' %}"></script>
