@@ -29,24 +29,22 @@
         <script src="{% static 'jquery-autocomplete/jquery.autocomplete.js' %}"></script>
         {% endcompress %}
 
-        {% compress js file scripts %}
-        <script src="{% static 'js/comms.js' %}"></script>
-
         {% if user.is_authenticated %}
-        <script src="{% static 'socket.io/client-dist/socket.io.js' %}"></script>
-        <script src="{% static 'js/socket.js' %}"></script>
-        <script src="{% static 'js/alerts.js' %}"></script>
-        <!--
-        <script type="module" src="{% static 'react/dist/chatbox.js' %}"></script>
-        -->
+            {% compress js file scripts %}
+            <script src="{% static 'js/comms.js' %}"></script>
 
+            <script src="{% static 'socket.io/client-dist/socket.io.js' %}"></script>
+            <script src="{% static 'js/socket.js' %}"></script>
+            <script src="{% static 'js/alerts.js' %}"></script>
+            <!--
+            <script type="module" src="{% static 'react/dist/chatbox.js' %}"></script>
+            -->
+            {% endcompress %}
         {% endif %}
 
         {% block extrajs %}
         {% endblock %}
 
-
-        {% endcompress %}
 
         <link rel="stylesheet" href="{% static 'jquery-autocomplete/jquery.autocomplete.css' %}" media="all" />
 
@@ -200,8 +198,10 @@
         {% block reactjs %}
 
         {% if is_production %}
+            {% compress js file react %}
             <script src="{% static 'react/umd/react.production.min.js' %}" crossorigin></script>
             <script src="{% static 'react-dom/umd/react-dom.production.min.js' %}"></script>
+            {% endcompress %}
         {% else %}
             <script src="{% static 'react/umd/react.development.js' %}" crossorigin></script>
             <script src="{% static 'react-dom/umd/react-dom.development.js' %}"></script>
