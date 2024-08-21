@@ -14,7 +14,7 @@ phases:
     commands:
       - python3 -m venv /tmp/env
       - mkdir -p /scuba/system
-      - aws s3 sync s3://scubamob-prod/system/settings.py /scuba/system/settings.py
+      - aws s3 cp s3://scubamob-prod/system/settings.py /scuba/system/settings.py
       - ls -l /scuba
       - ls -la /scuba/system
       - more /scuba/system/settings.py
