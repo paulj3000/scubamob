@@ -33,6 +33,7 @@ phases:
       - aws s3 sync ./coverage s3://scubamob-deploy/builds/${CODEBUILD_BUILD_ARN}/coverage/
       - aws s3 sync ./flake-report s3://scubamob-deploy/builds/${CODEBUILD_BUILD_ARN}/flake-report/
       - aws s3 sync ./static/CACHE s3://scubamob-prod/static/CACHE/
+      - aws s3 sync ./static/bootstrap-icons s3://scubamob-prod/static/bootstrap-icons/
       - aws s3 sync ./static/images s3://scubamob-prod/static/images/
       - aws s3 sync ./static/admin s3://scubamob-prod/static/admin/
 

@@ -20,8 +20,9 @@
 
         {% compress css file vendor %}
         <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.css' %}" media="all">
-        <link rel="stylesheet" href="{% static 'bootstrap-icons/font/bootstrap-icons.css' %}" media="all">
         {% endcompress %}
+
+        <link rel="stylesheet" href="{% static 'bootstrap-icons/font/bootstrap-icons.css' %}" media="all">
 
         {% compress js file vendor %}
         <script src="{% static 'js-cookie/dist/js.cookie.js' %}"></script>
