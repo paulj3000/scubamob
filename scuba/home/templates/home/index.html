@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% load static %}
+{% load static compress %}
 
 {% block navbar %}fixed-top{% endblock %}
 
@@ -9,7 +9,9 @@
 {% endblock %}
 
 {% block extrajs %}
+{% compress js file homepage %}
 <script src="{% static 'js/home/index.js' %}"></script>
+{% endcompress %}
 {% endblock %}
 
 
