@@ -11,7 +11,7 @@ function Favorites(props) {
         <h2>Favorites</h2>
         <div className="row">
             {props.divesites.list.map(site => (
-                <Site site={site} />
+                <Site site={site} key={site.id} />
             ))}
         </div>
         </>

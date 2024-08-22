@@ -45,7 +45,7 @@ function Others(props) {
         <h2>Other Checkins</h2>
         <div className="row">
             {props.divesites.list.map(site => (
-                <OtherSite site={site} />
+                <OtherSite site={site} key={site.id} />
             ))}
         </div>
         </>
