@@ -30,13 +30,15 @@
         <script src="{% static 'jquery-autocomplete/jquery.autocomplete.js' %}"></script>
         {% endcompress %}
 
-        {% compress js file comms %}
-        <script src="{% static 'js/comms.js' %}"></script>
+        {% if user.is_authenticated %}
+            {% compress js file comms %}
+            <script src="{% static 'js/comms.js' %}"></script>
 
-        <script src="{% static 'js/socket.js' %}"></script>
-        <script src="{% static 'js/alerts.js' %}"></script>
-        <script type="module" src="{% static 'react/dist/chatbox.js' %}"></script>
-        {% endcompress %}
+            <script src="{% static 'js/socket.js' %}"></script>
+            <script src="{% static 'js/alerts.js' %}"></script>
+            <script type="module" src="{% static 'react/dist/chatbox.js' %}"></script>
+            {% endcompress %}
+        {% endif %}
 
         {% block extrajs %}
         {% endblock %}
