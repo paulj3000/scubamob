@@ -15,8 +15,6 @@ from django.db.models import Q
 from django.templatetags.static import static
 from django.core.exceptions import ValidationError
 
-from bs4 import BeautifulSoup
-
 from rest_framework.authtoken.models import Token
 
 from scuba.libs.stringutils import StringUtils
@@ -291,14 +289,14 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         '''
         # now let's send something....
         content = email_template.content.replace('##CONFIRMATION_CODE##', str(code))
-        soup = BeautifulSoup(content, 'lxml')
-        email_txt = soup.get_text()
+        #soup = BeautifulSoup(content, 'lxml')
+        #email_txt = soup.get_text()
 
         html = generate_email(
             self, 'content/emails/confirmation_code.html',
             {'content': content, 'short_code': email_template.short_code})
 
-        return (html, email_txt)
+        return (html, "email_txt")
 
     # -----------------------------------------------------------------------------
     # start feed stuff

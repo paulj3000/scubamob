@@ -34,27 +34,6 @@ class SignupForm(forms.ModelForm):
         cleaned = super().clean()
         email = cleaned.get('email', 'unknown@unknown.com')
 
-        # check if the ip address is from an invalid country. If it is, return an error
-        ip_address = getattr(self, 'ip_address', None)
-
-        if ip_address:
-            try:
-                blocked_data = BlockedCountry.is_ip_from_blocked_country(ip_address)
-                if blocked_data[0]:
-                    InvalidSignup.objects.create(
-                        email=email, view=InvalidSignup.VIEW_SIGNUP,
-                        ip_address=self.ip_address, blocked_country=blocked_data[0])
-
-                    logger.info(f"{ip_address}: Request came from country {blocked_data[1]}")
-                    raise forms.ValidationError("This request cannot be processed")
-
-                setattr(self, 'iso_country', blocked_data[1])
-
-            except InvalidIPAddress:
-                # the IP address is not valid
-                logger.info(f"{ip_address}: No data was returned")
-                raise forms.ValidationError("This request cannot be processed")
-
         # return the cleaned data
         return cleaned
 

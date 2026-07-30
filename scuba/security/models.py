@@ -1,6 +1,5 @@
 from django.db import models
 
-from geolite2 import geolite2
 from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.libs.exceptions import InvalidIPAddress
 
@@ -19,19 +18,6 @@ class BlockedCountry(UUIDModel):
 
     def __str__(self):
         return self.name
-
-    @staticmethod
-    def is_ip_from_blocked_country(ip_address):
-        reader = geolite2.reader()
-
-        match = reader.get(ip_address)
-
-        if not match or 'country' not in match:
-            # an ip address could not be matched. Throw an exception
-            raise InvalidIPAddress
-
-        blocked_country = BlockedCountry.objects.filter(iso=match['country']['iso_code']).first()
-        return [blocked_country, match['country']['iso_code']]
 
 
 class InvalidEmail(UUIDModel):

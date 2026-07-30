@@ -17,7 +17,6 @@ from django.contrib.auth.signals import user_logged_in
 
 from scuba.accounts.models import User
 from scuba.libs.stringutils import StringUtils
-from scuba.libs.external.maxmind import MaxMind
 
 
 @receiver(pre_save, sender=User)
@@ -38,14 +37,7 @@ def post_login(sender, user, request, **kwargs):
 
     # get the IP address
     ip_address = request.META.get('HTTP_X_REAL_IP')
-    tz = None
-
-    if ip_address:
-        data = MaxMind.get_city_data(ip_address)
-        # data = geolite2.lookup(ip_address)
-        tz = data[1].time_zone
-    else:
-        tz = 'America/Los_Angeles'
+    tz = 'America/Los_Angeles'
 
     try:
         timezone.activate(pytz.timezone(tz))
