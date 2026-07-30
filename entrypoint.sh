@@ -8,6 +8,7 @@ pip install --no-cache-dir -r requirements.txt
 pip install mysqlclient==2.1.0
 python manage.py flush --no-input
 python manage.py migrate
+python manage.py create_db_views
 
 npm install
 npm run build
