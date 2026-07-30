@@ -1,5 +1,4 @@
 import re
-import datetime
 import time
 import random
 import base64
@@ -357,7 +356,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
 
         UserLogin.objects.create(
             user=self, ip_address=ip_address, device=device, iso_country=country)
-        self.last_login_date = datetime.datetime.now()
+        self.last_login_date = timezone.now()
         self.save()
 
     def get_all_logins(self):

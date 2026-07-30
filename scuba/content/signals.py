@@ -7,10 +7,9 @@ Author: Pauljames "The Juggernaut" Dimitriu
 
 Add some signal stuff for account creation stuff
 """
-from datetime import datetime
-
 from django.dispatch import receiver
 from django.db.models.signals import pre_save
+from django.utils import timezone
 
 from scuba.content.models import NewsArticle, Article
 from scuba.libs.stringutils import StringUtils
@@ -27,7 +26,7 @@ def verify_news_article(sender, instance, **kwargs):
 
     # do we need to update the published date
     if not instance.published_date and instance.is_published:
-        instance.published_date = datetime.now()
+        instance.published_date = timezone.now()
 
 
 @receiver(pre_save, sender=Article)
