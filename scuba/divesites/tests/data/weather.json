@@ -1,0 +1,30 @@
+        {
+            "location": {
+                "name": "San Diego",
+                "region": "California",
+                "country": "USA",
+                "lat": 32.7157,
+                "lon": -117.1611
+            },
+            "current": {
+                "temp_c": 21.5,
+                "temp_f": 70.7,
+                "condition": {
+                    "text": "Sunny",
+                    "icon": "//cdn.weatherapi.com/weather/64x64/day/113.png"
+                },
+                "wind_mph": 5.0,
+                "wind_degree": 270,
+                "wind_dir": "W",
+                "pressure_mb": 1015,
+                "precip_in": 0.0,
+                "humidity": 62,
+                "cloud": 0,
+                "feelslike_c": 21.5,
+                "feelslike_f": 70.7,
+                "vis_km": 16,
+                "vis_miles": 10,
+                "uv": 6,
+                "gust_mph": 8
+            }
+        }
