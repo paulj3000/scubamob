@@ -1,25 +1,6 @@
-API_KEYS = [
-    ('WEATHER_API', 'Weather API'),
-    ('GOOGLE_MAPS', 'Google Maps'),
-]
-
 SYSTEM_APIS = (
-    ('ALERTING_SERVER', 'Alerting Server'),
     ('SETTINGS_SERVER', 'Settings Server'),
-    ('AWS_SERVER', 'AWS Server'),
-    ('BILLING_SERVER', 'Billing Server'),
     ('CHAT_SERVER', 'Chat Server'),
-    ('LOGBOOK_SERVER', 'Logbook Server'),
-    ('SETTINGS_SERVER', 'Settings Server'),
-    ('API_SERVER', 'API Server'),
-    ('AWS_S3_BUCKET', 'AWS S3 Bucket'),
-    ('AWS_S3_FILE_DELETE', 'AWS S3 File Delete'),
-    ('AWS_S3_FILE_HEADERS', 'AWS S3 File Headers'),
-    ('AWS_S3_FILE_RENAME', 'AWS S3 File Rename'),
-    ('AWS_S3_FILE_UPLOAD', 'AWS S3 File Upload'),
-    ('AWS_S3_GEN_POST_URL', 'AWS S3 Generate Post Url'),
-    ('AWS_SQS_QUEUE', 'AWS SQS Queue'),
-    ('AWS_CLOUDFRONT_URL', 'AWS Cloudfront Url'),
 )
 
 

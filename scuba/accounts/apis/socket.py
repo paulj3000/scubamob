@@ -1,11 +1,11 @@
 import os
 import requests
 
+from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import generics
 
-from scuba.sitesettings.exceptions import InvalidConfigurationException
 from scuba.sitesettings.models import SystemApi
 
 
@@ -57,15 +57,11 @@ class AlertsApi(generics.GenericAPIView):
             'userId': user.id
         }
 
-        try:
-            url = SystemApi.get_alerting_url()
-            if os.environ.get('IS_TEST'):
-                return Response({'alerts': []})
-            else:
-                alerts = requests.get(url, params=params)
-                return Response(alerts.json())
+        if os.environ.get('IS_TEST'):
+            return Response({'alerts': []})
 
+        try:
+            alerts = requests.get(settings.ALERTING_URL, params=params)
+            return Response(alerts.json())
         except requests.exceptions.ConnectionError:
             return Response({'error': 'cannot reach chat server'}, 500)
-        except InvalidConfigurationException:
-            return Response({'error': 'alert server is offline'}, 400)

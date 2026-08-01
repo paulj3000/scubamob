@@ -1,6 +1,6 @@
 import requests
+from django.conf import settings
 
-from scuba.sitesettings.models import APIKey
 from scuba.libs.exceptions import InvalidWeatherDataException
 
 # weatherapi.com settings
@@ -14,7 +14,7 @@ class Weather:
 
     @staticmethod
     def get_api_key():
-        return APIKey.get_weather_api_key()
+        return settings.WEATHER_API_KEY
 
     @staticmethod
     def gen_param_lat_lon(lat, lng):

@@ -12,6 +12,7 @@ from scuba.sitesettings.settings import (
     SETTINGS_APIS, AWS_APIS, BILLING_APIS, APPS)
 from scuba.sitesettings import settings
 from scuba.settings import PROFILE_BLANK_URL, BANNER_BLANK_URL
+from django.conf import settings as django_settings
 
 
 class SystemApi(UUIDModel):
@@ -56,10 +57,6 @@ class SystemApi(UUIDModel):
         return SystemApi.get_url_by_key('BILLING_PROCESSORS')
 
     @staticmethod
-    def get_aws_cloudfront_url():
-        return SystemApi.get_url_by_key('AWS_CLOUDFRONT_URL')
-
-    @staticmethod
     def get_default_layout():
         return SystemApi.get_url_by_key('LAYOUT_DEFAULT_LAYOUT')
 
@@ -70,10 +67,6 @@ class SystemApi(UUIDModel):
     # -----------------------------------------------------------------------------
     # start Alerting APIs
     # -----------------------------------------------------------------------------
-    @staticmethod
-    def get_alerting_url():
-        return SystemApi.get_url_by_key('ALERTING_URL')
-
     def get_alerting_alerts():
         endpoint = SystemApi.get_url_by_key('ALERTING_ALERTS')
         return SystemApi.get_alerting_endpoint(endpoint)
@@ -111,9 +104,7 @@ class SystemApi(UUIDModel):
     @staticmethod
     def get_alert_notify_staff():
         endpoint = SystemApi.get_url_by_key('ALERTING_NOTIFY_STAFF')
-        domain = SystemApi.get_url_by_key('ALERTING_URL')
-
-        return urljoin(domain, endpoint)
+        return urljoin(django_settings.ALERTING_URL, endpoint)
 
     # -----------------------------------------------------------------------------
     # start API group stuff
@@ -446,8 +437,7 @@ class APIKey(UUIDModel):
     key = models.CharField(
         db_index=True,
         unique=True,
-        max_length=128,
-        choices=settings.API_KEYS)
+        max_length=128)
     value = models.CharField(max_length=128)
 
     class Meta:
@@ -456,20 +446,6 @@ class APIKey(UUIDModel):
     def __str__(self):
         """ return a string representation of the page """
         return self.key
-
-    @staticmethod
-    def get_weather_api_key():
-        try:
-            return APIKey.objects.get(key='WEATHER_API').value
-        except APIKey.DoesNotExist:
-            raise exceptions.InvalidAPIKeyException
-
-    @staticmethod
-    def get_google_maps_key():
-        try:
-            return APIKey.objects.get(key='GOOGLE_MAPS').value
-        except APIKey.DoesNotExist:
-            raise exceptions.InvalidAPIKeyException
 
 
 class FlagOption(UUIDModel):
