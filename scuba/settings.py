@@ -11,6 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Values from the OS environment take precedence over values in .env.
 env = environ.Env(
     DEBUG=(bool, True),
+    IS_PRODUCTION=(bool, False),
     DJANGO_SECRET_KEY=(str, "dev-only-insecure-secret-key"),
     ALLOWED_HOSTS=(list, []),
     INTERNAL_IPS=(list, ["127.0.0.1", "10.0.2.2", "10.0.2.15"]),
@@ -141,7 +142,6 @@ AUTH_USER_MODEL = 'accounts.User'
 
 
 REST_FRAMEWORK = {
-    'PAGINATE_BY': 2,
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
@@ -271,12 +271,9 @@ xCOMPRESS_FILTERS = {
 
 xCOMPRESS_YUGLIFY_BINARY = f"{BASE_DIR}/node_modules/yuglify/bin/yuglify"
 
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_ALL_ORIGINS = True
-
 SITE_TITLE = 'ScubaMob'
 TITLE_HTML = 'ScubaMob&reg;'
-IS_PRODUCTION = False
+IS_PRODUCTION = env("IS_PRODUCTION")
 
 
 LOGGING = {

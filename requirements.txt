@@ -12,7 +12,6 @@ daphne==4.2.1
 
 boto3==1.42.26
 django-ses==4.7.2
-openai==2.15.0
 jsonschema>=4.20.0
 
 pillow==12.2.0
