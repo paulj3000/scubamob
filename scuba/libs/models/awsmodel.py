@@ -1,6 +1,8 @@
 from django.db import models
 
 from scuba.libs.models.uuidmodel import UUIDModel
+from scuba.libs.aws.s3 import S3
+from scuba.settings import AWS_S3_BUCKET
 
 
 class AWSModel(UUIDModel):
@@ -33,6 +35,5 @@ class AWSModel(UUIDModel):
             file: the file on the local computer to upload
             to_file: the destination file
         '''
-        cb = kwargs.get('cb')
-        s3 = S3(settings.AWS_S3_BUCKET)
-        s3.upload_from_filename(file, to_file, cb=cb)
+        s3 = S3(AWS_S3_BUCKET)
+        s3.upload_file(file, to_file, **kwargs)

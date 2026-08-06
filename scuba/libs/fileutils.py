@@ -24,7 +24,7 @@ class FileUtils:
         headers.update(kwargs.get('headers', {}))
 
         # generate the data to send over to S3
-        S3.upload_file_content(AWS_S3_BUCKET, filename, content, **headers)
+        S3.upload_raw_data(filename, content, bucket=AWS_S3_BUCKET, **headers)
 
     @staticmethod
     def delete_file_from_s3(filename):

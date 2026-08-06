@@ -34,7 +34,7 @@ class ImageUploader:
         try:
             img = Image.open(image_file)
             new_image = BytesIO()
-            img.thumbnail(PROGRAM_IMAGE_FORMAT['size'], Image.ANTIALIAS)
+            img.thumbnail(PROGRAM_IMAGE_FORMAT['size'], Image.LANCZOS)
             img.save(new_image,
                      format=PROGRAM_IMAGE_FORMAT['format'],
                      optimize=True,
@@ -67,6 +67,6 @@ class ImageUploader:
 
         # move the file pointer to the beginning
         image_file.seek(0)
-        S3.upload_raw_data(AWS_S3_BUCKET, filename, image_file, **header)
+        S3.upload_raw_data(filename, image_file, bucket=AWS_S3_BUCKET, **header)
 
         return filename
