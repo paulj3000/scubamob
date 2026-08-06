@@ -54,11 +54,12 @@ class UserAdmin(admin.ModelAdmin):
         my_urls = [
             re_path(
                 r'^(?P<userid>([\w-]+))/emails/welcome/$',
-                self.send_welcome_email_to_user, name='send_welcome_email'),
+                self.admin_site.admin_view(self.send_welcome_email_to_user),
+                name='send_welcome_email'),
 
             re_path(
                 r'^(?P<userid>([\w-]+))/reset-password/$',
-                self.reset_password, name='reset_user_password'),
+                self.admin_site.admin_view(self.reset_password), name='reset_user_password'),
 
             re_path(
                 r'^(?P<userid>([\w-]+))/impersonate/$',
@@ -111,9 +112,11 @@ class UserAdmin(admin.ModelAdmin):
     def reset_password(self, request, userid):
         user = get_object_or_404(self.model, pk=userid)
         form = PasswordResetForm(data={'email': user.email})
-        form.is_valid()
-        form.save()
-        messages.add_message(request, messages.INFO, 'Password reset successfully sent')
+        if form.is_valid():
+            form.save()
+            messages.add_message(request, messages.INFO, 'Password reset successfully sent')
+        else:
+            messages.add_message(request, messages.ERROR, 'Could not send password reset email.')
         return redirect('/admin/accounts/user/{0}/change/'.format(userid))
 
     # -----------------------------------------------------------------------------
@@ -152,15 +155,20 @@ class UserAdmin(admin.ModelAdmin):
         # set a success message
         messages.add_message(request, messages.INFO, 'Passwords successfully reset')
 
-    def send_welcome_email_to_user(modeladmin, request, userid):
-        user = User.objects.get(id=userid)
-        user.send_welcome_email()
-
-        messages.add_message(
-            request,
-            messages.INFO,
-            'Welcome email successfully reset'
-        )
+    def send_welcome_email_to_user(self, request, userid):
+        user = get_object_or_404(self.model, pk=userid)
+        try:
+            # send_welcome_email() requires an EmailTemplate instance, but no
+            # EmailTemplate model exists anywhere in this codebase (removed in an
+            # earlier commit) -- this always raises until that is rebuilt.
+            user.send_welcome_email()
+        except TypeError:
+            messages.add_message(
+                request, messages.ERROR,
+                'Welcome email could not be sent: the welcome-email template system '
+                'is currently broken (see CODE_REVIEW.md).')
+        else:
+            messages.add_message(request, messages.INFO, 'Welcome email successfully sent')
 
         return redirect(f'/admin/accounts/user/{userid}/change/')
 
