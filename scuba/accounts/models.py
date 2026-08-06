@@ -26,6 +26,8 @@ from scuba.accounts.exceptions import (
 from scuba.accounts.settings import SETTINGS
 from scuba.sitesettings.models import SystemSetting
 from scuba.divesites.models import Divesite
+from scuba.libs.aws.s3 import S3
+from scuba.settings import AWS_S3_BUCKET
 
 from scuba.libs.mail import generate_email, send_mail
 
@@ -123,18 +125,11 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
     # start Buddy stuff
     # -----------------------------------------------------------------------------
     def get_active_buddy_requests(self):
-        # let's get our user object
-        user = self.user
+        ''' get_active_buddy_requests
 
-        # check for requests which have the user's email,
-        # but do not have a friend (user) id associated to it.
-        # We will update the friend id with the current user
-        UserBuddyRequest.objects.filter(
-            friend__id=0, email=user.email
-        ).update(friend=user)
-
-        # now, let's actually run the query and return
-        user.friend_requested.filter(active=1).sort('first_name')
+        Return the pending buddy requests sent to this user.
+        '''
+        return self.buddy_requested.filter(is_active=True).order_by('user__first_name')
 
     def get_buddy(self, buddy):
         return UserBuddy.objects.filter(
@@ -392,7 +387,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         # generate the file name the
         img_length = 5  # the sub key length
         sub_name = StringUtils.generate_random_number(img_length)
-        base_name = "profiles/%s/%s_%d.png" % (self.get_aws_id(), sub_name, int(time.time()))
+        base_name = "profiles/%s/%s_%d.png" % (self.aws_id, sub_name, int(time.time()))
 
         # if re.search(r'^data:image\/(jpg|png);base64', uploaded_image_string, re.DOTALL):
         result = re.search("data:image/(?P<ext>.*?);base64,(?P<data>.*)", uploaded_image_string)
@@ -403,9 +398,9 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
             data = result.groupdict().get("data")
 
             img = base64.urlsafe_b64decode(data)
-            User.upload_image(base_name, 'image/%s' % ext, img)
+            S3.upload_raw_data(base_name, img, bucket=AWS_S3_BUCKET, ContentType='image/%s' % ext)
 
-            # does the user have a prfofile image? if so, replace it
+            # does the user have a profile image? if so, replace it
             if hasattr(self, 'userprofileimage'):
                 profile_image = getattr(self, 'userprofileimage')
                 profile_image.image = base_name
@@ -430,7 +425,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
                 if default:
                     break
 
-            return self.settings.create(setting=SETTINGS_KEYS[settings_key], value=default)
+            return self.settings.create(setting=setting_key, value=default)
 
         return item
 
