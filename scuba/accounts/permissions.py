@@ -19,8 +19,8 @@ class CanViewProfile(permissions.BasePermission):
         if not obj:
             return False
 
-        # make sure the user can see the permission
-        if user.blocked.filter(buddy=obj) or obj.blocked.filter(user=obj):
+        # make sure neither user has blocked the other
+        if user.is_blocked(obj):
             return False
 
         return True

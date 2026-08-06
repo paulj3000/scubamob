@@ -139,6 +139,35 @@ class TestUserBuddiesAPI(TestCase):
         response = client.post('/api/buddies/add/', payload, format='json')
         self.assertEqual(response.status_code, 400)
 
+    def test_cannot_view_buddies_of_a_user_who_blocked_you(self):
+        """
+        CODE_REVIEW.md §3 item 7 -- the profile-scoped GetBuddiesListApi
+        (/api/profile/<id>/buddies) must not disclose a blocking user's
+        buddy list to the user they blocked.
+        """
+        user = User.objects.get(email='foo@nowhere.com')
+        blocker = User.objects.get(email='test3@tester.com')
+        blocker.block_buddy(user)
+
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        response = client.get(f'/api/profile/{blocker.pk_as_str}/buddies', format='json')
+        self.assertEqual(response.status_code, 403)
+
+    def test_can_view_buddies_of_an_unblocked_user(self):
+        user = User.objects.get(email='foo@nowhere.com')
+        other = User.objects.get(email='test3@tester.com')
+        other_buddy = User.objects.get(email='test2@tester.com')
+        other.add_buddy(other_buddy)
+
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        response = client.get(f'/api/profile/{other.pk_as_str}/buddies', format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()['buddies']), 1)
+
     def test_listing_buddies(self):
         """
         Test the listing of user's buddies

@@ -1,9 +1,11 @@
 from django.shortcuts import get_object_or_404
 
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
 
 from scuba.accounts.models import User
+from scuba.accounts.permissions import CanViewProfile
 from scuba.accounts.serializers import feed as serializers
 
 
@@ -30,6 +32,7 @@ class GetFeedApi(generics.ListAPIView):
     Return the feed of the user
     """
     serializer_class = serializers.FeedSerializer
+    permission_classes = [IsAuthenticated & CanViewProfile]
     lookup_field = 'id'
 
     def get_queryset(self):

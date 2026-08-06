@@ -57,7 +57,11 @@ class PasswordForm(ModelForm):
 
 class EmailInviteForm(forms.Form):
     email = forms.CharField(label="", widget=forms.TextInput(), required=True)
-    email_invites = []
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        self.email_invites = []
+        super().__init__(*args, **kwargs)
 
     def get_email_invites(self):
         return self.email_invites
@@ -68,39 +72,39 @@ class EmailInviteForm(forms.Form):
 
     def save(self, commit=True):
         # before we even think about saving, let's make sure:
-        # if the email is registered, this user is not a friend of
-        # the current logged in user
-        friend = None
-        email = self.cleaned_data['email']
-
+        # if the email is registered, this user is not already a buddy of
+        # the current logged in user, and doesn't already have a pending
+        # request from them
         for email in self.cleaned_data['email'].split(','):
+            email = email.strip()
+
             # let's get the email and check if it's already in the system
             try:
                 # make sure the email address is correct
                 validate_email(email)
             except ValidationError:
-                print(f"bad email:  {email}")
                 continue
 
-            friend = None
-            try:
-                friend = User.objects.get(email=email)
-            except User.DoesNotExist:
-                pass
+            friend = User.objects.filter(email=email).first()
 
-            # ok, so far a valid email address.  now, let's check for a valid user
-            # first, is this this a valid usre with
-            if UserBuddy.objects.filter(user__email=email, friend=self.user):
-                # the user is already a friend.  forget it
+            if friend is None:
+                # not a registered user yet -- there's nowhere in the schema
+                # to persist a pending request for a non-user email, so just
+                # record it for the caller to send an invitation email to
+                self.email_invites.append(email)
                 continue
 
-            if UserBuddyRequest.objects.filter(user=self.user, email=email):
+            if UserBuddy.objects.filter(user=self.user, buddy=friend).exists():
+                # the user is already a buddy.  forget it
+                continue
+
+            if UserBuddyRequest.objects.filter(user=self.user, buddy=friend).exists():
                 # the user has already been requested
                 continue
 
             # if we got down here, we can add the new user
             self.email_invites.append(email)
-            UserBuddyRequest.objects.create(friend=self.user, email=email, user=friend)
+            UserBuddyRequest.objects.create(user=self.user, buddy=friend)
 
 
 def validate_password(password):

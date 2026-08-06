@@ -145,6 +145,7 @@ class GetBuddiesListApi(generics.ListAPIView):
     Return all of the buddies for this particular user
     """
     serializer_class = buddies_serializers.BuddySerializer
+    permission_classes = [IsAuthenticated & CanViewProfile]
     lookup_field = 'id'
 
     def get_queryset(self):
@@ -165,6 +166,7 @@ class GetFeedApi(generics.ListAPIView):
     Return the feed of the user
     """
     serializer_class = serializers.FeedSerializer
+    permission_classes = [IsAuthenticated & CanViewProfile]
     lookup_field = 'id'
 
     def get_queryset(self):

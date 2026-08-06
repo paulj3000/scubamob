@@ -10,7 +10,7 @@ import pytest
 
 
 from scuba.accounts.models import User
-from scuba.divesites.models import Divesite
+from scuba.divesites.models import Divesite, DivesiteCheckin
 
 
 class TestFeedAPI(TestCase):
@@ -25,17 +25,65 @@ class TestFeedAPI(TestCase):
         client = APIClient()
         client.force_authenticate(user=user)
 
+        # these don't even match the URL's 32-hex-char pattern
         response = client.get('/api/feed/1', format='json')
-        self.assertEqual(response.status_code, 404)
-
-        response = client.get('/api/feed/1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', format='json')
         self.assertEqual(response.status_code, 404)
 
         response = client.get('/api/feed/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', format='json')
         self.assertEqual(response.status_code, 404)
 
+        # these match the pattern but don't correspond to a real user --
+        # CanViewProfile denies access rather than confirming non-existence,
+        # consistent with how GetProfileApi and friends already behave
+        response = client.get('/api/feed/1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', format='json')
+        self.assertEqual(response.status_code, 403)
+
         response = client.get('/api/feed/70d200e9f10f4d56adc3dafd44afea2f', format='json')
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 403)
+
+    def test_cannot_view_feed_of_a_user_who_blocked_you(self):
+        """
+        CODE_REVIEW.md §3 item 9 -- GetFeedApi must not let a blocked
+        viewer see the blocking user's feed.
+        """
+        user = User.objects.get(email='foo@nowhere.com')
+        blocker = User.objects.get(email='test3@tester.com')
+        blocker.block_buddy(user)
+
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        response = client.get(f'/api/feed/{blocker.pk_as_str}', format='json')
+        self.assertEqual(response.status_code, 403)
+
+        response = client.get(
+            f'/api/profile/{blocker.pk_as_str}/feed', format='json')
+        self.assertEqual(response.status_code, 403)
+
+    def test_anonymous_checkin_does_not_leak_identity_via_profile_feed(self):
+        """
+        CODE_REVIEW.md §3 item 8 -- serializers/profile.py's FeedSerializer
+        used to skip the is_anonymous check that serializers/feed.py's
+        otherwise-identical copy already had, leaking anonymous check-in
+        data through the /api/profile/<id>/feed endpoint specifically.
+        """
+        user = User.objects.get(email='foo@nowhere.com')
+        other = User.objects.get(email='test3@tester.com')
+        divesite = Divesite.objects.all().first()
+
+        checkin = DivesiteCheckin.objects.create(
+            divesite=divesite, user=other, is_anonymous=True)
+        other.add_checkin_to_feed(checkin.id)
+
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        response = client.get(f'/api/profile/{other.pk_as_str}/feed', format='json')
+
+        self.assertEqual(response.status_code, 200)
+        feed = response.json()['feed']
+        self.assertEqual(len(feed), 1)
+        self.assertIsNone(feed[0]['item'])
 
     def test_flag_feed_empty(self):
         """

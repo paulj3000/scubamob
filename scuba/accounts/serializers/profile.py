@@ -257,7 +257,8 @@ class FeedSerializer(serializers.Serializer):
             return divesites_serializers.DivesiteReviewSerializer(obj, divesite=obj.divesite).data
         elif data.instance_type == 1:
             obj = DivesiteCheckin.objects.get(id=data.instance_id)
-            return divesites_serializers.DivesiteCheckinSerializer(obj, divesite=obj.divesite).data
+            if not obj.is_anonymous:
+                return divesites_serializers.DivesiteCheckinSerializer(obj).data
 
         return None
 
