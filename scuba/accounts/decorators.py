@@ -36,6 +36,9 @@ def can_view_profile(view_func, **kwargs):
             if profile.is_hidden:
                 raise Http404
 
+            if profile.is_private:
+                raise Http404
+
         setattr(request, 'profile', profile)
         setattr(request, 'is_user', False)
         return view_func(request, *args, **kwargs)

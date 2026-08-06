@@ -309,7 +309,7 @@ class ChatApi(BaseAPI):
         }
 
         try:
-            req = requests.get(url, params=params)
+            req = requests.get(url, params=params, timeout=5)
             return req.json()
         except (requests.ConnectionError, requests.exceptions.JSONDecodeError):
             raise exceptions.ChatServerDownException
@@ -326,7 +326,7 @@ class ChatApi(BaseAPI):
         }
 
         try:
-            req = requests.get(url, params=params)
+            req = requests.get(url, params=params, timeout=5)
             return req.json()
         except (requests.ConnectionError, requests.exceptions.JSONDecodeError):
             raise exceptions.ChatServerDownException

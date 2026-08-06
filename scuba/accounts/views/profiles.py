@@ -38,8 +38,7 @@ class ProfileView(TemplateView):
 @method_decorator(login_required, name='dispatch')
 class AddUIMessageView(View):
     def post(self, request):
-        if request.get('message'):
-            print(request['message'])
-
+        if request.POST.get('message'):
             messages.add_message(request, messages.INFO, 'Hello world.')
-        return JsonResponse()
+
+        return JsonResponse({'message': 'Hello world.'})

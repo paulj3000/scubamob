@@ -70,7 +70,9 @@ class GetGalleryApi(generics.ListAPIView):
         return serializer_class(*args, **kwargs)
 
     def get_queryset(self):
-        return User.objects.get(id=self.request.id).media
+        id = self.kwargs.get(self.lookup_field)
+        user = get_object_or_404(User, id=id)
+        return user.media
 
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
@@ -114,7 +116,9 @@ class GetAlbumsApi(generics.ListAPIView):
         })
 
     def get_queryset(self):
-        return User.objects.get(id=self.request.id).albums
+        id = self.kwargs.get(self.lookup_field)
+        user = get_object_or_404(User, id=id)
+        return user.albums
 
 
 class GetPhotosApi(generics.ListAPIView):
@@ -122,7 +126,7 @@ class GetPhotosApi(generics.ListAPIView):
     lookup_field = 'id'
 
     def get_queryset(self):
-        self.request.user.get_photos()
+        return self.request.user.get_photos()
 
 
 class QueryApi(generics.GenericAPIView):

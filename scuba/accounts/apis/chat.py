@@ -60,7 +60,7 @@ class ChatWUserApi(APIView):
         try:
             chat = requests.get(
                 f"{SystemApi.get_chat_server()}/api/chats/lookup",
-                params=params)
+                params=params, timeout=5)
             retval = chat.json()
 
             if retval and retval['chat']:
@@ -164,7 +164,8 @@ class GetChatsApi(APIView):
         }
 
         try:
-            chat = requests.get(f"{SystemApi.get_chat_server()}/api/chats", params=params)
+            chat = requests.get(
+                f"{SystemApi.get_chat_server()}/api/chats", params=params, timeout=5)
             retval = chat.json()
             retval['me'] = user.pk_as_str
             return Response(retval)

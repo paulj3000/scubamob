@@ -87,17 +87,15 @@ class UserSettingApi(generics.GenericAPIView):
 
         url = SettingsApi.get_user_settings_with_options(user.pk_as_str, settings)
 
-        res = requests.get(url)
+        res = requests.get(url, timeout=5)
         return Response(res.json(), status=res.status_code)
 
     def post(self, request, *args, **kwargs):
         user = self.request.user
-        from pprint import pprint
-        pprint(request.data)
 
         url = SettingsApi.post_user_settings(user.pk_as_str)
 
-        res = requests.post(url, json=request.data)
+        res = requests.post(url, json=request.data, timeout=5)
         return Response(res.json(), status=res.status_code)
 
 
@@ -128,7 +126,7 @@ class UserSettingListApi(generics.GenericAPIView):
         url = SettingsApi.get_user_setting_list(user.pk_as_str, settings.split(','))
 
         try:
-            res = requests.get(url)
+            res = requests.get(url, timeout=5)
             return Response(res.json(), status=res.status_code)
         except requests.exceptions.ConnectionError:
             logger.error(url)

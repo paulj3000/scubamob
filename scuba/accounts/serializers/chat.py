@@ -19,7 +19,6 @@ class UserListSerializer(serializers.Serializer):
 
     @staticmethod
     def get_profile_image(data):
-        print(SystemApi.get_aws_cloudfront_url())
         return urljoin(SystemApi.get_aws_cloudfront_url(), data.get_profile_image())
 
     @staticmethod
@@ -114,7 +113,8 @@ class ChatSerializer(serializers.Serializer):
         }
 
         try:
-            chat = requests.post(f"{SystemApi.get_chat_server()}/api/chats/", json=params)
+            chat = requests.post(
+                f"{SystemApi.get_chat_server()}/api/chats/", json=params, timeout=5)
             return chat.json()
         except requests.exceptions.ConnectionError:
             raise serializers.ValidationError("could not connect to chat server")

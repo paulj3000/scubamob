@@ -123,15 +123,6 @@ class LoginSerializer(serializers.ModelSerializer):
             user = authenticate(request=self.context.get('request'),
                                 username=username, password=password)
 
-            print(f"USERNAME {username}")
-            print(f"USERNAME {username}")
-            print(f"USERNAME {username}")
-            print(f"USERNAME {username}")
-
-            print(user)
-            print(user)
-            print(user)
-
             # The authenticate call simply returns None for is_active=False
             # users. (Assuming the default ModelBackend authentication
             # backend.)
