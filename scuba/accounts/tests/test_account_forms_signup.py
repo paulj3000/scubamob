@@ -7,7 +7,6 @@ Replace this with more appropriate tests for your application.
 from django.test import TestCase
 
 from scuba.accounts.forms.signup import SignupForm
-from scuba.security.models import BlockedCountry
 
 
 class TestAccountFormSignup(TestCase):
@@ -27,7 +26,7 @@ class TestAccountFormSignup(TestCase):
             'is_spam': False,
         }
 
-        form = SignupForm(data=data, ip_address='54.183.214.227')
+        form = SignupForm(data=data)
         self.assertTrue(form.is_valid())
 
         new_user = form.save()
@@ -47,7 +46,7 @@ class TestAccountFormSignup(TestCase):
             'is_spam': False,
         }
 
-        form = SignupForm(data=data, ip_address='54.183.214.227')
+        form = SignupForm(data=data)
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form.errors["email"], ["This request cannot be processed"]
@@ -68,7 +67,7 @@ class TestAccountFormSignup(TestCase):
             'is_spam': False,
         }
 
-        form = SignupForm(data=data, ip_address='54.183.214.227')
+        form = SignupForm(data=data)
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form.errors["email"], [f"{email} is already registered"],
@@ -89,7 +88,7 @@ class TestAccountFormSignup(TestCase):
             'is_spam': False,
         }
 
-        form = SignupForm(data=data, ip_address='54.183.214.227')
+        form = SignupForm(data=data)
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form.errors["username"], [f"{username} is already registered"],
@@ -114,7 +113,7 @@ class TestAccountFormSignup(TestCase):
             passwd = 'x' * x
             data['password'] = passwd
 
-            form = SignupForm(data=data, ip_address='54.183.214.227')
+            form = SignupForm(data=data)
             self.assertFalse(form.is_valid())
             self.assertIn(
                 'This password is too short. It must contain at least 8 characters.',
@@ -123,7 +122,7 @@ class TestAccountFormSignup(TestCase):
 
         # too long: rejected by this project's own 20-character maximum
         data['password'] = 'x' * 21
-        form = SignupForm(data=data, ip_address='54.183.214.227')
+        form = SignupForm(data=data)
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form.errors["password"], ['Password must be no more than 20 characters.'],
@@ -146,39 +145,15 @@ class TestAccountFormSignup(TestCase):
             username = 'x' * x
             data['username'] = username
 
-            form = SignupForm(data=data, ip_address='54.183.214.227')
+            form = SignupForm(data=data)
             self.assertFalse(form.is_valid())
             self.assertEqual(
                 form.errors['username'], [f'{username} is a bad length']
             )
 
         data['username'] = 'x' * 41
-        form = SignupForm(data=data, ip_address='54.183.214.227')
+        form = SignupForm(data=data)
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form.errors['username'], ['Ensure this value has at most 40 characters (it has 41).']
-        )
-
-    def test_blocked_ip_address(self):
-        """
-        Test if the signup is from a blocked IP address
-        """
-        BlockedCountry.objects.create(name='Russia', iso='RU')
-
-        username = 'testtester'
-        data = {
-            'first_name': 'Test',
-            'last_name': 'User',
-            'username': username,
-            'date_of_birth': '1970-04-01',
-            'email': 'xxx@duplicateusername.com',
-            'password': 'testpassword',
-            'is_spam': False,
-        }
-
-        form = SignupForm(data=data, ip_address='46.17.46.213')
-        print(form.errors)
-        self.assertFalse(form.is_valid())
-        self.assertEqual(
-            form.errors["__all__"], ["This request cannot be processed"],
         )

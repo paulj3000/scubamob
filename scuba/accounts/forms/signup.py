@@ -4,9 +4,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 from scuba.accounts.models import User
-from scuba.security.models import BlockedCountry, InvalidSignup
 from scuba.accounts.validators.signup import validate_password
-from scuba.libs.exceptions import InvalidIPAddress
 
 
 logger = logging.getLogger(__name__)
@@ -22,14 +20,6 @@ class SignupForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'date_of_birth', 'email', 'password',)
-
-    def __init__(self, ip_address, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        setattr(self, 'ip_address', ip_address)
-
-    def set_ip_address(self, ip_address):
-        # set the ip address of the user coming in
-        self.ip_address = ip_address
 
     def clean(self):
         cleaned = super().clean()
@@ -83,10 +73,5 @@ class SignupForm(forms.ModelForm):
 
         if commit:
             user.save()
-
-        # add the user's signup country
-
-        if hasattr(self, 'iso_country'):
-            user.add_signup_country(getattr(self, 'iso_country'))
 
         return user

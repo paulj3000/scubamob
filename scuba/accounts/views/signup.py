@@ -24,11 +24,6 @@ class SignupView(FormView):
         'hide_nav_account': True,
     }
 
-    def get_form_kwargs(self):
-        form_data = super().get_form_kwargs()
-        form_data['ip_address'] = self.request.META.get("HTTP_X_REAL_IP")
-        return form_data
-
     def form_valid(self, form):
         """ form_valid
 
@@ -60,7 +55,6 @@ class ValidateEmail(View):
         form = self.get_form()
 
         request = self.request
-        form.set_ip_address(request.META.get('HTTP_X_REAL_IP'))
 
         if form.is_valid():
             return self.form_valid(form)
