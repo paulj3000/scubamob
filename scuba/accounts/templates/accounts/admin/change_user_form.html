@@ -6,6 +6,7 @@
             {# You can also give a name to that pattern and refer to it below using 'url' #}
             <li><a href="{% url 'admin:send_welcome_email' userid=object_id %}" class="historylink">Send Welcome Email</a></li>
             <li><a href="{% url 'admin:reset_user_password' userid=object_id %}" class="historylink">Reset password</a></li>
+            <li><a href="{% url 'admin:impersonate_user' userid=object_id %}" class="historylink">Impersonate</a></li>
         </ul>
     {% endif %}{% endif %}
 {% endblock %}

@@ -9,6 +9,7 @@ import scuba.search.views as search_views
 import scuba.home.apis as home_apis
 import scuba.accounts.views.login as login_views
 import scuba.accounts.views.signup as signup_views
+import scuba.accounts.views.impersonation as impersonation_views
 import scuba.content.views as content_views
 import scuba.accounts.apis.account as account_api
 import scuba.accounts.apis.profile as profile_api
@@ -30,6 +31,7 @@ urlpatterns = [
 
     path('home/', home_views.HomeView.as_view(), name='home'),
     path('signup/', signup_views.SignupView.as_view(), name='signup'),
+    path('impersonate/stop/', impersonation_views.StopImpersonationView.as_view(), name='stop_impersonation'),
     path('security/', include('scuba.security.urls')),
     path('aws/', include('scuba.aws.urls')),
 

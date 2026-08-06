@@ -119,7 +119,6 @@ TEMPLATES = [
 
 AUTHENTICATION_BACKENDS = DEFAULT_SETTINGS.AUTHENTICATION_BACKENDS + [
     'rest_framework.authentication.TokenAuthentication',
-    'scuba.libs.authentication.adminoverride.AdminOverride',
     'scuba.libs.authentication.usernameauthentication.UsernameAuthentication',
 ]
 

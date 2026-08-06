@@ -32,6 +32,9 @@ def Scuba(request):
     if user.is_authenticated:
         context['profile_image'] = request.session.get('profile_image', user.get_profile_image())
 
+    # surface an always-visible banner while an admin is impersonating this user
+    context['impersonating'] = bool(request.session.get('impersonator_id'))
+
     # set up the main menu
 
     return context

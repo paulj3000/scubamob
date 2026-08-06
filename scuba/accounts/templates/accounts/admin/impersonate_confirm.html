@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<p>
+    You are about to log in as <strong>{{ target.email }}</strong> ({{ target.username }}).
+    This action is recorded, including your account, the target account, and the reason
+    you provide below.
+</p>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="form-row">
+        <label for="id_reason">Reason for this support session</label>
+        <textarea id="id_reason" name="reason" rows="3" cols="60" required></textarea>
+    </div>
+    <div class="submit-row">
+        <input type="submit" value="Start impersonation" class="default">
+        <a href="{% url 'admin:accounts_user_change' target.pk %}" class="button cancel-link">Cancel</a>
+    </div>
+</form>
+{% endblock %}

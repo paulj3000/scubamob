@@ -20,6 +20,14 @@ Never place server secrets in JavaScript, templates, committed `.env` files, fix
 - Use JWT for non-browser API clients when introduced.
 - Do not remove CSRF protection from session-authenticated endpoints.
 - Rate-limit authentication and invitation endpoints when infrastructure supports it.
+- Support staff impersonating another user ("login as user") must go through
+  `scuba.security.services.impersonation`, be gated on the real Django
+  `is_superuser` flag (not the `is_admin`/`is_staff` convenience flag), and
+  record an auditable `ImpersonationEvent` (actor, target, reason, start/end
+  time). Never reintroduce impersonation via the authentication-backend
+  password-format trick that `scuba/libs/authentication/adminoverride.py`
+  used to implement; that reused the standard login path with no audit
+  trail and let any admin credential impersonate any user.
 
 ## Authorization
 

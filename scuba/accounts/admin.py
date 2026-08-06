@@ -4,11 +4,12 @@ from django.contrib import admin
 from django.contrib.sessions.models import Session
 from django.urls import re_path
 from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.forms import PasswordResetForm
 
 from scuba.accounts.models import User, UserBlocked, UserBuddyRequest, UserBuddy
 import scuba.accounts.models as account_models
+from scuba.security.services import impersonation
 
 
 class UserConfirmationCodeAdminInline(admin.StackedInline):
@@ -58,9 +59,54 @@ class UserAdmin(admin.ModelAdmin):
             re_path(
                 r'^(?P<userid>([\w-]+))/reset-password/$',
                 self.reset_password, name='reset_user_password'),
+
+            re_path(
+                r'^(?P<userid>([\w-]+))/impersonate/$',
+                self.admin_site.admin_view(self.impersonate_confirm), name='impersonate_user'),
         ]
 
         return my_urls + urls
+
+    def impersonate_confirm(self, request, userid):
+        """ impersonate_confirm
+
+        GET renders a confirmation form asking for a reason; POST performs
+        the audited "login as user" switch and redirects to the site as
+        that user.
+        """
+        target = get_object_or_404(self.model, pk=userid)
+
+        if not request.user.is_superuser:
+            messages.add_message(
+                request, messages.ERROR, 'Only superusers may impersonate another user.')
+            return redirect(f'/admin/accounts/user/{userid}/change/')
+
+        if request.method == 'POST':
+            reason = request.POST.get('reason', '')
+            try:
+                impersonation.start_impersonation(request, request.user, target, reason)
+            except impersonation.ImpersonationError as exc:
+                messages.add_message(request, messages.ERROR, str(exc))
+                return redirect(f'/admin/accounts/user/{userid}/change/')
+
+            return redirect('/')
+
+        context = {
+            **self.admin_site.each_context(request),
+            'target': target,
+            'opts': self.model._meta,
+        }
+        return render(request, 'accounts/admin/impersonate_confirm.html', context)
+
+    def impersonate_user_action(self, request, queryset):
+        """ admin action: redirect to the confirm-reason page for one user """
+        if queryset.count() != 1:
+            messages.add_message(
+                request, messages.ERROR, 'Select exactly one user to impersonate.')
+            return None
+
+        target = queryset.first()
+        return redirect(f'/admin/accounts/user/{target.pk}/impersonate/')
 
     def reset_password(self, request, userid):
         user = get_object_or_404(self.model, pk=userid)
@@ -132,12 +178,14 @@ class UserAdmin(admin.ModelAdmin):
     delete_all_unexpired_sessions_for_user.short_description = 'Invalidate User Sessions'
     block_user.short_description = "Block User"
     send_password_reset.short_description = "Send Password Reset"
+    impersonate_user_action.short_description = "Impersonate selected user"
 
     # add some custom actions for the user
     actions = [
         delete_all_unexpired_sessions_for_user,
         block_user,
         send_password_reset,
+        impersonate_user_action,
     ]
 
     # The fields to be used in displaying the User model.

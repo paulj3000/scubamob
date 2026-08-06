@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.libs.exceptions import InvalidIPAddress
@@ -47,6 +48,35 @@ class BouncedEmail(UUIDModel):
     def __str__(self):
         """ return a string friendly representation of this model """
         return self.user.email
+
+
+class ImpersonationEvent(UUIDModel):
+    ''' audit record of a superuser logging in as another user for support '''
+
+    actor = models.ForeignKey(
+        'accounts.User', on_delete=models.CASCADE,
+        related_name='impersonations_started')
+    target = models.ForeignKey(
+        'accounts.User', on_delete=models.CASCADE,
+        related_name='impersonations_received')
+    reason = models.TextField()
+    ip_address = models.CharField(max_length=128, default='0.0.0.0')
+    started_at = models.DateTimeField(auto_now_add=True)
+    ended_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        """ define database tables, etc """
+        db_table = 'impersonation_event'
+        ordering = ['-started_at']
+
+    def __str__(self):
+        """ return a string friendly representation of this event """
+        return f'{self.actor.email} as {self.target.email} ({self.started_at})'
+
+    def mark_ended(self):
+        """ close out this event now """
+        self.ended_at = timezone.now()
+        self.save(update_fields=['ended_at'])
 
 
 class InvalidSignup(UUIDModel):
