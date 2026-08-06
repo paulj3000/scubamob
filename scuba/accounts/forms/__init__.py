@@ -2,15 +2,14 @@ from django.core.exceptions import ValidationError
 from django import forms
 from django.forms import ModelForm
 from django.core.validators import validate_email
-from django.contrib.auth.models import User
 
-from scuba.accounts.models import UserBuddyRequest, UserBuddy
+from scuba.accounts.models import User, UserBuddyRequest, UserBuddy
 
 
 class SettingsForm(ModelForm):
-    first_name = forms.CharField(label="First Name", required=True)
-    last_name = forms.CharField(label="Last Name", required=True)
-    email = forms.CharField(label="Email", required=True)
+    first_name = forms.CharField(label="First Name", required=True, max_length=40)
+    last_name = forms.CharField(label="Last Name", required=True, max_length=40)
+    email = forms.CharField(label="Email", required=True, max_length=255)
 
     class Meta:
         model = User

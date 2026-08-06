@@ -17,7 +17,7 @@ def settings(us_request, mode, formname):
 
         # ok, everything is done.  Let's redirect the user to the home page
         messages.success(us_request, 'Your %s has been updated' % mode)
-        return HttpResponseRedirect(reverse('account_settings'))
+        return HttpResponseRedirect(reverse('settings_home'))
 
     else:
         form = formname(instance=account)
