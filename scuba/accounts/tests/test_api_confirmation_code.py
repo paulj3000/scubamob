@@ -5,7 +5,9 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 import os
+from unittest.mock import patch
 
+from django.core import mail
 from django.test import TestCase
 from rest_framework.test import APIClient
 
@@ -62,6 +64,27 @@ class TestConfirmationCode(TestCase):
             self.fail("Code was not found")
         except UserConfirmationCode.DoesNotExist:
             self.fail("Code was not found")
+
+    @patch('scuba.libs.mail.S3')
+    def test_get_confirmation_code_actually_sends_an_email(self, mock_s3_class):
+        """
+        CODE_REVIEW.md §3 item 4 -- with NO_MAIL unset, the real signup
+        flow's GET /api/signup/confirmation_code must actually send an
+        email rather than crashing on the missing EmailTemplate model.
+        """
+        os.environ.pop('NO_MAIL', None)
+        self.addCleanup(os.environ.pop, 'NO_MAIL', None)
+        user = User.objects.get(email='foo@nowhere.com')
+
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        response = client.get('/api/signup/confirmation_code', format='json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn(user.email, mail.outbox[0].to)
+        mock_s3_class.return_value.upload_data.assert_called_once()
 
     def test_get_and_set_confirmation_code(self):
         """

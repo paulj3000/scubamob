@@ -11,6 +11,7 @@ from django.contrib.auth.models import (
 
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.utils.html import strip_tags
 from django.db.models import Q
 from django.templatetags.static import static
 from django.core.exceptions import ValidationError
@@ -27,7 +28,7 @@ from scuba.accounts.settings import SETTINGS
 from scuba.sitesettings.models import SystemSetting
 from scuba.divesites.models import Divesite
 from scuba.libs.aws.s3 import S3
-from scuba.settings import AWS_S3_BUCKET
+from scuba.settings import AWS_S3_BUCKET, EMAIL_BACKEND, SITE_TITLE
 
 from scuba.libs.mail import generate_email, send_mail
 
@@ -263,35 +264,28 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
             raise InvalidConfirmationCodeException
 
     def send_confirmation_code_email(self, code):
-        """ send_welcome_email
+        """ send_confirmation_code_email
 
         Send a confirmation code email to the user.
         """
-        email_template = EmailTemplate.get_confirmation_code_email()
-        data = self.generate_confirmation_code_email(email_template, code)
-
-        subject = email_template.subject
-        subject = subject.replace('##CONFIRMATION_CODE##', str(code))
-        subject = subject.replace('##FIRST_NAME##', self.first_name.title())
+        html, text = self.generate_confirmation_code_email(code)
+        subject = f"Your {SITE_TITLE} confirmation code is {code}"
 
         # now store the email
-        send_mail(self, subject, data[0], data[1])
+        send_mail(self, subject, html, text)
 
-    def generate_confirmation_code_email(self, email_template, code):
+    def generate_confirmation_code_email(self, code):
         '''
-        This will generate the welcome email and return the
+        This will generate the confirmation code email and return the
         rendered value
         '''
-        # now let's send something....
-        content = email_template.content.replace('##CONFIRMATION_CODE##', str(code))
-        #soup = BeautifulSoup(content, 'lxml')
-        #email_txt = soup.get_text()
+        content = f"Your confirmation code is <strong>{code}</strong>."
 
         html = generate_email(
             self, 'content/emails/confirmation_code.html',
-            {'content': content, 'short_code': email_template.short_code})
+            {'content': content, 'short_code': f'Your {SITE_TITLE} confirmation code'})
 
-        return (html, "email_txt")
+        return (html, strip_tags(content))
 
     # -----------------------------------------------------------------------------
     # start feed stuff
@@ -469,34 +463,30 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
     # -----------------------------------------------------------------------------
     # Start stuff related to sending emails
     # -----------------------------------------------------------------------------
-    def send_welcome_email(self, email_template):
+    def send_welcome_email(self):
         """ send_welcome_email
 
-        Send a welcome email to the user. Attach a tracker to it to see when
-        he has opened it
+        Send a welcome email to the user.
         """
-        data = self.generate_welcome_email(email_template, generate_tracker())
+        html, text = self.generate_welcome_email()
 
         if EMAIL_BACKEND:
             # now store the email
-            send_mail(self, email_template.subject, data[0], data[1])
+            send_mail(self, f"Welcome to {SITE_TITLE}!", html, text)
 
-    def generate_welcome_email(self, email_template, tracker=""):
+    def generate_welcome_email(self):
         '''
         This will generate the welcome email and return the
         rendered value
         '''
-        # now let's send something....
-        content = email_template.content.replace('##USERNAME##', self.full_name.title())
-        soup = BeautifulSoup(content, 'lxml')
-        email_txt = soup.get_text()
+        content = f"Welcome to {SITE_TITLE}, {self.get_full_name().title()}!"
 
         html = generate_email(
             self,
-            'emails/welcome.html',
-            {'content': content, 'short_code': email_template.short_code}, tracker)
+            'content/emails/welcome.html',
+            {'content': content, 'short_code': f'Welcome to {SITE_TITLE}'})
 
-        return (html, email_txt)
+        return (html, strip_tags(content))
 
     # -----------------------------------------------------------------------------
     # Start divesite methods

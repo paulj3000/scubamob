@@ -158,24 +158,18 @@ class UserAdmin(admin.ModelAdmin):
     def send_welcome_email_to_user(self, request, userid):
         user = get_object_or_404(self.model, pk=userid)
         try:
-            # send_welcome_email() requires an EmailTemplate instance, but no
-            # EmailTemplate model exists anywhere in this codebase (removed in an
-            # earlier commit) -- this always raises until that is rebuilt.
             user.send_welcome_email()
-        except TypeError:
-            messages.add_message(
-                request, messages.ERROR,
-                'Welcome email could not be sent: the welcome-email template system '
-                'is currently broken (see CODE_REVIEW.md).')
+        except Exception:
+            messages.add_message(request, messages.ERROR, 'Welcome email could not be sent.')
         else:
             messages.add_message(request, messages.INFO, 'Welcome email successfully sent')
 
         return redirect(f'/admin/accounts/user/{userid}/change/')
 
-    def send_welcome_email(modeladmin, request, queryset, email_template):
+    def send_welcome_email(modeladmin, request, queryset):
         for object in queryset:
             # send emails whether or not the is_public flag is set
-            object.send_welcome_email(email_template)
+            object.send_welcome_email()
 
         messages.add_message(
             request,

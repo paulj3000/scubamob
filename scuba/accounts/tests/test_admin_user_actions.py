@@ -2,6 +2,8 @@
 Integration tests for the admin-only reset-password and welcome-email
 support URLs on scuba/accounts/admin.py's UserAdmin.
 """
+from unittest.mock import patch
+
 from django.core import mail
 from django.test import TestCase
 
@@ -85,11 +87,14 @@ class TestAdminWelcomeEmail(TestCase):
             email='target@user.com', username='targetuser', password='tester1234',
             first_name='Target', last_name='User')
 
-    def test_staff_hitting_welcome_email_gets_a_clean_error_not_a_500(self):
+    @patch('scuba.libs.mail.S3')
+    def test_staff_can_trigger_a_welcome_email(self, mock_s3_class):
         self.client.force_login(self.staff, backend=MODEL_BACKEND)
 
         response = self.client.get(f'/admin/accounts/user/{self.target.pk}/emails/welcome/')
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, f'/admin/accounts/user/{self.target.pk}/change/')
-        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn(self.target.email, mail.outbox[0].to)
+        mock_s3_class.return_value.upload_data.assert_called_once()

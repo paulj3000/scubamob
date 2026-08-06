@@ -14,7 +14,7 @@ from django.template import loader
 from scuba.settings import EMAIL_FROM, EMAIL_BCC, BASE_URL, SITE_URL, TITLE_HTML
 
 from scuba.libs.aws.s3 import S3
-from scuba.settings import AWS_EMAIL_STORAGE_ROOT
+from scuba.settings import AWS_EMAIL_STORAGE_ROOT, AWS_S3_BUCKET_PRIVATE
 
 
 def generate_email(user, template, context):
