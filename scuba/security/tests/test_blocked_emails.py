@@ -1,12 +1,15 @@
 """
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
+Integration tests for the /security/emails/bounced SNS webhook. Every
+message must carry a valid AWS SNS signature to be accepted.
 """
+from unittest.mock import Mock, patch
+
 from django.test import TestCase
 from rest_framework.test import APIClient
 
+from scuba.libs.aws.testing import generate_test_keypair_and_cert, sign_sns_payload
+
+VALID_CERT_URL = 'https://sns.us-west-2.amazonaws.com/SimpleNotificationService-abc123.pem'
 
 SNS_PAYLOAD = {
     "Type": "SubscriptionConfirmation",
@@ -17,30 +20,46 @@ SNS_PAYLOAD = {
     "SubscribeURL": "https://sns.us-west-2.amazonaws.com/?Action=ConfirmSubscription&TopicArn=arn:aws:sns:us-west-2:XXXXXXXXXXXX:ses-test&Token=SECRET_TOKEN",  # noqa: E501
     "Timestamp": "2018-11-21T19:48:08.170Z",
     "SignatureVersion": "1",
-    "Signature": "SECRET",
-    "SigningCertURL": "https://sns.us-west-2.amazonaws.com/SimpleNotificationService-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.pem"  # noqa: E501
+    "SigningCertURL": VALID_CERT_URL,
 }
 
 
 class TestBlockedEmail(TestCase):
-    def test_subscription_request(self):
-        """
-        Test subscription request
-        """
+    def setUp(self):
+        self.private_key, self.cert_pem = generate_test_keypair_and_cert()
+        self.client = APIClient()
 
-        client = APIClient()
-        response = client.post('/security/emails/bounced', SNS_PAYLOAD, format='json')
+    def _mock_cert_response(self):
+        response = Mock()
+        response.content = self.cert_pem
+        response.raise_for_status = Mock()
+        return response
+
+    def test_unsigned_subscription_request_is_rejected(self):
+        """ a message with no valid AWS SNS signature must never be accepted """
+        payload = dict(SNS_PAYLOAD, Signature='SECRET')
+
+        response = self.client.post('/security/emails/bounced', payload, format='json')
+
+        self.assertEqual(response.status_code, 403)
+
+    @patch('scuba.libs.aws.sns.requests.get')
+    def test_validly_signed_subscription_request(self, mock_get):
+        mock_get.return_value = self._mock_cert_response()
+        payload = sign_sns_payload(self.private_key, dict(SNS_PAYLOAD))
+
+        response = self.client.post('/security/emails/bounced', payload, format='json')
+
         self.assertEqual(response.status_code, 201)
 
-    def test_subscription_request_failed(self):
-        # noqa: E501
-        """
-        Test subscription request
-        """
+    @patch('scuba.libs.aws.sns.requests.get')
+    def test_validly_signed_subscription_request_rejects_duplicate(self, mock_get):
+        mock_get.return_value = self._mock_cert_response()
 
-        client = APIClient()
-        response = client.post('/security/emails/bounced', SNS_PAYLOAD, format='json')
+        first = sign_sns_payload(self.private_key, dict(SNS_PAYLOAD))
+        response = self.client.post('/security/emails/bounced', first, format='json')
         self.assertEqual(response.status_code, 201)
 
-        response = client.post('/security/emails/bounced', SNS_PAYLOAD, format='json')
+        second = sign_sns_payload(self.private_key, dict(SNS_PAYLOAD))
+        response = self.client.post('/security/emails/bounced', second, format='json')
         self.assertEqual(response.status_code, 400)

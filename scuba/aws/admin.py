@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 
 import scuba.aws.models as aws_models
 from scuba.settings import AWS_CLOUDFRONT_DEPLOY
@@ -20,10 +20,10 @@ class CodeBuildJobAdminInline(admin.TabularInline):
             return 'Not available yet'
 
         base_url = f"{AWS_CLOUDFRONT_DEPLOY}builds/"
-        url = f'<a target="_blank" href="{base_url}{obj.id}/coverage/">Coverage</a> | ' + \
-              f'<a target="_blank" href="{base_url}{obj.id}/flake-report/">Flake8</a>'
-
-        return mark_safe(url)
+        return format_html(
+            '<a target="_blank" href="{0}{1}/coverage/">Coverage</a> | '
+            '<a target="_blank" href="{0}{1}/flake-report/">Flake8</a>',
+            base_url, obj.id)
 
 
 class CodeBuildProjectAdmin(admin.ModelAdmin):

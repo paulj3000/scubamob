@@ -1,4 +1,5 @@
 import json
+import logging
 
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
@@ -12,7 +13,10 @@ from scuba.aws.serializers import (
     CodeBuildJobSerializer,
 )
 
+from scuba.libs.aws.sns import SNSVerificationError, verify_signature
 from scuba.libs.rest_framework.parsers import AWSJSONParser
+
+logger = logging.getLogger(__name__)
 
 
 class CodeBuildAPI(generics.GenericAPIView):
@@ -23,12 +27,16 @@ class CodeBuildAPI(generics.GenericAPIView):
     def post(self, request):
         """ post
 
-        Do the actual posting of the password reset
+        Handle an inbound AWS CodeBuild SNS notification. Only messages
+        carrying a valid AWS SNS signature are processed.
         """
-        fh = open("/tmp/build.txt", "a")
-        fh.write(json.dumps(request.data) + "\n")
-        fh.write("\n\n---------\n\n")
-        fh.close()
+        try:
+            verify_signature(request.data)
+        except SNSVerificationError as exc:
+            logger.warning('Rejected unverified CodeBuild SNS message: %s', exc)
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        logger.debug('Verified CodeBuild SNS message: %s', request.data)
 
         if request.data.get('Type') == 'SubscriptionConfirmation':
             serializer = SNSSubscriptionRequestSerializer(data=request.data)
@@ -54,14 +62,8 @@ class CodeBuildAPI(generics.GenericAPIView):
             serializer.save()
             return Response(status=status.HTTP_200_OK)
         except KeyError:
-            return Response(status=status.HTTP_400_HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-            serializer = CodeBuildJobSerializer(data=detail)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(status=status.HTTP_200_OK)
-        except KeyError:
-            return Response(status=status.HTTP_400_HTTP_400_BAD_REQUEST)
 
 class CodePipelineAPI(generics.GenericAPIView):
     permission_classes = (AllowAny,)
@@ -71,12 +73,16 @@ class CodePipelineAPI(generics.GenericAPIView):
     def post(self, request):
         """ post
 
-        Do the actual posting of the password reset
+        Handle an inbound AWS CodePipeline SNS notification. Only messages
+        carrying a valid AWS SNS signature are processed.
         """
-        fh = open("/tmp/pipeline.txt", "a")
-        fh.write(json.dumps(request.data) + "\n")
-        fh.write("\n\n---------\n\n")
-        fh.close()
+        try:
+            verify_signature(request.data)
+        except SNSVerificationError as exc:
+            logger.warning('Rejected unverified CodePipeline SNS message: %s', exc)
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        logger.debug('Verified CodePipeline SNS message: %s', request.data)
 
         if request.data.get('Type') == 'SubscriptionConfirmation':
             serializer = SNSSubscriptionRequestSerializer(data=request.data)
@@ -84,20 +90,23 @@ class CodePipelineAPI(generics.GenericAPIView):
             serializer.save()
             return Response(status=status.HTTP_201_CREATED)
 
-        message = json.loads(request.data['Message'])
-        detail = message['detail']
-        detail['pipeline_execution_attempt'] = detail['pipeline-execution-attempt']
-        detail['project_name'] = detail['pipeline']
-        detail['start_time'] = detail['start-time']
-        detail['execution_id'] = detail['execution-id']
-        detail['notification_rule_arn'] = message.get('notificationRuleArn')
-        detail['topic_arn'] = request.data['TopicArn']
-        detail['payload'] = json.dumps(request.data)
+        try:
+            message = json.loads(request.data['Message'])
+            detail = message['detail']
+            detail['pipeline_execution_attempt'] = detail['pipeline-execution-attempt']
+            detail['project_name'] = detail['pipeline']
+            detail['start_time'] = detail['start-time']
+            detail['execution_id'] = detail['execution-id']
+            detail['notification_rule_arn'] = message.get('notificationRuleArn')
+            detail['topic_arn'] = request.data['TopicArn']
+            detail['payload'] = json.dumps(request.data)
 
-        for arn in message.get('resources'):
-            detail['pipeline_arn'] = arn
-            serializer = CodePipelineStateSerializer(data=detail)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+            for arn in message.get('resources'):
+                detail['pipeline_arn'] = arn
+                serializer = CodePipelineStateSerializer(data=detail)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+        except KeyError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
         return Response(status=status.HTTP_200_OK)

@@ -37,18 +37,21 @@ class SNSSubscriptionRequestSerializer(serializers.ModelSerializer):
 
         return data
 
+    @staticmethod
     def validate_signature(data):
         if SNSSubscriptionRequest.objects.filter(signature=data):
             raise serializers.ValidationError(_(f'{data} already exists.'))
 
         return data
 
+    @staticmethod
     def validate_message_id(data):
         if SNSSubscriptionRequest.objects.filter(message_id=data):
             raise serializers.ValidationError(_(f'{data} already exists.'))
 
         return data
 
+    @staticmethod
     def validate_timestamp(data):
         try:
             return datetime.fromisoformat(data)
