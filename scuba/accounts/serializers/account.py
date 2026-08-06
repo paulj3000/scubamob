@@ -1,9 +1,11 @@
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import authenticate
+from django.core.exceptions import ValidationError
 
 from rest_framework import serializers
 
 from scuba.accounts.models import User
+from scuba.accounts.validators.signup import validate_password
 
 
 class RegisterSerializer(serializers.Serializer):
@@ -50,6 +52,19 @@ class RegisterSerializer(serializers.Serializer):
             raise serializers.ValidationError(f"Username {username} is already registered")
 
         return username
+
+    def validate_password(self, password):
+        """ validate_password
+
+        Validate the password coming in against this project's password
+        policy (scuba.accounts.validators.signup.validate_password).
+        """
+        try:
+            validate_password(password)
+        except ValidationError as exc:
+            raise serializers.ValidationError(exc.messages)
+
+        return password
 
     def create(self, validated_data):
         user = User.objects.create(

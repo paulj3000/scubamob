@@ -19,7 +19,7 @@ class TestUserRegisterAPI(TestCase):
         payload = {
             'first_name': 'good',
             'last_name': 'user',
-            'password': 'password',
+            'password': 'Str0ngPassw0rd!',
             'email': 'goodsignup@nowhere.com',
             'username': 'goodsignup'
         }
@@ -34,6 +34,24 @@ class TestUserRegisterAPI(TestCase):
         self.assertIsNotNone(response.json().get('profile_image'))
         self.assertEqual(len(id), 32)
         self.assertNotIn('-', id)
+
+    def test_user_register_weak_password_is_rejected(self):
+        """
+        Test that a weak password is rejected instead of silently accepted
+        """
+        client = APIClient()
+        payload = {
+            'first_name': 'weak',
+            'last_name': 'password',
+            'password': 'password',
+            'email': 'weakpassword@nowhere.com',
+            'username': 'weakpassworduser'
+        }
+
+        response = client.post('/api/register/', payload, format='json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIsNotNone(response.json().get('password'))
 
     def test_user_register_duplicate_email(self):
         """

@@ -97,7 +97,8 @@ class TestAccountFormSignup(TestCase):
 
     def test_bad_password_length(self):
         """
-        Test a bad password, it has to be at least 4 characters
+        Test a bad (too short) password is rejected by Django's configured
+        AUTH_PASSWORD_VALIDATORS (minimum length is 8).
         """
         data = {
             'first_name': 'Test',
@@ -115,15 +116,17 @@ class TestAccountFormSignup(TestCase):
 
             form = SignupForm(data=data, ip_address='54.183.214.227')
             self.assertFalse(form.is_valid())
-            self.assertEqual(
-                form.errors["password"], ['Your password must be between 4 and 20 characters'],
+            self.assertIn(
+                'This password is too short. It must contain at least 8 characters.',
+                form.errors["password"],
             )
 
+        # too long: rejected by this project's own 20-character maximum
         data['password'] = 'x' * 21
         form = SignupForm(data=data, ip_address='54.183.214.227')
         self.assertFalse(form.is_valid())
         self.assertEqual(
-            form.errors["password"], ['Your password must be between 4 and 20 characters'],
+            form.errors["password"], ['Password must be no more than 20 characters.'],
         )
 
     def test_bad_username_length(self):

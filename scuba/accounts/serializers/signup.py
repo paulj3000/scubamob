@@ -10,20 +10,24 @@ class SetUsernameSerializer(serializers.Serializer):
     username = serializers.CharField()
 
     def validate_username(self, username):
-        """ validate_plan
+        """ validate_username
 
-        Validate the plan id coming in
+        Make sure the username isn't already taken by a different user.
         """
-        if User.objects.filter(username=username).count():
+        taken = User.objects.filter(username=username)
+        if self.instance is not None:
+            taken = taken.exclude(pk=self.instance.pk)
+
+        if taken.exists():
             raise serializers.ValidationError(f"Username {username} is already registered")
 
         return username
 
     def update(self, instance, validated_data):
-        """ A stub for the update method. This does nothing """
-        user = self.context['request'].user
-        user.username = instance['username']
-        user.save()
+        """ set the caller's username to the validated value """
+        instance.username = validated_data['username']
+        instance.save()
+        return instance
 
 
 class SetPasswordSerializer(serializers.Serializer):
@@ -39,9 +43,10 @@ class SetPasswordSerializer(serializers.Serializer):
         return password
 
     def update(self, instance, validated_data):
-        """ A stub for the update method. This does nothing """
-        user = self.context['request'].user
-        user.set_password(instance['password'])
+        """ set the caller's password to the validated value """
+        instance.set_password(validated_data['password'])
+        instance.save()
+        return instance
 
     def create(self, validated_data):
         raise NotImplementedError

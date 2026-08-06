@@ -143,17 +143,53 @@ class TestCreateUserAPI(TestCase):
         response = client.put('/api/signup/username/', payload, format='json')
         self.assertEqual(response.status_code, 200)
 
+        user.refresh_from_db()
+        self.assertEqual(user.username, 'anewusername')
+
+    def test_set_own_current_username_is_not_rejected_as_duplicate(self):
+        """
+        Re-submitting the caller's own unchanged username must not be
+        treated as a conflict with itself.
+        """
+        user = User.objects.get(email='foo@nowhere.com')
+
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        payload = {
+            'username': user.username
+        }
+
+        response = client.put('/api/signup/username/', payload, format='json')
+        self.assertEqual(response.status_code, 200)
+
     def test_set_duplicate_username(self):
         """
         Test changing username with an already taken username
         """
+        user = User.objects.get(email='foo@nowhere.com')
+
         client = APIClient()
+        client.force_authenticate(user=user)
+
         payload = {
             'username': "testuser3"
         }
 
         response = client.put('/api/signup/username/', payload, format='json')
         self.assertEqual(response.status_code, 400)
+
+    def test_set_username_requires_authentication(self):
+        """
+        Test that changing a username requires a logged-in caller
+        """
+        client = APIClient()
+        payload = {
+            'username': "anonymoustakeover"
+        }
+
+        response = client.put('/api/signup/username/', payload, format='json')
+        self.assertEqual(response.status_code, 401)
 
     def test_not_implemented_1(self):
         """

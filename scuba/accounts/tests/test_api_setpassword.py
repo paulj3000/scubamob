@@ -29,6 +29,9 @@ class APISetPassword(TestCase):
         response = client.put('/api/signup/password/', payload, format='json')
         self.assertEqual(response.status_code, 200)
 
+        user.refresh_from_db()
+        self.assertTrue(user.check_password('ThisisAGoodPassword%'))
+
     def test_set_bad_password(self):
         """
         Test setting bad password

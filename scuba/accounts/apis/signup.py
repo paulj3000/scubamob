@@ -46,32 +46,29 @@ class SetPasswordApi(generics.GenericAPIView):
     serializer_class = serializers.SetPasswordSerializer
 
     def put(self, request):
-        """ post
+        """ put
 
-        Do the actual posting of the password reset
+        Change the logged-in user's password.
         """
-        serializer = self.serializer_class(data=request.data,
-                                           context={'user': request.user})
+        serializer = self.serializer_class(instance=request.user, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-        if serializer.is_valid():
-            return Response()
-
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response()
 
 
 class SetUsernameApi(generics.GenericAPIView):
     serializer_class = serializers.SetUsernameSerializer
-    permission_classes = (AllowAny,)
 
     def put(self, request):
-        """ post
+        """ put
 
-        Do the actual posting of the password reset
+        Change the logged-in user's username.
         """
-        serializer = self.serializer_class(data=request.data,
-                                           context={'user': request.user})
-
+        serializer = self.serializer_class(instance=request.user, data=request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.save()
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

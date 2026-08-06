@@ -113,7 +113,7 @@ def validate_password(password):
     returns a boolean: True if password fulfils the params else
         return false
     """
-    if password and len(password) < 4 or len(password) > 20:
+    if not password or len(password) < 4 or len(password) > 20:
         return False
 
     # the passord is good. We will return True

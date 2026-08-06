@@ -4,6 +4,7 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from scuba.accounts.validators.signup import validate_password, validate_username
@@ -14,12 +15,23 @@ class TestValidatorSignup(TestCase):
         """
         Test password validator
         """
-        self.assertTrue(validate_password("test1234"))
-        self.assertTrue(validate_password("test1234567"))
-        self.assertFalse(validate_password("tes"))
-        self.assertFalse(validate_password("t"))
-        self.assertFalse(validate_password("te"))
-        self.assertFalse(validate_password("123456789012345678901234te"))
+        validate_password("test1234567")  # does not raise
+        validate_password("Str0ngPassw0rd!")  # does not raise
+
+        with self.assertRaises(ValidationError):
+            validate_password("test1234")  # too common
+
+        with self.assertRaises(ValidationError):
+            validate_password("tes")
+
+        with self.assertRaises(ValidationError):
+            validate_password("t")
+
+        with self.assertRaises(ValidationError):
+            validate_password("te")
+
+        with self.assertRaises(ValidationError):
+            validate_password("123456789012345678901234te")
 
     def test_validator_username(self):
         """

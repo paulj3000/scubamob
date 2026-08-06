@@ -1,6 +1,7 @@
 import logging
 
 from django import forms
+from django.core.exceptions import ValidationError
 
 from scuba.accounts.models import User
 from scuba.security.models import BlockedCountry, InvalidSignup
@@ -45,10 +46,10 @@ class SignupForm(forms.ModelForm):
         """
         password = self.cleaned_data.get('password')
 
-        if not validate_password(password):
-            raise forms.ValidationError(
-                'Your password must be between 4 and 20 characters'
-            )
+        try:
+            validate_password(password)
+        except ValidationError as exc:
+            raise forms.ValidationError(exc.messages)
 
         # return the cleaned password
         return password
