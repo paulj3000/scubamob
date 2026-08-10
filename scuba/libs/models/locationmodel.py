@@ -57,5 +57,5 @@ class LocationModel(UUIDModel):
         lngg2 = math.degrees(lngg2)
 
         return cls.objects.filter(
-            current_lat__gte=lat1, current_lat__lte=lat2).filter(
-                current_lngg__gte=lngg1, current_lngg__lte=lngg2)
+            lat__gte=lat1, lat__lte=lat2).filter(
+                lng__gte=lngg1, lng__lte=lngg2)

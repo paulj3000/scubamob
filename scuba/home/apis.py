@@ -40,32 +40,26 @@ class GetHomescreenApi(generics.GenericAPIView):
         buddy_recent_activity = user.get_all_buddies_recent_activity()
 
         q_param = request.query_params.get('q', 92107)
-        '''
-        if data.get('q'):
-            if ',' in data['q']:
-                lat, lng = data['q'].split(',')
-                if int(lat) == 0 and int(lng) == 0:
-                    weather = Weather.get_current_by_postal_code('92107')
-                else:
-                    weather = Weather.get_current_by_lat_lng(lat, lng)
-            else:
-                code = data.get('postal_code', data['q'])
-                weather = Weather.get_current_by_postal_code(code)
-        else:
-            weather = Weather.get_current_by_postal_code('92107')
-        '''
 
-        # check for the weather. If it doesn't return, give the
-        # default location of 92107
-        try:
-            weather = Weather.get_current_by_q_param(q_param)
-        except InvalidWeatherDataException:
-            weather = Weather.get_current_by_q_param('92107')
+        # cache by query param so repeated requests for the same location
+        # skip the external API call entirely -- the cache key can't be
+        # derived from the region until *after* a fetch (the region is
+        # resolved from the weather response itself), so caching on
+        # q_param is what actually makes the cache useful.
+        cache_key = f'weather_query_{q_param}'
+        weather = cache.get(cache_key)
+
+        if weather is None:
+            # check for the weather. If it doesn't return, give the
+            # default location of 92107
+            try:
+                weather = Weather.get_current_by_q_param(q_param)
+            except InvalidWeatherDataException:
+                weather = Weather.get_current_by_q_param('92107')
+
+            cache.set(cache_key, weather, 3600)
 
         obj = Region.store_weather_region(weather)
-
-        key = f'weather_{obj.pk_as_str}'
-        cache.set(key, weather, 3600)
 
         location = weather.pop('location')
         location['id'] = obj.pk_as_str

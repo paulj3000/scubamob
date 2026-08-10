@@ -4,12 +4,34 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
+from unittest.mock import patch, MagicMock
+
 import pytest
-from django.test import TestCase
+from django.test import TestCase, SimpleTestCase
 
 from scuba.libs.aws.s3 import S3
 from scuba.libs.stringutils import StringUtils
 from scuba.libs.exceptions import InvalidAWSKey
+
+
+class TestS3Init(SimpleTestCase):
+    @patch('scuba.libs.aws.s3.S3.get_session')
+    def test_init_uses_get_session_credential_resolution(self, mock_get_session):
+        """
+        S3() must resolve credentials the same way get_session() does (env
+        vars first, falling back to a named AWS CLI profile), not construct
+        its own boto3.Session directly -- a hardcoded profile_name session
+        breaks in any container/CI without a literal ~/.aws/credentials file.
+        """
+        mock_conn = MagicMock()
+        mock_get_session.return_value = mock_conn
+
+        s3 = S3('my-bucket')
+
+        mock_get_session.assert_called_once()
+        self.assertIs(s3.conn, mock_conn)
+        self.assertEqual(s3.bucket, 'my-bucket')
+        mock_conn.Bucket.assert_called_once_with('my-bucket')
 
 
 class TestS3(TestCase):

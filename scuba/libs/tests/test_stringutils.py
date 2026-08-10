@@ -4,8 +4,11 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
+from unittest.mock import patch
+
 from django.test import TestCase
 
+from scuba.accounts.models import User
 from scuba.libs.stringutils import StringUtils
 
 
@@ -41,3 +44,34 @@ class TestStringUtils(TestCase):
         for some_len in [10, 5, 3, 20]:
             some_str = gen_str(some_len)
             self.assertEqual(len(some_str), some_len)
+
+    def test_get_random_password_string_uses_secrets(self):
+        """
+        get_random_password_string must draw from the secrets module (not
+        the non-cryptographic random module) for password generation.
+        """
+        with patch('scuba.libs.stringutils.secrets.choice', return_value='x') as mock_choice:
+            password = StringUtils.get_random_password_string(12)
+
+        self.assertEqual(len(password), 12)
+        self.assertEqual(mock_choice.call_count, 12)
+
+    def test_get_random_password_string_length_and_charset(self):
+        import string as string_module
+
+        password = StringUtils.get_random_password_string(16)
+        self.assertEqual(len(password), 16)
+
+        allowed = set(string_module.ascii_letters + string_module.digits + string_module.punctuation)
+        self.assertTrue(set(password) <= allowed)
+
+    def test_generate_short_id_queries_the_passed_model(self):
+        """
+        generate_short_id is a plain staticmethod -- it must query
+        uniqueness against the model explicitly passed as `model_cls`,
+        not implicitly bind to StringUtils itself.
+        """
+        short_id = StringUtils.generate_short_id(User, 6, 'act', key='aws_id')
+        self.assertTrue(short_id.startswith('act'))
+        self.assertEqual(len(short_id), 9)
+        self.assertFalse(User.objects.filter(aws_id=short_id).exists())

@@ -5,9 +5,11 @@ from scuba.libs.exceptions import InvalidWeatherDataException
 
 # weatherapi.com settings
 WEATHER_API = {
-    'current': 'http://api.weatherapi.com/v1/current.json',
-    'forecast': 'http://api.weatherapi.com/v1/forecast.json',
+    'current': 'https://api.weatherapi.com/v1/current.json',
+    'forecast': 'https://api.weatherapi.com/v1/forecast.json',
 }
+
+REQUEST_TIMEOUT_SECONDS = 5
 
 
 class Weather:
@@ -47,8 +49,9 @@ class Weather:
     @classmethod
     def get_current_by_q_param(cls, q_param):
         # call the API and return the data
-        res = requests.get(WEATHER_API['current'],
-                           {'key': cls.get_api_key(), 'q': q_param})
+        res = requests.get(
+            WEATHER_API['current'],
+            {'key': cls.get_api_key(), 'q': q_param}, timeout=REQUEST_TIMEOUT_SECONDS)
 
         if res.status_code >= 400:
             raise InvalidWeatherDataException()
@@ -58,13 +61,20 @@ class Weather:
     @classmethod
     def get_current_by_postal_code(cls, postal_code):
         # call the API and return the data
-        res = requests.get(WEATHER_API['current'],
-                           {'key': cls.get_api_key(), 'q': postal_code})
+        res = requests.get(
+            WEATHER_API['current'],
+            {'key': cls.get_api_key(), 'q': postal_code}, timeout=REQUEST_TIMEOUT_SECONDS)
+
+        if res.status_code >= 400:
+            raise InvalidWeatherDataException()
+
         return res.json()
 
     @classmethod
     def get_current_by_lat_lng(cls, lat, lng):
-        res = requests.get(WEATHER_API['current'], {'key': cls.get_api_key(), 'q': f'{lat},{lng}'})
+        res = requests.get(
+            WEATHER_API['current'],
+            {'key': cls.get_api_key(), 'q': f'{lat},{lng}'}, timeout=REQUEST_TIMEOUT_SECONDS)
 
         if res.status_code >= 400:
             raise InvalidWeatherDataException()

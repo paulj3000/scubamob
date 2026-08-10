@@ -11,6 +11,11 @@ from scuba.libs.aws.s3 import S3
 class FileUtils:
     @staticmethod
     def write_to_file(filename, content):
+        # reject any path-traversal component -- filename comes straight
+        # from the caller with no base directory to sandbox it against.
+        if '..' in filename.replace('\\', '/').split('/'):
+            raise ValueError(f"Invalid filename: {filename}")
+
         f = open(filename, "wb")
         f.write(content.encode())
         f.close()
@@ -35,7 +40,7 @@ class FileUtils:
             'key': filename,
         }
 
-        resp = requests.post(url, json=data)
+        resp = requests.post(url, json=data, timeout=5)
 
         if resp.status_code < 200 or resp.status_code > 299:
             raise InvalidHttpStatusCode(resp.status_code, resp.text)

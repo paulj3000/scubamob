@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import re
+import secrets
 import string
 import time
 import random
@@ -32,22 +33,24 @@ class StringUtils:
         return str(int(time.time()))
 
     @staticmethod
-    def generate_short_id(cls, key_length, prefix, key='short_id'):
+    def generate_short_id(model_cls, key_length, prefix, key='short_id'):
         ''' generate_short_id
 
         generate a unique short id. Make sure it does not collide with
-        another short id from another section '''
+        another short id from another section. `model_cls` is the model
+        to check uniqueness against, explicitly passed in by the caller
+        (this is a plain staticmethod, not bound to `model_cls`). '''
         def gen():
-            key = [random.choice(string.digits) for i in range(key_length)]
+            digits = [random.choice(string.digits) for i in range(key_length)]
 
             # a quick little function to generate the key
-            return prefix + ''.join(key)
+            return prefix + ''.join(digits)
 
         # do the query
         to_query = {}
         to_query[key] = gen()
 
-        while cls.objects.filter(**to_query).count():
+        while model_cls.objects.filter(**to_query).count():
             to_query[key] = gen()
 
         # return the generated id
@@ -57,10 +60,11 @@ class StringUtils:
     def get_random_password_string(length):
         """ get_random_password_string
 
-        # get random string password with letters, digits, and symbols
+        # get a cryptographically secure random password with letters,
+        # digits, and symbols
         """
         password_characters = string.ascii_letters + string.digits + string.punctuation
-        return ''.join(random.choice(password_characters) for i in range(length))
+        return ''.join(secrets.choice(password_characters) for i in range(length))
 
     @staticmethod
     def generate_time_based_random_string(string_length):

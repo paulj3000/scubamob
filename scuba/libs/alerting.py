@@ -13,4 +13,4 @@ class Alerting:
             'buddyUserId': buddyUserId,
         }
 
-        requests.post(url, json=to_send)
+        requests.post(url, json=to_send, timeout=5)

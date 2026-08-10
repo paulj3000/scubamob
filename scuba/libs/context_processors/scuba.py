@@ -30,7 +30,11 @@ def Scuba(request):
 
     # if the user is logged in, get his profile image
     if user.is_authenticated:
-        context['profile_image'] = request.session.get('profile_image', user.get_profile_image())
+        # `or`, not .get(..., default) -- the default arg to .get() is
+        # evaluated eagerly on every call regardless of whether the key
+        # is already cached in the session, defeating the point of
+        # caching it there in the first place.
+        context['profile_image'] = request.session.get('profile_image') or user.get_profile_image()
 
     # surface an always-visible banner while an admin is impersonating this user
     context['impersonating'] = bool(request.session.get('impersonator_id'))

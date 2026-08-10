@@ -24,9 +24,11 @@ class S3:
     using class instantiation.
     """
     def __init__(self, bucket_name):
-        print(bucket_name)
-        session = boto3.Session(profile_name=AWS_PROFILE)
-        self.conn = session.resource('s3')
+        # use the same credential resolution as get_session() (env vars
+        # first, falling back to a local named AWS CLI profile) so this
+        # works in containers/CI, not just a machine with
+        # ~/.aws/credentials configured.
+        self.conn = S3.get_session()
 
         # now assign the bucket
         self.bucket = bucket_name

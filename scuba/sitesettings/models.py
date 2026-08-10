@@ -389,7 +389,7 @@ class LogbookApi(BaseAPI):
     @staticmethod
     def query_logbook_server(url):
         try:
-            req = requests.get(url)
+            req = requests.get(url, timeout=5)
             return req.json()
         except requests.ConnectionError:
             raise exceptions.LogbookServerDownException
@@ -397,7 +397,7 @@ class LogbookApi(BaseAPI):
     @staticmethod
     def post_to_logbook_server(url, json):
         try:
-            req = requests.post(url, json=json)
+            req = requests.post(url, json=json, timeout=5)
             return req.json()
         except requests.ConnectionError:
             raise exceptions.LogbookServerDownException
