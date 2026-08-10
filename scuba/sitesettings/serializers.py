@@ -18,7 +18,7 @@ class SystemEndpointApi(serializers.ModelSerializer):
     class Meta:
         """ define models, fields, etc """
         model = Endpoint
-        fields = ('app', 'key', 'url',)
+        fields = ('key', 'url',)
 
 
 class SNSSubscriptionRequestSerializer(serializers.ModelSerializer):

@@ -11,7 +11,7 @@ class GetSystemEndpointsApi(generics.GenericAPIView):
     serializer_class = SystemEndpointApi
 
     def get(self, request):
-        data = Endpoint.get_active_endpoints()
+        data = Endpoint.objects.filter(is_active=True)
 
         endpoints = self.serializer_class(data, many=True)
         retval = {
@@ -37,7 +37,7 @@ class GetSystemSettingsApi(generics.GenericAPIView):
         data = SystemApi.objects.filter(key__in=keys)
 
         retval = {
-            'apis': {item.key: item.url for item in data}
+            'apis': {item.key: item.value for item in data}
         }
 
         return Response(retval)
