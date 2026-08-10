@@ -32,14 +32,14 @@ class RuleList(ListView):
 
         get the current site from something (I'm tired of doing module strings)
         """
-        if hasattr(settings, 'SITE_BY_REQUEST'):
+        if getattr(settings, 'SITE_BY_REQUEST'):
             return Site.objects.get(domain=request.get_host())
 
         return Site.objects.get_current()
 
     def reverse_sitemap_url(self):
         try:
-            if hasattr(settings, 'SITEMAP_VIEW_NAME'):
+            if getattr(settings, 'SITEMAP_VIEW_NAME'):
                 return reverse(getattr(settings, 'SITEMAP_VIEW_NAME'))
 
             return reverse(sitemap_views.index)
@@ -63,10 +63,10 @@ class RuleList(ListView):
         """
         sitemap_urls = None
 
-        if hasattr(settings, 'SITEMAP_URLS'):
+        if getattr(settings, 'SITEMAP_URLS'):
             sitemap_urls = list(getattr(settings, 'SITEMAP_URLS'))
 
-        if not sitemap_urls and hasattr(settings, 'USE_SITEMAP'):
+        if not sitemap_urls and getattr(settings, 'USE_SITEMAP'):
             sitemap_url = self.reverse_sitemap_url()
 
             if sitemap_url is not None:
@@ -91,8 +91,8 @@ class RuleList(ListView):
         """
         context = super().get_context_data(**kwargs)
         context['sitemap_urls'] = self.get_sitemap_urls()
-        if hasattr(settings, 'USE_HOST'):
-            if hasattr(settings, 'USE_SCHEME_IN_HOST'):
+        if getattr(settings, 'USE_HOST'):
+            if getattr(settings, 'USE_SCHEME_IN_HOST'):
                 context['host'] = self.get_domain()
             else:
                 context['host'] = self.current_site.domain

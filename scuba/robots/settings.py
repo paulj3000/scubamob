@@ -18,7 +18,7 @@ class Settings:
     def __getattr__(self, attribute):
         if attribute in self.defaults:
             return getattr(settings, *self.defaults[attribute])
-        return None
+        raise AttributeError(f"'Settings' object has no attribute '{attribute}'")
 
 
 sys.modules[__name__] = Settings()
