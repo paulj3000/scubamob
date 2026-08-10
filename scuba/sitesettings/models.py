@@ -95,15 +95,6 @@ class SystemApi(UUIDModel):
         return SystemApi.get_url_by_key('SETTINGS_SERVER', False)
 
     @staticmethod
-    def get_logbook_server():
-        """ get_logbook_server
-
-        Returns:
-        string: Returns the base URL for the logbook server
-        """
-        return SystemApi.get_url_by_key('LOGBOOK_SERVER', False)
-
-    @staticmethod
     def get_alerting_endpoint(endpoint):
         domain = SystemApi.get_url_by_key('ALERTING_SERVER')
         return urljoin(domain, endpoint)
@@ -359,48 +350,6 @@ class ChatApi(BaseAPI):
             return req.json()
         except requests.ConnectionError:
             raise exceptions.ChatServerDownException
-
-
-class LogbookApi(BaseAPI):
-    choices = settings.LOGBOOK_APIS
-
-    class Meta:
-        db_table = 'logbook_api'
-
-    @staticmethod
-    def get_all_logbooks(userid):
-        endpoint = LogbookApi.objects.get(key='GET_LOGBOOKS').value
-        endpoint = LogbookApi.get_all_logbooks_url(userid)
-
-        return LogbookApi.query_logbook_server(endpoint)
-
-    @staticmethod
-    def get_all_logbooks_url(userid):
-        endpoint = LogbookApi.objects.get(key='GET_LOGBOOKS').value
-        endpoint = LogbookApi.sub_url_userid(endpoint, userid)
-        return LogbookApi.query_logbook_server(endpoint)
-
-    @staticmethod
-    def get_all_tags(userid):
-        endpoint = LogbookApi.objects.get(key='GET_TAGS').value
-        endpoint = LogbookApi.sub_url_userid(endpoint, userid)
-        return LogbookApi.query_logbook_server(endpoint)
-
-    @staticmethod
-    def query_logbook_server(url):
-        try:
-            req = requests.get(url, timeout=5)
-            return req.json()
-        except requests.ConnectionError:
-            raise exceptions.LogbookServerDownException
-
-    @staticmethod
-    def post_to_logbook_server(url, json):
-        try:
-            req = requests.post(url, json=json, timeout=5)
-            return req.json()
-        except requests.ConnectionError:
-            raise exceptions.LogbookServerDownException
 
 
 class SettingsApi(BaseAPI):

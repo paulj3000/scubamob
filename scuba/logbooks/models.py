@@ -22,10 +22,6 @@ class LogbookFolder(UUIDModel):
         'accounts.User', related_name='logbook_folders', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
 
-    def get_logs(self):
-        divelog_mongo = DiveLog()
-        return divelog_mongo.get_log(user_id=self.user.id, folder=self.guid)
-
     class Meta:
         db_table = 'logbook_folder'
         unique_together = (('user', 'name'), )

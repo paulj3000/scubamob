@@ -67,7 +67,6 @@ urlpatterns = [
     path('api/profile/me/', include('scuba.accounts.urls_profile_me_api')),
     path('api/profile/q/', profile_api.QueryApi.as_view()),
     re_path('api/profile/(?P<id>[a-fA-F0-9]{32})/', include('scuba.accounts.urls_profile_api')),
-    path('api/logbooks/', include('scuba.logbooks.urls_logbooks_api')),
     path('api/ui/', include('scuba.accounts.urls_ui_api')),
     path('api/chats/', include('scuba.accounts.urls_chats_api')),
     path('api/feed/', include('scuba.accounts.urls_feed_api')),

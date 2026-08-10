@@ -9,7 +9,6 @@ SYSTEM_APIS = (
     ('AWS_SERVER', 'AWS Server'),
     ('BILLING_SERVER', 'Billing Server'),
     ('CHAT_SERVER', 'Chat Server'),
-    ('LOGBOOK_SERVER', 'Logbook Server'),
     ('SETTINGS_SERVER', 'Settings Server'),
     ('API_SERVER', 'API Server'),
     ('AWS_S3_BUCKET', 'AWS S3 Bucket'),
@@ -53,15 +52,6 @@ CHAT_APIS = (
     ('ADMIN_GET_ALL_CHATS', 'Admin Get All Chats'),
 )
 
-
-LOGBOOK_APIS = (
-    ('GET_LOGBOOKS', 'Get All Logbooks'),
-    ('GET_LOG', 'Get Log'),
-    ('ADD_LOG', 'Add Logbook'),
-    ('GET_TAGS', 'Get All TAGS'),
-    ('GET_ALL_TEMPLATES', 'Get All Templates'),
-    ('GET_TEMPLATE', 'Get Template'),
-)
 
 SETTINGS_APIS = (
     ('ADD_USER_SETTING', 'Add User Setting'),
