@@ -1,7 +1,7 @@
 import requests
 
 from django.core.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FileUploadParser
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -16,19 +16,22 @@ from scuba.sitesettings.models import SystemApi, ChatApi
 
 
 class UserListApi(generics.GenericAPIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         """ get
 
-        Do the actual get
+        Return basic display info for a list of user ids, excluding
+        anyone the caller has blocked or who has blocked the caller.
         """
-        user_list = []
-
         ids = request.query_params.getlist('id')
 
         try:
-            user_list = UserListSerializer(User.objects.filter(id__in=ids), many=True)
+            users = [
+                user for user in User.objects.filter(id__in=ids)
+                if not request.user.is_blocked(user)
+            ]
+            user_list = UserListSerializer(users, many=True)
             return Response({'users': user_list.data})
         except ValidationError:
             pass
