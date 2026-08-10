@@ -7,7 +7,7 @@ from django.views.generic import TemplateView
 class IndexView(TemplateView):
     template_name = "accounts/collections/index.html"
 
-    def get_context_datas(self, **kwargs):
+    def get_context_data(self, **kwargs):
         """ get_context_data
 
         override the get_context_data. add some extra data

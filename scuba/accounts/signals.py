@@ -8,7 +8,6 @@ Author: Pauljames "The Juggernaut" Dimitriu
 Add some signal stuff for account creation stuff
 """
 import pytz
-from pytz import UnknownTimeZoneError
 
 from django.utils import timezone
 from django.dispatch import receiver
@@ -34,18 +33,11 @@ def pre_save_new_user(sender, instance, **kwargs):
 
 @receiver(user_logged_in)
 def post_login(sender, user, request, **kwargs):
-
-    # get the IP address
-    ip_address = request.META.get('HTTP_X_REAL_IP')
     tz = 'America/Los_Angeles'
 
-    try:
-        timezone.activate(pytz.timezone(tz))
-        request.session['timezone'] = tz
-        request.session['zipcode'] = 92107
-    except UnknownTimeZoneError:
-        request.session['timezone'] = 'America/Los_Angeles'
-        request.session['zipcode'] = 92107
+    timezone.activate(pytz.timezone(tz))
+    request.session['timezone'] = tz
+    request.session['zipcode'] = 92107
 
 
 @receiver(post_save, sender=User)

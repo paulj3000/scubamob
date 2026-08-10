@@ -65,17 +65,6 @@ class PrimaryEmailSerializer(serializers.ModelSerializer):
 
 
 class UserSettingSerializer(serializers.ModelSerializer):
-    @staticmethod
-    def xvalidate_is_primary(is_primary):
-        """ validate_email
-
-        make sure the email coming in hasn't been used yet
-        """
-        if is_primary:
-            raise serializers.ValidationError("This email is already the primary email")
-
-        return is_primary
-
     class Meta:
         model = UserSetting
         fields = ('value', 'setting',)
@@ -84,11 +73,9 @@ class UserSettingSerializer(serializers.ModelSerializer):
         }
 
     def update(self, instance, validated_data):
-        """ create
-
-        Create a new user and all around good stuff here
-        """
-        return self.context['request'].user.set_primary_email(instance.id)
+        instance.value = validated_data.get('value', instance.value)
+        instance.save()
+        return instance
 
     def to_representation(self, instance):
         """ Modify the return data based on what we're sending in

@@ -33,29 +33,9 @@ class UserDivesiteFavoriteSerializer(serializers.Serializer):
         fields = ('divesite',)
 
     def create(self, validated_data):
-        """ A stub for the create method. This does nothing """
         user = self.context['request'].user
         return user.divesites_favorites.create(divesite_id=validated_data['divesite_id'])
-        from pprint import pprint
-        pprint(validated_data)
-        pprint(validated_data)
-        raise NotImplementedError
 
     def update(self, instance, validated_data):
-        """ A stub for the create method. This does nothing """
+        """ A stub for the update method. This does nothing """
         raise NotImplementedError
-
-    def xto_representation(self, value):
-        """ Modify the return data based on what we're sending in
-
-        If we are looking for programs, we'll return that too
-        """
-        # get the original representation
-        ret = super().to_representation(value)
-        from pprint import pprint
-        pprint(ret.values())
-
-        divesites = Divesite.objects.filter(id__in=ret.values())
-        pprint(divesites)
-
-        return DivesiteSerializer(divesites, many=True).data

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
 from django.contrib import admin
 from django.contrib.sessions.models import Session
 from django.urls import re_path
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.forms import PasswordResetForm
+from django.utils import timezone
 
 from scuba.accounts.models import User, UserBlocked, UserBuddyRequest, UserBuddy
 import scuba.accounts.models as account_models
@@ -124,7 +124,7 @@ class UserAdmin(admin.ModelAdmin):
     # -----------------------------------------------------------------------------
     def all_unexpired_sessions_for_user(self, user):
         user_sessions = []
-        all_sessions = Session.objects.filter(expire_date__gte=datetime.now())
+        all_sessions = Session.objects.filter(expire_date__gte=timezone.now())
         for session in all_sessions:
             session_data = session.get_decoded()
             if session_data.get('_auth_user_id') and \

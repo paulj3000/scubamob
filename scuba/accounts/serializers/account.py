@@ -191,17 +191,3 @@ class LoginSerializer(serializers.ModelSerializer):
         fields = ('id', 'first_name', 'last_name', 'email', 'token', 'device',
                   'confirmed', 'username',
                   'date_joined', 'password', 'profile_image', 'ip_address',)
-
-    def create(self, validated_data):
-        """ create
-
-        Create a new user and all around good stuff here
-        """
-        user = super().create(validated_data)
-        user.set_password(validated_data['password'])
-        user.save()
-
-        # generate some playlist
-        user.generate_default_playlists()
-
-        return user

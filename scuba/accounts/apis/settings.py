@@ -3,11 +3,10 @@ import logging
 
 from rest_framework.response import Response
 from rest_framework import generics
-from rest_framework.permissions import AllowAny
 from rest_framework import status
 
 from scuba.accounts.serializers.settings import UserEmailSerializer, UserSettingSerializer
-from scuba.accounts.models import UserEmail, User
+from scuba.accounts.models import UserEmail
 from scuba.accounts.exceptions import InvalidEmailIdException, PrimaryEmailIdException
 from scuba.sitesettings.models import SettingsApi
 
@@ -132,18 +131,3 @@ class UserSettingListApi(generics.GenericAPIView):
             logger.error(url)
 
             return Response({'error': 'cannot connect to settings'}, status=500)
-
-
-# TODO: Find a proper location for this
-class ValidateUserId(generics.GenericAPIView):
-    permission_classes = (AllowAny,)
-
-    def get(self, request, id, *args, **kwargs):
-        retval = None
-        try:
-            User.objects.get(id=id)
-            retval = True
-        except User.DoesNotExist:
-            retval = False
-
-        return Response({'user': {'is_valid': retval}})
