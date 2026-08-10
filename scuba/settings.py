@@ -44,7 +44,14 @@ SITE_URL = env("SITE_URL")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
-
+# Cookie/transport hardening -- only enforced when DEBUG is off, so local
+# development over plain http is unaffected.
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_SSL_REDIRECT = not DEBUG
+SECURE_HSTS_SECONDS = 0 if DEBUG else 60 * 60 * 24 * 30  # 30 days
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
 
 
 # Application definition
@@ -140,7 +147,6 @@ AUTH_USER_MODEL = 'accounts.User'
 
 
 REST_FRAMEWORK = {
-    'PAGINATE_BY': 2,
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
@@ -149,7 +155,15 @@ REST_FRAMEWORK = {
     'NON_FIELD_ERRORS_KEY': 'errors',
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-    ]
+    ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '1000/min',
+        'user': '2000/min',
+    },
 }
 
 # Password validation
@@ -222,8 +236,6 @@ GOOGLE_API_KEY = env("GOOGLE_API_KEY")
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-TEST_PEP8_DIRS = [ BASE_DIR / "scuba" ]
-
 # start AWS stuff
 PROFILE_BLANK_URL = 'images/profiles/profile-blank.png'
 BANNER_BLANK_URL = 'images/divesite-blank.png'
@@ -254,28 +266,15 @@ VIDEO_TYPES = ['mp4']
 IMAGE_TYPES = ['png', 'jpg', 'gif', 'jpeg']
 VALID_CONTENT_TYPES = ['image/png', 'image/jpg', 'image/jpeg', 'video/mp4']
 
-#COMPRESS_CSS_HASHING_METHOD = 'content'
 COMPRESS_OFFLINE = True
 COMPRESS_CSS_FILTERS = [
     'compressor.filters.css_default.CssAbsoluteFilter',
     'compressor.filters.cssmin.CSSMinFilter',
 ]
 
-xCOMPRESS_FILTERS = {
-    'css': ['compressor.filters.css_default.CssAbsoluteFilter',
-            'compressor.filters.yuglify.YUglifyCSSFilter'],
-    'js': ['compressor.filters.jsmin.JSMinFilter',
-           'compressor.filters.yuglify.YUglifyJSFilter'],
-}
-
-xCOMPRESS_YUGLIFY_BINARY = f"{BASE_DIR}/node_modules/yuglify/bin/yuglify"
-
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_ALL_ORIGINS = True
-
 SITE_TITLE = 'ScubaMob'
 TITLE_HTML = 'ScubaMob&reg;'
-IS_PRODUCTION = False
+IS_PRODUCTION = env.bool('IS_PRODUCTION', default=False)
 
 
 LOGGING = {
