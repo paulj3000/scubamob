@@ -8,6 +8,7 @@ from django.test import SimpleTestCase, TestCase
 
 from scuba.libs.weather import Weather, WEATHER_API, REQUEST_TIMEOUT_SECONDS
 from scuba.libs.exceptions import InvalidWeatherDataException
+from scuba.settings import WEATHER_API_KEY
 
 
 class TestWeatherUrls(SimpleTestCase):
@@ -17,7 +18,13 @@ class TestWeatherUrls(SimpleTestCase):
 
 
 class TestWeather(TestCase):
-    fixtures = ["test_sitesettings.json"]
+    @patch('scuba.libs.weather.requests.get')
+    def test_get_api_key_reads_from_settings(self, mock_get):
+        mock_get.return_value = MagicMock(status_code=200, json=lambda: {'ok': True})
+
+        Weather.get_current_by_q_param('92107')
+
+        self.assertEqual(mock_get.call_args[0][1]['key'], WEATHER_API_KEY)
 
     @patch('scuba.libs.weather.requests.get')
     def test_get_current_by_q_param_passes_timeout(self, mock_get):

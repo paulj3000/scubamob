@@ -2,7 +2,7 @@ import logging
 
 import googlemaps
 
-from scuba.sitesettings.models import APIKey
+from scuba.settings import GOOGLE_API_KEY
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class GoogleAddress:
     @staticmethod
     def get_geocode_from_postal_code(postal_code):
-        gmaps = googlemaps.Client(key=APIKey.get_google_maps_key())
+        gmaps = googlemaps.Client(key=GOOGLE_API_KEY)
         return gmaps.geocode(postal_code)
 
     '''

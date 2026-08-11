@@ -577,10 +577,23 @@ class UserFeed(UUIDModel):
         unique_together = (('instance_id', 'instance_type', 'user'), )
 
 
+class FlagOption(UUIDModel):
+    FLAG_TYPES = {
+        (0, 'Review'),
+        (1, 'Checkin'),
+    }
+
+    flag = models.CharField(max_length=128)
+    instance_type = models.PositiveSmallIntegerField(choices=FLAG_TYPES)
+
+    class Meta:
+        db_table = 'flag_option'
+
+
 class UserFeedFlagged(UUIDModel):
     user = models.ForeignKey(User, related_name='flags', on_delete=models.CASCADE)
     user_feed = models.ForeignKey(UserFeed, related_name='flags', on_delete=models.CASCADE)
-    flag = models.ForeignKey('sitesettings.FlagOption', on_delete=models.CASCADE)
+    flag = models.ForeignKey(FlagOption, on_delete=models.CASCADE)
     reason = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
 

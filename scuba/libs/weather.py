@@ -1,6 +1,6 @@
 import requests
 
-from scuba.sitesettings.models import APIKey
+from scuba.settings import WEATHER_API_KEY
 from scuba.libs.exceptions import InvalidWeatherDataException
 
 # weatherapi.com settings
@@ -16,7 +16,7 @@ class Weather:
 
     @staticmethod
     def get_api_key():
-        return APIKey.get_weather_api_key()
+        return WEATHER_API_KEY
 
     @staticmethod
     def gen_param_lat_lon(lat, lng):
