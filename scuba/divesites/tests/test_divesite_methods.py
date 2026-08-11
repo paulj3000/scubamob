@@ -13,7 +13,7 @@ from scuba.accounts.models import User
 
 
 class TestDivesiteMethods(TestCase):
-    fixtures = ["test_divesites.json", "test_users.json", "test_sitesettings.json"]
+    fixtures = ["test_divesites.json", "test_users.json"]
 
     def test_new_divesite_object(self):
         """

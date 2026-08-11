@@ -17,7 +17,7 @@ WEATHER_PAYLOAD = {
 
 
 class TestHomeAPI(TestCase):
-    fixtures = ["test_divesites.json", "test_users.json", "test_sitesettings.json"]
+    fixtures = ["test_divesites.json", "test_users.json"]
 
     def setUp(self):
         cache.clear()

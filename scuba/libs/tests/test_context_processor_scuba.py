@@ -10,7 +10,7 @@ from scuba.libs.context_processors.scuba import Scuba
 
 
 class TestScubaContextProcessor(TestCase):
-    fixtures = ["test_users.json", "test_sitesettings.json"]
+    fixtures = ["test_users.json"]
 
     def setUp(self):
         self.factory = RequestFactory()
