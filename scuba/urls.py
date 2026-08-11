@@ -14,7 +14,6 @@ import scuba.content.views as content_views
 import scuba.accounts.apis.account as account_api
 import scuba.accounts.apis.profile as profile_api
 
-from scuba.sitesettings.apis import GetSystemSettingsApi, GetSystemEndpointsApi
 from scuba.settings import SITE_TITLE
 
 from django.contrib import admin
@@ -74,9 +73,6 @@ urlpatterns = [
     path('api/divesites/', include('scuba.divesites.urls_api')),
     path('api/search', home_apis.SearchApi.as_view()),
     path('api/settings/', include('scuba.accounts.urls_settings_api')),
-    path('api/endpoints', GetSystemEndpointsApi.as_view()),
-    path('api/sitesettings', GetSystemSettingsApi.as_view()),
-    path('api/sitesettings/all', GetSystemSettingsApi.as_view()),
     path('api/register/', account_api.RegisterUserApi.as_view()),
     path('api/login/', account_api.LoginUserApi.as_view()),
 

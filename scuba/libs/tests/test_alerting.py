@@ -2,12 +2,13 @@
 Tests for scuba.libs.alerting.Alerting.send_buddy_request. requests.post is
 mocked -- no live alerting service access.
 
-Previously this called sitesettings.SystemApi.get_alerting_buddy_request(),
-which looked up a SystemApi key ('ALERTING_BUDDY_REQUEST') that never
-existed anywhere -- always raising InvalidConfigurationException. The real,
-fixture-configured endpoint path lived under the sibling AlertingApi model
-instead (key 'BUDDY_REQUEST' = '/api/alerts/buddies/request'), just never
-wired up correctly (see MODERNIZATION_ROADMAP.md item 9).
+Previously this called the retired config-store app's SystemApi
+.get_alerting_buddy_request(), which looked up a SystemApi key
+('ALERTING_BUDDY_REQUEST') that never existed anywhere -- always raising
+InvalidConfigurationException. The real, fixture-configured endpoint path
+lived under the sibling AlertingApi model instead (key 'BUDDY_REQUEST' =
+'/api/alerts/buddies/request'), just never wired up correctly (see
+MODERNIZATION_ROADMAP.md item 9).
 """
 from unittest.mock import patch
 

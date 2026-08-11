@@ -25,6 +25,6 @@ then
     echo "MySQL started"
 fi
 
-python manage.py loaddata scuba/home/fixtures/home.json scuba/sitesettings/fixtures/site_settings.json scuba/accounts/fixtures/firstuser.json
+python manage.py loaddata scuba/home/fixtures/home.json scuba/accounts/fixtures/firstuser.json
 
 exec "$@"

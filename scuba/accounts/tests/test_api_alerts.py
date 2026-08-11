@@ -1,8 +1,9 @@
 """
 Tests for AlertsApi (scuba.accounts.apis.socket). Covers the
 ALERT_SERVER_ACTIVE settings-based gate -- previously the 200/400 split
-accidentally hinged on whether a never-configured sitesettings.SystemApi
-row existed, not on this flag at all (see MODERNIZATION_ROADMAP.md item 9).
+accidentally hinged on whether a never-configured SystemApi row (from the
+now-retired config-store app) existed, not on this flag at all (see
+MODERNIZATION_ROADMAP.md item 9).
 """
 import os
 from unittest.mock import patch
