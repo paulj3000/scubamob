@@ -10,7 +10,6 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 
 from scuba.accounts.models import User
-from scuba.sitesettings.models import ChatApi, SystemApi
 
 
 class TestChatApisTimeouts(TestCase):
@@ -22,8 +21,8 @@ class TestChatApisTimeouts(TestCase):
         self.client.force_authenticate(user=self.user)
 
     @patch('scuba.accounts.apis.chat.requests.get')
-    @patch('scuba.accounts.apis.chat.SystemApi.get_chat_server', return_value='http://chat.test')
-    def test_chat_w_user_api_get_has_a_timeout(self, mock_get_chat_server, mock_get):
+    @patch('scuba.accounts.apis.chat.CHAT_SERVER', 'http://chat.test')
+    def test_chat_w_user_api_get_has_a_timeout(self, mock_get):
         mock_get.return_value.json.return_value = {'chat': None}
 
         self.client.get('/api/accounts/chats/', format='json')
@@ -31,19 +30,26 @@ class TestChatApisTimeouts(TestCase):
         self.assertEqual(mock_get.call_args.kwargs.get('timeout'), 5)
 
     @patch('scuba.accounts.apis.chat.requests.get')
-    @patch('scuba.accounts.apis.chat.SystemApi.get_chat_server', return_value='http://chat.test')
-    def test_get_chats_api_has_a_timeout(self, mock_get_chat_server, mock_get):
+    @patch('scuba.accounts.apis.chat.CHAT_SERVER', 'http://chat.test')
+    def test_get_chats_api_has_a_timeout(self, mock_get):
         mock_get.return_value.json.return_value = {}
 
         self.client.get('/api/chats/', format='json')
 
         self.assertEqual(mock_get.call_args.kwargs.get('timeout'), 5)
 
+    @patch('scuba.accounts.apis.chat.requests.get')
+    @patch('scuba.accounts.apis.chat.CHAT_SERVER', 'http://chat.test')
+    def test_get_all_chats_api_has_a_timeout(self, mock_get):
+        mock_get.return_value.json.return_value = {}
+
+        self.client.get('/api/chats/all', format='json')
+
+        self.assertEqual(mock_get.call_args.kwargs.get('timeout'), 5)
+
     @patch('scuba.accounts.serializers.chat.requests.post')
-    @patch(
-        'scuba.accounts.serializers.chat.SystemApi.get_chat_server',
-        return_value='http://chat.test')
-    def test_chat_serializer_save_has_a_timeout(self, mock_get_chat_server, mock_post):
+    @patch('scuba.accounts.serializers.chat.CHAT_SERVER', 'http://chat.test')
+    def test_chat_serializer_save_has_a_timeout(self, mock_post):
         other = User.objects.create_user(
             email='chatother@nowhere.com', username='chatotheruser', password='tester1234',
             first_name='Other', last_name='User')
@@ -52,17 +58,6 @@ class TestChatApisTimeouts(TestCase):
         self.client.post('/api/accounts/chats/', {'users': [other.pk_as_str]}, format='json')
 
         self.assertEqual(mock_post.call_args.kwargs.get('timeout'), 5)
-
-    @patch('scuba.sitesettings.models.requests.get')
-    def test_chat_api_get_all_user_chats_has_a_timeout(self, mock_get):
-        SystemApi.objects.create(key='CHAT_SERVER', value='http://chat.test/', is_active=True)
-        ChatApi.objects.create(
-            key='GET_ALL_USER_CHATS', value='/api/chats/all', verb='GET')
-        mock_get.return_value.json.return_value = {}
-
-        ChatApi.get_all_user_chats(self.user.pk_as_str)
-
-        self.assertEqual(mock_get.call_args.kwargs.get('timeout'), 5)
 
 
 class TestSettingsApisTimeouts(TestCase):

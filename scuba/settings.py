@@ -20,6 +20,8 @@ env = environ.Env(
 
     GOOGLE_API_KEY=(str, "google-api-key"),
     WEATHER_API_KEY=(str, "weather-api-key"),
+    CHAT_SERVER=(str, "http://localhost:3001"),
+    CHAT_SERVER_ACTIVE=(bool, False),
     AWS_S3_BUCKET=(str, "scubamob-dev"),
     AWS_S3_BUCKET_PRIVATE=(str, "scubamob-private"),
     AWS_CLOUDFRONT=(str, 'https://NOTSET/'),
@@ -230,6 +232,8 @@ EMAIL_BACKEND = 'django_ses.SESBackend'
 DEFAULT_FROM_EMAIL = 'no-reply@scubamob.com'
 GOOGLE_API_KEY = env("GOOGLE_API_KEY")
 WEATHER_API_KEY = env("WEATHER_API_KEY")
+CHAT_SERVER = env("CHAT_SERVER")
+CHAT_SERVER_ACTIVE = env.bool("CHAT_SERVER_ACTIVE")
 
 
 

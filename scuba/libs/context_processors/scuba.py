@@ -11,6 +11,7 @@ before we print out our page
 import os
 
 from django.conf import settings
+from scuba.settings import CHAT_SERVER_ACTIVE
 from scuba.sitesettings.models import SystemSetting
 
 
@@ -24,7 +25,7 @@ def Scuba(request):
         'site_title': settings.SITE_TITLE,
         'html_name': settings.TITLE_HTML,
         'is_production': settings.IS_PRODUCTION or os.environ.get('IS_BUILDING'),
-        'chat_server_active': SystemSetting.get_chat_server_active(),
+        'chat_server_active': CHAT_SERVER_ACTIVE,
         'alert_server_active': SystemSetting.get_alert_server_active()
     }
 

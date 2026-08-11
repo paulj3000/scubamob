@@ -6,8 +6,7 @@ from mimetypes import guess_extension
 from rest_framework import serializers
 
 from scuba.accounts.models import User
-from scuba.settings import AWS_CLOUDFRONT
-from scuba.sitesettings.models import SystemApi
+from scuba.settings import AWS_CLOUDFRONT, CHAT_SERVER
 from scuba.libs.fileutils import FileUtils
 from scuba.libs.stringutils import StringUtils
 
@@ -115,7 +114,7 @@ class ChatSerializer(serializers.Serializer):
 
         try:
             chat = requests.post(
-                f"{SystemApi.get_chat_server()}/api/chats/", json=params, timeout=5)
+                f"{CHAT_SERVER}/api/chats/", json=params, timeout=5)
             return chat.json()
         except requests.exceptions.ConnectionError:
             raise serializers.ValidationError("could not connect to chat server")

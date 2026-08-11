@@ -305,52 +305,6 @@ class ChatApi(BaseAPI):
         except (requests.ConnectionError, requests.exceptions.JSONDecodeError):
             raise exceptions.ChatServerDownException
 
-    @classmethod
-    def get_all_chat_messages(cls, userid, chatid, limit=100, page=0):
-        url = cls.get_url('GET_ALL_CHAT_MESSAGES')
-
-        params = {
-            'userId': userid,
-            'chatId': chatid,
-            'limit': limit,
-            'page': page
-        }
-
-        try:
-            req = requests.get(url, params=params, timeout=5)
-            return req.json()
-        except (requests.ConnectionError, requests.exceptions.JSONDecodeError):
-            raise exceptions.ChatServerDownException
-
-    @classmethod
-    def admin_get_all_chats(cls):
-        url = cls.get_url('ADMIN_GET_ALL_CHATS')
-
-        try:
-            req = requests.get(url)
-            return req.json()
-        except (requests.ConnectionError, requests.exceptions.JSONDecodeError):
-            raise exceptions.ChatServerDownException
-
-    @classmethod
-    def chat_lookup(cls, json):
-        url = cls.get_url('CHAT_LOOKUP')
-
-        try:
-            req = requests.post(url, json=json)
-            return req.json()
-        except (requests.ConnectionError, requests.exceptions.JSONDecodeError):
-            raise exceptions.ChatServerDownException
-
-    @classmethod
-    def create_chat(cls, json):
-        url = cls.get_url('CREATE_CHAT')
-        try:
-            req = requests.post(url, json=json)
-            return req.json()
-        except requests.ConnectionError:
-            raise exceptions.ChatServerDownException
-
 
 class SettingsApi(BaseAPI):
     choices = SETTINGS_APIS

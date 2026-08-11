@@ -12,7 +12,7 @@ from scuba.accounts.models import User
 from scuba.accounts.serializers.chat import UserListSerializer, \
     UploadFileSerializer, ChatSerializer
 
-from scuba.sitesettings.models import SystemApi, ChatApi
+from scuba.settings import CHAT_SERVER
 
 
 class UserListApi(generics.GenericAPIView):
@@ -62,7 +62,7 @@ class ChatWUserApi(APIView):
 
         try:
             chat = requests.get(
-                f"{SystemApi.get_chat_server()}/api/chats/lookup",
+                f"{CHAT_SERVER}/api/chats/lookup",
                 params=params, timeout=5)
             retval = chat.json()
 
@@ -143,9 +143,12 @@ class GetAllChatsApi(APIView):
         Do the actual get
         """
         user = request.user
+        params = {'userId': user.pk_as_str}
 
         try:
-            retval = ChatApi.get_all_user_chats(user.pk_as_str)
+            chat = requests.get(
+                f"{CHAT_SERVER}/api/chats/user/all", params=params, timeout=5)
+            retval = chat.json()
             retval['me'] = user.pk_as_str
             return Response(retval)
         except requests.exceptions.ConnectionError:
@@ -168,37 +171,9 @@ class GetChatsApi(APIView):
 
         try:
             chat = requests.get(
-                f"{SystemApi.get_chat_server()}/api/chats", params=params, timeout=5)
+                f"{CHAT_SERVER}/api/chats", params=params, timeout=5)
             retval = chat.json()
             retval['me'] = user.pk_as_str
             return Response(retval)
         except requests.exceptions.ConnectionError:
             return Response({'error': 'cannot reach chat server'}, 500)
-
-
-class GetChatMessagesApi(APIView):
-    permission_classes = [IsAuthenticated]
-    serializer = ChatSerializer
-
-    def get(self, request):
-        """ get
-
-        Do the actual get
-        """
-        query = request.query_params
-        user = request.user
-
-        try:
-            retval = ChatApi.get_all_chat_messages(user.pk_as_str, query.get('chatId'))
-            return Response(retval)
-        except requests.exceptions.ConnectionError:
-            return Response({'error': 'cannot reach chat server'}, 500)
-
-    def post(self, request):
-        """ get
-
-        Do the actual get
-        """
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        return Response(serializer.save(), status=status.HTTP_201_CREATED)
