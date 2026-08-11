@@ -6,6 +6,7 @@ from mimetypes import guess_extension
 from rest_framework import serializers
 
 from scuba.accounts.models import User
+from scuba.settings import AWS_CLOUDFRONT
 from scuba.sitesettings.models import SystemApi
 from scuba.libs.fileutils import FileUtils
 from scuba.libs.stringutils import StringUtils
@@ -19,7 +20,7 @@ class UserListSerializer(serializers.Serializer):
 
     @staticmethod
     def get_profile_image(data):
-        return urljoin(SystemApi.get_aws_cloudfront_url(), data.get_profile_image())
+        return urljoin(AWS_CLOUDFRONT, data.get_profile_image())
 
     @staticmethod
     def get_id(data):

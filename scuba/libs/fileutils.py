@@ -1,10 +1,7 @@
 import os
-import requests
 
-from scuba.sitesettings.models import SystemApi
 from scuba.settings import AWS_S3_BUCKET
 from scuba.libs.stringutils import StringUtils
-from scuba.libs.exceptions import InvalidHttpStatusCode
 from scuba.libs.aws.s3 import S3
 
 
@@ -33,19 +30,7 @@ class FileUtils:
 
     @staticmethod
     def delete_file_from_s3(filename):
-        url = SystemApi.get_s3_delete()
-
-        data = {
-            'bucket': AWS_S3_BUCKET,
-            'key': filename,
-        }
-
-        resp = requests.post(url, json=data, timeout=5)
-
-        if resp.status_code < 200 or resp.status_code > 299:
-            raise InvalidHttpStatusCode(resp.status_code, resp.text)
-
-        return resp
+        S3.delete_file(filename, bucket=AWS_S3_BUCKET)
 
     @staticmethod
     def create_temp_dir(dir_base):

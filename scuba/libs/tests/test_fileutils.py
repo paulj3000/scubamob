@@ -48,3 +48,9 @@ class TestFileUtils(SimpleTestCase):
         mock_upload.assert_called_once_with(
             'content/report.txt', b'hello world', bucket=AWS_S3_BUCKET,
             ContentType='text/plain', ACL='public-read')
+
+    @patch('scuba.libs.fileutils.S3.delete_file')
+    def test_delete_file_from_s3_calls_the_real_s3_method(self, mock_delete):
+        FileUtils.delete_file_from_s3('content/report.txt')
+
+        mock_delete.assert_called_once_with('content/report.txt', bucket=AWS_S3_BUCKET)

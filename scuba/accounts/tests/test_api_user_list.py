@@ -7,13 +7,10 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 
 from scuba.accounts.models import User
-from scuba.sitesettings.models import SystemApi
 
 
 class TestUserListApi(TestCase):
     def setUp(self):
-        SystemApi.objects.create(
-            key='AWS_CLOUDFRONT_URL', value='https://cdn.test/', is_active=True)
         self.caller = User.objects.create_user(
             email='caller@nowhere.com', username='calleruser', password='tester1234',
             first_name='Caller', last_name='User')
