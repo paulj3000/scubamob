@@ -185,7 +185,9 @@
 
 
 	<section>
+            {% if user.is_authenticated %}
             <div id="chatbox"></div>
+            {% endif %}
             <div class="container">
 
                 <footer class="py-3 my-4">
