@@ -7,7 +7,7 @@ pip install --no-cache-dir --upgrade pip
 pip install --no-cache-dir -r requirements.txt
 pip install mysqlclient==2.1.0
 python manage.py flush --no-input
-python manage.py migrate
+python manage.py migrate --run-syncdb
 
 npm install
 npm run build
