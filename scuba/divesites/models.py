@@ -9,8 +9,7 @@ from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.divesites.settings import RATING_CHOICES, DIFFICULTY_CHOICES
 from scuba.libs.stringutils import StringUtils
 from scuba.libs.imageuploader import ImageUploader
-from scuba.sitesettings.models import SystemSetting
-from scuba.settings import AWS_CLOUDFRONT
+from scuba.settings import AWS_CLOUDFRONT, BANNER_BLANK_URL
 
 
 class Divesite(UUIDModel):
@@ -95,7 +94,7 @@ class Divesite(UUIDModel):
             return self.divesitebanner.get_banner_image()
 
         # No profile image. just return a default
-        return SystemSetting.get_default_banner_image()
+        return BANNER_BLANK_URL
 
     def upload_banner(self, uploaded_image):
         """ upload_banner

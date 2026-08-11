@@ -25,10 +25,9 @@ from scuba.accounts.exceptions import (
     InvalidEmailIdException, InvalidUserIdException,
     PrimaryEmailIdException, EmailInUseException, InvalidConfirmationCodeException)
 from scuba.accounts.settings import SETTINGS
-from scuba.sitesettings.models import SystemSetting
 from scuba.divesites.models import Divesite
 from scuba.libs.aws.s3 import S3
-from scuba.settings import AWS_S3_BUCKET, EMAIL_BACKEND, SITE_TITLE
+from scuba.settings import AWS_S3_BUCKET, EMAIL_BACKEND, PROFILE_BLANK_URL, SITE_TITLE
 
 from scuba.libs.mail import generate_email, send_mail
 
@@ -370,7 +369,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
             return self.userprofileimage.get_profile_image()
 
         # No profile image. just return a default
-        return static(SystemSetting.get_default_profile_image())
+        return static(PROFILE_BLANK_URL)
 
     def upload_profile_image_as_string(self, uploaded_image_string):
         ''' upload a profile image to S3 when the uploaded image is sent
@@ -962,7 +961,7 @@ class ViewProfile(UUIDModel):
         if self.profile_image:
             return static(self.profile_image)
 
-        return static(SystemSetting.get_default_profile_image())
+        return static(PROFILE_BLANK_URL)
 
     @property
     def is_hidden(self):
