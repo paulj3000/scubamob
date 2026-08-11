@@ -9,7 +9,6 @@ from django.contrib import messages
 
 from scuba.accounts.decorators import can_view_profile
 from scuba.accounts.serializers.profile import ProfileSerializer
-from scuba.settings import CHAT_SERVER_ACTIVE
 
 
 @method_decorator([login_required, can_view_profile], name='dispatch')
@@ -27,7 +26,6 @@ class ProfileView(TemplateView):
                 self.request.profile, context={'request': self.request}).data
 
         context.update({
-            'chat_server_active': CHAT_SERVER_ACTIVE,
             'profile': self.request.profile,
             'profile_json': json.dumps(profile_data),
         })

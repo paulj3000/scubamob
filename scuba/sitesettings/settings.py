@@ -8,7 +8,6 @@ SYSTEM_APIS = (
     ('SETTINGS_SERVER', 'Settings Server'),
     ('AWS_SERVER', 'AWS Server'),
     ('BILLING_SERVER', 'Billing Server'),
-    ('CHAT_SERVER', 'Chat Server'),
     ('SETTINGS_SERVER', 'Settings Server'),
     ('API_SERVER', 'API Server'),
     ('AWS_S3_BUCKET', 'AWS S3 Bucket'),
@@ -44,15 +43,6 @@ BILLING_APIS = (
 )
 
 
-CHAT_APIS = (
-    ('CHAT_LOOKUP', 'Chat Lookup'),
-    ('CREATE_CHAT', 'Create Chat'),
-    ('GET_ALL_USER_CHATS', 'Get All User Chats'),
-    ('GET_ALL_CHAT_MESSAGES', 'Get All Chat Messages'),
-    ('ADMIN_GET_ALL_CHATS', 'Admin Get All Chats'),
-)
-
-
 SETTINGS_APIS = (
     ('ADD_USER_SETTING', 'Add User Setting'),
     ('GET_USER_SETTING_LIST', 'Get User Setting List'),
@@ -74,7 +64,6 @@ SETTINGS_APIS = (
 )
 
 SYSTEM_SETTINGS = [
-    ('CHAT_SERVER_ACTIVE', 'Chat Server Active'),
     ('ALERT_SERVER_ACTIVE', 'Alert Server Active'),
     ('DEFAULT_PROFILE_IMAGE', 'Default Profile Image'),
     ('DEFAULT_BANNER_IMAGE', 'Default Banner Image'),

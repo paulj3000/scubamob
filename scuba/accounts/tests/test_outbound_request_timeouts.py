@@ -12,54 +12,6 @@ from rest_framework.test import APIClient
 from scuba.accounts.models import User
 
 
-class TestChatApisTimeouts(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(
-            email='chattimeout@nowhere.com', username='chattimeoutuser',
-            password='tester1234', first_name='Chat', last_name='User')
-        self.client = APIClient()
-        self.client.force_authenticate(user=self.user)
-
-    @patch('scuba.accounts.apis.chat.requests.get')
-    @patch('scuba.accounts.apis.chat.CHAT_SERVER', 'http://chat.test')
-    def test_chat_w_user_api_get_has_a_timeout(self, mock_get):
-        mock_get.return_value.json.return_value = {'chat': None}
-
-        self.client.get('/api/accounts/chats/', format='json')
-
-        self.assertEqual(mock_get.call_args.kwargs.get('timeout'), 5)
-
-    @patch('scuba.accounts.apis.chat.requests.get')
-    @patch('scuba.accounts.apis.chat.CHAT_SERVER', 'http://chat.test')
-    def test_get_chats_api_has_a_timeout(self, mock_get):
-        mock_get.return_value.json.return_value = {}
-
-        self.client.get('/api/chats/', format='json')
-
-        self.assertEqual(mock_get.call_args.kwargs.get('timeout'), 5)
-
-    @patch('scuba.accounts.apis.chat.requests.get')
-    @patch('scuba.accounts.apis.chat.CHAT_SERVER', 'http://chat.test')
-    def test_get_all_chats_api_has_a_timeout(self, mock_get):
-        mock_get.return_value.json.return_value = {}
-
-        self.client.get('/api/chats/all', format='json')
-
-        self.assertEqual(mock_get.call_args.kwargs.get('timeout'), 5)
-
-    @patch('scuba.accounts.serializers.chat.requests.post')
-    @patch('scuba.accounts.serializers.chat.CHAT_SERVER', 'http://chat.test')
-    def test_chat_serializer_save_has_a_timeout(self, mock_post):
-        other = User.objects.create_user(
-            email='chatother@nowhere.com', username='chatotheruser', password='tester1234',
-            first_name='Other', last_name='User')
-        mock_post.return_value.json.return_value = {'chat': {}}
-
-        self.client.post('/api/accounts/chats/', {'users': [other.pk_as_str]}, format='json')
-
-        self.assertEqual(mock_post.call_args.kwargs.get('timeout'), 5)
-
-
 class TestSettingsApisTimeouts(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(

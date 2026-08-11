@@ -20,8 +20,6 @@ env = environ.Env(
 
     GOOGLE_API_KEY=(str, "google-api-key"),
     WEATHER_API_KEY=(str, "weather-api-key"),
-    CHAT_SERVER=(str, "http://localhost:3001"),
-    CHAT_SERVER_ACTIVE=(bool, False),
     SETTINGS_SERVER=(str, "http://localhost:3003"),
     ALERTING_SERVER=(str, "http://localhost:3001"),
     ALERT_SERVER_ACTIVE=(bool, False),
@@ -29,6 +27,11 @@ env = environ.Env(
     AWS_S3_BUCKET_PRIVATE=(str, "scubamob-private"),
     AWS_CLOUDFRONT=(str, 'https://NOTSET/'),
     AWS_CLOUDFRONT_DEPLOY=(str, 'https://NOTSET/'),
+
+    CHAT_DYNAMODB_TABLE=(str, "scubamob-chat-dev"),
+    CHAT_DYNAMODB_REGION=(str, "us-west-1"),
+    CHAT_REDIS_URL=(str, "redis://localhost:6379/0"),
+    CHAT_ATTACHMENT_BUCKET=(str, "scubamob-chat-attachments-dev"),
 )
 
 env.read_env(BASE_DIR / ".env")
@@ -80,6 +83,7 @@ INSTALLED_APPS = [
     'scuba.accounts',
     'scuba.aws',
     'scuba.cache',
+    'scuba.chat',
     'scuba.content',
     'scuba.divegroups',
     'scuba.diveshops',
@@ -235,8 +239,6 @@ EMAIL_BACKEND = 'django_ses.SESBackend'
 DEFAULT_FROM_EMAIL = 'no-reply@scubamob.com'
 GOOGLE_API_KEY = env("GOOGLE_API_KEY")
 WEATHER_API_KEY = env("WEATHER_API_KEY")
-CHAT_SERVER = env("CHAT_SERVER")
-CHAT_SERVER_ACTIVE = env.bool("CHAT_SERVER_ACTIVE")
 SETTINGS_SERVER = env("SETTINGS_SERVER")
 ALERTING_SERVER = env("ALERTING_SERVER")
 ALERT_SERVER_ACTIVE = env.bool("ALERT_SERVER_ACTIVE")
@@ -256,6 +258,11 @@ AWS_PROFILE = 'default'
 AWS_EMAIL_STORAGE_ROOT = 'emailsent/skmradio'
 AWS_CLOUDFRONT = env("AWS_CLOUDFRONT")
 AWS_CLOUDFRONT_DEPLOY = env('AWS_CLOUDFRONT_DEPLOY')
+
+CHAT_DYNAMODB_TABLE = env("CHAT_DYNAMODB_TABLE")
+CHAT_DYNAMODB_REGION = env("CHAT_DYNAMODB_REGION")
+CHAT_REDIS_URL = env("CHAT_REDIS_URL")
+CHAT_ATTACHMENT_BUCKET = env("CHAT_ATTACHMENT_BUCKET")
 
 FILE_UPLOAD_HANDLERS = ['django.core.files.uploadhandler.TemporaryFileUploadHandler']
 

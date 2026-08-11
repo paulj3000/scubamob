@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import generics
 
-from scuba.settings import ALERTING_SERVER, ALERT_SERVER_ACTIVE, CHAT_SERVER
+from scuba.settings import ALERTING_SERVER, ALERT_SERVER_ACTIVE
 
 
 class SocketApi(generics.GenericAPIView):
@@ -29,8 +29,6 @@ class SocketApi(generics.GenericAPIView):
             }
         }
 
-        # socket server stuff
-        socket_data['server'] = {'CHAT_SERVER': CHAT_SERVER}
         return Response({'socket': socket_data})
 
 

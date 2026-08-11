@@ -1,6 +1,5 @@
 import re
 from urllib.parse import urljoin
-import requests
 
 from django.db import models
 
@@ -157,15 +156,6 @@ class SystemSetting(UUIDModel):
         db_table = 'system_setting'
 
     @staticmethod
-    def get_chat_server_active():
-        value = SystemSetting.get_url_by_key('CHAT_SERVER_ACTIVE', False)
-        if value:
-            if value in ('1', 'True', 'true'):
-                return True
-            return False
-        return False
-
-    @staticmethod
     def get_alert_server_active():
         value = SystemSetting.get_url_by_key('ALERT_SERVER_ACTIVE', False)
         if value:
@@ -283,27 +273,6 @@ class BillingApi(BaseAPI):
 
     class Meta:
         db_table = 'billing_api'
-
-
-class ChatApi(BaseAPI):
-    choices = settings.CHAT_APIS
-
-    class Meta:
-        db_table = 'chat_api'
-
-    @classmethod
-    def get_all_user_chats(cls, userid):
-        url = cls.get_url('GET_ALL_USER_CHATS')
-
-        params = {
-            'userId': userid
-        }
-
-        try:
-            req = requests.get(url, params=params, timeout=5)
-            return req.json()
-        except (requests.ConnectionError, requests.exceptions.JSONDecodeError):
-            raise exceptions.ChatServerDownException
 
 
 class SettingsApi(BaseAPI):
