@@ -41,6 +41,16 @@ def conversation_partition_key(conversation_id: str) -> str:
     return f"CONVERSATION#{conversation_id}"
 
 
+def user_channel_group_name(user_id: str) -> str:
+    """
+    The channels-layer group a user's single authenticated WebSocket joins
+    (§22). chat.services._publish_event fans a conversation event out to
+    every current participant's group; chat.consumers.ChatConsumer joins
+    its connecting user to exactly this group.
+    """
+    return f"chat_user_{user_id}"
+
+
 def message_sort_key(created_at: datetime, message_id: str) -> str:
     """
     DynamoDB SK for a message (§6, §9): timestamp + message id, so that

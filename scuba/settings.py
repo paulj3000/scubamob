@@ -66,6 +66,7 @@ SECURE_HSTS_PRELOAD = not DEBUG
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -78,6 +79,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'django_bootstrap5',
+    'channels',
     'rest_framework',
     'rest_framework.authtoken',
     'scuba.accounts',
@@ -137,6 +139,7 @@ AUTHENTICATION_BACKENDS = DEFAULT_SETTINGS.AUTHENTICATION_BACKENDS + [
 ]
 
 WSGI_APPLICATION = 'scuba.wsgi.application'
+ASGI_APPLICATION = 'scuba.asgi.application'
 
 AUTH_USER_MODEL = 'accounts.User'
 
@@ -262,6 +265,19 @@ CHAT_DYNAMODB_TABLE = env("CHAT_DYNAMODB_TABLE")
 CHAT_DYNAMODB_REGION = env("CHAT_DYNAMODB_REGION")
 CHAT_REDIS_URL = env("CHAT_REDIS_URL")
 CHAT_ATTACHMENT_BUCKET = env("CHAT_ATTACHMENT_BUCKET")
+
+# Real-time chat delivery (docs/chat_dynamo.md Phase 6, §22-24). Tests
+# override this with channels.layers.InMemoryChannelLayer -- CLAUDE.md
+# forbids tests depending on a live external service, and a real Redis
+# isn't available in this environment anyway.
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [CHAT_REDIS_URL],
+        },
+    },
+}
 
 FILE_UPLOAD_HANDLERS = ['django.core.files.uploadhandler.TemporaryFileUploadHandler']
 

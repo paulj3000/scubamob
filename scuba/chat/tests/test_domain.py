@@ -4,7 +4,7 @@ from django.test import SimpleTestCase
 
 from scuba.chat.domain import (
     Message, MessageType, conversation_partition_key,
-    generate_message_id, message_sort_key,
+    generate_message_id, message_sort_key, user_channel_group_name,
 )
 
 
@@ -30,6 +30,9 @@ class TestGenerateMessageId(SimpleTestCase):
 class TestKeyBuilders(SimpleTestCase):
     def test_conversation_partition_key(self):
         self.assertEqual(conversation_partition_key('abc123'), 'CONVERSATION#abc123')
+
+    def test_user_channel_group_name(self):
+        self.assertEqual(user_channel_group_name('abc123'), 'chat_user_abc123')
 
     def test_message_sort_key_includes_timestamp_and_id(self):
         created_at = datetime(2026, 8, 11, 14, 31, 12, tzinfo=dt_timezone.utc)

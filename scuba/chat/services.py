@@ -7,12 +7,15 @@ real repositories (DynamoDB for messages, SQL for conversations/
 participants) but accepts repository overrides so callers -- mainly
 tests -- can substitute the Phase 0 in-memory fakes instead.
 """
+import logging
 from typing import Optional
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.utils import timezone
 
 from scuba.accounts.models import User
-from scuba.chat.domain import Message, MessageType, generate_message_id
+from scuba.chat.domain import Message, MessageType, generate_message_id, user_channel_group_name
 from scuba.chat.events import ChatEvent, MessageEventType
 from scuba.chat.exceptions import (
     BlockedUserError, ConversationNotFoundError, InsufficientRoleError, InvalidMessagePayloadError,
@@ -28,6 +31,8 @@ from scuba.chat.repositories.participant_repository import (
 )
 
 _ADMIN_ROLES = (ConversationRole.ADMIN, ConversationRole.OWNER)
+
+logger = logging.getLogger(__name__)
 
 
 def _default_message_repository() -> MessageRepository:
@@ -116,8 +121,33 @@ def _message_to_event_payload(message: Message) -> dict:
     }
 
 
-def _publish_event(event: ChatEvent) -> None:
-    """ No-op until Phase 6 wires in Django Channels/Redis delivery (§22-24). """
+def _publish_event(
+    event: ChatEvent, *, participant_repository: Optional[ParticipantRepository] = None,
+) -> None:
+    """
+    Fans the event out to every current participant's WebSocket group
+    (Phase 6, §22-24). The message is already durably persisted by the
+    time this runs (§24: "Persist first, broadcast second.") -- a
+    delivery failure here must never undo or fail the send itself, so
+    channel-layer errors are logged, not raised.
+    """
+    channel_layer = get_channel_layer()
+    if channel_layer is None:
+        return  # no CHANNEL_LAYERS configured (e.g. some test contexts) -- nothing to do
+
+    participant_repository = participant_repository or _default_participant_repository()
+    participants = participant_repository.list_participants(event.conversation_id)
+
+    for participant in participants:
+        try:
+            async_to_sync(channel_layer.group_send)(
+                user_channel_group_name(str(participant.user_id)),
+                {'type': 'chat.event', 'payload': event.as_dict()},
+            )
+        except Exception:
+            logger.exception(
+                "Failed to publish %s for conversation %s to user %s",
+                event.event, event.conversation_id, participant.user_id)
 
 
 def _schedule_notifications(message: Message) -> None:
@@ -231,11 +261,14 @@ def send_message(
     conversation_repository.update_last_message(                                         # 7
         conversation_id, message_id=message.message_id, sent_at=message.created_at)
 
-    _publish_event(ChatEvent(                                                             # 8
-        event=MessageEventType.MESSAGE_CREATED,
-        conversation_id=conversation_id,
-        payload={'message': _message_to_event_payload(message)},
-    ))
+    _publish_event(
+        ChatEvent(
+            event=MessageEventType.MESSAGE_CREATED,
+            conversation_id=conversation_id,
+            payload={'message': _message_to_event_payload(message)},
+        ),
+        participant_repository=participant_repository,
+    )
 
     _schedule_notifications(message)                                                      # 9
 
