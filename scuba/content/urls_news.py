@@ -10,7 +10,7 @@ These are the links for news section of the site
 """
 from django.urls import path, re_path
 
-from skm.content import views as news_views
+from scuba.content import views as news_views
 
 urlpatterns = [
     path('', news_views.NewsIndexView.as_view(), name="news_index"),

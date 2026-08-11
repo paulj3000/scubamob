@@ -1,5 +1,5 @@
 from rest_framework import generics
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from scuba.sitesettings.models import SystemApi, Endpoint
@@ -22,7 +22,7 @@ class GetSystemEndpointsApi(generics.GenericAPIView):
 
 
 class GetSystemSettingsApi(generics.GenericAPIView):
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = SystemApiSerializer
 
     def get(self, request):
