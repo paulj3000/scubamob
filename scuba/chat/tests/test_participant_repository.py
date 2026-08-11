@@ -75,3 +75,33 @@ class TestDjangoParticipantRepository(TestCase):
         participant = ConversationParticipant.objects.get(conversation=self.conversation, user=self.user)
         self.assertEqual(participant.last_read_message_id, 'abc123')
         self.assertIsNotNone(participant.last_read_at)
+
+    def test_mark_left_sets_left_at_without_deleting_the_row(self):
+        self.repo.add_participant(str(self.conversation.id), str(self.user.id))
+
+        self.repo.mark_left(str(self.conversation.id), str(self.user.id))
+
+        participant = ConversationParticipant.objects.get(conversation=self.conversation, user=self.user)
+        self.assertIsNotNone(participant.left_at)
+
+    def test_set_archived_toggles_the_flag(self):
+        self.repo.add_participant(str(self.conversation.id), str(self.user.id))
+
+        self.repo.set_archived(str(self.conversation.id), str(self.user.id), True)
+        participant = ConversationParticipant.objects.get(conversation=self.conversation, user=self.user)
+        self.assertTrue(participant.archived)
+
+        self.repo.set_archived(str(self.conversation.id), str(self.user.id), False)
+        participant.refresh_from_db()
+        self.assertFalse(participant.archived)
+
+    def test_set_muted_toggles_the_flag(self):
+        self.repo.add_participant(str(self.conversation.id), str(self.user.id))
+
+        self.repo.set_muted(str(self.conversation.id), str(self.user.id), True)
+        participant = ConversationParticipant.objects.get(conversation=self.conversation, user=self.user)
+        self.assertTrue(participant.muted)
+
+        self.repo.set_muted(str(self.conversation.id), str(self.user.id), False)
+        participant.refresh_from_db()
+        self.assertFalse(participant.muted)

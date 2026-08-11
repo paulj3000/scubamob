@@ -27,6 +27,22 @@ class BlockedUserError(ChatError):
     """ The message or conversation would cross a user-blocking relationship. """
 
 
+class InvalidSenderError(ChatError):
+    """ The given sender id does not refer to a real, active user. """
+
+
+class InvalidMessagePayloadError(ChatError):
+    """ The message body/type does not pass basic validation. """
+
+
+class NotMessageOwnerError(ChatError):
+    """ The acting user did not author the message and lacks override rights. """
+
+
+class InsufficientRoleError(ChatError):
+    """ The acting user's participant role does not permit the requested action. """
+
+
 class RepositoryUnavailableError(ChatError):
     """
     The backing store for a repository (DynamoDB, Redis) could not be

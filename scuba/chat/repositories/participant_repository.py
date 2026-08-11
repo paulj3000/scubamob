@@ -35,6 +35,18 @@ class ParticipantRepository(ABC):
     def mark_read(self, conversation_id: str, user_id: str, *, last_read_message_id: str) -> None:
         """ Updates last_read_message_id / last_read_at (§25). """
 
+    @abstractmethod
+    def mark_left(self, conversation_id: str, user_id: str) -> None:
+        """ Soft-leave: sets left_at (§13), unlike remove_participant's hard delete. """
+
+    @abstractmethod
+    def set_archived(self, conversation_id: str, user_id: str, archived: bool) -> None:
+        ...
+
+    @abstractmethod
+    def set_muted(self, conversation_id: str, user_id: str, muted: bool) -> None:
+        ...
+
 
 class DjangoParticipantRepository(ParticipantRepository):
     """ Real implementation backed by the Phase 1 ConversationParticipant model. """
@@ -65,3 +77,18 @@ class DjangoParticipantRepository(ParticipantRepository):
         ConversationParticipant.objects.filter(
             conversation_id=conversation_id, user_id=user_id
         ).update(last_read_message_id=last_read_message_id, last_read_at=timezone.now())
+
+    def mark_left(self, conversation_id: str, user_id: str) -> None:
+        ConversationParticipant.objects.filter(
+            conversation_id=conversation_id, user_id=user_id
+        ).update(left_at=timezone.now())
+
+    def set_archived(self, conversation_id: str, user_id: str, archived: bool) -> None:
+        ConversationParticipant.objects.filter(
+            conversation_id=conversation_id, user_id=user_id
+        ).update(archived=archived)
+
+    def set_muted(self, conversation_id: str, user_id: str, muted: bool) -> None:
+        ConversationParticipant.objects.filter(
+            conversation_id=conversation_id, user_id=user_id
+        ).update(muted=muted)

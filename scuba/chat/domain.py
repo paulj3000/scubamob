@@ -28,6 +28,8 @@ class MessageType:
     EQUIPMENT = 'EQUIPMENT'
     MARKETPLACE_ITEM = 'MARKETPLACE_ITEM'
 
+    ALL = (TEXT, SYSTEM, DIVE, DIVE_PLAN, DIVE_SITE, LOGBOOK_ENTRY, EQUIPMENT, MARKETPLACE_ITEM)
+
 
 def generate_message_id() -> str:
     """ A message id: a UUID4 with no dashes, matching UUIDModel.pk_as_str. """

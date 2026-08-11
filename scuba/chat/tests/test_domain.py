@@ -8,6 +8,15 @@ from scuba.chat.domain import (
 )
 
 
+class TestMessageTypeAll(SimpleTestCase):
+    def test_contains_every_declared_message_type(self):
+        self.assertEqual(set(MessageType.ALL), {
+            MessageType.TEXT, MessageType.SYSTEM, MessageType.DIVE, MessageType.DIVE_PLAN,
+            MessageType.DIVE_SITE, MessageType.LOGBOOK_ENTRY, MessageType.EQUIPMENT,
+            MessageType.MARKETPLACE_ITEM,
+        })
+
+
 class TestGenerateMessageId(SimpleTestCase):
     def test_returns_a_32_character_hex_string(self):
         message_id = generate_message_id()
