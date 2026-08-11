@@ -36,6 +36,14 @@ class ConversationRepository(ABC):
         transaction as the DynamoDB write.
         """
 
+    @abstractmethod
+    def list_conversations_for_user(self, user_id: str) -> list[Any]:
+        """ Every conversation the user currently belongs to (Phase 4, §19). """
+
+    @abstractmethod
+    def update_conversation(self, conversation_id: str, *, title: str) -> Any:
+        ...
+
 
 class DjangoConversationRepository(ConversationRepository):
     """ Real implementation backed by the Phase 1 SQL models. """
@@ -84,6 +92,17 @@ class DjangoConversationRepository(ConversationRepository):
     def update_last_message(self, conversation_id: str, *, message_id: str, sent_at) -> None:
         Conversation.objects.filter(pk=conversation_id).update(
             last_message_id=message_id, last_message_at=sent_at)
+
+    def list_conversations_for_user(self, user_id: str) -> list[Conversation]:
+        return list(
+            Conversation.objects.filter(
+                participants__user_id=user_id, participants__left_at__isnull=True
+            ).distinct()
+        )
+
+    def update_conversation(self, conversation_id: str, *, title: str) -> Optional[Conversation]:
+        Conversation.objects.filter(pk=conversation_id).update(title=title)
+        return self.get_conversation(conversation_id)
 
     @staticmethod
     def _get_pair(user_low: str, user_high: str) -> Optional[DirectConversationPair]:

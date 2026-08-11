@@ -55,6 +55,89 @@ class TestCreateDirectConversation(ChatServicesTestCase):
         self.assertEqual(first.id, second.id)
 
 
+class TestListConversations(ChatServicesTestCase):
+    def test_returns_only_conversations_the_user_belongs_to(self):
+        theirs = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+        services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.member.id))
+
+        found = services.list_conversations(str(self.owner.id))
+
+        self.assertEqual([c.id for c in found], [theirs.id])
+
+
+class TestGetConversation(ChatServicesTestCase):
+    def test_returns_the_conversation_for_a_participant(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+
+        found = services.get_conversation(
+            conversation_id=str(conversation.id), user_id=str(self.owner.id))
+
+        self.assertEqual(found.id, conversation.id)
+
+    def test_rejects_a_non_participant(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+
+        with self.assertRaises(NotAConversationParticipantError):
+            services.get_conversation(
+                conversation_id=str(conversation.id), user_id=str(self.outsider.id))
+
+    def test_raises_for_a_nonexistent_conversation(self):
+        with self.assertRaises(ConversationNotFoundError):
+            services.get_conversation(
+                conversation_id='00000000-0000-0000-0000-000000000000', user_id=str(self.owner.id))
+
+
+class TestUpdateConversation(ChatServicesTestCase):
+    def test_owner_can_rename_the_conversation(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id), title='Old')
+
+        updated = services.update_conversation(
+            conversation_id=str(conversation.id), actor_id=str(self.owner.id), title='New')
+
+        self.assertEqual(updated.title, 'New')
+
+    def test_a_plain_member_cannot_rename_the_conversation(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+        services.add_participant(
+            conversation_id=str(conversation.id), user_id=str(self.member.id),
+            actor_id=str(self.owner.id))
+
+        with self.assertRaises(InsufficientRoleError):
+            services.update_conversation(
+                conversation_id=str(conversation.id), actor_id=str(self.member.id), title='New')
+
+
+class TestListMessages(ChatServicesTestCase):
+    def test_returns_messages_for_a_participant(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+        services.send_message(
+            conversation_id=str(conversation.id), sender_id=str(self.owner.id),
+            body='hi', message_repository=self.message_repository)
+
+        messages, next_cursor = services.list_messages(
+            conversation_id=str(conversation.id), user_id=str(self.owner.id),
+            message_repository=self.message_repository)
+
+        self.assertEqual(len(messages), 1)
+        self.assertIsNone(next_cursor)
+
+    def test_rejects_a_non_participant(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+
+        with self.assertRaises(NotAConversationParticipantError):
+            services.list_messages(
+                conversation_id=str(conversation.id), user_id=str(self.outsider.id),
+                message_repository=self.message_repository)
+
+
 class TestSendMessage(ChatServicesTestCase):
     def setUp(self):
         super().setUp()

@@ -151,6 +151,42 @@ def create_direct_conversation(
     return conversation_repository.get_or_create_direct_conversation(user_a, user_b)
 
 
+def list_conversations(
+    user_id: str, *, conversation_repository: Optional[ConversationRepository] = None,
+):
+    """ Every conversation the user currently belongs to (Phase 4, §19). """
+    conversation_repository = conversation_repository or _default_conversation_repository()
+    return conversation_repository.list_conversations_for_user(user_id)
+
+
+def get_conversation(
+    *, conversation_id: str, user_id: str,
+    conversation_repository: Optional[ConversationRepository] = None,
+    participant_repository: Optional[ParticipantRepository] = None,
+):
+    """ A single conversation -- only visible to its current participants. """
+    conversation_repository = conversation_repository or _default_conversation_repository()
+    participant_repository = participant_repository or _default_participant_repository()
+
+    conversation = _get_conversation_or_raise(conversation_repository, conversation_id)
+    _require_participant(participant_repository, conversation_id, user_id)
+    return conversation
+
+
+def update_conversation(
+    *, conversation_id: str, actor_id: str, title: str,
+    conversation_repository: Optional[ConversationRepository] = None,
+    participant_repository: Optional[ParticipantRepository] = None,
+):
+    conversation_repository = conversation_repository or _default_conversation_repository()
+    participant_repository = participant_repository or _default_participant_repository()
+
+    _get_conversation_or_raise(conversation_repository, conversation_id)
+    _require_role(participant_repository, conversation_id, actor_id, _ADMIN_ROLES)
+
+    return conversation_repository.update_conversation(conversation_id, title=title)
+
+
 def send_message(
     *, conversation_id: str, sender_id: str, body: str,
     client_message_id: Optional[str] = None,
@@ -204,6 +240,19 @@ def send_message(
     _schedule_notifications(message)                                                      # 9
 
     return message                                                                        # 10
+
+
+def list_messages(
+    *, conversation_id: str, user_id: str, limit: int = 50, cursor: Optional[str] = None,
+    message_repository: Optional[MessageRepository] = None,
+    participant_repository: Optional[ParticipantRepository] = None,
+):
+    """ Chronologically ordered, cursor-paginated (§10) -- only for current participants. """
+    message_repository = message_repository or _default_message_repository()
+    participant_repository = participant_repository or _default_participant_repository()
+
+    _require_participant(participant_repository, conversation_id, user_id)
+    return message_repository.list_messages(conversation_id, limit=limit, cursor=cursor)
 
 
 def edit_message(

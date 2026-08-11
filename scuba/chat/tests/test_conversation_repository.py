@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from scuba.accounts.models import User
-from scuba.chat.models import ConversationType
+from scuba.chat.models import ConversationParticipant, ConversationType
 from scuba.chat.repositories.conversation_repository import DjangoConversationRepository
 
 
@@ -73,3 +73,33 @@ class TestDjangoConversationRepository(TestCase):
         conversation.refresh_from_db()
         self.assertEqual(conversation.last_message_id, 'abc123')
         self.assertEqual(conversation.last_message_at, sent_at)
+
+    def test_list_conversations_for_user_returns_only_conversations_they_are_in(self):
+        theirs = self.repo.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.user_a.id))
+        ConversationParticipant.objects.create(conversation=theirs, user=self.user_a)
+        not_theirs = self.repo.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.user_b.id))
+        ConversationParticipant.objects.create(conversation=not_theirs, user=self.user_b)
+
+        found = self.repo.list_conversations_for_user(str(self.user_a.id))
+
+        self.assertEqual([c.id for c in found], [theirs.id])
+
+    def test_list_conversations_for_user_excludes_conversations_they_left(self):
+        conversation = self.repo.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.user_a.id))
+        ConversationParticipant.objects.create(
+            conversation=conversation, user=self.user_a, left_at=timezone.now())
+
+        found = self.repo.list_conversations_for_user(str(self.user_a.id))
+
+        self.assertEqual(found, [])
+
+    def test_update_conversation_sets_the_title(self):
+        conversation = self.repo.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.user_a.id), title='Old')
+
+        updated = self.repo.update_conversation(str(conversation.id), title='New')
+
+        self.assertEqual(updated.title, 'New')
