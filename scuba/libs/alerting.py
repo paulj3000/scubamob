@@ -1,12 +1,12 @@
 import requests
 
-from scuba.sitesettings.models import SystemApi
+from scuba.settings import ALERTING_SERVER
 
 
 class Alerting:
     @staticmethod
     def send_buddy_request(userId, buddyUserId):
-        url = SystemApi.get_alerting_buddy_request()
+        url = f"{ALERTING_SERVER}/api/alerts/buddies/request"
 
         to_send = {
             'userId': userId,

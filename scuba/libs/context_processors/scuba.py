@@ -11,8 +11,7 @@ before we print out our page
 import os
 
 from django.conf import settings
-from scuba.settings import CHAT_SERVER_ACTIVE
-from scuba.sitesettings.models import SystemSetting
+from scuba.settings import ALERT_SERVER_ACTIVE, CHAT_SERVER_ACTIVE
 
 
 def Scuba(request):
@@ -26,7 +25,7 @@ def Scuba(request):
         'html_name': settings.TITLE_HTML,
         'is_production': settings.IS_PRODUCTION or os.environ.get('IS_BUILDING'),
         'chat_server_active': CHAT_SERVER_ACTIVE,
-        'alert_server_active': SystemSetting.get_alert_server_active()
+        'alert_server_active': ALERT_SERVER_ACTIVE
     }
 
     # if the user is logged in, get his profile image
