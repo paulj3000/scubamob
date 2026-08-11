@@ -30,6 +30,7 @@ coverage==7.13.1
 factory_boy==3.3.3
 freezegun==1.5.5
 responses==0.25.8
+moto[dynamodb]==5.2.2
 
 ruff==0.15.0
 pycodestyle==2.14.0

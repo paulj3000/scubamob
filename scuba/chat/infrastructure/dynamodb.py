@@ -1,15 +1,11 @@
 """
 DynamoDB access for the chat domain (docs/chat_dynamo.md §11, §53).
 
-Phase 0 scope only: a settings-driven table accessor, so the table name
-and region are never scattered through the codebase (§11: "Do not scatter
-table names throughout the code."). No message read/write logic lives
-here yet -- that's MessageRepository's boto3-backed implementation,
-Phase 2. Nothing in this module is called by anything yet, so importing
-it never triggers a real AWS call; tests mock boto3 directly rather than
-hitting DynamoDB Local (Phase 0 doesn't wire that up -- CLAUDE.md forbids
-tests depending on live external services, and chat.repositories'
-InMemoryMessageRepository fake already covers local dev/test needs).
+A settings-driven table/client accessor, so the table name and region are
+never scattered through the codebase (§11: "Do not scatter table names
+throughout the code."). Message read/write logic lives in
+MessageRepository's boto3-backed implementation (Phase 2); this module
+only hands out configured session/table/client objects.
 """
 import os
 
@@ -33,3 +29,17 @@ def get_table(table_name: str = CHAT_DYNAMODB_TABLE):
     """ The boto3 Table resource for the chat messages table. """
     session = get_session()
     return session.resource('dynamodb').Table(table_name)
+
+
+def get_client():
+    """
+    A plain low-level DynamoDB client, deliberately *not* table.meta.client
+    -- a resource's .meta.client carries the resource layer's automatic
+    type-transformation event handlers, which corrupt already-serialized
+    AttributeValue items passed to low-level-only calls like
+    transact_write_items (reproduced empirically: fails with a generic
+    TransactionCanceledException/TypeError under moto). Raw calls that
+    need manually-serialized items must use a client built straight from
+    the session instead.
+    """
+    return get_session().client('dynamodb')
