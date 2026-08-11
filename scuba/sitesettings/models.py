@@ -375,17 +375,3 @@ class APIKey(UUIDModel):
             raise exceptions.InvalidAPIKeyException
 
 
-class SNSSubscriptionRequest(UUIDModel):
-    message_id = models.CharField(max_length=40, unique=True)
-    token = models.TextField()
-    topic_arn = models.CharField(max_length=64)
-    message = models.CharField(max_length=128)
-    subscribe_url = models.TextField()
-    timestamp = models.DateTimeField()
-    signature_version = models.PositiveSmallIntegerField()
-    signature = models.TextField()
-    signing_cert_url = models.CharField(max_length=256)
-    is_confirmed = models.BooleanField(default=False)
-
-    class Meta:
-        db_table = 'sns_subscription_requests'

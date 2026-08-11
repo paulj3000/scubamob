@@ -54,5 +54,21 @@ class CodePipelineStateAdmin(admin.ModelAdmin):
     list_display = ('pipeline', 'state',)
 
 
+class SNSSubscriptionRequestAdmin(admin.ModelAdmin):
+    def confirm_sns_request(self, request, queryset):
+        for subscription in queryset:
+            print(subscription.subscribe_url)
+
+        # set a success message
+        # messages.add_message(request, messages.INFO, 'Passwords successfully reset')
+
+    confirm_sns_request.short_description = "Confirm SNS Request"
+    actions = [
+        confirm_sns_request,
+    ]
+    list_display = ('topic_arn', 'is_confirmed', 'timestamp',)
+
+
 admin.site.register(aws_models.CodeBuildProject, CodeBuildProjectAdmin)
 admin.site.register(aws_models.CodePipelineRun, CodePipelineRunAdmin)
+admin.site.register(aws_models.SNSSubscriptionRequest, SNSSubscriptionRequestAdmin)

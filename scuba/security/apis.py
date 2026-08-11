@@ -6,7 +6,7 @@ from rest_framework.response import Response
 import rest_framework.status as status
 
 from scuba.libs.aws.sns import SNSVerificationError, verify_signature
-from scuba.sitesettings.serializers import SNSSubscriptionRequestSerializer
+from scuba.aws.serializers import SNSSubscriptionRequestSerializer
 
 logger = logging.getLogger(__name__)
 

@@ -60,21 +60,6 @@ class EndpointAdmin(admin.ModelAdmin):
     list_display = ('system', 'key', 'url',)
 
 
-class SNSSubscriptionRequestAdmin(admin.ModelAdmin):
-    def confirm_sns_request(self, request, queryset):
-        for subscription in queryset:
-            print(subscription.subscribe_url)
-
-        # set a success message
-        # messages.add_message(request, messages.INFO, 'Passwords successfully reset')
-
-    confirm_sns_request.short_description = "Confirm SNS Request"
-    actions = [
-        confirm_sns_request,
-    ]
-    list_display = ('topic_arn', 'is_confirmed', 'timestamp',)
-
-
 admin.site.register(models.Endpoint, EndpointAdmin)
 admin.site.register(models.APIKey, APIKeyAdmin)
 admin.site.register(models.AlertingApi, GenericKeyValueApiAdmin)
@@ -83,5 +68,4 @@ admin.site.register(models.BillingApi, GenericKeyValueApiAdmin)
 admin.site.register(models.ChatApi, GenericKeyValueApiAdmin)
 admin.site.register(models.SystemApi, SystemApiAdmin)
 admin.site.register(models.SettingsApi, GenericKeyValueApiAdmin)
-admin.site.register(models.SNSSubscriptionRequest, SNSSubscriptionRequestAdmin)
 admin.site.register(models.SystemSetting, SystemSettingAdmin)

@@ -1,10 +1,6 @@
-import re
-from datetime import datetime
-
-from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from scuba.sitesettings.models import SystemApi, Endpoint, SNSSubscriptionRequest
+from scuba.sitesettings.models import SystemApi, Endpoint
 
 
 class SystemApiSerializer(serializers.ModelSerializer):
@@ -19,63 +15,3 @@ class SystemEndpointApi(serializers.ModelSerializer):
         """ define models, fields, etc """
         model = Endpoint
         fields = ('key', 'url',)
-
-
-class SNSSubscriptionRequestSerializer(serializers.ModelSerializer):
-    MessageId = serializers.CharField(source='message_id')
-    TopicArn = serializers.CharField(source='topic_arn')
-    SubscribeURL = serializers.CharField(source='subscribe_url')
-    Timestamp = serializers.CharField(source='timestamp')
-    SignatureVersion = serializers.CharField(source='signature_version')
-    Signature = serializers.CharField(source='signature')
-    SigningCertURL = serializers.CharField(source='signing_cert_url')
-
-    @staticmethod
-    def validate_SigningCertURL(data):
-        if SNSSubscriptionRequest.objects.filter(signing_cert_url=data):
-            raise serializers.ValidationError(_(f'{data} already exists.'))
-
-        return data
-
-    @staticmethod
-    def validate_signature(data):
-        if SNSSubscriptionRequest.objects.filter(signature=data):
-            raise serializers.ValidationError(_(f'{data} already exists.'))
-
-        return data
-
-    @staticmethod
-    def validate_message_id(data):
-        if SNSSubscriptionRequest.objects.filter(message_id=data):
-            raise serializers.ValidationError(_(f'{data} already exists.'))
-
-        return data
-
-    @staticmethod
-    def validate_timestamp(data):
-        try:
-            return datetime.fromisoformat(data)
-        except ValueError:
-            raise serializers.ValidationError(_(f'{data} is not a valid timestamp.'))
-
-    class Meta:
-        """ define models, fields, etc """
-        model = SNSSubscriptionRequest
-        fields = ('MessageId',
-                  'SigningCertURL',
-                  'Signature',
-                  'SignatureVersion',
-                  'Timestamp',
-                  'SubscribeURL',
-                  'TopicArn',)
-
-    def create(self, validated_data):
-        validated_data['timestamp'] = datetime.strptime(validated_data['timestamp'],
-                                                        '%Y-%m-%dT%H:%M:%S.%fZ')
-
-        token = re.findall(r"Token=(.*)", validated_data['subscribe_url'])[0]
-        validated_data['token'] = token
-        return SNSSubscriptionRequest.objects.create(**validated_data)
-
-    def update(self, obj, validated_data):
-        raise NotImplementedError

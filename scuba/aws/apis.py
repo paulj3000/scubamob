@@ -7,10 +7,10 @@ from rest_framework.response import Response
 import rest_framework.status as status
 from rest_framework.parsers import JSONParser
 
-from scuba.sitesettings.serializers import SNSSubscriptionRequestSerializer
 from scuba.aws.serializers import (
     CodePipelineStateSerializer,
     CodeBuildJobSerializer,
+    SNSSubscriptionRequestSerializer,
 )
 
 from scuba.libs.aws.sns import SNSVerificationError, verify_signature
