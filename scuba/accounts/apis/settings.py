@@ -8,7 +8,7 @@ from rest_framework import status
 from scuba.accounts.serializers.settings import UserEmailSerializer, UserSettingSerializer
 from scuba.accounts.models import UserEmail
 from scuba.accounts.exceptions import InvalidEmailIdException, PrimaryEmailIdException
-from scuba.sitesettings.models import SettingsApi
+from scuba.settings import SETTINGS_SERVER
 
 
 logger = logging.getLogger(__name__)
@@ -84,7 +84,7 @@ class UserSettingApi(generics.GenericAPIView):
         else:
             settings = request.query_params.get('settings').split(',')
 
-        url = SettingsApi.get_user_settings_with_options(user.pk_as_str, settings)
+        url = f"{SETTINGS_SERVER}/api/users/{user.pk_as_str}/options?setting={','.join(settings)}"
 
         res = requests.get(url, timeout=5)
         return Response(res.json(), status=res.status_code)
@@ -92,7 +92,7 @@ class UserSettingApi(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         user = self.request.user
 
-        url = SettingsApi.post_user_settings(user.pk_as_str)
+        url = f"{SETTINGS_SERVER}/api/users/{user.pk_as_str}"
 
         res = requests.post(url, json=request.data, timeout=5)
         return Response(res.json(), status=res.status_code)
@@ -122,7 +122,7 @@ class UserSettingListApi(generics.GenericAPIView):
         if not settings:
             return Response({'error': 'no settings sent in'}, status=status.HTTP_400_BAD_REQUEST)
 
-        url = SettingsApi.get_user_setting_list(user.pk_as_str, settings.split(','))
+        url = f"{SETTINGS_SERVER}/api/users/{user.pk_as_str}?setting={settings}"
 
         try:
             res = requests.get(url, timeout=5)

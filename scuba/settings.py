@@ -22,6 +22,7 @@ env = environ.Env(
     WEATHER_API_KEY=(str, "weather-api-key"),
     CHAT_SERVER=(str, "http://localhost:3001"),
     CHAT_SERVER_ACTIVE=(bool, False),
+    SETTINGS_SERVER=(str, "http://localhost:3003"),
     AWS_S3_BUCKET=(str, "scubamob-dev"),
     AWS_S3_BUCKET_PRIVATE=(str, "scubamob-private"),
     AWS_CLOUDFRONT=(str, 'https://NOTSET/'),
@@ -234,6 +235,7 @@ GOOGLE_API_KEY = env("GOOGLE_API_KEY")
 WEATHER_API_KEY = env("WEATHER_API_KEY")
 CHAT_SERVER = env("CHAT_SERVER")
 CHAT_SERVER_ACTIVE = env.bool("CHAT_SERVER_ACTIVE")
+SETTINGS_SERVER = env("SETTINGS_SERVER")
 
 
 

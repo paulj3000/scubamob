@@ -69,10 +69,8 @@ class TestSettingsApisTimeouts(TestCase):
         self.client.force_authenticate(user=self.user)
 
     @patch('scuba.accounts.apis.settings.requests.get')
-    @patch(
-        'scuba.accounts.apis.settings.SettingsApi.get_user_settings_with_options',
-        return_value='http://settings.test/options')
-    def test_user_setting_api_get_has_a_timeout(self, mock_url, mock_get):
+    @patch('scuba.accounts.apis.settings.SETTINGS_SERVER', 'http://settings.test')
+    def test_user_setting_api_get_has_a_timeout(self, mock_get):
         mock_get.return_value.json.return_value = {}
         mock_get.return_value.status_code = 200
 
@@ -81,10 +79,8 @@ class TestSettingsApisTimeouts(TestCase):
         self.assertEqual(mock_get.call_args.kwargs.get('timeout'), 5)
 
     @patch('scuba.accounts.apis.settings.requests.post')
-    @patch(
-        'scuba.accounts.apis.settings.SettingsApi.post_user_settings',
-        return_value='http://settings.test/post')
-    def test_user_setting_api_post_has_a_timeout(self, mock_url, mock_post):
+    @patch('scuba.accounts.apis.settings.SETTINGS_SERVER', 'http://settings.test')
+    def test_user_setting_api_post_has_a_timeout(self, mock_post):
         mock_post.return_value.json.return_value = {}
         mock_post.return_value.status_code = 200
 
@@ -93,10 +89,8 @@ class TestSettingsApisTimeouts(TestCase):
         self.assertEqual(mock_post.call_args.kwargs.get('timeout'), 5)
 
     @patch('scuba.accounts.apis.settings.requests.get')
-    @patch(
-        'scuba.accounts.apis.settings.SettingsApi.get_user_setting_list',
-        return_value='http://settings.test/list')
-    def test_user_setting_list_api_get_has_a_timeout(self, mock_url, mock_get):
+    @patch('scuba.accounts.apis.settings.SETTINGS_SERVER', 'http://settings.test')
+    def test_user_setting_list_api_get_has_a_timeout(self, mock_get):
         mock_get.return_value.json.return_value = {}
         mock_get.return_value.status_code = 200
 
