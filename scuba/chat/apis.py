@@ -42,12 +42,20 @@ def _error_response(error: Exception) -> Response:
     return Response({'error': str(error)}, status=status_code)
 
 
+def _conversation_context(user_id: str) -> dict:
+    """ Resolves ConversationSerializer's 'unread' field (Phase 7, §25). """
+    return {'unread_conversation_ids': services.get_unread_conversation_ids(user_id)}
+
+
 class ConversationListApi(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         conversations = services.list_conversations(str(request.user.id))
-        return Response({'conversations': ConversationSerializer(conversations, many=True).data})
+        context = _conversation_context(str(request.user.id))
+        return Response({
+            'conversations': ConversationSerializer(conversations, many=True, context=context).data,
+        })
 
     def post(self, request):
         serializer = CreateConversationSerializer(data=request.data)
@@ -74,7 +82,8 @@ class ConversationDetailApi(APIView):
         except ChatError as error:
             return _error_response(error)
 
-        return Response({'conversation': ConversationSerializer(conversation).data})
+        context = _conversation_context(str(request.user.id))
+        return Response({'conversation': ConversationSerializer(conversation, context=context).data})
 
     def patch(self, request, conversation_id):
         serializer = UpdateConversationSerializer(data=request.data)
@@ -87,7 +96,8 @@ class ConversationDetailApi(APIView):
         except ChatError as error:
             return _error_response(error)
 
-        return Response({'conversation': ConversationSerializer(conversation).data})
+        context = _conversation_context(str(request.user.id))
+        return Response({'conversation': ConversationSerializer(conversation, context=context).data})
 
 
 class ConversationMessagesApi(APIView):
@@ -199,4 +209,13 @@ class DirectConversationApi(APIView):
         except (ChatError, ValueError) as error:
             return _error_response(error)
 
-        return Response({'conversation': ConversationSerializer(conversation).data})
+        context = _conversation_context(str(request.user.id))
+        return Response({'conversation': ConversationSerializer(conversation, context=context).data})
+
+
+class UnreadCountApi(APIView):
+    """ Phase 7, §25: total unread conversations for the messaging launcher / nav bar. """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({'unread_count': services.get_unread_count(str(request.user.id))})

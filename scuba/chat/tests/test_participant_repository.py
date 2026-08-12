@@ -95,6 +95,46 @@ class TestDjangoParticipantRepository(TestCase):
         participant.refresh_from_db()
         self.assertFalse(participant.archived)
 
+    def test_list_unread_conversation_ids_includes_a_never_read_conversation(self):
+        self.repo.add_participant(str(self.conversation.id), str(self.user.id))
+        Conversation.objects.filter(pk=self.conversation.id).update(
+            last_message_id='m1', last_message_at=timezone.now())
+
+        self.assertEqual(
+            self.repo.list_unread_conversation_ids(str(self.user.id)), {str(self.conversation.id)})
+
+    def test_list_unread_conversation_ids_excludes_a_conversation_with_no_messages(self):
+        self.repo.add_participant(str(self.conversation.id), str(self.user.id))
+
+        self.assertEqual(self.repo.list_unread_conversation_ids(str(self.user.id)), set())
+
+    def test_list_unread_conversation_ids_excludes_a_conversation_read_up_to_date(self):
+        self.repo.add_participant(str(self.conversation.id), str(self.user.id))
+        Conversation.objects.filter(pk=self.conversation.id).update(
+            last_message_id='m1', last_message_at=timezone.now())
+        self.repo.mark_read(str(self.conversation.id), str(self.user.id), last_read_message_id='m1')
+
+        self.assertEqual(self.repo.list_unread_conversation_ids(str(self.user.id)), set())
+
+    def test_list_unread_conversation_ids_includes_a_conversation_with_a_stale_read_pointer(self):
+        self.repo.add_participant(str(self.conversation.id), str(self.user.id))
+        Conversation.objects.filter(pk=self.conversation.id).update(
+            last_message_id='m1', last_message_at=timezone.now())
+        self.repo.mark_read(str(self.conversation.id), str(self.user.id), last_read_message_id='m0')
+        Conversation.objects.filter(pk=self.conversation.id).update(
+            last_message_id='m2', last_message_at=timezone.now())
+
+        self.assertEqual(
+            self.repo.list_unread_conversation_ids(str(self.user.id)), {str(self.conversation.id)})
+
+    def test_list_unread_conversation_ids_excludes_a_conversation_left(self):
+        self.repo.add_participant(str(self.conversation.id), str(self.user.id))
+        Conversation.objects.filter(pk=self.conversation.id).update(
+            last_message_id='m1', last_message_at=timezone.now())
+        self.repo.mark_left(str(self.conversation.id), str(self.user.id))
+
+        self.assertEqual(self.repo.list_unread_conversation_ids(str(self.user.id)), set())
+
     def test_set_muted_toggles_the_flag(self):
         self.repo.add_participant(str(self.conversation.id), str(self.user.id))
 

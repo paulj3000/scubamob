@@ -8,13 +8,27 @@ from scuba.chat.models import Conversation, ConversationType
 
 
 class ConversationSerializer(serializers.ModelSerializer):
+    """
+    'unread' (Phase 7, §25) is the requesting user's read state, not a
+    model field -- it resolves from the 'unread_conversation_ids' context
+    key (see chat.apis._conversation_context) and defaults to False when
+    that key is absent.
+    """
+    unread = serializers.SerializerMethodField()
+
     class Meta:
         model = Conversation
         fields = (
             'id', 'conversation_type', 'title', 'created_by',
+            'created_at', 'updated_at', 'last_message_at', 'last_message_id', 'unread',
+        )
+        read_only_fields = (
+            'id', 'conversation_type', 'title', 'created_by',
             'created_at', 'updated_at', 'last_message_at', 'last_message_id',
         )
-        read_only_fields = fields
+
+    def get_unread(self, conversation) -> bool:
+        return str(conversation.id) in self.context.get('unread_conversation_ids', set())
 
 
 class CreateConversationSerializer(serializers.Serializer):

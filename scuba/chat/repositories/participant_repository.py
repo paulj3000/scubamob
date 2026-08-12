@@ -5,6 +5,7 @@ Phase 1 Django-ORM-backed implementation.
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 
+from django.db.models import F, Q
 from django.utils import timezone
 
 from scuba.chat.models import ConversationParticipant
@@ -34,6 +35,16 @@ class ParticipantRepository(ABC):
     @abstractmethod
     def mark_read(self, conversation_id: str, user_id: str, *, last_read_message_id: str) -> None:
         """ Updates last_read_message_id / last_read_at (§25). """
+
+    @abstractmethod
+    def list_unread_conversation_ids(self, user_id: str) -> set[str]:
+        """
+        Conversations where the user's last_read_message_id doesn't match
+        the conversation's current last_message_id (§25-26). A pure SQL
+        comparison of already-stored pointers -- never queries DynamoDB,
+        per §26's "do not query every DynamoDB message every time an
+        unread badge is rendered".
+        """
 
     @abstractmethod
     def mark_left(self, conversation_id: str, user_id: str) -> None:
@@ -77,6 +88,15 @@ class DjangoParticipantRepository(ParticipantRepository):
         ConversationParticipant.objects.filter(
             conversation_id=conversation_id, user_id=user_id
         ).update(last_read_message_id=last_read_message_id, last_read_at=timezone.now())
+
+    def list_unread_conversation_ids(self, user_id: str) -> set[str]:
+        unread = ConversationParticipant.objects.filter(
+            user_id=user_id, left_at__isnull=True, conversation__last_message_id__isnull=False,
+        ).filter(
+            Q(last_read_message_id__isnull=True)
+            | ~Q(last_read_message_id=F('conversation__last_message_id'))
+        ).values_list('conversation_id', flat=True)
+        return {str(conversation_id) for conversation_id in unread}
 
     def mark_left(self, conversation_id: str, user_id: str) -> None:
         ConversationParticipant.objects.filter(

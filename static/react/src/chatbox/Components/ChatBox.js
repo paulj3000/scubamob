@@ -5,10 +5,10 @@ import React from 'react';
  * Mounted once, site-wide, for authenticated users only (templates/layout.html).
  *
  * UI states supported per §21: collapsed, conversation list, one active
- * conversation. Multiple open conversations / unread badges are explicitly
- * deferred ("Initial implementation can support one open active
- * conversation" / unread counts need Phase 7's infra, which doesn't exist
- * yet).
+ * conversation. Multiple open conversations are still deferred ("Initial
+ * implementation can support one open active conversation"). Unread badges
+ * (Phase 7, §25) are wired up here, backed by GET /api/chat/unread-count/
+ * and each conversation's 'unread' field.
  */
 class ChatBox extends React.Component {
     constructor(props) {
@@ -24,9 +24,23 @@ class ChatBox extends React.Component {
             messageBody: '',
             loadingMessages: false,
             sending: false,
+            unreadCount: 0,
             error: null,
         };
     }
+
+    componentDidMount() {
+        this.loadUnreadCount();
+    }
+
+    loadUnreadCount = () => {
+        fetch('/api/chat/unread-count/')
+            .then(res => res.json())
+            .then(result => {
+                this.setState({ unreadCount: result.unread_count || 0 });
+            })
+            .catch(() => {});
+    };
 
     toggleCollapsed = () => {
         const collapsed = !this.state.collapsed;
@@ -51,6 +65,26 @@ class ChatBox extends React.Component {
             });
     };
 
+    markConversationRead = (conversation) => {
+        fetch(`/api/chat/conversations/${conversation.id}/read/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': Cookies.get('csrftoken'),
+            },
+            body: JSON.stringify({}),
+        })
+            .then(() => {
+                this.setState(prevState => ({
+                    conversations: prevState.conversations.map(existing => (
+                        existing.id === conversation.id ? { ...existing, unread: false } : existing
+                    )),
+                }));
+                this.loadUnreadCount();
+            })
+            .catch(() => {});
+    };
+
     openConversation = (conversation) => {
         this.setState({
             activeConversation: conversation,
@@ -58,6 +92,10 @@ class ChatBox extends React.Component {
             loadingMessages: true,
             error: null,
         });
+
+        if (conversation.unread) {
+            this.markConversationRead(conversation);
+        }
 
         fetch(`/api/chat/conversations/${conversation.id}/messages/`)
             .then(res => res.json())
@@ -145,14 +183,21 @@ class ChatBox extends React.Component {
     };
 
     renderCollapsed() {
+        const { unreadCount } = this.state;
+
         return (
             <button
                 type="button"
-                className="btn btn-primary rounded-pill shadow"
+                className="btn btn-primary rounded-pill shadow position-relative"
                 style={styles.toggleButton}
                 onClick={this.toggleCollapsed}
             >
                 <i className="bi bi-chat-dots-fill me-1"></i> Messaging
+                {unreadCount > 0 && (
+                    <span className="badge rounded-pill bg-danger position-absolute" style={styles.badge}>
+                        {unreadCount}
+                    </span>
+                )}
             </button>
         );
     }
@@ -186,10 +231,16 @@ class ChatBox extends React.Component {
                         <button
                             type="button"
                             key={conversation.id}
-                            className="list-group-item list-group-item-action"
+                            className="list-group-item list-group-item-action d-flex
+                                justify-content-between align-items-center"
                             onClick={() => this.openConversation(conversation)}
                         >
-                            {this.conversationLabel(conversation)}
+                            <span className={conversation.unread ? 'fw-bold' : ''}>
+                                {this.conversationLabel(conversation)}
+                            </span>
+                            {conversation.unread && (
+                                <span className="badge rounded-pill bg-danger ms-2">&nbsp;</span>
+                            )}
                         </button>
                     ))}
                 </div>
@@ -269,6 +320,11 @@ const styles = {
         bottom: '20px',
         right: '20px',
         zIndex: 1050,
+    },
+    badge: {
+        top: '-6px',
+        right: '-6px',
+        fontSize: '0.65em',
     },
     panel: {
         position: 'fixed',

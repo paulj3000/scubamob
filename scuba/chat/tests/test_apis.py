@@ -9,12 +9,13 @@ from unittest import mock
 
 import boto3
 from django.test import TestCase
+from django.utils import timezone
 from moto import mock_aws
 from rest_framework.test import APIClient
 
 from scuba.accounts.models import User
 from scuba.chat import services
-from scuba.chat.models import ConversationType
+from scuba.chat.models import Conversation, ConversationType
 from scuba.settings import CHAT_DYNAMODB_REGION, CHAT_DYNAMODB_TABLE
 
 
@@ -236,6 +237,57 @@ class TestConversationArchiveApi(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json()['archived'])
+
+
+class TestUnreadCountApi(TestCase):
+    def setUp(self):
+        self.owner = _make_user('unreadowner@nowhere.com', 'apiunreadowner')
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.owner)
+
+    def test_anonymous_access_is_rejected(self):
+        response = APIClient().get('/api/chat/unread-count/')
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_zero_with_no_conversations(self):
+        response = self.client.get('/api/chat/unread-count/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['unread_count'], 0)
+
+    def test_counts_a_conversation_with_an_unread_message(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+        Conversation.objects.filter(pk=conversation.id).update(
+            last_message_id='m1', last_message_at=timezone.now())
+
+        response = self.client.get('/api/chat/unread-count/')
+
+        self.assertEqual(response.json()['unread_count'], 1)
+
+    def test_conversation_list_marks_unread_conversations(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+        Conversation.objects.filter(pk=conversation.id).update(
+            last_message_id='m1', last_message_at=timezone.now())
+
+        response = self.client.get('/api/chat/conversations/')
+
+        self.assertTrue(response.json()['conversations'][0]['unread'])
+
+    def test_marking_read_clears_the_unread_count(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+        Conversation.objects.filter(pk=conversation.id).update(
+            last_message_id='m1', last_message_at=timezone.now())
+
+        self.client.post(
+            f'/api/chat/conversations/{conversation.id}/read/',
+            {'last_read_message_id': 'm1'}, format='json')
+        response = self.client.get('/api/chat/unread-count/')
+
+        self.assertEqual(response.json()['unread_count'], 0)
 
 
 class TestDirectConversationApi(TestCase):

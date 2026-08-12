@@ -341,6 +341,21 @@ def mark_conversation_read(
         conversation_id, user_id, last_read_message_id=last_read_message_id)
 
 
+def get_unread_conversation_ids(
+    user_id: str, *, participant_repository: Optional[ParticipantRepository] = None,
+) -> set[str]:
+    """ Conversations with unread messages for this user (Phase 7, §25). """
+    participant_repository = participant_repository or _default_participant_repository()
+    return participant_repository.list_unread_conversation_ids(user_id)
+
+
+def get_unread_count(
+    user_id: str, *, participant_repository: Optional[ParticipantRepository] = None,
+) -> int:
+    """ Backs GET /api/chat/unread-count/ (Phase 7, §25). """
+    return len(get_unread_conversation_ids(user_id, participant_repository=participant_repository))
+
+
 def add_participant(
     *, conversation_id: str, user_id: str, actor_id: str, role: str = ConversationRole.MEMBER,
     conversation_repository: Optional[ConversationRepository] = None,

@@ -6,6 +6,7 @@ validation, authorization), not DynamoDB itself (see
 test_dynamodb_message_repository.py for that).
 """
 from django.test import TestCase
+from django.utils import timezone
 
 from scuba.accounts.models import User
 from scuba.chat import services
@@ -14,7 +15,7 @@ from scuba.chat.exceptions import (
     InvalidMessagePayloadError, InvalidSenderError, MessageNotFoundError,
     NotAConversationParticipantError, NotMessageOwnerError,
 )
-from scuba.chat.models import ConversationRole, ConversationType
+from scuba.chat.models import Conversation, ConversationRole, ConversationType
 from scuba.chat.repositories.message_repository import InMemoryMessageRepository
 
 
@@ -319,6 +320,33 @@ class TestMarkConversationRead(ChatServicesTestCase):
             services.mark_conversation_read(
                 conversation_id=str(conversation.id), user_id=str(self.outsider.id),
                 last_read_message_id='abc123')
+
+
+class TestGetUnreadCount(ChatServicesTestCase):
+    def test_counts_conversations_with_a_new_message_since_last_read(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+        Conversation.objects.filter(pk=conversation.id).update(
+            last_message_id='m1', last_message_at=timezone.now())
+
+        self.assertEqual(services.get_unread_count(str(self.owner.id)), 1)
+        self.assertEqual(
+            services.get_unread_conversation_ids(str(self.owner.id)), {str(conversation.id)})
+
+    def test_excludes_conversations_read_up_to_date(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+        Conversation.objects.filter(pk=conversation.id).update(
+            last_message_id='m1', last_message_at=timezone.now())
+
+        services.mark_conversation_read(
+            conversation_id=str(conversation.id), user_id=str(self.owner.id),
+            last_read_message_id='m1')
+
+        self.assertEqual(services.get_unread_count(str(self.owner.id)), 0)
+
+    def test_zero_for_a_user_with_no_conversations(self):
+        self.assertEqual(services.get_unread_count(str(self.outsider.id)), 0)
 
 
 class TestAddParticipant(ChatServicesTestCase):
