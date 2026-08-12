@@ -235,7 +235,7 @@ class DivesiteReviewSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
 
         today = date.today()
-        if DivesiteReview.objects.filter(user=user, review_date=today, divesite=divesite).filter():
+        if DivesiteReview.objects.filter(user=user, review_date=today, divesite=divesite).exists():
             raise serializers.ValidationError("You already submitted a review for today")
 
         return attrs
@@ -385,6 +385,9 @@ class DivesiteCheckinSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
+
+        if instance.is_anonymous:
+            ret['user'] = None
 
         divesite = Divesite.objects.get(id=ret.pop('divesite_id'))
 

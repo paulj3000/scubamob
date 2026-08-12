@@ -28,6 +28,7 @@ async function uploadFile() {
     formData.append("newbanner", fileupload.files[0]);
     await fetch("{% url 'admin:api_upload_banner' divesiteid=original.id %}", {
       method: "POST",
+      headers: {"X-CSRFToken": "{{ csrf_token }}"},
       body: formData
     });
     alert('The file has been uploaded successfully.');

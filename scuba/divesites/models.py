@@ -1,10 +1,13 @@
 import string
+from math import radians, cos, sin, asin, sqrt
 from random import choice
 
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Avg, ExpressionWrapper, F
 from django.db.models.functions import Coalesce
 
+from scuba.constants import EARTH_RADIUS
 from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.divesites.settings import RATING_CHOICES, DIFFICULTY_CHOICES
 from scuba.libs.stringutils import StringUtils
@@ -15,11 +18,14 @@ from scuba.settings import AWS_CLOUDFRONT, BANNER_BLANK_URL
 class Divesite(UUIDModel):
     name = models.CharField(max_length=100)
     description = models.TextField()
-    url = models.URLField(max_length=255, db_index=True, blank=True)
-    lat = models.DecimalField(max_digits=15, decimal_places=9)
+    url = models.URLField(max_length=255, db_index=True, blank=True, unique=True)
+    lat = models.DecimalField(
+        max_digits=15, decimal_places=9,
+        validators=[MinValueValidator(-90), MaxValueValidator(90)])
     location = models.CharField(max_length=128)
-    long = models.DecimalField(max_digits=15, decimal_places=9)
-    long = models.DecimalField(max_digits=15, decimal_places=9)
+    long = models.DecimalField(
+        max_digits=15, decimal_places=9,
+        validators=[MinValueValidator(-180), MaxValueValidator(180)])
     aws_id = models.CharField(max_length=10, blank=True)
     is_active = models.BooleanField(default=True)
     query_weather = models.BooleanField(default=True)
@@ -28,6 +34,14 @@ class Divesite(UUIDModel):
 
     class Meta:
         db_table = 'divesites'
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(lat__gte=-90) & models.Q(lat__lte=90),
+                name='divesite_lat_in_range'),
+            models.CheckConstraint(
+                condition=models.Q(long__gte=-180) & models.Q(long__lte=180),
+                name='divesite_long_in_range'),
+        ]
 
     def __str__(self):
         return self.name
@@ -37,8 +51,14 @@ class Divesite(UUIDModel):
         return self.get_banner()
 
     def save(self, *args, **kwargs):
-        # generate a url for the divesite
-        self.url = StringUtils.generate_url_from_string(self.name)
+        # generate a unique url for the divesite
+        base_url = StringUtils.generate_url_from_string(self.name)
+        url = base_url
+        suffix = 1
+        while Divesite.objects.exclude(pk=self.pk).filter(url=url).exists():
+            suffix += 1
+            url = f"{base_url}-{suffix}"
+        self.url = url
         super().save(*args, **kwargs)
 
     def add_to_favorite(self, user):
@@ -47,6 +67,38 @@ class Divesite(UUIDModel):
     @staticmethod
     def get_all_active_divesites():
         return Divesite.objects.filter(is_active=True)
+
+    @staticmethod
+    def get_local_divesites(lat, lng, distance):
+        """ get_local_divesites
+
+        return active divesites within `distance` miles of (lat, lng).
+        Falls back to all active divesites when any parameter is missing.
+        """
+        queryset = Divesite.get_all_active_divesites()
+
+        if lat is None or lng is None or distance is None:
+            return queryset
+
+        lat = float(lat)
+        lng = float(lng)
+        distance = float(distance)
+
+        nearby_ids = [
+            divesite.id for divesite in queryset
+            if Divesite.haversine_distance(lat, lng, float(divesite.lat), float(divesite.long)) <= distance
+        ]
+
+        return queryset.filter(id__in=nearby_ids)
+
+    @staticmethod
+    def haversine_distance(lat1, lng1, lat2, lng2):
+        """ great-circle distance, in miles, between two lat/lng points """
+        lat1, lng1, lat2, lng2 = map(radians, [lat1, lng1, lat2, lng2])
+        dlat = lat2 - lat1
+        dlng = lng2 - lng1
+        a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlng / 2) ** 2
+        return 2 * EARTH_RADIUS * asin(sqrt(a))
 
     def get_aws_id(self):
         """ a small utility to validate we have a valid AWS id
@@ -90,11 +142,7 @@ class Divesite(UUIDModel):
         return a banner for the divesite. If one does not exist, get a blank / default
         one
         """
-        if hasattr(self, 'divesitebanner'):
-            return self.divesitebanner.get_banner_image()
-
-        # No profile image. just return a default
-        return BANNER_BLANK_URL
+        return self.get_active_banner() or BANNER_BLANK_URL
 
     def upload_banner(self, uploaded_image):
         """ upload_banner
@@ -107,10 +155,10 @@ class Divesite(UUIDModel):
         filename = ImageUploader.compress_upload_image(uploaded_image, path)
 
         active = False
-        if not self.get_active_image():
+        if not self.get_active_banner():
             active = True
 
-        return self.banner.create(filename=filename, is_active=active)
+        return self.banners.create(banner=filename, is_active=active)
 
     def get_active_banner(self):
         banner_image = self.banners.filter(is_active=True).first()
@@ -122,7 +170,7 @@ class Divesite(UUIDModel):
         return None
 
     def get_divesite_stats(self, date):
-        return DivesiteDailyStats.objects.filter(divesite=self).aggregate(
+        return DivesiteDailyStats.objects.filter(divesite=self, stats_date=date).aggregate(
             avg_temp_c=Coalesce(
                 Avg('temp_c', output_field=models.IntegerField()), models.Value(0)),
             avg_temp_f=Coalesce(ExpressionWrapper(
@@ -155,19 +203,20 @@ class DivesiteReview(UUIDModel):
 class DivesiteBanner(UUIDModel):
     divesite = models.ForeignKey(Divesite, related_name='banners', on_delete=models.CASCADE)
     banner = models.CharField(max_length=128)
+    is_active = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'divesite_banner'
 
     @property
     def image_cleaned(self):
-        return self.image.replace('programs/', '')
+        return self.banner.replace('divesites/', '')
 
     def get_banner_image(self):
         """ get_banner_image
 
-        sanitize the profile image. This will return the full url path
-        of the profile image, sans the 'profiles/' prefix
+        sanitize the banner image. This will return the full url path
+        of the banner image, sans the 'divesites/' prefix
         """
         return f"{AWS_CLOUDFRONT}{self.image_cleaned}"
 
@@ -179,6 +228,9 @@ class DivesiteFavorite(UUIDModel):
 
     class Meta:
         db_table = 'divesite_favorite'
+        constraints = [
+            models.UniqueConstraint(fields=['divesite', 'user'], name='unique_divesite_favorite'),
+        ]
 
 
 class DivesiteCheckin(UUIDModel):

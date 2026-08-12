@@ -2,7 +2,6 @@
 from django.contrib import admin
 from django.urls import path, re_path
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 
 import scuba.divesites.models as divesites_models
@@ -51,7 +50,6 @@ class DivesiteAdmin(admin.ModelAdmin):
         retval = DivesiteSerializer(divesites_models.Divesite.objects.all(), many=True)
         return JsonResponse({'sites': retval.data})
 
-    @csrf_exempt
     def upload_banner(self, request, divesiteid):
         """ updateprogramtime
 
@@ -59,7 +57,7 @@ class DivesiteAdmin(admin.ModelAdmin):
         """
         divesite = get_object_or_404(Divesite, id=divesiteid)
         divesite.upload_banner(request.FILES['newbanner'])
-        return JsonResponse({'images': 'program.get_active_banner()'})
+        return JsonResponse({'images': divesite.get_active_banner()})
 
     def toggle_active_divesite(modeladmin, request, queryset):
         for obj in queryset:
