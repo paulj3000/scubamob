@@ -15,3 +15,7 @@ import scuba.galleries.models as galleries_models
 
 
 admin.site.register(galleries_models.Album)
+admin.site.register(galleries_models.AlbumImage)
+admin.site.register(galleries_models.AlbumMedia)
+admin.site.register(galleries_models.Media)
+admin.site.register(galleries_models.DailyImage)

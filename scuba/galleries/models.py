@@ -1,7 +1,7 @@
 import os
 import uuid
 from PIL import Image
-from io import StringIO
+from io import BytesIO
 
 from django.db import models
 
@@ -20,6 +20,8 @@ IMAGE_TYPE_EXTENSIONS = {
         'image/png': 'png',
         'image/tiff': 'tiff'
 }
+
+MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10MB
 
 
 class Media(UUIDModel):
@@ -42,7 +44,7 @@ class Media(UUIDModel):
         return '%s/%s/p206x206/%s' % (guid, album_id, filename)
 
     def get_image(self):
-        return settings.PRODUCTION_GALLERY_URL + self.image
+        return settings.PRODUCTION_GALLERY_URL + self.filename
 
     def get_thumbnail(self):
         return settings.PRODUCTION_GALLERY_URL + self.thumbnail
@@ -51,30 +53,25 @@ class Media(UUIDModel):
         db_table = 'media'
 
     @staticmethod
-    def upload_new_media(name, content_type, data):
-        name = StringUtils.generate_url_from_string(name)
-        print(name)
+    def upload_new_media(user, name, content_type, data):
+        title = StringUtils.generate_url_from_string(name)
 
-        count = Media.objects.filter(title=name).count()
+        count = Media.objects.filter(title=title).count()
         extra = 1
         while count:
-            tmp_name, ext = os.path.splitext(name)
-            tmp_name = f"{tmp_name}-{extra}{ext}"
+            tmp_name, ext = os.path.splitext(title)
+            title = f"{tmp_name}-{extra}{ext}"
             extra += 1
-            count = Media.objects.filter(title=tmp_name).count()
-
-            if not count:
-                name = tmp_name
+            count = Media.objects.filter(title=title).count()
 
         # TODO: validate the extension
-        aws_filename = f"content/{settings.SITE_ID}/{name}"
+        aws_filename = f"content/{settings.SITE_ID}/{title}"
 
         # upload the file to s3
         FileUtils.upload_file_to_s3(aws_filename, content_type, data)
 
         # and now, create the file
-        return Media.objects.create(
-            filename=name, content_type=content_type, aws_filename=aws_filename)
+        return Media.objects.create(user=user, filename=aws_filename, title=title)
 
 
 class Album(UUIDModel):
@@ -84,17 +81,20 @@ class Album(UUIDModel):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
+    @property
+    def guid(self):
+        return self.pk_as_str
+
     def add_image(self, uploaded_image):
         # seek to the beginning of the script
         filename = "%s.%s" % (
             str(uuid.uuid1()).replace('-', ''),
             IMAGE_TYPE_EXTENSIONS[uploaded_image.content_type])
 
-        account = self.user.get_account()
-        name = AlbumImage.generate_image_name(account.guid, self.guid, filename)
+        name = AlbumImage.generate_image_name(self.user.pk_as_str, self.pk_as_str, filename)
         headers = {'Content-Type': uploaded_image.content_type}
 
-        S3.upload_raw_data(name, uploaded_image.read(), settings.GALLERY_BUCKET, headers)
+        S3.upload_raw_data(name, uploaded_image.read(), bucket=settings.GALLERY_BUCKET, **headers)
         return name
 
     def add_image_thumbnail(self, uploaded_image):
@@ -105,37 +105,36 @@ class Album(UUIDModel):
             str(uuid.uuid1()).replace('-', ''),
             IMAGE_TYPE_EXTENSIONS[uploaded_image.content_type])
 
-        account = self.user.get_account()
         gallery_file_thumbnail = AlbumImage.generate_image_thumbnail_name(
-            account.guid, self.guid, filename)
+            self.user.pk_as_str, self.pk_as_str, filename)
         headers = {'Content-Type': uploaded_image.content_type}
 
         WHITE = (255, 255, 255)
 
         size = 150, 150
-        im = Image.open(StringIO(uploaded_image.read()))
-        im.thumbnail(size, Image.ANTIALIAS)
+        im = Image.open(BytesIO(uploaded_image.read()))
+        im.thumbnail(size, Image.LANCZOS)
 
         bg = Image.new('RGB', (150, 150), WHITE)
 
         W, H = bg.size
         w, h = im.size
 
-        xo, yo = (W - w) / 2, (H - h) / 2
+        xo, yo = (W - w) // 2, (H - h) // 2
         bg.paste(im, (xo, yo, xo + w, yo + h))
 
         # convert the image
         img_type = IMAGE_TYPE_EXTENSIONS[uploaded_image.content_type]
         img_type = 'jpeg' if img_type.lower() == 'jpg' else img_type
 
-        temp_handle = StringIO()
+        temp_handle = BytesIO()
         bg.save(temp_handle, img_type)
         temp_handle.seek(0)
 
         S3.upload_raw_data(gallery_file_thumbnail,
                            temp_handle.read(),
-                           settings.GALLERY_BUCKET,
-                           headers)
+                           bucket=settings.GALLERY_BUCKET,
+                           **headers)
 
         return gallery_file_thumbnail
 
@@ -145,7 +144,7 @@ class Album(UUIDModel):
     def to_json(self):
         return {
             'title': self.title, 'description': self.description,
-            'id': self.id, 'guid': self.guid}
+            'id': self.id, 'guid': self.pk_as_str}
 
 
 class AlbumImage(UUIDModel):
@@ -189,7 +188,7 @@ class AlbumImage(UUIDModel):
 
 class AlbumMedia(UUIDModel):
     album = models.ForeignKey(Album, on_delete=models.CASCADE)
-    media = models.ForeignKey(Album, related_name='media', on_delete=models.CASCADE)
+    media = models.ForeignKey(Media, related_name='albums', on_delete=models.CASCADE)
     pos = models.PositiveSmallIntegerField()
 
     class Meta:
