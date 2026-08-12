@@ -40,6 +40,9 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('The given email must be set')
 
+        if not extra_fields.get('username'):
+            raise ValueError('The given username must be set')
+
         now = timezone.now()
         email = self.normalize_email(email)
         user = self.model(email=email, last_login=now, date_joined=now, **extra_fields)
@@ -51,7 +54,7 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, email, password, **extra_fields):
         ''' override the create superuser function '''
-        user = self.create_user(email, password=password)
+        user = self.create_user(email, password=password, **extra_fields)
         user.is_admin = True
         user.is_superuser = True
         user.save(using=self._db)
@@ -85,6 +88,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         ordering = ['-date_joined']
 
     USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
     @property
     def profile_image(self):
