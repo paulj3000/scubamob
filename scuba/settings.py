@@ -194,6 +194,9 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGIN_REDIRECT_URL = '/home'
 LOGIN_URL = '/login'
 
+# how long a magic-link (passwordless) sign-in link stays valid for
+MAGIC_LINK_TOKEN_TTL_MINUTES = 15
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/

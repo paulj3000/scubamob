@@ -18,5 +18,9 @@ class InvalidConfirmationCodeException(Exception):
     """ Invalid confirmation code exception """
 
 
+class InvalidProfileImageException(Exception):
+    """ Invalid profile image exception """
+
+
 class IsBlockedException(Exception):
     """ User is blocked """

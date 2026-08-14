@@ -103,6 +103,19 @@ urlpatterns = [
     path('login/', login_views.LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(next_page='/'), name="logout"),
 
+    path('login/magic-link/', login_views.MagicLinkRequestView.as_view(), name='magic_link_request'),
+    path(
+        'login/magic-link/sent/',
+        TemplateView.as_view(
+            template_name='accounts/magic_link_sent.html',
+            extra_context={'hide_nav_account': True},
+        ),
+        name='magic_link_sent'),
+    path(
+        'login/magic-link/<str:uidb64>/<str:token>/',
+        login_views.MagicLinkConfirmView.as_view(),
+        name='magic_link_confirm'),
+
     path('robots.txt', include('scuba.robots.urls')),
 
     # enable the admin section

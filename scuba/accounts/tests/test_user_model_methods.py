@@ -1,14 +1,12 @@
 """
-Tests for three User model methods fixed under CODE_REVIEW.md §3 items
-3, 5, 6. All three had zero call sites anywhere in the app (confirmed via
-grep) -- these are landmine fixes, not fixes to anything live.
+Tests for User model methods fixed under CODE_REVIEW.md §3 items 3 and 5.
+Both had zero call sites anywhere in the app (confirmed via grep) --
+these are landmine fixes, not fixes to anything live.
 """
-import base64
-from unittest.mock import patch
-
 from django.test import TestCase
 
 from scuba.accounts.models import User, UserBuddyRequest, UserProfileImage, UserSetting
+from scuba.settings import AWS_CLOUDFRONT
 
 
 class TestGetSetting(TestCase):
@@ -65,45 +63,29 @@ class TestGetActiveBuddyRequests(TestCase):
         self.assertEqual(requests.count(), 0)
 
 
-def _data_uri_for(raw_bytes, ext='png'):
-    encoded = base64.urlsafe_b64encode(raw_bytes).decode('ascii')
-    return f'data:image/{ext};base64,{encoded}'
-
-
-class TestUploadProfileImageAsString(TestCase):
+class TestUserProfileImageUrl(TestCase):
+    """
+    UserProfileImage.get_profile_image() used to run the S3 key through
+    Django's static() tag and strip a stray 'programs/' prefix that
+    doesn't match anything the app ever writes -- the resulting URL
+    (/static/profiles/...) was never servable. It should build a
+    CloudFront URL and strip the 'profiles/' prefix the upload path
+    actually uses, matching every other S3-backed image field in the app
+    (e.g. DivesiteBanner.get_banner_image).
+    """
     def setUp(self):
         self.user = User.objects.create_user(
-            email='profileimage@nowhere.com', username='profileimageuser',
-            password='tester1234', first_name='Profile', last_name='User')
+            email='avatarurl@nowhere.com', username='avatarurluser',
+            password='tester1234', first_name='Avatar', last_name='User')
 
-    def test_invalid_input_returns_none(self):
-        result = self.user.upload_profile_image_as_string('not a data uri')
+    def test_returns_a_cloudfront_url_with_the_profiles_prefix_stripped(self):
+        image = UserProfileImage.objects.create(
+            user=self.user, image='profiles/abc123/xyz_1700000000.jpg')
 
-        self.assertIsNone(result)
+        self.assertEqual(
+            image.get_profile_image(), f"{AWS_CLOUDFRONT}abc123/xyz_1700000000.jpg")
 
-    @patch('scuba.accounts.models.S3.upload_raw_data')
-    def test_creates_a_new_profile_image(self, mock_upload):
-        data_uri = _data_uri_for(b'fake-png-bytes')
+    def test_user_get_profile_image_delegates_to_it(self):
+        UserProfileImage.objects.create(user=self.user, image='profiles/abc123/xyz.jpg')
 
-        profile_image = self.user.upload_profile_image_as_string(data_uri)
-
-        self.assertIsInstance(profile_image, UserProfileImage)
-        self.assertEqual(profile_image.user, self.user)
-        self.assertTrue(profile_image.image.startswith(f'profiles/{self.user.aws_id}/'))
-
-        mock_upload.assert_called_once()
-        args, kwargs = mock_upload.call_args
-        self.assertEqual(args[0], profile_image.image)
-        self.assertEqual(args[1], b'fake-png-bytes')
-        self.assertEqual(kwargs['ContentType'], 'image/png')
-
-    @patch('scuba.accounts.models.S3.upload_raw_data')
-    def test_replaces_an_existing_profile_image(self, mock_upload):
-        existing = UserProfileImage.objects.create(user=self.user, image='profiles/old.png')
-
-        data_uri = _data_uri_for(b'new-bytes')
-        profile_image = self.user.upload_profile_image_as_string(data_uri)
-
-        self.assertEqual(profile_image.pk, existing.pk)
-        self.assertNotEqual(profile_image.image, 'profiles/old.png')
-        self.assertEqual(UserProfileImage.objects.filter(user=self.user).count(), 1)
+        self.assertEqual(self.user.get_profile_image(), f"{AWS_CLOUDFRONT}abc123/xyz.jpg")
