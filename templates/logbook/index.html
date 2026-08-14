@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<script src="{% static 'js/logbook_index.js' %}"></script>
+<script src="{% static 'js/logbook/lb_index.js' %}"></script>
 
 {% if messages %}
 <ul class="messages">
@@ -25,10 +25,6 @@
         <div id="lb-tags" onclick="alert('hello2');">Tags</div>
     </li>
 </ul>
-
-<div class="ha_right" style="margin-bottom:10px">
-    <a class="cssbutton" href="{% url 'dive_add' %}" class="cant" style="width:100px">Log a New Dive</a>
-</div>
 
 <div id="lb-results">
 </div>

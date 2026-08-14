@@ -14,7 +14,7 @@ class Logbook(UUIDModel):
 
     @staticmethod
     def get_logs(user):
-        pass
+        return Logbook.objects.filter(user=user)
 
 
 class LogbookFolder(UUIDModel):
