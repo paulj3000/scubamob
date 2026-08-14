@@ -15,14 +15,20 @@ def index(us_request):
 
 @login_required
 def getlocaldiveshops(us_request):
-    retval = []
+    radius = us_request.GET.get('radius')
+    lon = us_request.GET.get('lon')
+    lat = us_request.GET.get('lat')
 
-#    try:
-    radius = int(us_request.GET['radius'])
-    lon = float(us_request.GET['lon'])
-    lat = float(us_request.GET['lat'])
+    shops = Diveshop.get_local_diveshops(lon, lat, radius)
 
-    for ds in Diveshop.get_local_diveshops(lon, lat, radius):
-        retval.append(ds)
+    retval = [
+        {
+            'id': shop.pk_as_str,
+            'name': shop.name,
+            'lat': float(shop.lat),
+            'long': float(shop.long),
+        }
+        for shop in shops
+    ]
 
     return JsonResponse({'items': retval})
