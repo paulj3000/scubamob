@@ -1,14 +1,3 @@
-# -----------------------------------------------------------------------------
-# scuba/logbook/forms.py
-#
-# This is the main class for the migrator.  This will take in a username, and
-# an optional new username.  The result will dictate whether the account can
-# successfully be migrated
-#
-# (C) Copyright 2013, Divespot.  All rights reserved.
-#
-# Author: Pauljames "The Juggernaut" Dimitriu
-# -----------------------------------------------------------------------------
 from django.forms import ModelForm
 
 from scuba.equipment.models import Equipment
@@ -25,6 +14,7 @@ class EquipmentForm(ModelForm):
         obj = super(EquipmentForm, self).save(*args, **kwargs)
         obj.user = self.user
         obj.save()
+        return obj
 
 
 class EquipmentMaintenanceForm(ModelForm):
