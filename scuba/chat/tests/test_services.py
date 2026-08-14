@@ -17,6 +17,7 @@ from scuba.chat.exceptions import (
 )
 from scuba.chat.models import Conversation, ConversationRole, ConversationType
 from scuba.chat.repositories.message_repository import InMemoryMessageRepository
+from scuba.chat.repositories.typing_repository import InMemoryTypingRepository, typing_key
 
 
 def _make_user(email, username):
@@ -347,6 +348,55 @@ class TestGetUnreadCount(ChatServicesTestCase):
 
     def test_zero_for_a_user_with_no_conversations(self):
         self.assertEqual(services.get_unread_count(str(self.outsider.id)), 0)
+
+
+class TestStartTyping(ChatServicesTestCase):
+    def test_records_typing_state(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+        typing_repository = InMemoryTypingRepository()
+
+        services.start_typing(
+            conversation_id=str(conversation.id), user_id=str(self.owner.id),
+            typing_repository=typing_repository)
+
+        self.assertIn(
+            typing_key(str(conversation.id), str(self.owner.id)), typing_repository._typing)
+
+    def test_rejects_a_non_participant(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+
+        with self.assertRaises(NotAConversationParticipantError):
+            services.start_typing(
+                conversation_id=str(conversation.id), user_id=str(self.outsider.id),
+                typing_repository=InMemoryTypingRepository())
+
+
+class TestStopTyping(ChatServicesTestCase):
+    def test_clears_typing_state(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+        typing_repository = InMemoryTypingRepository()
+        services.start_typing(
+            conversation_id=str(conversation.id), user_id=str(self.owner.id),
+            typing_repository=typing_repository)
+
+        services.stop_typing(
+            conversation_id=str(conversation.id), user_id=str(self.owner.id),
+            typing_repository=typing_repository)
+
+        self.assertNotIn(
+            typing_key(str(conversation.id), str(self.owner.id)), typing_repository._typing)
+
+    def test_rejects_a_non_participant(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+
+        with self.assertRaises(NotAConversationParticipantError):
+            services.stop_typing(
+                conversation_id=str(conversation.id), user_id=str(self.outsider.id),
+                typing_repository=InMemoryTypingRepository())
 
 
 class TestAddParticipant(ChatServicesTestCase):

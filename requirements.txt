@@ -10,6 +10,7 @@ django-filter==25.2
 channels==4.3.2
 channels_redis==4.3.0
 daphne==4.2.1
+redis==8.1.0
 
 boto3==1.42.26
 cryptography==49.0.0
@@ -32,6 +33,7 @@ factory_boy==3.3.3
 freezegun==1.5.5
 responses==0.25.8
 moto[dynamodb]==5.2.2
+fakeredis==2.37.0
 
 ruff==0.15.0
 pycodestyle==2.14.0

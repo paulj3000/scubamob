@@ -29,6 +29,7 @@ from scuba.chat.repositories.message_repository import DynamoDBMessageRepository
 from scuba.chat.repositories.participant_repository import (
     DjangoParticipantRepository, ParticipantRepository,
 )
+from scuba.chat.repositories.typing_repository import RedisTypingRepository, TypingRepository
 
 _ADMIN_ROLES = (ConversationRole.ADMIN, ConversationRole.OWNER)
 
@@ -45,6 +46,10 @@ def _default_conversation_repository() -> ConversationRepository:
 
 def _default_participant_repository() -> ParticipantRepository:
     return DjangoParticipantRepository()
+
+
+def _default_typing_repository() -> TypingRepository:
+    return RedisTypingRepository()
 
 
 def _get_conversation_or_raise(conversation_repository, conversation_id):
@@ -354,6 +359,43 @@ def get_unread_count(
 ) -> int:
     """ Backs GET /api/chat/unread-count/ (Phase 7, §25). """
     return len(get_unread_conversation_ids(user_id, participant_repository=participant_repository))
+
+
+def start_typing(
+    *, conversation_id: str, user_id: str,
+    typing_repository: Optional[TypingRepository] = None,
+    participant_repository: Optional[ParticipantRepository] = None,
+) -> None:
+    """ Phase 8, §27: records ephemeral typing state and notifies other participants. """
+    participant_repository = participant_repository or _default_participant_repository()
+    typing_repository = typing_repository or _default_typing_repository()
+
+    _require_participant(participant_repository, conversation_id, user_id)
+    typing_repository.set_typing(conversation_id, user_id)
+    _publish_event(
+        ChatEvent(
+            event=MessageEventType.TYPING_STARTED, conversation_id=conversation_id,
+            payload={'user_id': str(user_id)}),
+        participant_repository=participant_repository,
+    )
+
+
+def stop_typing(
+    *, conversation_id: str, user_id: str,
+    typing_repository: Optional[TypingRepository] = None,
+    participant_repository: Optional[ParticipantRepository] = None,
+) -> None:
+    participant_repository = participant_repository or _default_participant_repository()
+    typing_repository = typing_repository or _default_typing_repository()
+
+    _require_participant(participant_repository, conversation_id, user_id)
+    typing_repository.clear_typing(conversation_id, user_id)
+    _publish_event(
+        ChatEvent(
+            event=MessageEventType.TYPING_STOPPED, conversation_id=conversation_id,
+            payload={'user_id': str(user_id)}),
+        participant_repository=participant_repository,
+    )
 
 
 def add_participant(

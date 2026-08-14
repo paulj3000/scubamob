@@ -5,6 +5,8 @@ in-memory channel layer conftest.py configures for the whole test
 session -- no live Redis (CLAUDE.md forbids tests depending on a live
 external service).
 """
+from unittest import mock
+
 from channels.db import database_sync_to_async
 from channels.testing import WebsocketCommunicator
 from django.contrib.auth.models import AnonymousUser
@@ -15,6 +17,7 @@ from scuba.chat import services
 from scuba.chat.consumers import ChatConsumer
 from scuba.chat.models import ConversationType
 from scuba.chat.repositories.message_repository import InMemoryMessageRepository
+from scuba.chat.repositories.typing_repository import InMemoryTypingRepository
 
 
 def _make_user(email, username):
@@ -104,3 +107,101 @@ class TestChatEventBroadcast(TransactionTestCase):
         self.assertTrue(await outsider_comm.receive_nothing(timeout=1))
 
         await outsider_comm.disconnect()
+
+
+class TestChatConsumerTyping(TransactionTestCase):
+    """
+    Inbound typing.started/typing.stopped (Phase 8, §27). The default
+    typing repository is patched to an in-memory fake for the duration of
+    each test -- no live Redis (CLAUDE.md forbids tests depending on a
+    live external service); RedisTypingRepository itself is covered
+    directly in test_typing_repository.py against fakeredis.
+    """
+
+    def setUp(self):
+        patcher = mock.patch.object(
+            services, '_default_typing_repository', return_value=InMemoryTypingRepository())
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    async def test_typing_started_is_broadcast_to_other_participants(self):
+        owner = await database_sync_to_async(_make_user)('typeowner@nowhere.com', 'typeowner')
+        member = await database_sync_to_async(_make_user)('typemember@nowhere.com', 'typemember')
+        conversation = await database_sync_to_async(services.create_conversation)(
+            conversation_type=ConversationType.GROUP, created_by=str(owner.id))
+        await database_sync_to_async(services.add_participant)(
+            conversation_id=str(conversation.id), user_id=str(member.id), actor_id=str(owner.id))
+
+        owner_comm = WebsocketCommunicator(ChatConsumer.as_asgi(), '/ws/chat/')
+        owner_comm.scope['user'] = owner
+        member_comm = WebsocketCommunicator(ChatConsumer.as_asgi(), '/ws/chat/')
+        member_comm.scope['user'] = member
+        self.assertTrue((await owner_comm.connect())[0])
+        self.assertTrue((await member_comm.connect())[0])
+
+        await owner_comm.send_json_to({'type': 'typing.started', 'conversation_id': str(conversation.id)})
+
+        member_event = await member_comm.receive_json_from(timeout=2)
+        self.assertEqual(member_event['event'], 'typing.started')
+        self.assertEqual(member_event['conversation_id'], str(conversation.id))
+        self.assertEqual(member_event['user_id'], str(owner.id))
+
+        await owner_comm.disconnect()
+        await member_comm.disconnect()
+
+    async def test_typing_stopped_is_broadcast_to_other_participants(self):
+        owner = await database_sync_to_async(_make_user)('typeowner2@nowhere.com', 'typeowner2')
+        member = await database_sync_to_async(_make_user)('typemember2@nowhere.com', 'typemember2')
+        conversation = await database_sync_to_async(services.create_conversation)(
+            conversation_type=ConversationType.GROUP, created_by=str(owner.id))
+        await database_sync_to_async(services.add_participant)(
+            conversation_id=str(conversation.id), user_id=str(member.id), actor_id=str(owner.id))
+
+        owner_comm = WebsocketCommunicator(ChatConsumer.as_asgi(), '/ws/chat/')
+        owner_comm.scope['user'] = owner
+        member_comm = WebsocketCommunicator(ChatConsumer.as_asgi(), '/ws/chat/')
+        member_comm.scope['user'] = member
+        self.assertTrue((await owner_comm.connect())[0])
+        self.assertTrue((await member_comm.connect())[0])
+
+        await owner_comm.send_json_to({'type': 'typing.stopped', 'conversation_id': str(conversation.id)})
+
+        member_event = await member_comm.receive_json_from(timeout=2)
+        self.assertEqual(member_event['event'], 'typing.stopped')
+
+        await owner_comm.disconnect()
+        await member_comm.disconnect()
+
+    async def test_a_non_participant_typing_event_is_silently_ignored(self):
+        owner = await database_sync_to_async(_make_user)('typeowner3@nowhere.com', 'typeowner3')
+        outsider = await database_sync_to_async(_make_user)('typeoutsider3@nowhere.com', 'typeoutsider3')
+        conversation = await database_sync_to_async(services.create_conversation)(
+            conversation_type=ConversationType.GROUP, created_by=str(owner.id))
+
+        outsider_comm = WebsocketCommunicator(ChatConsumer.as_asgi(), '/ws/chat/')
+        outsider_comm.scope['user'] = outsider
+        self.assertTrue((await outsider_comm.connect())[0])
+
+        await outsider_comm.send_json_to(
+            {'type': 'typing.started', 'conversation_id': str(conversation.id)})
+
+        # the socket must stay open (no ChatError propagates into a close)
+        self.assertTrue(await outsider_comm.receive_nothing(timeout=1))
+        await outsider_comm.send_json_to({'type': 'ping'})
+        self.assertTrue(await outsider_comm.receive_nothing(timeout=1))
+
+        await outsider_comm.disconnect()
+
+    async def test_an_unrecognized_message_type_is_ignored(self):
+        owner = await database_sync_to_async(_make_user)('typeowner4@nowhere.com', 'typeowner4')
+        conversation = await database_sync_to_async(services.create_conversation)(
+            conversation_type=ConversationType.GROUP, created_by=str(owner.id))
+
+        owner_comm = WebsocketCommunicator(ChatConsumer.as_asgi(), '/ws/chat/')
+        owner_comm.scope['user'] = owner
+        self.assertTrue((await owner_comm.connect())[0])
+
+        await owner_comm.send_json_to({'type': 'not.a.real.event', 'conversation_id': str(conversation.id)})
+
+        self.assertTrue(await owner_comm.receive_nothing(timeout=1))
+        await owner_comm.disconnect()
