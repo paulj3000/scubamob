@@ -13,19 +13,16 @@ class SearchView(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            get = self.request.GET
+            location = self.request.GET.get('location')
 
-            print(" INEHERE >>>> ")
-
-            if get.get('location'):
-                print(" INEHERE 22 >>>> ")
-                p, created = SearchLocation.objects.get_or_create(
+            if location:
+                max_length = SearchLocation._meta.get_field('location').max_length
+                search_location, created = SearchLocation.objects.get_or_create(
                     user=request.user,
-                    location=get['location'])
+                    location=location[:max_length])
 
-                print(p)
                 if not created:
-                    p.save()
+                    search_location.save()
 
         return super().dispatch(request, *args, **kwargs)
 

@@ -16,3 +16,7 @@ class SearchLocation(UUIDModel):
 
     class Meta:
         db_table = 'search_location'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'location'], name='unique_search_location'),
+        ]
