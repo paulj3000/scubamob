@@ -73,6 +73,35 @@ class ConversationParticipant(UUIDModel):
         return f"{self.user} in conversation {self.conversation_id}"
 
 
+class Notification(UUIDModel):
+    """
+    §29, Phase 10: an in-app notification for a chat event ("Chris Kelly
+    sent you a message"). Only ever created for MESSAGE_CREATED today
+    (chat.services._schedule_notifications) -- email/push channels are
+    explicitly out of scope for this phase.
+    """
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chat_notifications')
+    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='notifications')
+    actor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='+')
+
+    # A DynamoDB message id (scuba.chat.domain.generate_message_id), not a
+    # foreign key -- same non-FK pattern as Conversation.last_message_id.
+    message_id = models.CharField(max_length=64)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    read_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'chat_notification'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['recipient', 'read_at'], name='chat_notif_recipient_read_idx'),
+        ]
+
+    def __str__(self):
+        return f"Notification for {self.recipient} in conversation {self.conversation_id}"
+
+
 class DirectConversationPair(UUIDModel):
     """
     Enforces §14: at most one active DIRECT conversation between any two

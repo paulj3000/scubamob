@@ -15,7 +15,7 @@ from rest_framework.test import APIClient
 
 from scuba.accounts.models import User
 from scuba.chat import services
-from scuba.chat.models import Conversation, ConversationType
+from scuba.chat.models import Conversation, ConversationType, Notification
 from scuba.chat.repositories.presence_repository import InMemoryPresenceRepository
 from scuba.settings import CHAT_DYNAMODB_REGION, CHAT_DYNAMODB_TABLE
 
@@ -368,3 +368,136 @@ class TestPresenceApi(TestCase):
         response = self.client.get(f'/api/chat/presence/{self.member.id}/')
 
         self.assertEqual(response.json()['state'], 'OFFLINE')
+
+
+class TestNotificationListApi(TestCase):
+    """ Phase 10, §29. """
+
+    def setUp(self):
+        self.owner = _make_user('notifowner@nowhere.com', 'apinotifowner')
+        self.actor = _make_user('notifactor@nowhere.com', 'apinotifactor')
+        self.conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.actor.id))
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.owner)
+
+    def test_anonymous_access_is_rejected(self):
+        response = APIClient().get('/api/chat/notifications/')
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_lists_only_the_users_own_notifications(self):
+        Notification.objects.create(
+            recipient=self.owner, conversation=self.conversation, actor=self.actor, message_id='m1')
+        other = _make_user('notifother@nowhere.com', 'apinotifother')
+        Notification.objects.create(
+            recipient=other, conversation=self.conversation, actor=self.actor, message_id='m2')
+
+        response = self.client.get('/api/chat/notifications/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()['results']), 1)
+
+    def test_unread_only_filter(self):
+        Notification.objects.create(
+            recipient=self.owner, conversation=self.conversation, actor=self.actor, message_id='m1',
+            read_at=timezone.now())
+        unread = Notification.objects.create(
+            recipient=self.owner, conversation=self.conversation, actor=self.actor, message_id='m2')
+
+        response = self.client.get('/api/chat/notifications/?unread_only=true')
+
+        results = response.json()['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['id'], str(unread.id))
+
+
+class TestUnreadNotificationCountApi(TestCase):
+    def setUp(self):
+        self.owner = _make_user('unreadnotifowner@nowhere.com', 'apiunreadnotifowner')
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.owner)
+
+    def test_anonymous_access_is_rejected(self):
+        response = APIClient().get('/api/chat/notifications/unread-count/')
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_zero_with_no_notifications(self):
+        response = self.client.get('/api/chat/notifications/unread-count/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['unread_count'], 0)
+
+    def test_counts_unread_notifications(self):
+        actor = _make_user('unreadnotifactor@nowhere.com', 'apiunreadnotifactor')
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(actor.id))
+        Notification.objects.create(
+            recipient=self.owner, conversation=conversation, actor=actor, message_id='m1')
+
+        response = self.client.get('/api/chat/notifications/unread-count/')
+
+        self.assertEqual(response.json()['unread_count'], 1)
+
+
+class TestNotificationReadApi(TestCase):
+    def setUp(self):
+        self.owner = _make_user('readnotifowner@nowhere.com', 'apireadnotifowner')
+        self.actor = _make_user('readnotifactor@nowhere.com', 'apireadnotifactor')
+        self.conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.actor.id))
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.owner)
+
+    def test_anonymous_access_is_rejected(self):
+        notification = Notification.objects.create(
+            recipient=self.owner, conversation=self.conversation, actor=self.actor, message_id='m1')
+
+        response = APIClient().post(f'/api/chat/notifications/{notification.id}/read/')
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_marks_a_notification_read(self):
+        notification = Notification.objects.create(
+            recipient=self.owner, conversation=self.conversation, actor=self.actor, message_id='m1')
+
+        response = self.client.post(f'/api/chat/notifications/{notification.id}/read/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.json()['notification']['read_at'])
+
+    def test_a_notification_belonging_to_someone_else_is_not_found(self):
+        other = _make_user('readnotifother@nowhere.com', 'apireadnotifother')
+        notification = Notification.objects.create(
+            recipient=other, conversation=self.conversation, actor=self.actor, message_id='m1')
+
+        response = self.client.post(f'/api/chat/notifications/{notification.id}/read/')
+
+        self.assertEqual(response.status_code, 404)
+
+
+class TestNotificationReadAllApi(TestCase):
+    def setUp(self):
+        self.owner = _make_user('readallnotifowner@nowhere.com', 'apireadallnotifowner')
+        self.actor = _make_user('readallnotifactor@nowhere.com', 'apireadallnotifactor')
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.owner)
+
+    def test_anonymous_access_is_rejected(self):
+        response = APIClient().post('/api/chat/notifications/read-all/')
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_marks_every_unread_notification_read(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.actor.id))
+        Notification.objects.create(
+            recipient=self.owner, conversation=conversation, actor=self.actor, message_id='m1')
+        Notification.objects.create(
+            recipient=self.owner, conversation=conversation, actor=self.actor, message_id='m2')
+
+        response = self.client.post('/api/chat/notifications/read-all/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(services.get_unread_notification_count(str(self.owner.id)), 0)

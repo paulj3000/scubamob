@@ -47,6 +47,10 @@ class NotAuthorizedToViewPresenceError(ChatError):
     """ The requester does not share a conversation with the user whose presence they asked for. """
 
 
+class NotificationNotFoundError(ChatError):
+    """ No notification exists for the given (notification id, recipient) pair. """
+
+
 class RepositoryUnavailableError(ChatError):
     """
     The backing store for a repository (DynamoDB, Redis) could not be

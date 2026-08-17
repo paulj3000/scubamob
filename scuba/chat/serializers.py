@@ -4,7 +4,7 @@ DRF serializers for the chat REST API (docs/chat_dynamo.md Phase 4, §19).
 from rest_framework import serializers
 
 from scuba.chat.domain import MessageType
-from scuba.chat.models import Conversation, ConversationType
+from scuba.chat.models import Conversation, ConversationType, Notification
 
 
 class ConversationSerializer(serializers.ModelSerializer):
@@ -75,3 +75,12 @@ class MuteConversationSerializer(serializers.Serializer):
 
 class ArchiveConversationSerializer(serializers.Serializer):
     archived = serializers.BooleanField(default=True)
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    """ Phase 10, §29: an in-app notification. """
+
+    class Meta:
+        model = Notification
+        fields = ('id', 'conversation', 'actor', 'message_id', 'created_at', 'read_at')
+        read_only_fields = fields

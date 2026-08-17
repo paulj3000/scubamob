@@ -14,9 +14,12 @@ from scuba.chat.domain import PresenceState
 from scuba.chat.exceptions import (
     BlockedUserError, ConversationNotFoundError, InsufficientRoleError,
     InvalidMessagePayloadError, InvalidSenderError, MessageNotFoundError,
-    NotAConversationParticipantError, NotAuthorizedToViewPresenceError, NotMessageOwnerError,
+    NotAConversationParticipantError, NotAuthorizedToViewPresenceError, NotificationNotFoundError,
+    NotMessageOwnerError,
 )
-from scuba.chat.models import Conversation, ConversationRole, ConversationType
+from scuba.chat.models import (
+    Conversation, ConversationParticipant, ConversationRole, ConversationType, Notification,
+)
 from scuba.chat.repositories.message_repository import InMemoryMessageRepository
 from scuba.chat.repositories.presence_repository import InMemoryPresenceRepository
 from scuba.chat.repositories.typing_repository import InMemoryTypingRepository, typing_key
@@ -223,6 +226,47 @@ class TestSendMessage(ChatServicesTestCase):
 
         self.assertEqual(first.message_id, second.message_id)
         self.assertEqual(second.body, 'hi')
+
+
+class TestScheduleNotifications(ChatServicesTestCase):
+    """ Phase 10, §29 -- send_message's step 9, hooked via _schedule_notifications. """
+
+    def setUp(self):
+        super().setUp()
+        self.conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+        services.add_participant(
+            conversation_id=str(self.conversation.id), user_id=str(self.member.id),
+            actor_id=str(self.owner.id))
+
+    def test_notifies_other_participants_but_not_the_sender(self):
+        services.send_message(
+            conversation_id=str(self.conversation.id), sender_id=str(self.owner.id),
+            body='hi', message_repository=self.message_repository)
+
+        self.assertEqual(Notification.objects.filter(recipient=self.member).count(), 1)
+        self.assertFalse(Notification.objects.filter(recipient=self.owner).exists())
+
+    def test_notification_carries_actor_conversation_and_message_id(self):
+        message = services.send_message(
+            conversation_id=str(self.conversation.id), sender_id=str(self.owner.id),
+            body='hi', message_repository=self.message_repository)
+
+        notification = Notification.objects.get(recipient=self.member)
+        self.assertEqual(notification.actor, self.owner)
+        self.assertEqual(notification.conversation, self.conversation)
+        self.assertEqual(notification.message_id, message.message_id)
+
+    def test_skips_a_participant_who_disabled_notifications(self):
+        ConversationParticipant.objects.filter(
+            conversation=self.conversation, user=self.member
+        ).update(notifications_enabled=False)
+
+        services.send_message(
+            conversation_id=str(self.conversation.id), sender_id=str(self.owner.id),
+            body='hi', message_repository=self.message_repository)
+
+        self.assertFalse(Notification.objects.filter(recipient=self.member).exists())
 
 
 class TestEditMessage(ChatServicesTestCase):
@@ -555,3 +599,87 @@ class TestArchiveAndMuteConversation(ChatServicesTestCase):
 
         participant = conversation.participants.get(user=self.owner)
         self.assertTrue(participant.muted)
+
+
+class TestListNotifications(ChatServicesTestCase):
+    def test_newest_first_and_scoped_to_the_user(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+        first = Notification.objects.create(
+            recipient=self.member, conversation=conversation, actor=self.owner, message_id='m1')
+        second = Notification.objects.create(
+            recipient=self.member, conversation=conversation, actor=self.owner, message_id='m2')
+        Notification.objects.create(
+            recipient=self.outsider, conversation=conversation, actor=self.owner, message_id='m3')
+
+        notifications = services.list_notifications(str(self.member.id))
+
+        self.assertEqual([n.id for n in notifications], [second.id, first.id])
+
+    def test_unread_only(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+        unread = Notification.objects.create(
+            recipient=self.member, conversation=conversation, actor=self.owner, message_id='m1')
+        Notification.objects.create(
+            recipient=self.member, conversation=conversation, actor=self.owner, message_id='m2',
+            read_at=timezone.now())
+
+        notifications = services.list_notifications(str(self.member.id), unread_only=True)
+
+        self.assertEqual([n.id for n in notifications], [unread.id])
+
+
+class TestGetUnreadNotificationCount(ChatServicesTestCase):
+    def test_counts_only_unread_notifications_for_the_user(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+        Notification.objects.create(
+            recipient=self.member, conversation=conversation, actor=self.owner, message_id='m1')
+        Notification.objects.create(
+            recipient=self.member, conversation=conversation, actor=self.owner, message_id='m2',
+            read_at=timezone.now())
+
+        self.assertEqual(services.get_unread_notification_count(str(self.member.id)), 1)
+
+
+class TestMarkNotificationRead(ChatServicesTestCase):
+    def test_marks_a_notification_as_read(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+        notification = Notification.objects.create(
+            recipient=self.member, conversation=conversation, actor=self.owner, message_id='m1')
+
+        result = services.mark_notification_read(
+            notification_id=str(notification.id), user_id=str(self.member.id))
+
+        self.assertIsNotNone(result.read_at)
+
+    def test_raises_for_a_notification_belonging_to_someone_else(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+        notification = Notification.objects.create(
+            recipient=self.member, conversation=conversation, actor=self.owner, message_id='m1')
+
+        with self.assertRaises(NotificationNotFoundError):
+            services.mark_notification_read(
+                notification_id=str(notification.id), user_id=str(self.outsider.id))
+
+    def test_raises_for_a_nonexistent_notification(self):
+        with self.assertRaises(NotificationNotFoundError):
+            services.mark_notification_read(
+                notification_id='00000000-0000-0000-0000-000000000000', user_id=str(self.member.id))
+
+
+class TestMarkAllNotificationsRead(ChatServicesTestCase):
+    def test_marks_every_unread_notification_for_the_user(self):
+        conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+        Notification.objects.create(
+            recipient=self.member, conversation=conversation, actor=self.owner, message_id='m1')
+        Notification.objects.create(
+            recipient=self.member, conversation=conversation, actor=self.owner, message_id='m2')
+
+        services.mark_all_notifications_read(str(self.member.id))
+
+        self.assertEqual(services.get_unread_notification_count(str(self.member.id)), 0)

@@ -8,6 +8,7 @@ from scuba.chat.exceptions import MessageNotFoundError
 from scuba.chat.repositories.attachment_repository import AttachmentRepository
 from scuba.chat.repositories.conversation_repository import ConversationRepository
 from scuba.chat.repositories.message_repository import InMemoryMessageRepository, MessageRepository
+from scuba.chat.repositories.notification_repository import NotificationRepository
 from scuba.chat.repositories.participant_repository import ParticipantRepository
 from scuba.chat.repositories.reaction_repository import ReactionRepository
 
@@ -34,6 +35,10 @@ class TestRepositoryInterfacesAreAbstract(SimpleTestCase):
     def test_cannot_instantiate_attachment_repository_directly(self):
         with self.assertRaises(TypeError):
             AttachmentRepository()
+
+    def test_cannot_instantiate_notification_repository_directly(self):
+        with self.assertRaises(TypeError):
+            NotificationRepository()
 
 
 def _make_message(conversation_id='conv1', **kwargs):

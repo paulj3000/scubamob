@@ -14,13 +14,13 @@ from scuba.chat import services
 from scuba.chat.exceptions import (
     BlockedUserError, ChatError, ConversationNotFoundError, InsufficientRoleError,
     InvalidMessagePayloadError, InvalidSenderError, MessageNotFoundError,
-    NotAConversationParticipantError, NotAuthorizedToViewPresenceError, NotMessageOwnerError,
-    RepositoryUnavailableError,
+    NotAConversationParticipantError, NotAuthorizedToViewPresenceError, NotificationNotFoundError,
+    NotMessageOwnerError, RepositoryUnavailableError,
 )
 from scuba.chat.serializers import (
     ArchiveConversationSerializer, ConversationSerializer, CreateConversationSerializer,
-    MarkReadSerializer, MessageSerializer, MuteConversationSerializer, SendMessageSerializer,
-    UpdateConversationSerializer,
+    MarkReadSerializer, MessageSerializer, MuteConversationSerializer, NotificationSerializer,
+    SendMessageSerializer, UpdateConversationSerializer,
 )
 
 _MAX_MESSAGE_PAGE_SIZE = 200
@@ -33,6 +33,7 @@ _ERROR_STATUS = {
     NotMessageOwnerError: status.HTTP_403_FORBIDDEN,
     BlockedUserError: status.HTTP_403_FORBIDDEN,
     NotAuthorizedToViewPresenceError: status.HTTP_403_FORBIDDEN,
+    NotificationNotFoundError: status.HTTP_404_NOT_FOUND,
     InvalidSenderError: status.HTTP_400_BAD_REQUEST,
     InvalidMessagePayloadError: status.HTTP_400_BAD_REQUEST,
     RepositoryUnavailableError: status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -239,3 +240,48 @@ class PresenceApi(APIView):
             return _error_response(error)
 
         return Response({'user_id': user_id, 'state': state})
+
+
+class NotificationListApi(APIView):
+    """ Phase 10, §29: the in-app notification feed, newest first. """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        unread_only = request.query_params.get('unread_only') == 'true'
+        try:
+            limit = min(int(request.query_params.get('limit', 50)), _MAX_MESSAGE_PAGE_SIZE)
+        except ValueError:
+            return Response(
+                {'error': 'limit must be an integer'}, status=status.HTTP_400_BAD_REQUEST)
+
+        notifications = services.list_notifications(
+            str(request.user.id), unread_only=unread_only, limit=limit)
+        return Response({'results': NotificationSerializer(notifications, many=True).data})
+
+
+class UnreadNotificationCountApi(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({'unread_count': services.get_unread_notification_count(str(request.user.id))})
+
+
+class NotificationReadApi(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, notification_id):
+        try:
+            notification = services.mark_notification_read(
+                notification_id=notification_id, user_id=str(request.user.id))
+        except ChatError as error:
+            return _error_response(error)
+
+        return Response({'notification': NotificationSerializer(notification).data})
+
+
+class NotificationReadAllApi(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        services.mark_all_notifications_read(str(request.user.id))
+        return Response({'status': 'ok'})

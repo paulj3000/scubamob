@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from scuba.chat.models import Conversation, ConversationParticipant, DirectConversationPair
+from scuba.chat.models import Conversation, ConversationParticipant, DirectConversationPair, Notification
 
 
 class ConversationParticipantInline(admin.TabularInline):
@@ -19,6 +19,12 @@ class ConversationParticipantAdmin(admin.ModelAdmin):
     list_filter = ('role', 'muted', 'archived')
 
 
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('recipient', 'actor', 'conversation', 'message_id', 'created_at', 'read_at')
+    list_filter = ('read_at',)
+
+
 admin.site.register(Conversation, ConversationAdmin)
 admin.site.register(ConversationParticipant, ConversationParticipantAdmin)
 admin.site.register(DirectConversationPair)
+admin.site.register(Notification, NotificationAdmin)

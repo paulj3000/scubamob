@@ -20,13 +20,16 @@ from scuba.chat.events import ChatEvent, MessageEventType
 from scuba.chat.exceptions import (
     BlockedUserError, ConversationNotFoundError, InsufficientRoleError, InvalidMessagePayloadError,
     InvalidSenderError, MessageNotFoundError, NotAConversationParticipantError,
-    NotAuthorizedToViewPresenceError, NotMessageOwnerError,
+    NotAuthorizedToViewPresenceError, NotificationNotFoundError, NotMessageOwnerError,
 )
 from scuba.chat.models import ConversationRole, ConversationType
 from scuba.chat.repositories.conversation_repository import (
     ConversationRepository, DjangoConversationRepository,
 )
 from scuba.chat.repositories.message_repository import DynamoDBMessageRepository, MessageRepository
+from scuba.chat.repositories.notification_repository import (
+    DjangoNotificationRepository, NotificationRepository,
+)
 from scuba.chat.repositories.participant_repository import (
     DjangoParticipantRepository, ParticipantRepository,
 )
@@ -56,6 +59,10 @@ def _default_typing_repository() -> TypingRepository:
 
 def _default_presence_repository() -> PresenceRepository:
     return RedisPresenceRepository()
+
+
+def _default_notification_repository() -> NotificationRepository:
+    return DjangoNotificationRepository()
 
 
 def _get_conversation_or_raise(conversation_repository, conversation_id):
@@ -161,8 +168,43 @@ def _publish_event(
                 event.event, event.conversation_id, participant.user_id)
 
 
-def _schedule_notifications(message: Message) -> None:
-    """ No-op until Phase 10 adds the notification system (§29). """
+def _schedule_notifications(
+    message: Message, *,
+    participant_repository: Optional[ParticipantRepository] = None,
+    notification_repository: Optional[NotificationRepository] = None,
+) -> None:
+    """
+    Phase 10, §29: creates an in-app Notification for every other current
+    participant, unless they've disabled notifications for this
+    conversation (ConversationParticipant.notifications_enabled). §29 says
+    "notifications should be asynchronous" and "do not send emails inside
+    the synchronous message-write path" -- this phase is in-app only (see
+    TASK_TRACKER.md for the scope decision), so there is no email/push
+    dispatch here to defer in the first place. What "asynchronous" means
+    for the in-app write itself: same as _publish_event just above -- a
+    notification failure must never fail or undo the message send, so
+    errors are logged, not raised.
+    """
+    participant_repository = participant_repository or _default_participant_repository()
+    notification_repository = notification_repository or _default_notification_repository()
+
+    participants = participant_repository.list_participants(message.conversation_id)
+    for participant in participants:
+        if str(participant.user_id) == str(message.sender_id):
+            continue
+        if not participant.notifications_enabled:
+            continue
+        try:
+            notification_repository.create_notification(
+                recipient_id=str(participant.user_id),
+                conversation_id=message.conversation_id,
+                actor_id=str(message.sender_id),
+                message_id=message.message_id,
+            )
+        except Exception:
+            logger.exception(
+                "Failed to create notification for user %s in conversation %s",
+                participant.user_id, message.conversation_id)
 
 
 def create_conversation(
@@ -281,7 +323,7 @@ def send_message(
         participant_repository=participant_repository,
     )
 
-    _schedule_notifications(message)                                                      # 9
+    _schedule_notifications(message, participant_repository=participant_repository)        # 9
 
     return message                                                                        # 10
 
@@ -483,6 +525,40 @@ def archive_conversation(
     participant_repository = participant_repository or _default_participant_repository()
     _require_participant(participant_repository, conversation_id, user_id)
     participant_repository.set_archived(conversation_id, user_id, archived)
+
+
+def list_notifications(
+    user_id: str, *, unread_only: bool = False, limit: int = 50,
+    notification_repository: Optional[NotificationRepository] = None,
+):
+    """ Phase 10, §29: the notification feed, newest first. """
+    notification_repository = notification_repository or _default_notification_repository()
+    return notification_repository.list_notifications(user_id, unread_only=unread_only, limit=limit)
+
+
+def get_unread_notification_count(
+    user_id: str, *, notification_repository: Optional[NotificationRepository] = None,
+) -> int:
+    notification_repository = notification_repository or _default_notification_repository()
+    return notification_repository.count_unread(user_id)
+
+
+def mark_notification_read(
+    *, notification_id: str, user_id: str,
+    notification_repository: Optional[NotificationRepository] = None,
+):
+    notification_repository = notification_repository or _default_notification_repository()
+    notification = notification_repository.mark_read(notification_id, user_id)
+    if notification is None:
+        raise NotificationNotFoundError(f"no notification {notification_id} for user {user_id}")
+    return notification
+
+
+def mark_all_notifications_read(
+    user_id: str, *, notification_repository: Optional[NotificationRepository] = None,
+) -> None:
+    notification_repository = notification_repository or _default_notification_repository()
+    notification_repository.mark_all_read(user_id)
 
 
 def mute_conversation(
