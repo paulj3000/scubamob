@@ -14,7 +14,8 @@ from scuba.chat import services
 from scuba.chat.exceptions import (
     BlockedUserError, ChatError, ConversationNotFoundError, InsufficientRoleError,
     InvalidMessagePayloadError, InvalidSenderError, MessageNotFoundError,
-    NotAConversationParticipantError, NotMessageOwnerError, RepositoryUnavailableError,
+    NotAConversationParticipantError, NotAuthorizedToViewPresenceError, NotMessageOwnerError,
+    RepositoryUnavailableError,
 )
 from scuba.chat.serializers import (
     ArchiveConversationSerializer, ConversationSerializer, CreateConversationSerializer,
@@ -31,6 +32,7 @@ _ERROR_STATUS = {
     InsufficientRoleError: status.HTTP_403_FORBIDDEN,
     NotMessageOwnerError: status.HTTP_403_FORBIDDEN,
     BlockedUserError: status.HTTP_403_FORBIDDEN,
+    NotAuthorizedToViewPresenceError: status.HTTP_403_FORBIDDEN,
     InvalidSenderError: status.HTTP_400_BAD_REQUEST,
     InvalidMessagePayloadError: status.HTTP_400_BAD_REQUEST,
     RepositoryUnavailableError: status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -219,3 +221,21 @@ class UnreadCountApi(APIView):
 
     def get(self, request):
         return Response({'unread_count': services.get_unread_count(str(request.user.id))})
+
+
+class PresenceApi(APIView):
+    """
+    Phase 9, §28: query-only presence lookup, scoped to requesters who
+    share a conversation with the target user (or the user themselves).
+    No WebSocket presence broadcast -- see TASK_TRACKER.md for the scope
+    decision.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        try:
+            state = services.get_presence(user_id=user_id, requester_id=str(request.user.id))
+        except ChatError as error:
+            return _error_response(error)
+
+        return Response({'user_id': user_id, 'state': state})

@@ -43,6 +43,10 @@ class InsufficientRoleError(ChatError):
     """ The acting user's participant role does not permit the requested action. """
 
 
+class NotAuthorizedToViewPresenceError(ChatError):
+    """ The requester does not share a conversation with the user whose presence they asked for. """
+
+
 class RepositoryUnavailableError(ChatError):
     """
     The backing store for a repository (DynamoDB, Redis) could not be

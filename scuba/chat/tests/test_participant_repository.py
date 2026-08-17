@@ -145,3 +145,21 @@ class TestDjangoParticipantRepository(TestCase):
         self.repo.set_muted(str(self.conversation.id), str(self.user.id), False)
         participant.refresh_from_db()
         self.assertFalse(participant.muted)
+
+    def test_shares_conversation_with_true_for_common_participants(self):
+        self.repo.add_participant(str(self.conversation.id), str(self.user.id))
+        self.repo.add_participant(str(self.conversation.id), str(self.other.id))
+
+        self.assertTrue(self.repo.shares_conversation_with(str(self.user.id), str(self.other.id)))
+
+    def test_shares_conversation_with_false_for_no_common_conversation(self):
+        self.repo.add_participant(str(self.conversation.id), str(self.user.id))
+
+        self.assertFalse(self.repo.shares_conversation_with(str(self.user.id), str(self.other.id)))
+
+    def test_shares_conversation_with_false_after_the_other_user_left(self):
+        self.repo.add_participant(str(self.conversation.id), str(self.user.id))
+        self.repo.add_participant(str(self.conversation.id), str(self.other.id))
+        self.repo.mark_left(str(self.conversation.id), str(self.other.id))
+
+        self.assertFalse(self.repo.shares_conversation_with(str(self.user.id), str(self.other.id)))

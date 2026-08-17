@@ -16,6 +16,7 @@ from rest_framework.test import APIClient
 from scuba.accounts.models import User
 from scuba.chat import services
 from scuba.chat.models import Conversation, ConversationType
+from scuba.chat.repositories.presence_repository import InMemoryPresenceRepository
 from scuba.settings import CHAT_DYNAMODB_REGION, CHAT_DYNAMODB_TABLE
 
 
@@ -312,3 +313,58 @@ class TestDirectConversationApi(TestCase):
         second = client.post(f'/api/chat/direct/{other.id}/')
 
         self.assertEqual(first.json()['conversation']['id'], second.json()['conversation']['id'])
+
+
+class TestPresenceApi(TestCase):
+    """
+    Phase 9, §28. The default presence repository is patched to an
+    in-memory fake for the duration of each test -- no live Redis
+    (CLAUDE.md forbids tests depending on a live external service).
+    """
+
+    def setUp(self):
+        self.presence_repository = InMemoryPresenceRepository()
+        patcher = mock.patch.object(
+            services, '_default_presence_repository', return_value=self.presence_repository)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+        self.owner = _make_user('presenceowner@nowhere.com', 'apipresenceowner')
+        self.member = _make_user('presencemember@nowhere.com', 'apipresencemember')
+        self.outsider = _make_user('presenceoutsider@nowhere.com', 'apipresenceoutsider')
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.owner)
+
+    def test_anonymous_access_is_rejected(self):
+        response = APIClient().get(f'/api/chat/presence/{self.owner.id}/')
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_a_user_can_view_their_own_presence(self):
+        self.presence_repository.mark_connected(str(self.owner.id))
+
+        response = self.client.get(f'/api/chat/presence/{self.owner.id}/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['state'], 'ONLINE')
+
+    def test_a_conversation_partner_can_view_presence(self):
+        services.create_direct_conversation(str(self.owner.id), str(self.member.id))
+        self.presence_repository.mark_connected(str(self.member.id))
+
+        response = self.client.get(f'/api/chat/presence/{self.member.id}/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['state'], 'ONLINE')
+
+    def test_a_non_partner_is_rejected(self):
+        response = self.client.get(f'/api/chat/presence/{self.outsider.id}/')
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_defaults_to_offline_when_never_connected(self):
+        services.create_direct_conversation(str(self.owner.id), str(self.member.id))
+
+        response = self.client.get(f'/api/chat/presence/{self.member.id}/')
+
+        self.assertEqual(response.json()['state'], 'OFFLINE')

@@ -10,13 +10,15 @@ from django.utils import timezone
 
 from scuba.accounts.models import User
 from scuba.chat import services
+from scuba.chat.domain import PresenceState
 from scuba.chat.exceptions import (
     BlockedUserError, ConversationNotFoundError, InsufficientRoleError,
     InvalidMessagePayloadError, InvalidSenderError, MessageNotFoundError,
-    NotAConversationParticipantError, NotMessageOwnerError,
+    NotAConversationParticipantError, NotAuthorizedToViewPresenceError, NotMessageOwnerError,
 )
 from scuba.chat.models import Conversation, ConversationRole, ConversationType
 from scuba.chat.repositories.message_repository import InMemoryMessageRepository
+from scuba.chat.repositories.presence_repository import InMemoryPresenceRepository
 from scuba.chat.repositories.typing_repository import InMemoryTypingRepository, typing_key
 
 
@@ -397,6 +399,50 @@ class TestStopTyping(ChatServicesTestCase):
             services.stop_typing(
                 conversation_id=str(conversation.id), user_id=str(self.outsider.id),
                 typing_repository=InMemoryTypingRepository())
+
+
+class TestMarkUserOnlineAndOffline(ChatServicesTestCase):
+    def test_online_then_offline(self):
+        presence_repository = InMemoryPresenceRepository()
+
+        services.mark_user_online(user_id=str(self.owner.id), presence_repository=presence_repository)
+        self.assertEqual(presence_repository.get_state(str(self.owner.id)), PresenceState.ONLINE)
+
+        services.mark_user_offline(user_id=str(self.owner.id), presence_repository=presence_repository)
+        self.assertEqual(
+            presence_repository.get_state(str(self.owner.id)), PresenceState.RECENTLY_ACTIVE)
+
+
+class TestGetPresence(ChatServicesTestCase):
+    def test_a_user_can_view_their_own_presence(self):
+        presence_repository = InMemoryPresenceRepository()
+        presence_repository.mark_connected(str(self.owner.id))
+
+        state = services.get_presence(
+            user_id=str(self.owner.id), requester_id=str(self.owner.id),
+            presence_repository=presence_repository)
+
+        self.assertEqual(state, PresenceState.ONLINE)
+
+    def test_a_conversation_partner_can_view_presence(self):
+        services.create_direct_conversation(str(self.owner.id), str(self.member.id))
+        presence_repository = InMemoryPresenceRepository()
+        presence_repository.mark_connected(str(self.owner.id))
+
+        state = services.get_presence(
+            user_id=str(self.owner.id), requester_id=str(self.member.id),
+            presence_repository=presence_repository)
+
+        self.assertEqual(state, PresenceState.ONLINE)
+
+    def test_a_non_partner_is_rejected(self):
+        presence_repository = InMemoryPresenceRepository()
+        presence_repository.mark_connected(str(self.owner.id))
+
+        with self.assertRaises(NotAuthorizedToViewPresenceError):
+            services.get_presence(
+                user_id=str(self.owner.id), requester_id=str(self.outsider.id),
+                presence_repository=presence_repository)
 
 
 class TestAddParticipant(ChatServicesTestCase):

@@ -19,4 +19,5 @@ urlpatterns = [
         chat_apis.ConversationArchiveApi.as_view()),
     re_path(rf'^direct/(?P<user_id>{_UUID})/$', chat_apis.DirectConversationApi.as_view()),
     re_path(r'^unread-count/$', chat_apis.UnreadCountApi.as_view()),
+    re_path(rf'^presence/(?P<user_id>{_UUID})/$', chat_apis.PresenceApi.as_view()),
 ]

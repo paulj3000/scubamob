@@ -58,6 +58,15 @@ class ParticipantRepository(ABC):
     def set_muted(self, conversation_id: str, user_id: str, muted: bool) -> None:
         ...
 
+    @abstractmethod
+    def shares_conversation_with(self, user_id: str, other_user_id: str) -> bool:
+        """
+        True if both users are current (non-left) participants of at least
+        one common conversation. Used by presence (§28, Phase 9) to scope
+        who may look up whose presence -- the same privacy boundary
+        everything else in chat already uses.
+        """
+
 
 class DjangoParticipantRepository(ParticipantRepository):
     """ Real implementation backed by the Phase 1 ConversationParticipant model. """
@@ -112,3 +121,10 @@ class DjangoParticipantRepository(ParticipantRepository):
         ConversationParticipant.objects.filter(
             conversation_id=conversation_id, user_id=user_id
         ).update(muted=muted)
+
+    def shares_conversation_with(self, user_id: str, other_user_id: str) -> bool:
+        return ConversationParticipant.objects.filter(
+            user_id=user_id, left_at__isnull=True,
+            conversation__participants__user_id=other_user_id,
+            conversation__participants__left_at__isnull=True,
+        ).exists()

@@ -17,6 +17,15 @@ from datetime import datetime
 from typing import Optional
 
 
+class PresenceState:
+    """ The three presence states (docs/chat_dynamo.md §28, Phase 9). """
+    ONLINE = 'ONLINE'
+    RECENTLY_ACTIVE = 'RECENTLY_ACTIVE'
+    OFFLINE = 'OFFLINE'
+
+    ALL = (ONLINE, RECENTLY_ACTIVE, OFFLINE)
+
+
 class MessageType:
     """ Initial message payload kinds (docs/chat_dynamo.md §7, §31). """
     TEXT = 'TEXT'

@@ -15,8 +15,10 @@ from django.test import TransactionTestCase
 from scuba.accounts.models import User
 from scuba.chat import services
 from scuba.chat.consumers import ChatConsumer
+from scuba.chat.domain import PresenceState
 from scuba.chat.models import ConversationType
 from scuba.chat.repositories.message_repository import InMemoryMessageRepository
+from scuba.chat.repositories.presence_repository import InMemoryPresenceRepository
 from scuba.chat.repositories.typing_repository import InMemoryTypingRepository
 
 
@@ -205,3 +207,70 @@ class TestChatConsumerTyping(TransactionTestCase):
 
         self.assertTrue(await owner_comm.receive_nothing(timeout=1))
         await owner_comm.disconnect()
+
+
+class TestChatConsumerPresence(TransactionTestCase):
+    """
+    Connect/disconnect drive presence (Phase 9, §28) -- there is no inbound
+    presence message, unlike typing. The default presence repository is
+    patched to an in-memory fake for the duration of each test -- no live
+    Redis (CLAUDE.md forbids tests depending on a live external service);
+    RedisPresenceRepository itself is covered directly in
+    test_presence_repository.py against fakeredis.
+    """
+
+    def setUp(self):
+        self.presence_repository = InMemoryPresenceRepository()
+        patcher = mock.patch.object(
+            services, '_default_presence_repository', return_value=self.presence_repository)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    async def test_connecting_marks_the_user_online(self):
+        user = await database_sync_to_async(_make_user)('presenceuser@nowhere.com', 'presenceuser')
+        comm = WebsocketCommunicator(ChatConsumer.as_asgi(), '/ws/chat/')
+        comm.scope['user'] = user
+
+        self.assertTrue((await comm.connect())[0])
+
+        state = await database_sync_to_async(self.presence_repository.get_state)(str(user.id))
+        self.assertEqual(state, PresenceState.ONLINE)
+
+        await comm.disconnect()
+
+    async def test_disconnecting_marks_the_user_recently_active(self):
+        user = await database_sync_to_async(_make_user)('presenceuser2@nowhere.com', 'presenceuser2')
+        comm = WebsocketCommunicator(ChatConsumer.as_asgi(), '/ws/chat/')
+        comm.scope['user'] = user
+        self.assertTrue((await comm.connect())[0])
+
+        await comm.disconnect()
+
+        state = await database_sync_to_async(self.presence_repository.get_state)(str(user.id))
+        self.assertEqual(state, PresenceState.RECENTLY_ACTIVE)
+
+    async def test_stays_online_while_a_second_connection_is_still_open(self):
+        user = await database_sync_to_async(_make_user)('presenceuser3@nowhere.com', 'presenceuser3')
+        first_comm = WebsocketCommunicator(ChatConsumer.as_asgi(), '/ws/chat/')
+        first_comm.scope['user'] = user
+        second_comm = WebsocketCommunicator(ChatConsumer.as_asgi(), '/ws/chat/')
+        second_comm.scope['user'] = user
+        self.assertTrue((await first_comm.connect())[0])
+        self.assertTrue((await second_comm.connect())[0])
+
+        await first_comm.disconnect()
+
+        state = await database_sync_to_async(self.presence_repository.get_state)(str(user.id))
+        self.assertEqual(state, PresenceState.ONLINE)
+
+        await second_comm.disconnect()
+
+    async def test_an_anonymous_connection_never_marks_anyone_online(self):
+        comm = WebsocketCommunicator(ChatConsumer.as_asgi(), '/ws/chat/')
+        comm.scope['user'] = AnonymousUser()
+
+        connected, _ = await comm.connect()
+
+        self.assertFalse(connected)
+        self.assertEqual(self.presence_repository._connections, {})
+        await comm.disconnect()

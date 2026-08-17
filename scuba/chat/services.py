@@ -19,7 +19,8 @@ from scuba.chat.domain import Message, MessageType, generate_message_id, user_ch
 from scuba.chat.events import ChatEvent, MessageEventType
 from scuba.chat.exceptions import (
     BlockedUserError, ConversationNotFoundError, InsufficientRoleError, InvalidMessagePayloadError,
-    InvalidSenderError, MessageNotFoundError, NotAConversationParticipantError, NotMessageOwnerError,
+    InvalidSenderError, MessageNotFoundError, NotAConversationParticipantError,
+    NotAuthorizedToViewPresenceError, NotMessageOwnerError,
 )
 from scuba.chat.models import ConversationRole, ConversationType
 from scuba.chat.repositories.conversation_repository import (
@@ -29,6 +30,7 @@ from scuba.chat.repositories.message_repository import DynamoDBMessageRepository
 from scuba.chat.repositories.participant_repository import (
     DjangoParticipantRepository, ParticipantRepository,
 )
+from scuba.chat.repositories.presence_repository import PresenceRepository, RedisPresenceRepository
 from scuba.chat.repositories.typing_repository import RedisTypingRepository, TypingRepository
 
 _ADMIN_ROLES = (ConversationRole.ADMIN, ConversationRole.OWNER)
@@ -50,6 +52,10 @@ def _default_participant_repository() -> ParticipantRepository:
 
 def _default_typing_repository() -> TypingRepository:
     return RedisTypingRepository()
+
+
+def _default_presence_repository() -> PresenceRepository:
+    return RedisPresenceRepository()
 
 
 def _get_conversation_or_raise(conversation_repository, conversation_id):
@@ -396,6 +402,43 @@ def stop_typing(
             payload={'user_id': str(user_id)}),
         participant_repository=participant_repository,
     )
+
+
+def mark_user_online(
+    *, user_id: str, presence_repository: Optional[PresenceRepository] = None,
+) -> None:
+    """ Phase 9, §28: called by ChatConsumer.connect -- one more open WebSocket. """
+    presence_repository = presence_repository or _default_presence_repository()
+    presence_repository.mark_connected(str(user_id))
+
+
+def mark_user_offline(
+    *, user_id: str, presence_repository: Optional[PresenceRepository] = None,
+) -> None:
+    """ Called by ChatConsumer.disconnect -- one fewer open WebSocket. """
+    presence_repository = presence_repository or _default_presence_repository()
+    presence_repository.mark_disconnected(str(user_id))
+
+
+def get_presence(
+    *, user_id: str, requester_id: str,
+    presence_repository: Optional[PresenceRepository] = None,
+    participant_repository: Optional[ParticipantRepository] = None,
+) -> str:
+    """
+    Phase 9, §28: a user's own presence is always visible to themselves;
+    otherwise the requester must currently share a conversation with them
+    -- the same privacy boundary every other chat lookup already uses,
+    since presence has no boundary of its own described in the doc.
+    """
+    presence_repository = presence_repository or _default_presence_repository()
+    if str(requester_id) != str(user_id):
+        participant_repository = participant_repository or _default_participant_repository()
+        if not participant_repository.shares_conversation_with(str(requester_id), str(user_id)):
+            raise NotAuthorizedToViewPresenceError(
+                f"user {requester_id} does not share a conversation with {user_id}")
+
+    return presence_repository.get_state(str(user_id))
 
 
 def add_participant(
