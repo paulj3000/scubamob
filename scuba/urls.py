@@ -39,7 +39,6 @@ urlpatterns = [
     path('articles/', include('scuba.content.urls_articles')),
     path('account/', include('scuba.accounts.urls')),
     path('settings/', include('scuba.accounts.urls_settings')),
-    path('groups/', include('scuba.divegroups.urls')),
     path('logbooks/', include('scuba.logbooks.urls')),
     path('sites/', include('scuba.divesites.urls')),
     path('diveshops/', include('scuba.diveshops.urls')),
