@@ -151,6 +151,17 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         # return all of the buddies that is not us!
         return self.buddies.all().order_by('-user__activities__activity_date')
 
+    def get_buddies_feed(self, limit=10):
+        """ get_buddies_feed
+
+        return the most recent non-private feed activity (reviews,
+        checkins) posted by any of this user's buddies
+        """
+        buddy_ids = self.buddies.values_list('buddy_id', flat=True)
+        return UserFeed.objects.filter(
+            user_id__in=buddy_ids, is_private=False
+        ).select_related('user').order_by('-created')[:limit]
+
     def add_buddy(self, buddy):
         """ add_buddy
 

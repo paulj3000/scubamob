@@ -37,6 +37,7 @@ urlpatterns = [
     path('collections/', include('scuba.accounts.urls_collections')),
     path('search', search_views.SearchView.as_view(), name='search'),
     path('articles/', include('scuba.content.urls_articles')),
+    path('news/', include('scuba.content.urls_news')),
     path('account/', include('scuba.accounts.urls')),
     path('settings/', include('scuba.accounts.urls_settings')),
     path('logbooks/', include('scuba.logbooks.urls')),

@@ -3,9 +3,11 @@ Tests for User model methods fixed under CODE_REVIEW.md §3 items 3 and 5.
 Both had zero call sites anywhere in the app (confirmed via grep) --
 these are landmine fixes, not fixes to anything live.
 """
+import uuid
+
 from django.test import TestCase
 
-from scuba.accounts.models import User, UserBuddyRequest, UserProfileImage, UserSetting
+from scuba.accounts.models import User, UserBuddyRequest, UserFeed, UserProfileImage, UserSetting
 from scuba.settings import AWS_CLOUDFRONT
 
 
@@ -89,3 +91,49 @@ class TestUserProfileImageUrl(TestCase):
         UserProfileImage.objects.create(user=self.user, image='profiles/abc123/xyz.jpg')
 
         self.assertEqual(self.user.get_profile_image(), f"{AWS_CLOUDFRONT}abc123/xyz.jpg")
+
+
+class TestGetBuddiesFeed(TestCase):
+    """
+    Tests for User.get_buddies_feed, added for the homepage "friends
+    activity" dashboard widget.
+    """
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='feedowner@nowhere.com', username='feedowneruser',
+            password='tester1234', first_name='Feed', last_name='Owner')
+        self.buddy = User.objects.create_user(
+            email='feedbuddy@nowhere.com', username='feedbuddyuser',
+            password='tester1234', first_name='Feed', last_name='Buddy')
+        self.stranger = User.objects.create_user(
+            email='feedstranger@nowhere.com', username='feedstrangeruser',
+            password='tester1234', first_name='Feed', last_name='Stranger')
+
+        self.user.add_buddy(self.buddy)
+
+    def test_includes_only_buddies_activity(self):
+        buddy_entry = UserFeed.objects.create(
+            user=self.buddy, instance_type=1, instance_id=uuid.uuid4())
+        UserFeed.objects.create(
+            user=self.stranger, instance_type=1, instance_id=uuid.uuid4())
+
+        feed = self.user.get_buddies_feed()
+
+        self.assertEqual(list(feed), [buddy_entry])
+
+    def test_excludes_private_entries(self):
+        UserFeed.objects.create(
+            user=self.buddy, instance_type=0, instance_id=uuid.uuid4(), is_private=True)
+
+        self.assertEqual(list(self.user.get_buddies_feed()), [])
+
+    def test_orders_most_recent_first_and_respects_limit(self):
+        first = UserFeed.objects.create(
+            user=self.buddy, instance_type=1, instance_id=uuid.uuid4())
+        second = UserFeed.objects.create(
+            user=self.buddy, instance_type=1, instance_id=uuid.uuid4())
+
+        feed = list(self.user.get_buddies_feed(limit=1))
+
+        self.assertEqual(feed, [second])
+        self.assertNotIn(first, feed)

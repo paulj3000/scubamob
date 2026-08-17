@@ -74,8 +74,8 @@ class NewsArticleView(TemplateView):
 
         add some extra variables to the rendering context
         """
-        print(kwargs['url'])
         context = super().get_context_data(**kwargs)
-        context['article'] = get_object_or_404(NewsArticle, url=kwargs.get('url'))
+        context['article'] = get_object_or_404(
+            NewsArticle, url=kwargs.get('url'), is_published=True)
         context['active'] = 'news'
         return context
