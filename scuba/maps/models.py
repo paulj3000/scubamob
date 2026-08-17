@@ -1,5 +1,6 @@
 from django.db import models
 
+from scuba.libs.exceptions import InvalidCoordinatesException
 from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.libs.weather import Weather
 
@@ -29,6 +30,14 @@ class Region(UUIDModel):
 
     @staticmethod
     def get_weather_by_lat_long(lat, long):
+        try:
+            lat_value, long_value = float(lat), float(long)
+        except (TypeError, ValueError):
+            raise InvalidCoordinatesException()
+
+        if not (-90 <= lat_value <= 90) or not (-180 <= long_value <= 180):
+            raise InvalidCoordinatesException()
+
         weather_json = Weather.get_current_by_lat_lng(lat, long)
         region = Region.store_weather_region(weather_json)
 
