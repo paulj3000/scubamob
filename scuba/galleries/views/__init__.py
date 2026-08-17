@@ -16,9 +16,9 @@ def index(us_request):
 @login_required
 def showalbum(us_request, album_id):
     # render the appropriate template
-    album = get_object_or_404(Album, guid=album_id)
+    album = get_object_or_404(Album, id=album_id)
 
-    if not album or album.user != us_request.user:
+    if album.user != us_request.user:
         raise Http404
 
     context = {'album': album}
@@ -28,9 +28,9 @@ def showalbum(us_request, album_id):
 @login_required
 def editalbum(us_request, album_id):
     # render the appropriate template
-    album = get_object_or_404(Album, guid=album_id)
+    album = get_object_or_404(Album, id=album_id)
 
-    if not album or album.user != us_request.user:
+    if album.user != us_request.user:
         raise Http404
 
     context = {'album': album}

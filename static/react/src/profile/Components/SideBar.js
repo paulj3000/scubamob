@@ -9,7 +9,51 @@ class SideBar extends React.Component {
         this.state = {
             profile: profile,
             following: profile.is_following,
+            uploadingAvatar: false,
+            avatarError: null,
         };
+        this.avatarInputRef = React.createRef();
+    }
+
+    onAvatarClick = () => {
+        this.avatarInputRef.current.click();
+    }
+
+    onAvatarFileSelected = (event) => {
+        const file = event.target.files[0];
+        event.target.value = null;
+
+        if (!file) {
+            return;
+        }
+
+        this.setState({ uploadingAvatar: true, avatarError: null });
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        fetch(`/api/settings/profile-image/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': Cookies.get('csrftoken'),
+            },
+            body: formData,
+        })
+        .then(res => res.json().then(data => ({ ok: res.ok, data })))
+        .then(({ ok, data }) => {
+            if (!ok) {
+                this.setState({ uploadingAvatar: false, avatarError: data.errors || 'Upload failed' });
+                return;
+            }
+
+            this.setState((state) => ({
+                uploadingAvatar: false,
+                profile: { ...state.profile, profile_image: data.profile_image },
+            }));
+        })
+        .catch(() => {
+            this.setState({ uploadingAvatar: false, avatarError: 'Upload failed' });
+        });
     }
 
     doFollow = () => {
@@ -35,13 +79,34 @@ class SideBar extends React.Component {
     }
 
     render() {
-        const { profile, following } = this.state;
+        const { profile, following, uploadingAvatar, avatarError } = this.state;
         return (
           <>
             <div className="card profile-sidebar">
                 <div className="header"></div>
                 <div className="profile-userpic">
                     <img src={profile.profile_image} className="img-fluid img-thumbnail rounded-circle" alt="" />
+                    {
+                        profile.is_self &&
+                        <div className="text-center mt-1">
+                            <button
+                                type="button"
+                                className="btn btn-sm btn-outline-secondary"
+                                onClick={this.onAvatarClick}
+                                disabled={uploadingAvatar}
+                            >
+                                {uploadingAvatar ? 'Uploading...' : 'Change photo'}
+                            </button>
+                            <input
+                                ref={this.avatarInputRef}
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                style={{ display: 'none' }}
+                                onChange={this.onAvatarFileSelected}
+                            />
+                            {avatarError && <div className="text-danger small mt-1">{avatarError}</div>}
+                        </div>
+                    }
                 </div>
 
                 <div className="profile-usertitle">

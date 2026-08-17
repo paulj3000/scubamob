@@ -1,8 +1,5 @@
-import re
 import datetime
-import time
 import random
-import base64
 
 from django.db import models
 from django.contrib.auth.models import (
@@ -18,7 +15,6 @@ from django.core.exceptions import ValidationError
 
 from rest_framework.authtoken.models import Token
 
-from scuba.libs.stringutils import StringUtils
 from scuba.accounts.settings import SETTINGS_KEYS, SETTINGS_VALUES
 from scuba.libs.models.uuidmodel import UUIDModel
 from scuba.accounts.exceptions import (
@@ -26,8 +22,9 @@ from scuba.accounts.exceptions import (
     PrimaryEmailIdException, EmailInUseException, InvalidConfirmationCodeException)
 from scuba.accounts.settings import SETTINGS
 from scuba.divesites.models import Divesite
-from scuba.libs.aws.s3 import S3
-from scuba.settings import AWS_S3_BUCKET, EMAIL_BACKEND, PROFILE_BLANK_URL, SITE_TITLE
+from scuba.settings import (
+    AWS_CLOUDFRONT, EMAIL_BACKEND, PROFILE_BLANK_URL, SITE_TITLE,
+    MAGIC_LINK_TOKEN_TTL_MINUTES)
 
 from scuba.libs.mail import generate_email, send_mail
 
@@ -40,6 +37,9 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('The given email must be set')
 
+        if not extra_fields.get('username'):
+            raise ValueError('The given username must be set')
+
         now = timezone.now()
         email = self.normalize_email(email)
         user = self.model(email=email, last_login=now, date_joined=now, **extra_fields)
@@ -51,7 +51,7 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, email, password, **extra_fields):
         ''' override the create superuser function '''
-        user = self.create_user(email, password=password)
+        user = self.create_user(email, password=password, **extra_fields)
         user.is_admin = True
         user.is_superuser = True
         user.save(using=self._db)
@@ -85,6 +85,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         ordering = ['-date_joined']
 
     USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
     @property
     def profile_image(self):
@@ -371,39 +372,6 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel):
         # No profile image. just return a default
         return static(PROFILE_BLANK_URL)
 
-    def upload_profile_image_as_string(self, uploaded_image_string):
-        ''' upload a profile image to S3 when the uploaded image is sent
-        over as a string
-        Params:
-            uploaded_image_string: a string representation of a profile image
-        '''
-        # generate the file name the
-        img_length = 5  # the sub key length
-        sub_name = StringUtils.generate_random_number(img_length)
-        base_name = "profiles/%s/%s_%d.png" % (self.aws_id, sub_name, int(time.time()))
-
-        # if re.search(r'^data:image\/(jpg|png);base64', uploaded_image_string, re.DOTALL):
-        result = re.search("data:image/(?P<ext>.*?);base64,(?P<data>.*)", uploaded_image_string)
-
-        profile_image = None
-        if result:
-            ext = result.groupdict().get("ext")
-            data = result.groupdict().get("data")
-
-            img = base64.urlsafe_b64decode(data)
-            S3.upload_raw_data(base_name, img, bucket=AWS_S3_BUCKET, ContentType='image/%s' % ext)
-
-            # does the user have a profile image? if so, replace it
-            if hasattr(self, 'userprofileimage'):
-                profile_image = getattr(self, 'userprofileimage')
-                profile_image.image = base_name
-                profile_image.save()
-            else:
-                profile_image = UserProfileImage.objects.create(user=self, image=base_name)
-
-        # return the new profile image
-        return profile_image
-
     def get_setting(self, setting):
 
         setting_key = SETTINGS_KEYS[setting]
@@ -616,6 +584,29 @@ class UserConfirmationCode(UUIDModel):
         self.save()
 
 
+class MagicLinkToken(UUIDModel):
+    """ MagicLinkToken
+
+    A one-time, expiring token used to sign a user in without a password
+    ("magic link" / passwordless login). Only the salted hash of the raw
+    token is ever persisted.
+    """
+    user = models.ForeignKey(User, related_name='magic_link_tokens', on_delete=models.CASCADE)
+    token_hash = models.CharField(max_length=64, db_index=True)
+    redeemed = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'user_magic_link_token'
+
+    def set_redeemed(self):
+        self.redeemed = True
+        self.save()
+
+    def is_expired(self):
+        return timezone.now() > self.created + datetime.timedelta(minutes=MAGIC_LINK_TOKEN_TTL_MINUTES)
+
+
 class UserFollower(UUIDModel):
     """ UserFollower
 
@@ -809,7 +800,7 @@ class UserProfileImage(UUIDModel):
 
     @property
     def image_cleaned(self):
-        return self.image.replace('programs/', '')
+        return self.image.replace('profiles/', '')
 
     def get_profile_image(self):
         """ get_profile_image
@@ -817,7 +808,7 @@ class UserProfileImage(UUIDModel):
         sanitize the profile image. This will return the full url path
         of the profile image, sans the 'profiles/' prefix
         """
-        return static(self.image_cleaned)
+        return f"{AWS_CLOUDFRONT}{self.image_cleaned}"
 
 
 class UserLogin(UUIDModel):
@@ -959,7 +950,7 @@ class ViewProfile(UUIDModel):
         first. Later, if no profile image exists, return a default avatar '''
 
         if self.profile_image:
-            return static(self.profile_image)
+            return f"{AWS_CLOUDFRONT}{self.profile_image.replace('profiles/', '')}"
 
         return static(PROFILE_BLANK_URL)
 

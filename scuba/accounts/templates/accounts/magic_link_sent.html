@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+    <div class="container-fluid h-custom">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-md-8 col-lg-6 col-xl-4">
+                <h3>Check your email</h3>
+                <p>If that email address is registered, we've sent a sign-in link to it.</p>
+
+                <div>
+                    To sign in
+                    <ol>
+                        <li>Check your email account</li>
+                        <li>Click the link in the email</li>
+                    </ol>
+                </div>
+                <p class="small fw-bold mt-2 pt-1 mb-0">
+                    <a href="{% url 'login' %}">Back to sign in with a password</a>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

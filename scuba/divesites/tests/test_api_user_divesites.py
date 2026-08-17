@@ -152,6 +152,33 @@ class TestUserDivesitesApi(TestCase):
         self.assertEqual(divesite['checkin_count'], 1, 'we now have a checkin')
         # self.assertEqual(len(divesite['checkins']), 1, 'we now have a checkin')
 
+    def test_anonymous_checkin_hides_user(self):
+        """
+        A checkin marked anonymous should not disclose the user's identity
+        """
+        user = User.objects.get(email='foo@nowhere.com')
+        divesite = Divesite.objects.get(name='White Point')
+
+        client = APIClient()
+        client.force_authenticate(user=user)
+
+        url = f'/api/divesites/{divesite.pk_as_str}/checkins'
+        payload = {
+            'review': 'anonymous dive',
+            'temp_c': 23,
+            'rating': 1,
+            'visibility': 300,
+            'is_anonymous': True,
+        }
+        response = client.post(url, payload, format='json')
+        self.assertEqual(response.status_code, 201)
+        self.assertIsNone(response.json()['user'])
+
+        response = client.get(url, format='json')
+        checkins = response.json()['checkins']
+        self.assertEqual(len(checkins), 1)
+        self.assertIsNone(checkins[0]['user'])
+
     def test_invalid_checkin(self):
         payload = {
             'note': 'Today is a good day',

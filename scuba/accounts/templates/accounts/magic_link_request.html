@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% load crispy_forms_tags static %}
+
+{% block content %}
+
+    <div class="container-fluid h-custom">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-md-8 col-lg-6 col-xl-4">
+                <h3>Email me a sign-in link</h3>
+                <p class="text-muted">Enter your email and we'll send you a link to sign in without a password.</p>
+
+                <form method="post" action="{% url 'magic_link_request' %}" id="f_magic_link_request">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+
+                    <div class="text-center text-lg-start mt-4 pt-2">
+                        <button type="submit" class="btn btn-primary btn-lg"
+                            style="padding-left: 2.5rem; padding-right: 2.5rem;">Send me a link</button>
+                        <p class="small fw-bold mt-2 pt-1 mb-0">
+                            <a href="{% url 'login' %}">Back to sign in with a password</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends 'content/emails/layout_email.html' %}
+{% load static %}
+
+    {% block shortcode %}
+    {{ short_code }}
+    {% endblock %}
+
+    {% block content %}
+        {{ content|safe }}
+    {% endblock %}

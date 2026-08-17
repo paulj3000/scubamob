@@ -56,42 +56,6 @@ class DivesiteListApi(generics.ListAPIView):
         return Response(retval)
 
 
-class DivesiteReviewListApi(generics.ListAPIView):
-    permission_classes = (AllowAny,)
-    serializer_class = DivesiteReviewSerializer
-
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_queryset(self):
-        lat = self.request.query_params.get('lat', None)
-        lng = self.request.query_params.get('long', None)
-        distance = self.request.query_params.get('distance', None)
-
-        return Divesite.get_local_diveshops(lat, lng, distance)
-
-    def get_queryset_off(self):
-        """ get_queryset
-
-        get all of categories associated to the section
-        """
-        '''
-        radius = int(us_request.GET['radius'])
-        lon = float(us_request.GET['lon'])
-        lat = float(us_request.GET['lat'])
-        '''
-
-        return Divesite.objects.all()
-
-    def list(self, request):
-        queryset = self.get_queryset()
-        retval = {
-            'diveshops': self.serializer_class(queryset, many=True).data
-        }
-
-        return Response(retval)
-
-
 class AddReviewApi(generics.GenericAPIView):
     """ Add Review API
 
@@ -194,7 +158,7 @@ class FavoriteListApi(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Divesite.objects.filter(followers__user=user)
+        return Divesite.objects.filter(followers__user=user).distinct()
 
     def list(self, request):
         queryset = self.get_queryset()

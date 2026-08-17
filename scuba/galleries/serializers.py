@@ -5,32 +5,21 @@ from scuba.settings import AWS_CLOUDFRONT
 
 
 class AlbumSerializer(serializers.ModelSerializer):
-    """ CauseSerializer
+    """ AlbumSerializer
 
-    The serializer for a program
-    Function takes in a program object and converts it to appropriate
-    json objects
+    The serializer for a gallery album. Read-only in practice today --
+    albums are created directly via Album.objects.create() in the view layer.
     """
     class Meta:
         """ define models, fields, etc """
         model = Album
         exclude = ('user', 'created', 'modified',)
 
-    @staticmethod
-    def get_url(data):
-        return f"{AWS_CLOUDFRONT}/{data.filename}"
-
-    def create(self, validated_data):
-        fileinfo = validated_data['file']
-        return Media.upload_new_media(fileinfo.name, fileinfo.content_type, fileinfo.read())
-
 
 class MediaSerializer(serializers.Serializer):
-    """ CauseSerializer
+    """ MediaSerializer
 
-    The serializer for a program
-    Function takes in a program object and converts it to appropriate
-    json objects
+    The serializer for a single uploaded piece of media
     """
     file = serializers.FileField(write_only=True)
     url = serializers.SerializerMethodField(read_only=True)
@@ -42,10 +31,17 @@ class MediaSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         fileinfo = validated_data['file']
-        return Media.upload_new_media(fileinfo.name, fileinfo.content_type, fileinfo.read())
+        user = self.context['request'].user
+        return Media.upload_new_media(user, fileinfo.name, fileinfo.content_type, fileinfo.read())
 
 
-class DailyImageSerializer(MediaSerializer):
+class DailyImageSerializer(serializers.Serializer):
+    """ DailyImageSerializer
+
+    Serializer for the AWSModel-backed DailyImage (filename/url/created),
+    not the same shape as MediaSerializer's Media model.
+    """
+    url = serializers.CharField(read_only=True)
     user = serializers.SerializerMethodField(read_only=True)
 
     @staticmethod

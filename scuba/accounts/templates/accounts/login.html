@@ -68,6 +68,7 @@ height: 100%;
               style="padding-left: 2.5rem; padding-right: 2.5rem;">Login</button>
                 <p class="small fw-bold mt-2 pt-1 mb-0">Don't have an account? <a href="{% url 'signup' %}"
                     class="link-danger">Sign Up</a></p>
+                <p class="small mt-2 pt-1 mb-0"><a href="{% url 'magic_link_request' %}">Email me a sign-in link instead</a></p>
           </div>
                     <input type="hidden" name="next" value="{{ next }}">
 

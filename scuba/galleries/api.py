@@ -1,6 +1,7 @@
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 
 from rest_framework import generics
@@ -17,6 +18,10 @@ class GetDailyPicApi(generics.GenericAPIView):
 
     def get(self, request):
         img = DailyImage.objects.filter().first()
+
+        if not img:
+            return Response({'image': None})
+
         return Response({'image': DailyImageSerializer(img).data})
 
 
@@ -45,21 +50,9 @@ class ListAlbumsApi(generics.ListAPIView):
 
 
 @login_required
-@require_http_methods(["GET"])
-def showalbum(us_request, id):
-    retval = []
-
-    for album in us_request.user.albums.all():
-        json = album.to_json()
-        retval.append(json)
-
-    return JsonResponse({'albums': retval})
-
-
-@login_required
 @require_http_methods(["POST"])
 def json_createalbum(us_request):
-    params = us_request.REQUEST
+    params = us_request.POST
 
     # convert the response to JSON
     album = Album.objects.create(
@@ -67,49 +60,30 @@ def json_createalbum(us_request):
         description=params.get('description'), )
 
     json = album.to_json()
-    json['url'] = reverse('show_album', kwargs={'album_id': album.guid})
+    json['url'] = reverse('show_album', kwargs={'album_id': album.pk_as_str})
 
     return JsonResponse(json)
 
 
 @login_required
-@require_http_methods(["GET"])
-def getalbums(us_request):
-    retval = []
-    for album in us_request.user.albums.filter():
-        json = album.to_json()
-        json['url'] = reverse('show_album', kwargs={'album_id': album.guid})
-
-        json['cover'] = album.album_image.all().first().thumbnail
-
-        img_count = album.album_image.all().count()
-        json['image_count'] = "%i %s" % (img_count, 'photo' if img_count == 1 else 'photos')
-        retval.append(json)
-
-    return JsonResponse({'albums': retval})
-
-
-@login_required
 @require_http_methods(["DELETE"])
 def json_deletealbum(us_request, album_id):
-    retval = []
-    # convert the response to JSON
-    return JsonResponse(retval)
+    album = get_object_or_404(Album, id=album_id, user=us_request.user)
+    album.delete()
+
+    return JsonResponse({'deleted': True})
 
 
 @login_required
 @require_http_methods(['GET'])
 def json_getalbumimages(us_request, album_id):
-    # PRODUCTION_GALLERY_URL
     retval = []
-    # convert the response to JSON
-    print(f"album id:  {album_id}")
-    images = AlbumImage.objects.filter(album__guid=album_id, album__user=us_request.user)
+    images = AlbumImage.objects.filter(album__id=album_id, album__user=us_request.user)
 
     for i in images:
         retval.append({'thumbnail': i.get_thumbnail(), 'image': i.get_image()})
 
-    return JsonResponse()
+    return JsonResponse({'images': retval})
 
 
 class MediaUploadApi(generics.GenericAPIView):
@@ -126,7 +100,7 @@ class MediaUploadApi(generics.GenericAPIView):
     def post(self, request):
         data = [{'file': value} for _, value in request.data.items()]
 
-        serializer = self.serializer_class(data=data, many=True)
+        serializer = self.get_serializer(data=data, many=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 

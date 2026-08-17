@@ -42,7 +42,7 @@ function deleteAlbum()
         })
         .done(function(data)  
         {
-            location.href="{% url 'gallery_home' %}";
+            location.href="{% url 'galleries_home' %}";
         });
 }
 </script>
@@ -52,7 +52,7 @@ function deleteAlbum()
     .bar {  height: 18px;  background: green;   }
 </style>
 
-<input id="fileupload" type="file" name="image" data-url="{% url 'gallery_image_upload' %}" multiple><br/>
+<input id="fileupload" type="file" name="image" data-url="{% url 'galleries_image_upload' %}" multiple><br/>
 
 <div id="album">
     <ul id="albumimages">
