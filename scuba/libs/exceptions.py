@@ -22,6 +22,16 @@ class InvalidWeatherDataException(Exception):
     """
 
 
+class InvalidCoordinatesException(InvalidWeatherDataException):
+    """ InvalidCoordinatesException
+
+    Thrown when a lat/long pair is out of range before being
+    forwarded to an external weather lookup. Subclasses
+    InvalidWeatherDataException so existing callers that only
+    catch that exception still degrade gracefully.
+    """
+
+
 class InvalidIPAddress(Exception):
     """ InvalidIPAddress
 

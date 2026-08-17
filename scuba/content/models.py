@@ -166,6 +166,7 @@ class NewsArticle(UUIDModel):
     def get_published_articles(cls, page=0, limit=10):
         """ get_published_articles
 
-        get all of the published articles
+        get the published articles, most recently modified first
         """
-        return cls.objects.filter(is_published=True).order_by('-last_modified')
+        offset = page * limit
+        return cls.objects.filter(is_published=True).order_by('-last_modified')[offset:offset + limit]

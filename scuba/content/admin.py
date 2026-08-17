@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.urls import path
 
 from scuba.content.models import (
-    FAQEntry, FAQSection, Image, Page, Article, ArticleVersion)
+    FAQEntry, FAQSection, Image, Page, Article, ArticleVersion, NewsArticle)
 from scuba.content.forms.admin import ImageForm
 
 
@@ -96,7 +96,19 @@ class ArticleAdmin(admin.ModelAdmin):
     exclude = ('url',)
 
 
+class NewsArticleAdmin(admin.ModelAdmin):
+    list_display = ('title', 'user', 'is_published', 'published_date')
+    exclude = ('url',)
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.user = request.user
+
+        super().save_model(request, obj, form, change)
+
+
 admin.site.register(Article, ArticleAdmin)
+admin.site.register(NewsArticle, NewsArticleAdmin)
 admin.site.register(Page, PageAdmin)
 admin.site.register(Image, ImageAdmin)
 admin.site.register(FAQSection)

@@ -2,11 +2,13 @@
 Integration tests for the AWS CodeBuild/CodePipeline SNS webhook endpoints.
 Both must reject any message that doesn't carry a valid AWS SNS signature.
 """
+from datetime import datetime
 from unittest.mock import Mock, patch
 
 from django.test import TestCase
 from rest_framework.test import APIClient
 
+from scuba.aws.models import SNSSubscriptionRequest
 from scuba.libs.aws.testing import generate_test_keypair_and_cert, sign_sns_payload
 
 VALID_CERT_URL = 'https://sns.us-west-2.amazonaws.com/SimpleNotificationService-abc123.pem'
@@ -72,6 +74,47 @@ class _WebhookTestBase(TestCase):
         response = self.client.post(self.endpoint, payload, format='json')
 
         self.assertEqual(response.status_code, 201)
+
+    @patch('scuba.libs.aws.sns.requests.get')
+    def test_subscription_confirmation_stores_a_real_datetime_timestamp(self, mock_get):
+        """
+        SNSSubscriptionRequestSerializer.validate_Timestamp only actually
+        runs when its name matches DRF's validate_<FieldName> convention
+        exactly -- confirms it's wired up by checking the stored value is a
+        real datetime, not the raw AWS timestamp string.
+        """
+        mock_get.return_value = self._mock_cert_response()
+        payload = sign_sns_payload(
+            self.private_key, _subscription_confirmation_payload(self.topic_suffix))
+
+        self.client.post(self.endpoint, payload, format='json')
+
+        stored = SNSSubscriptionRequest.objects.get(message_id=f'msg-{self.topic_suffix}')
+        self.assertEqual(stored.timestamp, datetime(2026, 8, 6, 0, 0, 0))
+
+    @patch('scuba.libs.aws.sns.requests.get')
+    def test_resubmitting_the_same_subscription_confirmation_is_rejected(self, mock_get):
+        """
+        validate_MessageId/validate_Signature's duplicate checks only
+        actually run when their names match DRF's validate_<FieldName>
+        convention exactly -- confirms they're wired up by checking a
+        replayed, identically-signed payload is rejected, not silently
+        accepted as a second row.
+        """
+        mock_get.return_value = self._mock_cert_response()
+        payload = sign_sns_payload(
+            self.private_key, _subscription_confirmation_payload(self.topic_suffix))
+
+        first = self.client.post(self.endpoint, payload, format='json')
+        second = self.client.post(self.endpoint, payload, format='json')
+
+        self.assertEqual(first.status_code, 201)
+        self.assertEqual(second.status_code, 400)
+        self.assertEqual(
+            SNSSubscriptionRequest.objects.filter(
+                message_id=f'msg-{self.topic_suffix}').count(),
+            1,
+        )
 
 
 class TestCodeBuildWebhook(_WebhookTestBase):

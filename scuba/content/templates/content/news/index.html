@@ -1,0 +1,22 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="cbox">
+
+    {% include 'static/header.html' with title='News' %}
+    <div class="content entry-content">
+        {% for article in articles %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a href="{% url 'news_article' url=article.url %}">{{ article.title }}</a>
+                </h5>
+                <p class="card-text text-muted">{{ article.published_date }}</p>
+            </div>
+        </div>
+        {% empty %}
+        <p>No news yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

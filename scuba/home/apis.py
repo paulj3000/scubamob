@@ -5,11 +5,13 @@ from rest_framework.response import Response
 from django.core.cache import cache
 
 from django.db.models import Q
-from scuba.home.serializers import BuddySerializer as SearchBuddySerializer
-from scuba.accounts.serializers.buddies import BuddySerializer, BuddyRecentActivity
+from scuba.home.serializers import BuddySerializer as SearchBuddySerializer, HomeFeedSerializer
+from scuba.accounts.serializers.buddies import BuddySerializer
 from scuba.accounts.models import User
+from scuba.content.models import NewsArticle
+from scuba.content.serializers import NewsArticleSerializer
 from scuba.divesites.models import Divesite
-from scuba.divesites.serializers import DivesiteSerializer
+from scuba.divesites.serializers import DivesiteCardSerializer
 from scuba.libs.weather import Weather
 from scuba.libs.exceptions import InvalidWeatherDataException
 from scuba.maps.models import Region
@@ -37,7 +39,6 @@ class SearchApi(generics.GenericAPIView):
 class GetHomescreenApi(generics.GenericAPIView):
     def get(self, request):
         user = request.user
-        buddy_recent_activity = user.get_all_buddies_recent_activity()
 
         q_param = request.query_params.get('q', 92107)
 
@@ -68,14 +69,19 @@ class GetHomescreenApi(generics.GenericAPIView):
             'buddies': {
                 'count': user.get_buddies_count(),
                 'list': BuddySerializer(user.get_all_buddies(), many=True).data,
-                'recent_activity': BuddyRecentActivity(buddy_recent_activity, many=True).data,
             },
             # 'weather': WeatherSerializer(weather, many=True).data,
             'weather': weather.pop('current'),
             'location': location,
             'divesites': {
-                'favorites': user.get_divesite_favorites(),
-                'list': DivesiteSerializer(Divesite.get_all_active_divesites(),
-                                           many=True, type='simple').data
-            }
+                'favorites': DivesiteCardSerializer(
+                    Divesite.objects.filter(id__in=user.get_divesite_favorites()),
+                    many=True).data,
+                'list': DivesiteCardSerializer(
+                    Divesite.get_all_active_divesites()[:6], many=True).data,
+            },
+            'friends_activity': HomeFeedSerializer(
+                user.get_buddies_feed(limit=10), many=True).data,
+            'news': NewsArticleSerializer(
+                NewsArticle.get_published_articles(limit=5), many=True).data,
         })

@@ -134,23 +134,23 @@ class SNSSubscriptionRequestSerializer(serializers.ModelSerializer):
         return data
 
     @staticmethod
-    def validate_signature(data):
+    def validate_Signature(data):
         if SNSSubscriptionRequest.objects.filter(signature=data):
             raise serializers.ValidationError(_(f'{data} already exists.'))
 
         return data
 
     @staticmethod
-    def validate_message_id(data):
+    def validate_MessageId(data):
         if SNSSubscriptionRequest.objects.filter(message_id=data):
             raise serializers.ValidationError(_(f'{data} already exists.'))
 
         return data
 
     @staticmethod
-    def validate_timestamp(data):
+    def validate_Timestamp(data):
         try:
-            return datetime.fromisoformat(data)
+            return datetime.strptime(data, '%Y-%m-%dT%H:%M:%S.%fZ')
         except ValueError:
             raise serializers.ValidationError(_(f'{data} is not a valid timestamp.'))
 
@@ -166,9 +166,10 @@ class SNSSubscriptionRequestSerializer(serializers.ModelSerializer):
                   'TopicArn',)
 
     def create(self, validated_data):
-        validated_data['timestamp'] = datetime.strptime(validated_data['timestamp'],
-                                                        '%Y-%m-%dT%H:%M:%S.%fZ')
-
+        # validate_Timestamp already parsed this into a real datetime --
+        # validated_data['timestamp'] used to still be the raw string here
+        # because the old (wrongly-named) validate_timestamp hook never
+        # actually ran.
         token = re.findall(r"Token=(.*)", validated_data['subscribe_url'])[0]
         validated_data['token'] = token
         return SNSSubscriptionRequest.objects.create(**validated_data)

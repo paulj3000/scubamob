@@ -3,8 +3,8 @@ Chat domain objects (docs/chat_dynamo.md Phase 0: "Define message IDs",
 "Define conversation IDs", §6 key structure, §18 idempotency).
 
 Conversation ids are Django UUID primary keys (scuba.libs.models.uuidmodel.
-UUIDModel, same convention every other ScubaMob app uses) once the Phase 1
-SQL models exist -- nothing to define here yet.
+UUIDModel, same convention every other ScubaMob app uses) -- see
+scuba.chat.models.Conversation (Phase 1). Nothing to define here for them.
 
 Message ids have no ORM to assign them, since messages live in DynamoDB
 (§15), so this module is their source of truth: application-generated,

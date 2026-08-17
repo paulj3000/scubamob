@@ -151,6 +151,46 @@ class DivesiteSerializer(serializers.ModelSerializer):
         raise NotImplementedError
 
 
+class DivesiteCardSerializer(serializers.ModelSerializer):
+    """ DivesiteCardSerializer
+
+    A lightweight divesite representation for dashboard cards. Deliberately
+    excludes DivesiteSerializer's `stats` field, which triggers a live
+    per-site weather lookup -- unsuitable when rendering several sites at
+    once (e.g. favorites/popular-sites widgets).
+    """
+    id = serializers.SerializerMethodField(read_only=True)
+    difficulty_display = serializers.SerializerMethodField(read_only=True)
+    banner = serializers.SerializerMethodField(read_only=True)
+    url = serializers.SerializerMethodField(read_only=True)
+    checkin_count = serializers.SerializerMethodField(read_only=True)
+
+    @staticmethod
+    def get_id(data):
+        return data.pk_as_str
+
+    @staticmethod
+    def get_url(data):
+        return reverse('site', kwargs={'url': data.url})
+
+    @staticmethod
+    def get_checkin_count(data):
+        return data.checkins.filter(checkin_date=date.today()).count()
+
+    @staticmethod
+    def get_banner(data):
+        return static(data.banner)
+
+    @staticmethod
+    def get_difficulty_display(data):
+        return data.get_difficulty_display()
+
+    class Meta:
+        """ define models, fields, etc """
+        model = Divesite
+        fields = ('id', 'name', 'banner', 'checkin_count', 'url', 'difficulty_display')
+
+
 class DivesiteReviewSerializer(serializers.ModelSerializer):
     """ DivesiteReviewSerializer
 
