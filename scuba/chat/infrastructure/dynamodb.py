@@ -1,15 +1,15 @@
 """
 DynamoDB access for the chat domain (docs/chat_dynamo.md §11, §53).
 
-Phase 0 scope only: a settings-driven table accessor, so the table name
-and region are never scattered through the codebase (§11: "Do not scatter
-table names throughout the code."). No message read/write logic lives
-here yet -- that's MessageRepository's boto3-backed implementation,
-Phase 2. Nothing in this module is called by anything yet, so importing
-it never triggers a real AWS call; tests mock boto3 directly rather than
-hitting DynamoDB Local (Phase 0 doesn't wire that up -- CLAUDE.md forbids
-tests depending on live external services, and chat.repositories'
-InMemoryMessageRepository fake already covers local dev/test needs).
+A settings-driven table accessor, so the table name and region are never
+scattered through the codebase (§11: "Do not scatter table names
+throughout the code."). Message read/write logic itself lives in
+scuba.chat.repositories.message_repository.DynamoDBMessageRepository
+(Phase 2), which calls get_table() rather than talking to boto3 directly.
+Importing this module never triggers a real AWS call; tests mock
+get_table()/boto3 directly rather than hitting DynamoDB Local (CLAUDE.md
+forbids tests depending on live external services, and
+InMemoryMessageRepository covers local dev/test needs in the meantime).
 """
 import os
 
