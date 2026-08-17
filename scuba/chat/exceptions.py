@@ -51,6 +51,14 @@ class NotificationNotFoundError(ChatError):
     """ No notification exists for the given (notification id, recipient) pair. """
 
 
+class AttachmentNotFoundError(ChatError):
+    """ No attachment exists for the given (conversation id, attachment id) pair. """
+
+
+class InvalidAttachmentError(ChatError):
+    """ The uploaded file fails validation (missing, too large, disallowed/undecodable type). """
+
+
 class RepositoryUnavailableError(ChatError):
     """
     The backing store for a repository (DynamoDB, Redis) could not be

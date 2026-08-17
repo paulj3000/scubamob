@@ -5,20 +5,28 @@ service-layer business logic (auth, membership, blocks, payload
 validation, authorization), not DynamoDB itself (see
 test_dynamodb_message_repository.py for that).
 """
+from io import BytesIO
+from unittest import mock
+
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import timezone
+from PIL import Image
 
 from scuba.accounts.models import User
 from scuba.chat import services
-from scuba.chat.domain import PresenceState
+from scuba.chat.domain import Attachment, AttachmentType, PresenceState, generate_attachment_id
 from scuba.chat.exceptions import (
-    BlockedUserError, ConversationNotFoundError, InsufficientRoleError,
-    InvalidMessagePayloadError, InvalidSenderError, MessageNotFoundError,
+    AttachmentNotFoundError, BlockedUserError, ConversationNotFoundError, InsufficientRoleError,
+    InvalidAttachmentError, InvalidMessagePayloadError, InvalidSenderError, MessageNotFoundError,
     NotAConversationParticipantError, NotAuthorizedToViewPresenceError, NotificationNotFoundError,
     NotMessageOwnerError,
 )
 from scuba.chat.models import (
     Conversation, ConversationParticipant, ConversationRole, ConversationType, Notification,
+)
+from scuba.chat.repositories.attachment_repository import (
+    InMemoryAttachmentRepository, InMemoryAttachmentStorage,
 )
 from scuba.chat.repositories.message_repository import InMemoryMessageRepository
 from scuba.chat.repositories.presence_repository import InMemoryPresenceRepository
@@ -28,6 +36,16 @@ from scuba.chat.repositories.typing_repository import InMemoryTypingRepository, 
 def _make_user(email, username):
     return User.objects.create_user(
         email=email, username=username, password='tester1234', first_name='Test', last_name='User')
+
+
+def _make_image_file(name='photo.png'):
+    buffer = BytesIO()
+    Image.new('RGB', (10, 10), color='red').save(buffer, format='PNG')
+    return SimpleUploadedFile(name, buffer.getvalue(), content_type='image/png')
+
+
+def _make_pdf_file(name='plan.pdf'):
+    return SimpleUploadedFile(name, b'%PDF-1.4\n%%EOF', content_type='application/pdf')
 
 
 class ChatServicesTestCase(TestCase):
@@ -683,3 +701,145 @@ class TestMarkAllNotificationsRead(ChatServicesTestCase):
         services.mark_all_notifications_read(str(self.member.id))
 
         self.assertEqual(services.get_unread_notification_count(str(self.member.id)), 0)
+
+
+class ChatAttachmentTestCase(ChatServicesTestCase):
+    def setUp(self):
+        super().setUp()
+        self.attachment_repository = InMemoryAttachmentRepository()
+        self.attachment_storage = InMemoryAttachmentStorage()
+        self.conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+        services.add_participant(
+            conversation_id=str(self.conversation.id), user_id=str(self.member.id),
+            actor_id=str(self.owner.id))
+        self.message = services.send_message(
+            conversation_id=str(self.conversation.id), sender_id=str(self.owner.id),
+            body='look at this', message_repository=self.message_repository)
+
+    def _upload(self, uploaded_file, uploader_id=None):
+        return services.upload_attachment(
+            conversation_id=str(self.conversation.id), message_id=self.message.message_id,
+            uploader_id=uploader_id or str(self.owner.id), uploaded_file=uploaded_file,
+            message_repository=self.message_repository,
+            attachment_repository=self.attachment_repository,
+            attachment_storage=self.attachment_storage)
+
+
+class TestUploadAttachment(ChatAttachmentTestCase):
+    def test_uploads_an_image_and_records_metadata(self):
+        attachment = self._upload(_make_image_file())
+
+        self.assertEqual(attachment.attachment_type, AttachmentType.IMAGE)
+        self.assertEqual(attachment.message_id, self.message.message_id)
+        self.assertEqual(attachment.conversation_id, str(self.conversation.id))
+        self.assertIn(attachment.s3_key, self.attachment_storage.objects)
+
+    def test_uploads_a_pdf_document(self):
+        attachment = self._upload(_make_pdf_file())
+
+        self.assertEqual(attachment.attachment_type, AttachmentType.DOCUMENT)
+
+    def test_rejects_a_non_participant(self):
+        with self.assertRaises(NotAConversationParticipantError):
+            self._upload(_make_image_file(), uploader_id=str(self.outsider.id))
+
+    def test_rejects_a_missing_message(self):
+        with self.assertRaises(MessageNotFoundError):
+            services.upload_attachment(
+                conversation_id=str(self.conversation.id), message_id='nope',
+                uploader_id=str(self.owner.id), uploaded_file=_make_image_file(),
+                message_repository=self.message_repository,
+                attachment_repository=self.attachment_repository,
+                attachment_storage=self.attachment_storage)
+
+    def test_rejects_a_non_author(self):
+        with self.assertRaises(NotMessageOwnerError):
+            self._upload(_make_image_file(), uploader_id=str(self.member.id))
+
+    def test_rejects_a_missing_file(self):
+        with self.assertRaises(InvalidAttachmentError):
+            self._upload(None)
+
+    def test_rejects_an_unsupported_content_type(self):
+        upload = SimpleUploadedFile('note.txt', b'hello', content_type='text/plain')
+        with self.assertRaises(InvalidAttachmentError):
+            self._upload(upload)
+
+    def test_rejects_a_file_that_is_too_large(self):
+        with mock.patch.object(services, 'MAX_ATTACHMENT_SIZE', 1):
+            with self.assertRaises(InvalidAttachmentError):
+                self._upload(_make_image_file())
+
+    def test_rejects_undecodable_image_bytes(self):
+        upload = SimpleUploadedFile('fake.png', b'not-really-a-png', content_type='image/png')
+        with self.assertRaises(InvalidAttachmentError):
+            self._upload(upload)
+
+    def test_rejects_undecodable_pdf_bytes(self):
+        upload = SimpleUploadedFile('fake.pdf', b'not-really-a-pdf', content_type='application/pdf')
+        with self.assertRaises(InvalidAttachmentError):
+            self._upload(upload)
+
+
+class TestListAttachments(ChatAttachmentTestCase):
+    def setUp(self):
+        super().setUp()
+        self._upload(_make_image_file())
+
+    def test_lists_attachments_for_a_participant(self):
+        attachments = services.list_attachments(
+            conversation_id=str(self.conversation.id), message_id=self.message.message_id,
+            user_id=str(self.owner.id), attachment_repository=self.attachment_repository)
+
+        self.assertEqual(len(attachments), 1)
+
+    def test_rejects_a_non_participant(self):
+        with self.assertRaises(NotAConversationParticipantError):
+            services.list_attachments(
+                conversation_id=str(self.conversation.id), message_id=self.message.message_id,
+                user_id=str(self.outsider.id), attachment_repository=self.attachment_repository)
+
+
+class TestGetAttachment(ChatAttachmentTestCase):
+    def setUp(self):
+        super().setUp()
+        self.attachment = self._upload(_make_image_file())
+
+    def test_returns_the_attachment_for_a_participant(self):
+        found = services.get_attachment(
+            conversation_id=str(self.conversation.id), attachment_id=self.attachment.attachment_id,
+            user_id=str(self.owner.id), attachment_repository=self.attachment_repository)
+
+        self.assertEqual(found.attachment_id, self.attachment.attachment_id)
+
+    def test_rejects_a_non_participant(self):
+        with self.assertRaises(NotAConversationParticipantError):
+            services.get_attachment(
+                conversation_id=str(self.conversation.id), attachment_id=self.attachment.attachment_id,
+                user_id=str(self.outsider.id), attachment_repository=self.attachment_repository)
+
+    def test_raises_for_a_missing_attachment(self):
+        with self.assertRaises(AttachmentNotFoundError):
+            services.get_attachment(
+                conversation_id=str(self.conversation.id), attachment_id='nope',
+                user_id=str(self.owner.id), attachment_repository=self.attachment_repository)
+
+
+class TestGetAttachmentDownloadUrl(ChatServicesTestCase):
+    def test_returns_a_url_from_the_given_storage(self):
+        attachment_storage = InMemoryAttachmentStorage()
+        attachment = Attachment(
+            attachment_id=generate_attachment_id(),
+            conversation_id='conv1',
+            message_id='msg1',
+            attachment_type=AttachmentType.IMAGE,
+            s3_key='chat/conv1/msg1/att1.jpg',
+            content_type='image/jpeg',
+            size=1024,
+            created_at=timezone.now(),
+        )
+
+        url = services.get_attachment_download_url(attachment, attachment_storage=attachment_storage)
+
+        self.assertIn(attachment.s3_key, url)

@@ -77,6 +77,27 @@ class ArchiveConversationSerializer(serializers.Serializer):
     archived = serializers.BooleanField(default=True)
 
 
+class AttachmentSerializer(serializers.Serializer):
+    """
+    Represents scuba.chat.domain.Attachment -- not a Django model.
+    's3_key' is deliberately not exposed; 'download_url' is a freshly
+    signed URL resolved by the view via chat.services.get_attachment_download_url
+    and passed in through context (§30), not a model field.
+    """
+    attachment_id = serializers.CharField()
+    conversation_id = serializers.CharField()
+    message_id = serializers.CharField()
+    attachment_type = serializers.CharField()
+    content_type = serializers.CharField()
+    size = serializers.IntegerField()
+    original_filename = serializers.CharField(allow_null=True)
+    created_at = serializers.DateTimeField()
+    download_url = serializers.SerializerMethodField()
+
+    def get_download_url(self, attachment) -> str:
+        return self.context.get('download_url')
+
+
 class NotificationSerializer(serializers.ModelSerializer):
     """ Phase 10, §29: an in-app notification. """
 

@@ -5,19 +5,30 @@ also mock DynamoDB via moto (real query/put calls through the views'
 default DynamoDBMessageRepository, no live AWS).
 """
 import uuid
+from io import BytesIO
 from unittest import mock
 
 import boto3
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import timezone
 from moto import mock_aws
+from PIL import Image
 from rest_framework.test import APIClient
 
 from scuba.accounts.models import User
 from scuba.chat import services
 from scuba.chat.models import Conversation, ConversationType, Notification
+from scuba.chat.repositories.attachment_repository import ATTACHMENT_ID_INDEX
+from scuba.chat.repositories.message_repository import MESSAGE_ID_INDEX
 from scuba.chat.repositories.presence_repository import InMemoryPresenceRepository
-from scuba.settings import CHAT_DYNAMODB_REGION, CHAT_DYNAMODB_TABLE
+from scuba.settings import CHAT_ATTACHMENT_BUCKET, CHAT_DYNAMODB_REGION, CHAT_DYNAMODB_TABLE
+
+
+def _make_image_upload(name='photo.png'):
+    buffer = BytesIO()
+    Image.new('RGB', (10, 10), color='blue').save(buffer, format='PNG')
+    return SimpleUploadedFile(name, buffer.getvalue(), content_type='image/png')
 
 
 def _make_user(email, username):
@@ -501,3 +512,152 @@ class TestNotificationReadAllApi(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(services.get_unread_notification_count(str(self.owner.id)), 0)
+
+
+class ChatAttachmentApiTestCase(TestCase):
+    """
+    Phase 11, §30: real DynamoDB + S3 calls via moto, no live AWS.
+    Subclasses must apply @mock_aws themselves -- moto's class decorator
+    only wraps methods defined directly on the decorated class, so
+    decorating this shared base would leave subclasses' own test_* methods
+    unmocked (they'd hit real AWS through the developer's local profile).
+    """
+
+    def setUp(self):
+        env_patcher = mock.patch.dict(
+            'os.environ', {'AWS_ACCESS_KEY_ID': 'testing', 'AWS_SECRET_ACCESS_KEY': 'testing'})
+        env_patcher.start()
+        self.addCleanup(env_patcher.stop)
+
+        dynamo_client = boto3.client('dynamodb', region_name=CHAT_DYNAMODB_REGION)
+        dynamo_client.create_table(
+            TableName=CHAT_DYNAMODB_TABLE,
+            KeySchema=[
+                {'AttributeName': 'PK', 'KeyType': 'HASH'},
+                {'AttributeName': 'SK', 'KeyType': 'RANGE'},
+            ],
+            AttributeDefinitions=[
+                {'AttributeName': 'PK', 'AttributeType': 'S'},
+                {'AttributeName': 'SK', 'AttributeType': 'S'},
+                {'AttributeName': 'message_id', 'AttributeType': 'S'},
+                {'AttributeName': 'attachment_id', 'AttributeType': 'S'},
+            ],
+            GlobalSecondaryIndexes=[
+                {
+                    'IndexName': MESSAGE_ID_INDEX,
+                    'KeySchema': [{'AttributeName': 'message_id', 'KeyType': 'HASH'}],
+                    'Projection': {'ProjectionType': 'ALL'},
+                },
+                {
+                    'IndexName': ATTACHMENT_ID_INDEX,
+                    'KeySchema': [{'AttributeName': 'attachment_id', 'KeyType': 'HASH'}],
+                    'Projection': {'ProjectionType': 'ALL'},
+                },
+            ],
+            BillingMode='PAY_PER_REQUEST',
+        )
+        boto3.client('s3', region_name='us-east-1').create_bucket(Bucket=CHAT_ATTACHMENT_BUCKET)
+
+        self.owner = _make_user('attachowner@nowhere.com', 'apiattachowner')
+        self.outsider = _make_user('attachoutsider@nowhere.com', 'apiattachoutsider')
+        self.conversation = services.create_conversation(
+            conversation_type=ConversationType.GROUP, created_by=str(self.owner.id))
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.owner)
+
+        message_response = self.client.post(
+            f'/api/chat/conversations/{self.conversation.id}/messages/',
+            {'body': 'check this out'}, format='json')
+        self.message_id = message_response.json()['message']['message_id']
+
+
+@mock_aws
+class TestMessageAttachmentsApi(ChatAttachmentApiTestCase):
+    def setUp(self):
+        # moto's @mock_aws class decorator only wraps methods present in
+        # this class's own __dict__ -- an inherited setUp (no override
+        # here) would run unmocked. See ChatAttachmentApiTestCase's
+        # docstring.
+        super().setUp()
+
+    def test_post_uploads_an_attachment(self):
+        response = self.client.post(
+            f'/api/chat/conversations/{self.conversation.id}/messages/{self.message_id}/attachments/',
+            {'file': _make_image_upload()}, format='multipart')
+
+        self.assertEqual(response.status_code, 201)
+        attachment = response.json()['attachment']
+        self.assertEqual(attachment['attachment_type'], 'IMAGE')
+        self.assertEqual(attachment['message_id'], self.message_id)
+        self.assertTrue(attachment['download_url'])
+
+    def test_post_rejects_a_non_participant(self):
+        client = APIClient()
+        client.force_authenticate(user=self.outsider)
+
+        response = client.post(
+            f'/api/chat/conversations/{self.conversation.id}/messages/{self.message_id}/attachments/',
+            {'file': _make_image_upload()}, format='multipart')
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_post_rejects_an_unsupported_file_type(self):
+        upload = SimpleUploadedFile('note.txt', b'hello', content_type='text/plain')
+
+        response = self.client.post(
+            f'/api/chat/conversations/{self.conversation.id}/messages/{self.message_id}/attachments/',
+            {'file': upload}, format='multipart')
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_lists_uploaded_attachments(self):
+        self.client.post(
+            f'/api/chat/conversations/{self.conversation.id}/messages/{self.message_id}/attachments/',
+            {'file': _make_image_upload()}, format='multipart')
+
+        response = self.client.get(
+            f'/api/chat/conversations/{self.conversation.id}/messages/{self.message_id}/attachments/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()['results']), 1)
+
+    def test_get_rejects_a_non_participant(self):
+        client = APIClient()
+        client.force_authenticate(user=self.outsider)
+
+        response = client.get(
+            f'/api/chat/conversations/{self.conversation.id}/messages/{self.message_id}/attachments/')
+
+        self.assertEqual(response.status_code, 403)
+
+
+@mock_aws
+class TestAttachmentDetailApi(ChatAttachmentApiTestCase):
+    def setUp(self):
+        super().setUp()
+        upload_response = self.client.post(
+            f'/api/chat/conversations/{self.conversation.id}/messages/{self.message_id}/attachments/',
+            {'file': _make_image_upload()}, format='multipart')
+        self.attachment_id = upload_response.json()['attachment']['attachment_id']
+
+    def test_get_returns_the_attachment_with_a_download_url(self):
+        response = self.client.get(
+            f'/api/chat/conversations/{self.conversation.id}/attachments/{self.attachment_id}/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['attachment']['download_url'])
+
+    def test_get_rejects_a_non_participant(self):
+        client = APIClient()
+        client.force_authenticate(user=self.outsider)
+
+        response = client.get(
+            f'/api/chat/conversations/{self.conversation.id}/attachments/{self.attachment_id}/')
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_get_returns_404_for_a_missing_attachment(self):
+        response = self.client.get(
+            f'/api/chat/conversations/{self.conversation.id}/attachments/{uuid.uuid4().hex}/')
+
+        self.assertEqual(response.status_code, 404)

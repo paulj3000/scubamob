@@ -13,16 +13,24 @@ from typing import Optional
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.utils import timezone
+from PIL import Image, UnidentifiedImageError
 
 from scuba.accounts.models import User
-from scuba.chat.domain import Message, MessageType, generate_message_id, user_channel_group_name
+from scuba.chat.domain import (
+    Attachment, AttachmentType, Message, MessageType, generate_attachment_id, generate_message_id,
+    user_channel_group_name,
+)
 from scuba.chat.events import ChatEvent, MessageEventType
 from scuba.chat.exceptions import (
-    BlockedUserError, ConversationNotFoundError, InsufficientRoleError, InvalidMessagePayloadError,
-    InvalidSenderError, MessageNotFoundError, NotAConversationParticipantError,
-    NotAuthorizedToViewPresenceError, NotificationNotFoundError, NotMessageOwnerError,
+    AttachmentNotFoundError, BlockedUserError, ConversationNotFoundError, InsufficientRoleError,
+    InvalidAttachmentError, InvalidMessagePayloadError, InvalidSenderError, MessageNotFoundError,
+    NotAConversationParticipantError, NotAuthorizedToViewPresenceError, NotificationNotFoundError,
+    NotMessageOwnerError,
 )
 from scuba.chat.models import ConversationRole, ConversationType
+from scuba.chat.repositories.attachment_repository import (
+    AttachmentRepository, AttachmentStorage, DynamoDBAttachmentRepository, S3AttachmentStorage,
+)
 from scuba.chat.repositories.conversation_repository import (
     ConversationRepository, DjangoConversationRepository,
 )
@@ -37,6 +45,18 @@ from scuba.chat.repositories.presence_repository import PresenceRepository, Redi
 from scuba.chat.repositories.typing_repository import RedisTypingRepository, TypingRepository
 
 _ADMIN_ROLES = (ConversationRole.ADMIN, ConversationRole.OWNER)
+
+# §30: content type -> (AttachmentType, file extension). Anything not
+# listed is rejected outright -- the client-declared content type is
+# never trusted beyond this allow-list lookup (same rule as
+# accounts.services.profile_image.PROFILE_IMAGE_FORMATS).
+_ATTACHMENT_CONTENT_TYPES = {
+    'image/jpeg': (AttachmentType.IMAGE, 'jpg'),
+    'image/png': (AttachmentType.IMAGE, 'png'),
+    'image/webp': (AttachmentType.IMAGE, 'webp'),
+    'application/pdf': (AttachmentType.DOCUMENT, 'pdf'),
+}
+MAX_ATTACHMENT_SIZE = 20 * 1024 * 1024  # 20MB
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +83,14 @@ def _default_presence_repository() -> PresenceRepository:
 
 def _default_notification_repository() -> NotificationRepository:
     return DjangoNotificationRepository()
+
+
+def _default_attachment_repository() -> AttachmentRepository:
+    return DynamoDBAttachmentRepository()
+
+
+def _default_attachment_storage() -> AttachmentStorage:
+    return S3AttachmentStorage()
 
 
 def _get_conversation_or_raise(conversation_repository, conversation_id):
@@ -98,6 +126,41 @@ def _validate_message_payload(body: str, message_type: str) -> None:
         raise InvalidMessagePayloadError("message body must not be empty")
     if message_type not in MessageType.ALL:
         raise InvalidMessagePayloadError(f"unknown message_type {message_type!r}")
+
+
+def _validate_attachment_upload(uploaded_file) -> str:
+    """
+    §30, SECURITY.md "Upload Safety": validate content type, size, and
+    that the bytes genuinely are what they claim to be, before anything
+    touches S3. Mirrors accounts.services.profile_image.validate_profile_image.
+    Returns the resolved AttachmentType.
+    """
+    if uploaded_file is None:
+        raise InvalidAttachmentError("no file was uploaded")
+
+    content_type = getattr(uploaded_file, 'content_type', None)
+    resolved = _ATTACHMENT_CONTENT_TYPES.get(content_type)
+    if resolved is None:
+        raise InvalidAttachmentError(f"unsupported attachment content type {content_type!r}")
+    attachment_type, _extension = resolved
+
+    if uploaded_file.size > MAX_ATTACHMENT_SIZE:
+        raise InvalidAttachmentError("attachment is too large")
+
+    uploaded_file.seek(0)
+    try:
+        if attachment_type == AttachmentType.IMAGE:
+            try:
+                Image.open(uploaded_file).verify()
+            except (UnidentifiedImageError, OSError):
+                raise InvalidAttachmentError("file is not a valid image")
+        else:
+            if uploaded_file.read(5) != b'%PDF-':
+                raise InvalidAttachmentError("file is not a valid PDF")
+    finally:
+        uploaded_file.seek(0)
+
+    return attachment_type
 
 
 def _check_direct_conversation_blocks(conversation, participant_repository, sender_id) -> None:
@@ -568,3 +631,86 @@ def mute_conversation(
     participant_repository = participant_repository or _default_participant_repository()
     _require_participant(participant_repository, conversation_id, user_id)
     participant_repository.set_muted(conversation_id, user_id, muted)
+
+
+def upload_attachment(
+    *, conversation_id: str, message_id: str, uploader_id: str, uploaded_file,
+    message_repository: Optional[MessageRepository] = None,
+    participant_repository: Optional[ParticipantRepository] = None,
+    attachment_repository: Optional[AttachmentRepository] = None,
+    attachment_storage: Optional[AttachmentStorage] = None,
+) -> Attachment:
+    """
+    Attaches an uploaded file to an existing message (§30: "An attachment
+    should be represented separately from the Message record."). Only the
+    message's own sender may attach files to it -- same ownership rule as
+    edit_message. Validates first, uploads the bytes to S3 second, and
+    only then records the metadata (§5: DynamoDB holds only the reference).
+    """
+    message_repository = message_repository or _default_message_repository()
+    participant_repository = participant_repository or _default_participant_repository()
+    attachment_repository = attachment_repository or _default_attachment_repository()
+    attachment_storage = attachment_storage or _default_attachment_storage()
+
+    _require_participant(participant_repository, conversation_id, uploader_id)
+
+    message = message_repository.get_message(conversation_id, message_id)
+    if message is None:
+        raise MessageNotFoundError(f"no message {message_id} in conversation {conversation_id}")
+    if str(message.sender_id) != str(uploader_id):
+        raise NotMessageOwnerError(f"user {uploader_id} did not author message {message_id}")
+
+    attachment_type = _validate_attachment_upload(uploaded_file)
+    _, extension = _ATTACHMENT_CONTENT_TYPES[uploaded_file.content_type]
+
+    attachment_id = generate_attachment_id()
+    s3_key = f"chat/{conversation_id}/{message_id}/{attachment_id}.{extension}"
+    attachment_storage.upload(s3_key, uploaded_file, content_type=uploaded_file.content_type)
+
+    attachment = Attachment(
+        attachment_id=attachment_id,
+        conversation_id=conversation_id,
+        message_id=message_id,
+        attachment_type=attachment_type,
+        s3_key=s3_key,
+        content_type=uploaded_file.content_type,
+        size=uploaded_file.size,
+        created_at=timezone.now(),
+        original_filename=getattr(uploaded_file, 'name', None),
+    )
+    return attachment_repository.create_attachment(attachment)
+
+
+def list_attachments(
+    *, conversation_id: str, message_id: str, user_id: str,
+    participant_repository: Optional[ParticipantRepository] = None,
+    attachment_repository: Optional[AttachmentRepository] = None,
+) -> list[Attachment]:
+    participant_repository = participant_repository or _default_participant_repository()
+    attachment_repository = attachment_repository or _default_attachment_repository()
+
+    _require_participant(participant_repository, conversation_id, user_id)
+    return attachment_repository.list_attachments_for_message(conversation_id, message_id)
+
+
+def get_attachment(
+    *, conversation_id: str, attachment_id: str, user_id: str,
+    participant_repository: Optional[ParticipantRepository] = None,
+    attachment_repository: Optional[AttachmentRepository] = None,
+) -> Attachment:
+    participant_repository = participant_repository or _default_participant_repository()
+    attachment_repository = attachment_repository or _default_attachment_repository()
+
+    _require_participant(participant_repository, conversation_id, user_id)
+    attachment = attachment_repository.get_attachment(conversation_id, attachment_id)
+    if attachment is None:
+        raise AttachmentNotFoundError(f"no attachment {attachment_id} in conversation {conversation_id}")
+    return attachment
+
+
+def get_attachment_download_url(
+    attachment: Attachment, *, attachment_storage: Optional[AttachmentStorage] = None,
+) -> str:
+    """ A freshly-minted, time-limited signed URL (§30) -- never persisted. """
+    attachment_storage = attachment_storage or _default_attachment_storage()
+    return attachment_storage.get_download_url(attachment.s3_key)

@@ -6,21 +6,22 @@ Views only ever call into chat.services -- never a repository directly
 (§19), since real-time delivery is entirely separate (Phase 6).
 """
 from rest_framework import status
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from scuba.chat import services
 from scuba.chat.exceptions import (
-    BlockedUserError, ChatError, ConversationNotFoundError, InsufficientRoleError,
-    InvalidMessagePayloadError, InvalidSenderError, MessageNotFoundError,
-    NotAConversationParticipantError, NotAuthorizedToViewPresenceError, NotificationNotFoundError,
-    NotMessageOwnerError, RepositoryUnavailableError,
+    AttachmentNotFoundError, BlockedUserError, ChatError, ConversationNotFoundError,
+    InsufficientRoleError, InvalidAttachmentError, InvalidMessagePayloadError, InvalidSenderError,
+    MessageNotFoundError, NotAConversationParticipantError, NotAuthorizedToViewPresenceError,
+    NotificationNotFoundError, NotMessageOwnerError, RepositoryUnavailableError,
 )
 from scuba.chat.serializers import (
-    ArchiveConversationSerializer, ConversationSerializer, CreateConversationSerializer,
-    MarkReadSerializer, MessageSerializer, MuteConversationSerializer, NotificationSerializer,
-    SendMessageSerializer, UpdateConversationSerializer,
+    ArchiveConversationSerializer, AttachmentSerializer, ConversationSerializer,
+    CreateConversationSerializer, MarkReadSerializer, MessageSerializer, MuteConversationSerializer,
+    NotificationSerializer, SendMessageSerializer, UpdateConversationSerializer,
 )
 
 _MAX_MESSAGE_PAGE_SIZE = 200
@@ -34,8 +35,10 @@ _ERROR_STATUS = {
     BlockedUserError: status.HTTP_403_FORBIDDEN,
     NotAuthorizedToViewPresenceError: status.HTTP_403_FORBIDDEN,
     NotificationNotFoundError: status.HTTP_404_NOT_FOUND,
+    AttachmentNotFoundError: status.HTTP_404_NOT_FOUND,
     InvalidSenderError: status.HTTP_400_BAD_REQUEST,
     InvalidMessagePayloadError: status.HTTP_400_BAD_REQUEST,
+    InvalidAttachmentError: status.HTTP_400_BAD_REQUEST,
     RepositoryUnavailableError: status.HTTP_503_SERVICE_UNAVAILABLE,
 }
 
@@ -285,3 +288,50 @@ class NotificationReadAllApi(APIView):
     def post(self, request):
         services.mark_all_notifications_read(str(request.user.id))
         return Response({'status': 'ok'})
+
+
+def _serialize_attachment(attachment) -> dict:
+    download_url = services.get_attachment_download_url(attachment)
+    return AttachmentSerializer(attachment, context={'download_url': download_url}).data
+
+
+class MessageAttachmentsApi(APIView):
+    """ Phase 11, §30: upload/list the attachments of a single message. """
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser]
+
+    def get(self, request, conversation_id, message_id):
+        try:
+            attachments = services.list_attachments(
+                conversation_id=conversation_id, message_id=message_id,
+                user_id=str(request.user.id))
+        except ChatError as error:
+            return _error_response(error)
+
+        return Response({'results': [_serialize_attachment(a) for a in attachments]})
+
+    def post(self, request, conversation_id, message_id):
+        try:
+            attachment = services.upload_attachment(
+                conversation_id=conversation_id, message_id=message_id,
+                uploader_id=str(request.user.id), uploaded_file=request.FILES.get('file'))
+        except ChatError as error:
+            return _error_response(error)
+
+        return Response(
+            {'attachment': _serialize_attachment(attachment)}, status=status.HTTP_201_CREATED)
+
+
+class AttachmentDetailApi(APIView):
+    """ Phase 11, §30: a single attachment with a freshly-signed download URL. """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, conversation_id, attachment_id):
+        try:
+            attachment = services.get_attachment(
+                conversation_id=conversation_id, attachment_id=attachment_id,
+                user_id=str(request.user.id))
+        except ChatError as error:
+            return _error_response(error)
+
+        return Response({'attachment': _serialize_attachment(attachment)})

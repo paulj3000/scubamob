@@ -3,6 +3,7 @@ from django.urls import re_path
 import scuba.chat.apis as chat_apis
 
 _UUID = r'[0-9A-Fa-f-]{32,36}'
+_HEX_ID = r'[0-9A-Fa-f]{32}'
 
 urlpatterns = [
     re_path(r'^conversations/$', chat_apis.ConversationListApi.as_view()),
@@ -10,6 +11,12 @@ urlpatterns = [
     re_path(
         rf'^conversations/(?P<conversation_id>{_UUID})/messages/$',
         chat_apis.ConversationMessagesApi.as_view()),
+    re_path(
+        rf'^conversations/(?P<conversation_id>{_UUID})/messages/(?P<message_id>{_HEX_ID})/attachments/$',
+        chat_apis.MessageAttachmentsApi.as_view()),
+    re_path(
+        rf'^conversations/(?P<conversation_id>{_UUID})/attachments/(?P<attachment_id>{_HEX_ID})/$',
+        chat_apis.AttachmentDetailApi.as_view()),
     re_path(
         rf'^conversations/(?P<conversation_id>{_UUID})/read/$', chat_apis.ConversationReadApi.as_view()),
     re_path(

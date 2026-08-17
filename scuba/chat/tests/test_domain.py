@@ -3,8 +3,8 @@ from datetime import datetime, timezone as dt_timezone
 from django.test import SimpleTestCase
 
 from scuba.chat.domain import (
-    Message, MessageType, conversation_partition_key,
-    generate_message_id, message_sort_key, user_channel_group_name,
+    Attachment, AttachmentType, Message, MessageType, attachment_sort_key, conversation_partition_key,
+    generate_attachment_id, generate_message_id, message_sort_key, user_channel_group_name,
 )
 
 
@@ -17,6 +17,11 @@ class TestMessageTypeAll(SimpleTestCase):
         })
 
 
+class TestAttachmentTypeAll(SimpleTestCase):
+    def test_contains_every_declared_attachment_type(self):
+        self.assertEqual(set(AttachmentType.ALL), {AttachmentType.IMAGE, AttachmentType.DOCUMENT})
+
+
 class TestGenerateMessageId(SimpleTestCase):
     def test_returns_a_32_character_hex_string(self):
         message_id = generate_message_id()
@@ -25,6 +30,16 @@ class TestGenerateMessageId(SimpleTestCase):
 
     def test_generates_unique_ids(self):
         self.assertNotEqual(generate_message_id(), generate_message_id())
+
+
+class TestGenerateAttachmentId(SimpleTestCase):
+    def test_returns_a_32_character_hex_string(self):
+        attachment_id = generate_attachment_id()
+        self.assertEqual(len(attachment_id), 32)
+        int(attachment_id, 16)  # raises ValueError if it isn't hex
+
+    def test_generates_unique_ids(self):
+        self.assertNotEqual(generate_attachment_id(), generate_attachment_id())
 
 
 class TestKeyBuilders(SimpleTestCase):
@@ -49,6 +64,11 @@ class TestKeyBuilders(SimpleTestCase):
 
         self.assertNotEqual(key_one, key_two)
 
+    def test_attachment_sort_key_includes_message_and_attachment_id(self):
+        key = attachment_sort_key('msg1', 'att1')
+
+        self.assertEqual(key, 'ATTACHMENT#msg1#att1')
+
 
 class TestMessageDataclass(SimpleTestCase):
     def test_optional_fields_default_to_none(self):
@@ -67,3 +87,19 @@ class TestMessageDataclass(SimpleTestCase):
         self.assertIsNone(message.reply_to_message_id)
         self.assertIsNone(message.entity_type)
         self.assertIsNone(message.entity_id)
+
+
+class TestAttachmentDataclass(SimpleTestCase):
+    def test_original_filename_defaults_to_none(self):
+        attachment = Attachment(
+            attachment_id='att1',
+            conversation_id='conv1',
+            message_id='msg1',
+            attachment_type=AttachmentType.IMAGE,
+            s3_key='chat/conv1/msg1/att1.jpg',
+            content_type='image/jpeg',
+            size=1024,
+            created_at=datetime(2026, 8, 11, tzinfo=dt_timezone.utc),
+        )
+
+        self.assertIsNone(attachment.original_filename)
